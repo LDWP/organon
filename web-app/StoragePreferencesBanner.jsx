@@ -45,7 +45,7 @@ export function PreferencesBanner({ onAccept, onRefuse }) {
     <div className="storage-banner" role="dialog" aria-label="Préférences de stockage local">
       <p>
         Ce site peut mémoriser vos préférences (thème jour/nuit, et de futures fonctions de
-        recherche) dans le stockage local de votre navigateur, pour 90 jours maximum. Aucune
+        recherche) dans le stockage local de votre navigateur, pour 365 jours maximum. Aucune
         donnée n'est envoyée à un tiers ni à Organon.
       </p>
       <div className="storage-actions">
