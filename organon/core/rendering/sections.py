@@ -129,14 +129,11 @@ def render_taxobox(struct: Struct, options: GenerateOptions, ebauche: list[str])
     resu += "\n"
 
     eteint = " | éteint=oui" if struct.taxon.eteint else ""
-    auteur = struct.taxon.auteur_resolu if struct.taxon.auteur_resolu is not None else format_auteur(
-        struct.taxon.auteur
+    auteur = (
+        struct.taxon.auteur_resolu
+        if struct.taxon.auteur_resolu is not None
+        else format_auteur(struct.taxon.auteur)
     )
-    # Citation d'auteur terminée par un point, convention habituelle de la ligne {{Taxobox
-    # taxon}} sur Wikipédia — jamais un second point si la chaîne en porte déjà un (rare, mais
-    # possible avec certaines abréviations).
-    if auteur and not auteur.endswith("."):
-        auteur += "."
     resu += f"{{{{Taxobox taxon | {regne} | {rang} | {taxon} | {auteur}{eteint} }}}}\n"
 
     uicn = struct.liens.get("uicn")
