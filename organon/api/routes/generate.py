@@ -142,26 +142,25 @@ class EnrichmentRunner:
         self._off = off
         self._options = options
 
-    async def collect_one_module(self, module_id: str):
+    async def collect_one_module(self, module_id: str) -> tuple[str,Struct | None]:
         if module_id == self._classification_id or module_id in self._off:
-            return None
+            return module_id, None
         module = get_module(module_id)
         if module is None:
-            return None
+            return module_id, None
         updated = await _collect_with_timeout(
             module, self.struct, is_classification=False, options=self._options
         )
-        return updated
+        return module_id, updated
 
     async def run(self) -> AsyncIterator[ModuleRunEvent]:
         tasks = []
-        async with asyncio.TaskGroup() as tg:
-            for module_id in self._applicable:
-                task = tg.create_task(self.collect_one_module(module_id))
-                tasks.append(task)
-                yield ModuleRunEvent(module_id, "running")
-        for task in tasks:
-            updated = task.result()
+        for module_id in self._applicable:
+            task = asyncio.create_task(self.collect_one_module(module_id), name=module_id)
+            tasks.append(task)
+            yield ModuleRunEvent(module_id, "running")
+        for task in asyncio.as_completed(tasks):
+            module_id, updated = await task
             try:
                 if updated is not None:
                     self.struct = updated
