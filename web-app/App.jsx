@@ -100,9 +100,8 @@ function flattenDisambiguationTree(nodes, depth = 0, out = []) {
 const AUTHOR_NAME = "Auteurs et crédits";
 const LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html";
 const BUG_REPORT_URL = "https://fr.wikipedia.org/wiki/Discussion_Wikipédia/Organon";
-// TODO: dépôt pas encore publié — renseigner une fois l'emplacement canonique choisi.
-const REPO_URL = null;
-const DOCS_URL = null;
+const REPO_URL = "https://github.com/LDWP/organon";
+const DOCS_URL = "https://github.com/LDWP/organon/blob/master/README.md";
 
 function getInitialTheme() {
   if (getStorageConsent() === "accepted") {
@@ -1281,17 +1280,9 @@ export default function App() {
               {AUTHOR_NAME}
             </button>{" "}
             · <a href={LICENSE_URL} target="_blank" rel="noreferrer">GPL-3.0-or-later</a> ·{" "}
-            {REPO_URL ? (
-              <a href={REPO_URL} target="_blank" rel="noreferrer">code source</a>
-            ) : (
-              <span title="Dépôt pas encore publié">code source (à publier)</span>
-            )}{" "}
+            <a href={REPO_URL} target="_blank" rel="noreferrer">code source</a>{" "}
             ·{" "}
-            {DOCS_URL ? (
-              <a href={DOCS_URL} target="_blank" rel="noreferrer">documentation</a>
-            ) : (
-              <span title="Documentation liée au dépôt, pas encore publiée">documentation (à publier)</span>
-            )}{" "}
+            <a href={DOCS_URL} target="_blank" rel="noreferrer">documentation</a>{" "}
             ·{" "}
             <a href={BUG_REPORT_URL} target="_blank" rel="noreferrer">signaler un bug</a>
           </p>
