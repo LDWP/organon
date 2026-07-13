@@ -160,8 +160,8 @@ class EnrichmentRunner:
             tasks.append(task)
             yield ModuleRunEvent(module_id, "running")
         for task in asyncio.as_completed(tasks):
-            module_id, updated = await task
             try:
+                module_id, updated = await task
                 if updated is not None:
                     self.struct = updated
                     self.ran_modules.append(module_id)
