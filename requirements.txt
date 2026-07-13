@@ -1,0 +1,15 @@
+# Dépendances de production, dédiées au déploiement Toolforge (build service). Le buildpack
+# Python de Toolforge détecte requirements.txt/poetry.lock/uv.lock, pas pyproject.toml seul.
+# Miroir des dépendances directes de [project.dependencies] dans pyproject.toml (source de
+# vérité) : à maintenir en synchronisation manuelle à chaque modification de pyproject.toml.
+# N'inclut pas [project.optional-dependencies].dev (pytest, ruff, mypy, respx) — inutile en prod.
+fastapi==0.139.0
+uvicorn[standard]==0.51.0
+pydantic==2.13.4
+pydantic-settings==2.14.2
+httpx==0.28.1
+PyYAML==6.0.3
+typer==0.26.8
+python-multipart==0.0.32
+authlib==1.7.2
+itsdangerous==2.2.0

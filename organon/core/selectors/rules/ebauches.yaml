@@ -1,0 +1,22 @@
+# Généré depuis selecteurs/ebauches.lst par scripts/migrate_selectors.py.
+# Ne pas éditer à la main sans mettre à jour le fichier source ci-dessus, ou
+# créer un ebauches.local.yaml pour des règles spécifiques (voir README).
+
+- when:
+    field: rangs.embranchement
+    eq: Cnidaria
+  return:
+  - cnidaire
+- when:
+    any_of:
+    - field: rangs.infra-ordre
+      eq: Gekkota
+    - field: rangs.famille
+      eq: Gekkonidae
+  return:
+  - gecko
+- when:
+    field: rangs.ordre
+    eq: Testudines
+  return:
+  - tortue

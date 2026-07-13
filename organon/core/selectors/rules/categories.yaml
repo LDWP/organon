@@ -1,0 +1,33 @@
+# Généré depuis selecteurs/categories.lst par scripts/migrate_selectors.py.
+# Ne pas éditer à la main sans mettre à jour le fichier source ci-dessus, ou
+# créer un categories.local.yaml pour des règles spécifiques (voir README).
+
+- when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Cnidaria
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce de cnidaires (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Cnidaria
+    - field: rang
+      eq: genre
+  return:
+  - Genre de cnidaires (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Cnidaria
+    - field: rang
+      eq: famille
+  return:
+  - Famille de cnidaires (nom scientifique)
+- when:
+    field: rangs.genre
+    eq: Uroplatus
+  return:
+  - Faune endémique de Madagascar

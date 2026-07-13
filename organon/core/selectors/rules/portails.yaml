@@ -1,0 +1,113 @@
+# Généré depuis selecteurs/portails.lst par scripts/migrate_selectors.py.
+# Ne pas éditer à la main sans mettre à jour le fichier source ci-dessus, ou
+# créer un portails.local.yaml pour des règles spécifiques (voir README).
+
+- when:
+    field: rangs.embranchement
+    eq: Annelida
+  return:
+  - Biologie marine
+  - Annélides
+- when:
+    field: rangs.infra-classe
+    eq: Arachnida
+  return:
+  - Arachnologie
+- when:
+    field: rangs.infra-classe
+    eq: Haptopoda
+  return:
+  - Arachnologie
+  - Paléontologie
+- when:
+    field: rangs.infra-classe
+    eq: Phalangiotarbida
+  return:
+  - Arachnologie
+  - Paléontologie
+- when:
+    field: rangs.infra-classe
+    eq: Trigonotarbida
+  return:
+  - Arachnologie
+  - Paléontologie
+- when:
+    field: rangs.infra-classe
+    eq: Uraraneida
+  return:
+  - Arachnologie
+  - Paléontologie
+- when:
+    field: rangs.sous-embranchement
+    eq: Crustacea
+  return:
+  - Carcinologie
+  - Biologie marine
+- when:
+    field: rangs.famille
+    eq: Waptiidae
+  return:
+  - Carcinologie
+  - Paléontologie
+- when:
+    field: rangs.famille
+    eq: Erymidae
+  return:
+  - Carcinologie
+  - Paléontologie
+- when:
+    field: rangs.infra-ordre
+    eq: Cetacea
+  return:
+  - Cétacés
+  - Mammifères
+- when:
+    field: rangs.embranchement
+    eq: Cnidaria
+  return:
+  - Biologie marine
+  - Cnidaires
+- when:
+    field: rangs.classe
+    eq: Insecta
+  return:
+  - Entomologie
+- when:
+    field: rangs.classe
+    eq: Amphibia
+  return:
+  - Herpétologie
+- when:
+    field: rangs.classe
+    eq: Reptilia
+  return:
+  - Herpétologie
+- when:
+    field: rangs.genre
+    eq: Uroplatus
+  return:
+  - Herpétologie
+  - Madagascar
+- when:
+    field: rangs.embranchement
+    eq: Mollusca
+  return:
+  - Biologie marine
+  - Malacologie
+- when:
+    field: rangs.ordre
+    eq: Primates
+  return:
+  - Mammifères
+  - Primates
+- when:
+    field: rangs.genre
+    eq: Rosa
+  return:
+  - Roses et rosiers
+- when:
+    field: rangs.famille
+    eq: Ursidae
+  return:
+  - Mammifères
+  - Ursidés

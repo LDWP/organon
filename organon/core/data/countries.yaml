@@ -1,0 +1,749 @@
+# Généré par scripts/build_countries_yaml.py.
+
+AF:
+  texte_affiche: Afghanistan
+  nom_page: Afghanistan
+ZA:
+  texte_affiche: Afrique du Sud
+  nom_page: Afrique du Sud
+AX:
+  texte_affiche: Îles Åland
+  nom_page: Åland
+AL:
+  texte_affiche: Albanie
+  nom_page: Albanie
+DZ:
+  texte_affiche: Algérie
+  nom_page: Algérie
+DE:
+  texte_affiche: Allemagne
+  nom_page: Allemagne
+AD:
+  texte_affiche: Andorre
+  nom_page: Andorre
+AO:
+  texte_affiche: Angola
+  nom_page: Angola
+AI:
+  texte_affiche: Anguilla
+  nom_page: Anguilla
+AQ:
+  texte_affiche: Antarctique
+  nom_page: Antarctique
+AG:
+  texte_affiche: Antigua-et-Barbuda
+  nom_page: Antigua-et-Barbuda
+SA:
+  texte_affiche: Arabie saoudite
+  nom_page: Arabie saoudite
+AR:
+  texte_affiche: Argentine
+  nom_page: Argentine
+AM:
+  texte_affiche: Arménie
+  nom_page: Arménie
+AW:
+  texte_affiche: Aruba
+  nom_page: Aruba
+AU:
+  texte_affiche: Australie
+  nom_page: Australie
+AT:
+  texte_affiche: Autriche
+  nom_page: Autriche
+AZ:
+  texte_affiche: Azerbaïdjan
+  nom_page: Azerbaïdjan
+BS:
+  texte_affiche: Bahamas
+  nom_page: Bahamas
+BH:
+  texte_affiche: Bahreïn
+  nom_page: Bahreïn
+BD:
+  texte_affiche: Bangladesh
+  nom_page: Bangladesh
+BB:
+  texte_affiche: Barbade
+  nom_page: Barbade
+BY:
+  texte_affiche: Biélorussie
+  nom_page: Biélorussie
+BE:
+  texte_affiche: Belgique
+  nom_page: Belgique
+BZ:
+  texte_affiche: Belize
+  nom_page: Belize
+BJ:
+  texte_affiche: Bénin
+  nom_page: Bénin
+BM:
+  texte_affiche: Bermudes
+  nom_page: Bermudes
+BT:
+  texte_affiche: Bhoutan
+  nom_page: Bhoutan
+BO:
+  texte_affiche: Bolivie
+  nom_page: Bolivie
+BQ:
+  texte_affiche: Pays-Bas caribéens
+  nom_page: Pays-Bas caribéens
+BA:
+  texte_affiche: Bosnie-Herzégovine
+  nom_page: Bosnie-Herzégovine
+BW:
+  texte_affiche: Botswana
+  nom_page: Botswana
+BV:
+  texte_affiche: Île Bouvet
+  nom_page: Île Bouvet
+BR:
+  texte_affiche: Brésil
+  nom_page: Brésil
+BN:
+  texte_affiche: Brunei
+  nom_page: Brunei
+BG:
+  texte_affiche: Bulgarie
+  nom_page: Bulgarie
+BF:
+  texte_affiche: Burkina Faso
+  nom_page: Burkina Faso
+BI:
+  texte_affiche: Burundi
+  nom_page: Burundi
+KY:
+  texte_affiche: Îles Caïmans
+  nom_page: Îles Caïmans
+KH:
+  texte_affiche: Cambodge
+  nom_page: Cambodge
+CM:
+  texte_affiche: Cameroun
+  nom_page: Cameroun
+CA:
+  texte_affiche: Canada
+  nom_page: Canada
+CV:
+  texte_affiche: Cap-Vert
+  nom_page: Cap-Vert
+CF:
+  texte_affiche: République centrafricaine
+  nom_page: République centrafricaine
+CL:
+  texte_affiche: Chili
+  nom_page: Chili
+CN:
+  texte_affiche: Chine
+  nom_page: Chine
+CX:
+  texte_affiche: Île Christmas
+  nom_page: Île Christmas (Australie)
+CY:
+  texte_affiche: Chypre
+  nom_page: Chypre (pays)
+CC:
+  texte_affiche: Îles Cocos
+  nom_page: Îles Cocos
+CO:
+  texte_affiche: Colombie
+  nom_page: Colombie
+KM:
+  texte_affiche: Comores
+  nom_page: Comores (pays)
+CG:
+  texte_affiche: République du Congo
+  nom_page: République du Congo
+CD:
+  texte_affiche: République démocratique du Congo
+  nom_page: République démocratique du Congo
+CK:
+  texte_affiche: Îles Cook
+  nom_page: Îles Cook
+KR:
+  texte_affiche: Corée du Sud
+  nom_page: Corée du Sud
+KP:
+  texte_affiche: Corée du Nord
+  nom_page: Corée du Nord
+CR:
+  texte_affiche: Costa Rica
+  nom_page: Costa Rica
+CI:
+  texte_affiche: Côte d&#39;Ivoire
+  nom_page: Côte d&#39;Ivoire
+HR:
+  texte_affiche: Croatie
+  nom_page: Croatie
+CU:
+  texte_affiche: Cuba
+  nom_page: Cuba
+CW:
+  texte_affiche: Curaçao
+  nom_page: Curaçao
+DK:
+  texte_affiche: Danemark
+  nom_page: Danemark
+DJ:
+  texte_affiche: Djibouti
+  nom_page: Djibouti
+DO:
+  texte_affiche: République dominicaine
+  nom_page: République dominicaine
+DM:
+  texte_affiche: Dominique
+  nom_page: Dominique (pays)
+EG:
+  texte_affiche: Égypte
+  nom_page: Égypte
+SV:
+  texte_affiche: Salvador
+  nom_page: Salvador
+AE:
+  texte_affiche: Émirats arabes unis
+  nom_page: Émirats arabes unis
+EC:
+  texte_affiche: Équateur
+  nom_page: Équateur (pays)
+ER:
+  texte_affiche: Érythrée
+  nom_page: Érythrée
+ES:
+  texte_affiche: Espagne
+  nom_page: Espagne
+EE:
+  texte_affiche: Estonie
+  nom_page: Estonie
+US:
+  texte_affiche: États-Unis
+  nom_page: États-Unis
+ET:
+  texte_affiche: Éthiopie
+  nom_page: Éthiopie
+FK:
+  texte_affiche: Malouines
+  nom_page: Îles Malouines
+FO:
+  texte_affiche: Îles Féroé
+  nom_page: Îles Féroé
+FJ:
+  texte_affiche: Fidji
+  nom_page: Fidji
+FI:
+  texte_affiche: Finlande
+  nom_page: Finlande
+FR:
+  texte_affiche: France
+  nom_page: France
+GA:
+  texte_affiche: Gabon
+  nom_page: Gabon
+GM:
+  texte_affiche: Gambie
+  nom_page: Gambie
+GE:
+  texte_affiche: Géorgie
+  nom_page: Géorgie (pays)
+GS:
+  texte_affiche: Géorgie du Sud-et-les îles Sandwich du Sud
+  nom_page: Géorgie du Sud-et-les îles Sandwich du Sud
+GH:
+  texte_affiche: Ghana
+  nom_page: Ghana
+GI:
+  texte_affiche: Gibraltar
+  nom_page: Gibraltar
+GR:
+  texte_affiche: Grèce
+  nom_page: Grèce
+GD:
+  texte_affiche: Grenade
+  nom_page: Grenade (pays)
+GL:
+  texte_affiche: Groenland
+  nom_page: Groenland
+GP:
+  texte_affiche: Guadeloupe
+  nom_page: Guadeloupe
+GU:
+  texte_affiche: Guam
+  nom_page: Guam
+GT:
+  texte_affiche: Guatemala
+  nom_page: Guatemala
+GG:
+  texte_affiche: Guernesey
+  nom_page: Bailliage de Guernesey
+GN:
+  texte_affiche: Guinée
+  nom_page: Guinée
+GW:
+  texte_affiche: Guinée-Bissau
+  nom_page: Guinée-Bissau
+GQ:
+  texte_affiche: Guinée équatoriale
+  nom_page: Guinée équatoriale
+GY:
+  texte_affiche: Guyana
+  nom_page: Guyana
+GF:
+  texte_affiche: Guyane
+  nom_page: Guyane
+HT:
+  texte_affiche: Haïti
+  nom_page: Haïti
+HM:
+  texte_affiche: Îles Heard-et-MacDonald
+  nom_page: Îles Heard-et-MacDonald
+HN:
+  texte_affiche: Honduras
+  nom_page: Honduras
+HK:
+  texte_affiche: Hong Kong
+  nom_page: Hong Kong
+HU:
+  texte_affiche: Hongrie
+  nom_page: Hongrie
+IM:
+  texte_affiche: Île de Man
+  nom_page: Île de Man
+UM:
+  texte_affiche: Îles mineures éloignées des États-Unis
+  nom_page: Îles mineures éloignées des États-Unis
+VG:
+  texte_affiche: Îles Vierges britanniques
+  nom_page: Îles Vierges britanniques
+VI:
+  texte_affiche: Îles Vierges des États-Unis
+  nom_page: Îles Vierges des États-Unis
+IN:
+  texte_affiche: Inde
+  nom_page: Inde
+ID:
+  texte_affiche: Indonésie
+  nom_page: Indonésie
+IR:
+  texte_affiche: Iran
+  nom_page: Iran
+IQ:
+  texte_affiche: Irak
+  nom_page: Irak
+IE:
+  texte_affiche: Irlande
+  nom_page: Irlande (pays)
+IS:
+  texte_affiche: Islande
+  nom_page: Islande
+IL:
+  texte_affiche: Israël
+  nom_page: Israël
+IT:
+  texte_affiche: Italie
+  nom_page: Italie
+JM:
+  texte_affiche: Jamaïque
+  nom_page: Jamaïque
+JP:
+  texte_affiche: Japon
+  nom_page: Japon
+JE:
+  texte_affiche: Jersey
+  nom_page: Jersey
+JO:
+  texte_affiche: Jordanie
+  nom_page: Jordanie
+KZ:
+  texte_affiche: Kazakhstan
+  nom_page: Kazakhstan
+KE:
+  texte_affiche: Kenya
+  nom_page: Kenya
+KG:
+  texte_affiche: Kirghizistan
+  nom_page: Kirghizistan
+KI:
+  texte_affiche: Kiribati
+  nom_page: Kiribati
+KW:
+  texte_affiche: Koweït
+  nom_page: Koweït
+LA:
+  texte_affiche: Laos
+  nom_page: Laos
+LS:
+  texte_affiche: Lesotho
+  nom_page: Lesotho
+LV:
+  texte_affiche: Lettonie
+  nom_page: Lettonie
+LB:
+  texte_affiche: Liban
+  nom_page: Liban
+LR:
+  texte_affiche: Liberia
+  nom_page: Liberia
+LY:
+  texte_affiche: Libye
+  nom_page: Libye
+LI:
+  texte_affiche: Liechtenstein
+  nom_page: Liechtenstein
+LT:
+  texte_affiche: Lituanie
+  nom_page: Lituanie
+LU:
+  texte_affiche: Luxembourg
+  nom_page: Luxembourg
+MO:
+  texte_affiche: Macao
+  nom_page: Macao
+MK:
+  texte_affiche: Macédoine du Nord
+  nom_page: Macédoine du Nord
+MG:
+  texte_affiche: Madagascar
+  nom_page: Madagascar
+MY:
+  texte_affiche: Malaisie
+  nom_page: Malaisie
+MW:
+  texte_affiche: Malawi
+  nom_page: Malawi
+MV:
+  texte_affiche: Maldives
+  nom_page: Maldives
+ML:
+  texte_affiche: Mali
+  nom_page: Mali
+MT:
+  texte_affiche: Malte
+  nom_page: Malte
+MP:
+  texte_affiche: Îles Mariannes du Nord
+  nom_page: Îles Mariannes du Nord
+MA:
+  texte_affiche: Maroc
+  nom_page: Maroc
+MH:
+  texte_affiche: Îles Marshall
+  nom_page: Îles Marshall
+MQ:
+  texte_affiche: Martinique
+  nom_page: Martinique
+MU:
+  texte_affiche: Maurice
+  nom_page: Maurice (pays)
+MR:
+  texte_affiche: Mauritanie
+  nom_page: Mauritanie
+YT:
+  texte_affiche: Mayotte
+  nom_page: Mayotte
+MX:
+  texte_affiche: Mexique
+  nom_page: Mexique
+FM:
+  texte_affiche: États fédérés de Micronésie
+  nom_page: États fédérés de Micronésie
+MD:
+  texte_affiche: Moldavie
+  nom_page: Moldavie
+MC:
+  texte_affiche: Monaco
+  nom_page: Monaco
+MN:
+  texte_affiche: Mongolie
+  nom_page: Mongolie
+ME:
+  texte_affiche: Monténégro
+  nom_page: Monténégro
+MS:
+  texte_affiche: Montserrat
+  nom_page: Montserrat (Antilles)
+MZ:
+  texte_affiche: Mozambique
+  nom_page: Mozambique
+MM:
+  texte_affiche: Birmanie
+  nom_page: Birmanie
+NA:
+  texte_affiche: Namibie
+  nom_page: Namibie
+NR:
+  texte_affiche: Nauru
+  nom_page: Nauru
+NP:
+  texte_affiche: Népal
+  nom_page: Népal
+NI:
+  texte_affiche: Nicaragua
+  nom_page: Nicaragua
+NE:
+  texte_affiche: Niger
+  nom_page: Niger
+NG:
+  texte_affiche: Nigeria
+  nom_page: Nigeria
+NU:
+  texte_affiche: Niue
+  nom_page: Niue
+NF:
+  texte_affiche: Île Norfolk
+  nom_page: Île Norfolk
+'NO':
+  texte_affiche: Norvège
+  nom_page: Norvège
+NC:
+  texte_affiche: Nouvelle-Calédonie
+  nom_page: Nouvelle-Calédonie
+NZ:
+  texte_affiche: Nouvelle-Zélande
+  nom_page: Nouvelle-Zélande
+IO:
+  texte_affiche: Territoire britannique de l'océan Indien
+  nom_page: Territoire britannique de l&#39;océan Indien
+OM:
+  texte_affiche: Oman
+  nom_page: Oman
+UG:
+  texte_affiche: Ouganda
+  nom_page: Ouganda
+UZ:
+  texte_affiche: Ouzbékistan
+  nom_page: Ouzbékistan
+PK:
+  texte_affiche: Pakistan
+  nom_page: Pakistan
+PW:
+  texte_affiche: Palaos
+  nom_page: Palaos
+PS:
+  texte_affiche: Palestine
+  nom_page: Palestine (État)
+PA:
+  texte_affiche: Panama
+  nom_page: Panama
+PG:
+  texte_affiche: Papouasie-Nouvelle-Guinée
+  nom_page: Papouasie-Nouvelle-Guinée
+PY:
+  texte_affiche: Paraguay
+  nom_page: Paraguay
+NL:
+  texte_affiche: Pays-Bas
+  nom_page: Pays-Bas
+PE:
+  texte_affiche: Pérou
+  nom_page: Pérou
+PH:
+  texte_affiche: Philippines
+  nom_page: Philippines
+PN:
+  texte_affiche: Îles Pitcairn
+  nom_page: Îles Pitcairn
+PL:
+  texte_affiche: Pologne
+  nom_page: Pologne
+PF:
+  texte_affiche: Polynésie française
+  nom_page: Polynésie française
+PR:
+  texte_affiche: Porto Rico
+  nom_page: Porto Rico
+PT:
+  texte_affiche: Portugal
+  nom_page: Portugal
+QA:
+  texte_affiche: Qatar
+  nom_page: Qatar
+RE:
+  texte_affiche: La Réunion
+  nom_page: La Réunion
+RO:
+  texte_affiche: Roumanie
+  nom_page: Roumanie
+GB:
+  texte_affiche: Royaume-Uni
+  nom_page: Royaume-Uni
+RU:
+  texte_affiche: Russie
+  nom_page: Russie
+RW:
+  texte_affiche: Rwanda
+  nom_page: Rwanda
+EH:
+  texte_affiche: République arabe sahraouie démocratique
+  nom_page: République arabe sahraouie démocratique
+BL:
+  texte_affiche: Saint-Barthélemy
+  nom_page: Saint-Barthélemy (Antilles françaises)
+KN:
+  texte_affiche: Saint-Christophe-et-Niévès
+  nom_page: Saint-Christophe-et-Niévès
+SM:
+  texte_affiche: Saint-Marin
+  nom_page: Saint-Marin
+MF:
+  texte_affiche: Saint-Martin
+  nom_page: Saint-Martin (Antilles françaises)
+SX:
+  texte_affiche: Saint-Martin
+  nom_page: Saint-Martin (royaume des Pays-Bas)
+PM:
+  texte_affiche: Saint-Pierre-et-Miquelon
+  nom_page: Saint-Pierre-et-Miquelon
+VA:
+  texte_affiche: État de la Cité du Vatican
+  nom_page: Vatican
+VC:
+  texte_affiche: Saint-Vincent-et-les-Grenadines
+  nom_page: Saint-Vincent-et-les-Grenadines
+SH:
+  texte_affiche: Sainte-Hélène, Ascension et Tristan da Cunha
+  nom_page: Sainte-Hélène, Ascension et Tristan da Cunha
+LC:
+  texte_affiche: Sainte-Lucie
+  nom_page: Sainte-Lucie
+SB:
+  texte_affiche: Îles Salomon
+  nom_page: Îles Salomon
+WS:
+  texte_affiche: Samoa
+  nom_page: Samoa
+AS:
+  texte_affiche: Samoa américaines
+  nom_page: Samoa américaines
+ST:
+  texte_affiche: Sao Tomé-et-Principe
+  nom_page: Sao Tomé-et-Principe
+SN:
+  texte_affiche: Sénégal
+  nom_page: Sénégal
+RS:
+  texte_affiche: Serbie
+  nom_page: Serbie
+SC:
+  texte_affiche: Seychelles
+  nom_page: Seychelles
+SL:
+  texte_affiche: Sierra Leone
+  nom_page: Sierra Leone
+SG:
+  texte_affiche: Singapour
+  nom_page: Singapour
+SK:
+  texte_affiche: Slovaquie
+  nom_page: Slovaquie
+SI:
+  texte_affiche: Slovénie
+  nom_page: Slovénie
+SO:
+  texte_affiche: Somalie
+  nom_page: Somalie
+SD:
+  texte_affiche: Soudan
+  nom_page: Soudan
+SS:
+  texte_affiche: Soudan du Sud
+  nom_page: Soudan du Sud
+LK:
+  texte_affiche: Sri Lanka
+  nom_page: Sri Lanka
+SE:
+  texte_affiche: Suède
+  nom_page: Suède
+CH:
+  texte_affiche: Suisse
+  nom_page: Suisse
+SR:
+  texte_affiche: Suriname
+  nom_page: Suriname
+SJ:
+  texte_affiche: Svalbard et ile Jan Mayen
+  nom_page: Norvège
+SZ:
+  texte_affiche: Eswatini
+  nom_page: Eswatini
+SY:
+  texte_affiche: Syrie
+  nom_page: Syrie
+TJ:
+  texte_affiche: Tadjikistan
+  nom_page: Tadjikistan
+TW:
+  texte_affiche: Taïwan
+  nom_page: République de Chine (Taïwan)
+TZ:
+  texte_affiche: Tanzanie
+  nom_page: Tanzanie
+TD:
+  texte_affiche: Tchad
+  nom_page: Tchad
+CZ:
+  texte_affiche: Tchéquie
+  nom_page: Tchéquie
+TF:
+  texte_affiche: Terres australes et antarctiques françaises
+  nom_page: Terres australes et antarctiques françaises
+TH:
+  texte_affiche: Thaïlande
+  nom_page: Thaïlande
+TL:
+  texte_affiche: Timor oriental
+  nom_page: Timor oriental
+TG:
+  texte_affiche: Togo
+  nom_page: Togo
+TK:
+  texte_affiche: Tokelau
+  nom_page: Tokelau
+TO:
+  texte_affiche: Tonga
+  nom_page: Tonga
+TT:
+  texte_affiche: Trinité-et-Tobago
+  nom_page: Trinité-et-Tobago
+TN:
+  texte_affiche: Tunisie
+  nom_page: Tunisie
+TM:
+  texte_affiche: Turkménistan
+  nom_page: Turkménistan
+TC:
+  texte_affiche: Îles Turques-et-Caïques
+  nom_page: Îles Turques-et-Caïques
+TR:
+  texte_affiche: Turquie
+  nom_page: Turquie
+TV:
+  texte_affiche: Tuvalu
+  nom_page: Tuvalu
+UA:
+  texte_affiche: Ukraine
+  nom_page: Ukraine
+UY:
+  texte_affiche: Uruguay
+  nom_page: Uruguay
+VU:
+  texte_affiche: Vanuatu
+  nom_page: Vanuatu
+VE:
+  texte_affiche: Venezuela
+  nom_page: Venezuela
+VN:
+  texte_affiche: Viêt Nam
+  nom_page: Viêt Nam
+WF:
+  texte_affiche: Wallis-et-Futuna
+  nom_page: Wallis-et-Futuna
+YE:
+  texte_affiche: Yémen
+  nom_page: Yémen
+ZM:
+  texte_affiche: Zambie
+  nom_page: Zambie
+ZW:
+  texte_affiche: Zimbabwe
+  nom_page: Zimbabwe

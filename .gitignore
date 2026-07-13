@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+venv/
+dist/
+build/
+htmlcov/
+.env
+web-app/dev.cmd
+/organon.code-workspace
+
+/docs
+/tests
+/scripts
+/organon/vexp.toml
+
+# Tout dossier commençant par un point reste local (config d'outils divers, jamais poussé).
+.*/
