@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Organon — recherche taxonomique</title>
+    <script>
+      // Applique le thème sauvegardé avant le premier rendu pour éviter un flash.
+      try {
+        var saved = localStorage.getItem("organon-theme");
+        if (saved === "dark" || saved === "light") {
+          document.documentElement.setAttribute("data-theme", saved);
+        }
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="/assets/index-Cp9IstGC.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DuyvntTC.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
