@@ -18,7 +18,7 @@
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 
-derniere_maj: "2026-07-12"
+derniere_maj: "2026-07-13"
 
 categories:
   - id: generalistes
@@ -404,14 +404,6 @@ categories:
         elements_recoltes: []
         acces: {type: scraping, detail: "scraping HTML, aucune API trouvée"}
         derniere_maj: null
-      - id: wcvp
-        nom: "World Checklist of Vascular Plants (WCVP)"
-        url: "https://wcvp.science.kew.org"
-        statut: bloque
-        classification: {possible: true, estime: true, detail: "référentiel mondial"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "API bloquée Cloudflare ; wcvp.science.kew.org redirige désormais vers powo.science.kew.org, toujours 403"}
-        derniere_maj: null
       - id: wcsp
         nom: "World Checklist of Selected Plant Families (WCSP)"
         url: null
@@ -423,11 +415,12 @@ categories:
       - id: powo
         nom: "Plants of the World Online (POWO)"
         url: "https://powo.science.kew.org"
-        statut: bloque
-        classification: {possible: true, estime: true, detail: "classification Kew officielle"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "confirmé en direct : 403 Cloudflare, même infrastructure que WCVP"}
-        derniere_maj: null
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "classification Kew officielle (WCVP)"}
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", synonymes, distribution, identifiant]
+        acces: {type: api_rest, detail: "via la bibliothèque pykew (API JSON powo.science.kew.org/api/2) ; l'accès direct par requests nu reste bloqué (403 WAF sans en-tête User-Agent de navigateur, voir organon/modules/powo/adapter.py)"}
+        derniere_maj: "2026-07-13"
+        notes: "World Checklist of Vascular Plants (WCVP), listée séparément dans un inventaire antérieur, est retirée ici : wcvp.science.kew.org redirige désormais vers powo.science.kew.org (même infrastructure, même jeu de données WCVP sous-jacent) — entrée redondante avec celle-ci."
       - id: grin
         nom: "Germplasm Resources Information Network (GRIN)"
         url: null

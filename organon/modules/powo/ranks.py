@@ -30,3 +30,15 @@ def powo_cherche_rang(rang: str | None) -> str | None:
     if not rang:
         return None
     return POWO_RANKS.get(rang.upper())
+
+
+POWO_KINGDOM_MAP: dict[str, str] = {"Plantae": "végétal"}
+"""WCVP ne couvre que Plantae (le champ `kingdom`/`plantae` ne varie pas en pratique, domaine du
+module déjà restreint à `['végétal']`) : une table à une entrée suffit, sans généraliser pour un
+cas qui ne se présente jamais."""
+
+
+def powo_cherche_regne(kingdom: str | None) -> str | None:
+    if not kingdom:
+        return None
+    return POWO_KINGDOM_MAP.get(kingdom)
