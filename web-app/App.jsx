@@ -241,10 +241,11 @@ export default function App() {
   // sous-taxons.
   const [taxoboxSourceOverride, setTaxoboxSourceOverride] = useState(null);
   const [subtaxaSourceOverride, setSubtaxaSourceOverride] = useState(null);
-  // Désactive applyRankConflicts (insertion de {{Taxobox conflit}} en cas de désaccord de rang
-  // entre sources) — utile pour relire le wikitexte brut de la source taxobox choisie sans le
-  // bruit des conflits, sans pour autant perdre la possibilité de les réactiver.
-  const [disableConflicts, setDisableConflicts] = useState(false);
+  // Active applyRankConflicts (insertion de {{Taxobox conflit}} en cas de désaccord de rang entre
+  // sources) — désactivé par défaut car la majorité des groupes ne présentent pas de divergence
+  // taxonomique significative ; à cocher au cas par cas pour les groupes qui en ont (poissons,
+  // insectes...).
+  const [gererConflits, setGererConflits] = useState(false);
   const [resultView, setResultView] = useState("result"); // "result" | "data"
   // Sous-onglets thématiques du panneau Résultat, un clic = un aspect de la taxobox à changer.
   const [resultSubTab, setResultSubTab] = useState("classification"); // "classification" | "image"
@@ -659,14 +660,23 @@ export default function App() {
 
   // Remplace, dans les lignes propres à la source taxobox affichée, celles dont le rang est
   // contesté par au moins une autre source par un {{Taxobox conflit}} listant chaque nom
-  // concurrent et sa source — laisse les autres lignes intactes. Peut être désactivé
-  // entièrement par la case "ne pas gérer les conflits" (voir disableConflicts).
+  // concurrent et sa source — laisse les autres lignes intactes. N'agit que si la case "gérer
+  // les conflits de classification" est cochée (voir gererConflits).
   function applyRankConflicts(wikitext, rankLines) {
-    if (!rankLines || disableConflicts) return wikitext;
+    if (!rankLines || !gererConflits) return wikitext;
     let result = wikitext;
+    const rangsResolus = new Set();
     for (const { rang, line } of rankLines) {
       const parNom = rankDisagreements[rang];
       if (!parNom || parNom.size < 2) continue;
+      if (rangsResolus.has(rang)) {
+        // Un même rang peut apparaître plusieurs fois dans rankLines (ex. ITIS rapportant
+        // plusieurs genres équivalents pour un même taxon) : le conflit a déjà été inséré une
+        // fois pour ce rang, on retire simplement la ligne redondante au lieu de le dupliquer.
+        result = result.split(`${line}\n`).join("");
+        continue;
+      }
+      rangsResolus.add(rang);
       const parts = [rang];
       for (const [autreNom, sourceId] of parNom) parts.push(autreNom, sourceId.toUpperCase());
       result = result.split(line).join(`{{Taxobox conflit | ${parts.join(" | ")} }}`);
@@ -1155,10 +1165,10 @@ export default function App() {
                             <label className="facet-checkbox">
                               <input
                                 type="checkbox"
-                                checked={disableConflicts}
-                                onChange={(e) => setDisableConflicts(e.target.checked)}
+                                checked={gererConflits}
+                                onChange={(e) => setGererConflits(e.target.checked)}
                               />
-                              Ne pas gérer les conflits de rang
+                              Gérer les conflits de classification
                             </label>
                           </div>
                         )
