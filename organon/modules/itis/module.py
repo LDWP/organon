@@ -95,7 +95,10 @@ class ItisModule(TaxonomyModule):
         rangs: list[RankName] = []
         for entry in hierarchy:
             if entry.get("tsn") == tsn:
-                continue  # le taxon lui-même (dernière entrée de la hiérarchie complète)
+                # Le taxon demandé marque la fin de la chaîne des ancêtres. getFullHierarchyFromTSN
+                # inclut aussi ses Direct Children en dessous (ex. espèces d'un genre) : on arrête
+                # la remontée ici pour ne pas les intégrer à la classification.
+                break
             rang_wp = itis_cherche_rang(entry.get("rankName") or "")
             if rang_wp in RANGS_REGNE:
                 continue  # le "règne" est stocké dans struct.regne, pas dans struct.rangs
