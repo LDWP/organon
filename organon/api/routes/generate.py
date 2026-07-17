@@ -66,6 +66,12 @@ from organon.modules.bootstrap import ensure_modules_registered
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+_ENRICHMENT_CONCURRENCY = 6
+"""Nombre de modules d'enrichissement autorisés à interroger leur API en même temps. Une
+génération type en cumule ~20 : sans cette limite, les lancer tous d'un coup multiplierait par
+20 la charge instantanée sur chaque service externe par rapport au fonctionnement séquentiel
+d'origine, pour un gain de latence marginal au-delà de quelques requêtes en vol."""
+
 
 async def _collect_with_timeout(
     module: TaxonomyModule, struct: Struct, *, is_classification: bool, options: GenerateOptions
@@ -120,11 +126,11 @@ class ModuleRunEvent:
 
 
 class EnrichmentRunner:
-    """Exécute en séquence les modules d'enrichissement applicables (hors classification), en
-    accumulant `struct`/`ran_modules`/`warnings` exactement comme le faisait la boucle `for`
-    d'origine dans `generate()` — extrait ici uniquement pour que `/generate/stream` puisse
-    observer un `ModuleRunEvent` par module sans dupliquer cette boucle (et donc sans risquer
-    une divergence de comportement entre les deux endpoints)."""
+    """Exécute en parallèle les modules d'enrichissement applicables (hors classification), en
+    accumulant `struct`/`ran_modules`/`warnings` — extrait ici uniquement pour que
+    `/generate/stream` puisse observer un `ModuleRunEvent` par module sans dupliquer cette
+    logique (et donc sans risquer une divergence de comportement entre les deux endpoints). Voir
+    `run()` pour l'ordre de fusion des résultats."""
 
     def __init__(
         self,
@@ -137,45 +143,76 @@ class EnrichmentRunner:
         self.struct = struct
         self.ran_modules: list[str] = [classification_id]
         self.warnings: list[str] = []
-        self._classification_id = classification_id
-        self._applicable = applicable
-        self._off = off
         self._options = options
+        self._semaphore = asyncio.Semaphore(_ENRICHMENT_CONCURRENCY)
+        # Filtré une fois ici (classification déjà traitée séparément, modules désactivés ou
+        # inconnus) plutôt que dans `run()`, pour ne créer une task et émettre un `ModuleRunEvent`
+        # "running" que pour les modules réellement interrogés.
+        self._enrichment_ids = [
+            m
+            for m in applicable
+            if m != classification_id and m not in off and get_module(m) is not None
+        ]
 
-    async def collect_one_module(self, module_id: str) -> tuple[str,Struct | None]:
-        if module_id == self._classification_id or module_id in self._off:
-            return module_id, None
+    async def collect_one_module(
+        self, module_id: str
+    ) -> tuple[str, Struct | None, Exception | None]:
+        """Ne lève jamais : le résultat porte l'erreur éventuelle plutôt que de la laisser se
+        propager, pour que `run()` puisse identifier de façon fiable quel module a échoué —
+        `asyncio.as_completed` ne préserve pas l'identité des tasks qu'on lui passe (il renvoie
+        des wrappers internes), donc retrouver `module_id` après coup via un mapping tâche ->
+        id, ou via l'unpacking d'un tuple qui échouerait avant d'avoir été produit, ne marche
+        pas de façon fiable en cas d'exception."""
         module = get_module(module_id)
-        if module is None:
-            return module_id, None
-        updated = await _collect_with_timeout(
-            module, self.struct, is_classification=False, options=self._options
-        )
-        return module_id, updated
+        try:
+            async with self._semaphore:
+                updated = await _collect_with_timeout(
+                    module, self.struct, is_classification=False, options=self._options
+                )
+            return module_id, updated, None
+        except Exception as exc:  # noqa: BLE001 — un module tiers en échec ne doit pas casser la génération
+            return module_id, None, exc
 
     async def run(self) -> AsyncIterator[ModuleRunEvent]:
-        tasks = []
-        for module_id in self._applicable:
-            task = asyncio.create_task(self.collect_one_module(module_id), name=module_id)
-            tasks.append(task)
+        """Lance tous les modules d'enrichissement en parallèle sur la même base `struct` (celle
+        laissée par la classification) et notifie leur progression au fil de l'eau via
+        `asyncio.as_completed`, mais n'applique leurs résultats à `self.struct`/`self.ran_modules`
+        qu'une fois tous terminés, dans l'ordre de priorité `_enrichment_ids` plutôt que dans
+        l'ordre d'arrivée réseau. Sans ça, deux modules qui écrivent le même champ mono-valeur de
+        `Struct` (`sous_taxons`, `synonymes`, `basionyme`...) donneraient un résultat dépendant de
+        la latence de chacun plutôt que de la priorité déclarée — les champs déjà namespacés par
+        module (`liens`, `vernaculaire`, `distribution`) n'ont pas ce problème, mais la fusion
+        reste uniforme pour rester simple."""
+        tasks = [
+            asyncio.create_task(self.collect_one_module(module_id), name=module_id)
+            for module_id in self._enrichment_ids
+        ]
+        for module_id in self._enrichment_ids:
             yield ModuleRunEvent(module_id, "running")
+
+        results: dict[str, Struct] = {}
         for task in asyncio.as_completed(tasks):
-            try:
-                module_id, updated = await task
-                if updated is not None:
-                    self.struct = updated
-                    self.ran_modules.append(module_id)
-                    yield ModuleRunEvent(module_id, "found")
-                else:
-                    # Pas d'entrée dans `self.warnings` : un module d'enrichissement qui ne
-                    # trouve rien pour ce taxon est le cas courant (la plupart des ~20 modules
-                    # ne couvrent qu'un domaine restreint), pas une anomalie à afficher dans le
-                    # wikitexte final — le statut "empty" reste visible module par module via
-                    # `ModuleRunEvent`/l'onglet Données côté frontend.
-                    yield ModuleRunEvent(module_id, "empty")
-            except Exception as exc:  # noqa: BLE001 — un module tiers en échec ne doit pas casser la génération
-                logger.warning("Module '%s' (enrichissement) : erreur réseau (%s), ignoré.", module_id, exc)
+            module_id, updated, exc = await task
+            if exc is not None:
+                logger.warning(
+                    "Module '%s' (enrichissement) : erreur réseau (%s), ignoré.", module_id, exc
+                )
                 yield ModuleRunEvent(module_id, "error", message=str(exc))
+            elif updated is not None:
+                results[module_id] = updated
+                yield ModuleRunEvent(module_id, "found")
+            else:
+                # Pas d'entrée dans `self.warnings` : un module d'enrichissement qui ne
+                # trouve rien pour ce taxon est le cas courant (la plupart des ~20 modules
+                # ne couvrent qu'un domaine restreint), pas une anomalie à afficher dans le
+                # wikitexte final — le statut "empty" reste visible module par module via
+                # `ModuleRunEvent`/l'onglet Données côté frontend.
+                yield ModuleRunEvent(module_id, "empty")
+
+        for module_id in self._enrichment_ids:
+            if module_id in results:
+                self.struct = results[module_id]
+                self.ran_modules.append(module_id)
 
 
 @router.post("/generate", response_model=GenerateResponse)
