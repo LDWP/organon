@@ -5,8 +5,9 @@
 nom scientifique), d'où le retour `list[str]` de `render_bioref` (voir le type
 `str | list[str] | None` de `organon.core.registry.TaxonomyModule`).
 
-Les identifiants ChecklistBank sont des chaînes alphanumériques d'une vingtaine de caractères
-(ex. `JFoARuPAMKtcBxRTJf4-D2`) ; aucun filtre de longueur n'est appliqué sur `id` avant rendu."""
+Les identifiants ChecklistBank de la release courante (`3LR`, voir adapter.py) sont de courtes
+chaînes alphanumériques (ex. `6K72F`) ; aucun filtre de longueur n'est appliqué sur `id` avant
+rendu."""
 
 from __future__ import annotations
 
