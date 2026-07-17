@@ -33,7 +33,7 @@ _IMAGEINFO_BATCH_SIZE = 50
 
 class CommonsImagesAdapter:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=30.0, headers={"User-Agent": USER_AGENT})
+        self._client = client or httpx.AsyncClient(timeout=10.0, headers={"User-Agent": USER_AGENT})
         self._owns_client = client is None
 
     async def aclose(self) -> None:

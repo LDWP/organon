@@ -20,7 +20,7 @@ TAXDETAILS_URL = "https://www.marinespecies.org/aphia.php"
 
 class WrmsAdapter:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=30.0)
+        self._client = client or httpx.AsyncClient(timeout=10.0)
         self._owns_client = client is None
 
     async def aclose(self) -> None:

@@ -12,7 +12,7 @@ DATASET_KEY = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"  # Backbone Taxonomy GBIF
 
 class GbifAdapter:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=30.0)
+        self._client = client or httpx.AsyncClient(timeout=10.0)
         self._owns_client = client is None
 
     async def aclose(self) -> None:

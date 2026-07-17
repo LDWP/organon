@@ -11,7 +11,7 @@ BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
 class NcbiAdapter:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=30.0)
+        self._client = client or httpx.AsyncClient(timeout=10.0)
         self._owns_client = client is None
 
     async def aclose(self) -> None:

@@ -20,7 +20,7 @@ class TropicosAdapter:
             "Authorization": f"Bearer {_TOKEN}",
             "Referer": "https://www.tropicos.org/name/Search",
         }
-        self._client = client or httpx.AsyncClient(timeout=30.0, headers=headers)
+        self._client = client or httpx.AsyncClient(timeout=10.0, headers=headers)
         self._owns_client = client is None
 
     async def aclose(self) -> None:
