@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import datetime
 import re
+import unicodedata
 from functools import lru_cache
 from pathlib import Path
 
@@ -87,17 +88,48 @@ def colonnes_contenu(contenu: str) -> str:
     return "{{colonnes|taille=25|1=\n" + contenu + "}}\n"
 
 
+def _sans_accents(mot: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFD", mot) if not unicodedata.combining(c))
+
+
+def _nb_accents(mot: str) -> int:
+    """Nombre de diacritiques portés par `mot`, pour départager deux graphies "similaires"
+    (voir est_similaire) qui ne diffèrent que par l'accentuation, ex. "Eléphant d'Afrique" vs
+    "Éléphant d'Afrique" — certaines sources n'accentuent pas les majuscules alors que l'usage
+    français les accentue."""
+    return sum(1 for c in unicodedata.normalize("NFD", mot) if unicodedata.combining(c))
+
+
 def est_similaire(mot_1: str, mot_2: str) -> bool:
-    """Compare deux mots en ignorant la casse et les tirets."""
-    return mot_1.lower().replace("-", " ") == mot_2.lower().replace("-", " ")
+    """Compare deux mots en ignorant la casse, les tirets et les accents."""
+    normalise = lambda m: _sans_accents(m.lower().replace("-", " "))
+    return normalise(mot_1) == normalise(mot_2)
+
+
+def _decoupe_nom(nom: str) -> list[str]:
+    """Scinde un nom vernaculaire sur les virgules internes : certaines sources (ex. EOL)
+    renvoient parfois plusieurs noms concaténés dans un seul champ, ex. "cabillaud, morue"."""
+    return [n.strip() for n in nom.split(",") if n.strip()]
+
+
+def _renomme_cle(liste: dict[str, list[str]], ancienne: str, nouvelle: str) -> None:
+    """Remplace la clé `ancienne` par `nouvelle` dans `liste` en conservant sa position et son
+    contenu (un simple pop/réassignation déplacerait l'entrée en fin de dict)."""
+    reconstruit = {nouvelle if k == ancienne else k: v for k, v in liste.items()}
+    liste.clear()
+    liste.update(reconstruit)
 
 
 def ajoute_si_besoin(liste: dict[str, list[str]], el: str, src: str) -> None:
     """Ajoute `el` (avec sa source `src`) à `liste` en dédupliquant les entrées "similaires"
-    (voir est_similaire) et en accumulant les sources pour un même nom déjà présent."""
-    if not liste:
-        liste[el] = [src]
-        return
+    (voir est_similaire) et en accumulant les sources pour un même nom déjà présent. `el` est
+    d'abord scindé sur les virgules internes (voir _decoupe_nom). Entre deux graphies
+    similaires, la plus accentuée est conservée comme forme d'affichage."""
+    for nom in _decoupe_nom(el):
+        _ajoute_nom_unique(liste, nom, src)
+
+
+def _ajoute_nom_unique(liste: dict[str, list[str]], el: str, src: str) -> None:
     trouve = None
     for nom in liste:
         if est_similaire(el, nom):
@@ -106,6 +138,9 @@ def ajoute_si_besoin(liste: dict[str, list[str]], el: str, src: str) -> None:
     if trouve is None:
         liste[el] = [src]
         return
+    if _nb_accents(el) > _nb_accents(trouve):
+        _renomme_cle(liste, trouve, el)
+        trouve = el
     if src in liste[trouve]:
         return
     liste[trouve].append(src)
