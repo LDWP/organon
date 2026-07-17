@@ -60,6 +60,8 @@ def resolve_field(struct: Struct, field: str) -> str | None:
         return struct.classification
     if field == "rang":
         return struct.taxon.rang
+    if field == "milieu":
+        return struct.milieu
     if field.startswith("rangs."):
         rang_id = field[len("rangs.") :]
         for r in struct.rangs:

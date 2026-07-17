@@ -89,6 +89,14 @@
   - Herpétologie
   - Madagascar
 - when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Mollusca
+    - field: milieu
+      eq: terrestre
+  return:
+  - Malacologie
+- when:
     field: rangs.embranchement
     eq: Mollusca
   return:

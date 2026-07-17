@@ -159,3 +159,9 @@ class Struct(BaseModel):
 
     image: dict[str, str] | None = None
     """struct['image'] — clés 'image'/'legende' pour la taxobox, si une source en fournit."""
+
+    milieu: str | None = None
+    """Milieu écologique du taxon ('marin' / 'terrestre'), quand une source le fournit (ex.
+    WoRMS via isMarine/isTerrestrial) ; None si inconnu. Utilisé par le sélecteur de portails
+    pour décider de l'ajout de {{Portail biologie marine}} (voir
+    `organon.core.selectors.rules.portails`)."""

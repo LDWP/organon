@@ -80,6 +80,13 @@ class WrmsModule(TaxonomyModule):
                 wrms_link["regne_detecte"] = regne_detecte
         struct.liens["wrms"] = wrms_link
 
+        if cur.get("isTerrestrial"):
+            # Prioritaire sur isMarine : un taxon amphibie/côtier n'est pas "uniquement marin",
+            # donc ne doit pas recevoir {{Portail biologie marine}} (voir portails.yaml).
+            struct.milieu = "terrestre"
+        elif cur.get("isMarine"):
+            struct.milieu = "marin"
+
         is_synonym = cur.get("valid_AphiaID") is not None and cur["valid_AphiaID"] != aphia_id
         if is_synonym:
             if not is_classification:
