@@ -66,11 +66,27 @@ from organon.modules.bootstrap import ensure_modules_registered
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
-_ENRICHMENT_CONCURRENCY = 6
-"""Nombre de modules d'enrichissement autorisés à interroger leur API en même temps. Une
-génération type en cumule ~20 : sans cette limite, les lancer tous d'un coup multiplierait par
-20 la charge instantanée sur chaque service externe par rapport au fonctionnement séquentiel
-d'origine, pour un gain de latence marginal au-delà de quelques requêtes en vol."""
+_MONOVALUE_FIELDS = (
+    "classification",
+    "classification_taxobox",
+    "regne",
+    "redirection",
+    "rangs",
+    "basionyme",
+    "sous_taxons",
+    "etymologie",
+    "originale",
+    "synonymes",
+    "type_taxon",
+    "cacher_regne",
+    "image",
+    "milieu",
+    "taxon",
+)
+"""Champs mono-valeur de `Struct` que plusieurs modules d'enrichissement peuvent chacun vouloir
+écrire (contrairement à `liens`/`vernaculaire`/`distribution`, déjà namespacés par module). Un
+module n'a modifié un de ces champs, par rapport à la struct de base pré-enrichissement, que si
+sa valeur diffère de celle de `_BASELINE` — voir `EnrichmentRunner.run` pour la fusion."""
 
 
 async def _collect_with_timeout(
@@ -141,10 +157,12 @@ class EnrichmentRunner:
         options: GenerateOptions,
     ) -> None:
         self.struct = struct
+        self._baseline = struct.model_copy(deep=True)
+        """Snapshot pré-enrichissement, pour distinguer un champ mono-valeur effectivement écrit
+        par un module d'un champ resté inchangé (voir `_MONOVALUE_FIELDS`)."""
         self.ran_modules: list[str] = [classification_id]
         self.warnings: list[str] = []
         self._options = options
-        self._semaphore = asyncio.Semaphore(_ENRICHMENT_CONCURRENCY)
         # Filtré une fois ici (classification déjà traitée séparément, modules désactivés ou
         # inconnus) plutôt que dans `run()`, pour ne créer une task et émettre un `ModuleRunEvent`
         # "running" que pour les modules réellement interrogés.
@@ -162,13 +180,19 @@ class EnrichmentRunner:
         `asyncio.as_completed` ne préserve pas l'identité des tasks qu'on lui passe (il renvoie
         des wrappers internes), donc retrouver `module_id` après coup via un mapping tâche ->
         id, ou via l'unpacking d'un tuple qui échouerait avant d'avoir été produit, ne marche
-        pas de façon fiable en cas d'exception."""
+        pas de façon fiable en cas d'exception.
+
+        Chaque module reçoit sa propre copie profonde de `self.struct` plutôt que l'objet
+        partagé : les modules mutent `struct` en place (`Struct` a été conçu pour un pipeline
+        séquentiel, voir sa docstring), donc en exécution concurrente deux modules qui écrivent
+        au même moment le même champ mono-valeur produiraient un résultat dépendant de
+        l'entrelacement de la boucle d'événements plutôt que de la priorité déclarée — `run()`
+        fusionne ensuite ces copies indépendantes dans l'ordre de priorité."""
         module = get_module(module_id)
         try:
-            async with self._semaphore:
-                updated = await _collect_with_timeout(
-                    module, self.struct, is_classification=False, options=self._options
-                )
+            updated = await _collect_with_timeout(
+                module, self.struct.model_copy(deep=True), is_classification=False, options=self._options
+            )
             return module_id, updated, None
         except Exception as exc:  # noqa: BLE001 — un module tiers en échec ne doit pas casser la génération
             return module_id, None, exc
@@ -180,9 +204,11 @@ class EnrichmentRunner:
         qu'une fois tous terminés, dans l'ordre de priorité `_enrichment_ids` plutôt que dans
         l'ordre d'arrivée réseau. Sans ça, deux modules qui écrivent le même champ mono-valeur de
         `Struct` (`sous_taxons`, `synonymes`, `basionyme`...) donneraient un résultat dépendant de
-        la latence de chacun plutôt que de la priorité déclarée — les champs déjà namespacés par
-        module (`liens`, `vernaculaire`, `distribution`) n'ont pas ce problème, mais la fusion
-        reste uniforme pour rester simple."""
+        la latence de chacun plutôt que de la priorité déclarée. Les champs déjà namespacés par
+        module (`liens`, `vernaculaire`, `distribution`) n'ont pas ce problème — chaque copie ne
+        porte que la clé de son propre module, donc un simple `update()` les fusionne sans
+        conflit ; seuls les champs mono-valeur de `_MONOVALUE_FIELDS` nécessitent un choix par
+        priorité, tranché en comparant chaque copie à `self._baseline`."""
         tasks = [
             asyncio.create_task(self.collect_one_module(module_id), name=module_id)
             for module_id in self._enrichment_ids
@@ -210,9 +236,17 @@ class EnrichmentRunner:
                 yield ModuleRunEvent(module_id, "empty")
 
         for module_id in self._enrichment_ids:
-            if module_id in results:
-                self.struct = results[module_id]
-                self.ran_modules.append(module_id)
+            if module_id not in results:
+                continue
+            copy = results[module_id]
+            self.struct.liens.update(copy.liens)
+            self.struct.vernaculaire.update(copy.vernaculaire)
+            self.struct.distribution.update(copy.distribution)
+            for field in _MONOVALUE_FIELDS:
+                value = getattr(copy, field)
+                if value != getattr(self._baseline, field):
+                    setattr(self.struct, field, value)
+            self.ran_modules.append(module_id)
 
 
 @router.post("/generate", response_model=GenerateResponse)
