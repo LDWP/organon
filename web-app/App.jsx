@@ -988,9 +988,108 @@ export default function App() {
               >
                 Données
               </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={resultView === "names"}
+                className={"tab" + (resultView === "names" ? " on" : "")}
+                onClick={() => setResultView("names")}
+              >
+                Noms &amp; synonymes
+              </button>
             </div>
 
-            {resultView === "data" ? (
+            {resultView === "names" ? (
+              <div className="panel">
+                <div className="panel-head">
+                  <span className="t">Noms &amp; synonymes — {activeSource ? activeSource.toUpperCase() : "…"}</span>
+                </div>
+                {!activeData ? (
+                  <p className="panel-empty">Aucune donnée disponible pour le moment.</p>
+                ) : (
+                  <>
+                    <div className="data-table-wrap">
+                      <h4 className="data-table-title">Auteur</h4>
+                      {activeData.auteur_consolide ? (
+                        <table className="data-table">
+                          <thead>
+                            <tr>
+                              <th>Retenu (vote majoritaire)</th>
+                              <th>Candidats par source</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>{activeData.auteur_consolide}</td>
+                              <td>
+                                {Object.entries(activeData.auteur_candidats).map(([moduleId, auteur]) => (
+                                  <div key={moduleId}>
+                                    <span className="id-badge">{moduleId.toUpperCase()}</span> {auteur}
+                                  </div>
+                                ))}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p className="panel-empty">Aucun auteur rapporté pour ce taxon.</p>
+                      )}
+                    </div>
+
+                    <div className="data-table-wrap">
+                      <h4 className="data-table-title">Noms vernaculaires</h4>
+                      {activeData.vernacular_names.length > 0 ? (
+                        <p>{activeData.vernacular_names.join(", ")}</p>
+                      ) : (
+                        <p className="panel-empty">Aucun nom vernaculaire rapporté.</p>
+                      )}
+                    </div>
+
+                    <div className="data-table-wrap">
+                      <h4 className="data-table-title">
+                        Synonymes
+                        {activeData.synonymes_source ? ` — source : ${activeData.synonymes_source.toUpperCase()}` : ""}
+                      </h4>
+                      {activeData.synonymes.length > 0 ? (
+                        <table className="data-table">
+                          <thead>
+                            <tr>
+                              <th>Nom</th>
+                              <th>Auteur</th>
+                              <th>Rang</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {activeData.synonymes.map((s, i) => (
+                              <tr key={i}>
+                                <td><em>{s.nom}</em></td>
+                                <td>{s.auteur || "—"}</td>
+                                <td>{s.rang || "—"}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p className="panel-empty">Aucun synonyme rapporté.</p>
+                      )}
+                    </div>
+
+                    <div className="data-table-wrap">
+                      <h4 className="data-table-title">Basionyme</h4>
+                      {activeData.basionyme ? (
+                        <p>
+                          <em>{activeData.basionyme.nom}</em>
+                          {activeData.basionyme.auteur ? ` ${activeData.basionyme.auteur}` : ""}{" "}
+                          <span className="id-badge">{activeData.basionyme.source.toUpperCase()}</span>
+                        </p>
+                      ) : (
+                        <p className="panel-empty">Aucun basionyme rapporté.</p>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            ) : resultView === "data" ? (
               <div className="panel">
                 <div className="panel-head">
                   <span className="t">Données — {activeSource ? activeSource.toUpperCase() : "…"}</span>

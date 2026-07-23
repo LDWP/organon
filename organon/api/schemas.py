@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from organon.core.config import GenerateOptions
 from organon.core.db_inventory import DbInventory
-from organon.core.models import RegneIncoherence
+from organon.core.models import Basionym, RankName, RegneIncoherence
 
 
 class GenerateRequest(GenerateOptions):
@@ -85,6 +85,17 @@ class GenerateResponse(BaseModel):
     d'imposer une source via `GenerateOptions.auteur_source` plutôt que de subir le vote
     automatique (ex. Campylobacter : ITIS rapporte une citation d'auteur plus complète que
     GBIF/WoRMS)."""
+    auteur_consolide: str = ""
+    """`struct.taxon.auteur` une fois le vote majoritaire (ou l'imposition manuelle via
+    `auteur_source`) tranché — même valeur que celle wikifiée dans `wikitext`, mais en texte
+    brut : `auteur_candidats` donne le détail par module, celui-ci donne le résultat retenu."""
+    synonymes: list[RankName] = []
+    """`struct.synonymes.liste`, si un module en a rapporté (voir `synonymes_source`) —
+    déjà collecté pour alimenter la section "Systématique" du wikitexte, ici exposé structuré."""
+    synonymes_source: str = ""
+    """Module source de `synonymes` (`struct.synonymes.source`) ; vide si aucun synonyme."""
+    basionyme: Basionym | None = None
+    """`struct.basionyme`, si un module en a rapporté un — `None` sinon."""
     logs: list[str] = []
     warnings: list[str] = []
     elapsed_seconds: float
