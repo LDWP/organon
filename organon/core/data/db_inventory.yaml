@@ -423,12 +423,12 @@ categories:
         notes: "World Checklist of Vascular Plants (WCVP), listée séparément dans un inventaire antérieur, est retirée ici : wcvp.science.kew.org redirige désormais vers powo.science.kew.org (même infrastructure, même jeu de données WCVP sous-jacent) — entrée redondante avec celle-ci."
       - id: grin
         nom: "Germplasm Resources Information Network (GRIN)"
-        url: null
-        statut: non_sonde
+        url: "https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomysearch.aspx"
+        statut: ecarte
         classification: {possible: false, estime: false, detail: "déjà une demande de fonctionnalité, pas une classification côté PHP"}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "site reconstruit en SPA, pas d'API JSON trouvée en sondage rapide"}
-        derniere_maj: null
+        acces: {type: scraping_fragile, detail: "revérifié en direct (2026-07-23) : ce n'est PAS une SPA (contrairement au sondage précédent) mais de l'ASP.NET WebForms classique (GRIN-Global v2.3.12), aucune API JSON/REST documentée, aucun export en masse trouvé. Les pages de détail (genre/famille/espèce) sont en GET simple et stable par id numérique (ex. taxonomygenus.aspx?id=1069), mais la résolution nom→id passe uniquement par le formulaire de recherche en POST avec __VIEWSTATE/__EVENTVALIDATION à renouveler à chaque requête — scraping stateful fragile, exactement le cas à éviter. Écarté sans module."}
+        derniere_maj: "2026-07-23"
       - id: tpl
         nom: "The Plant List (TPL)"
         url: null
