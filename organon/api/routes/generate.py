@@ -155,6 +155,7 @@ class EnrichmentRunner:
         applicable: list[str],
         off: set[str],
         options: GenerateOptions,
+        priorities: dict[str, int],
     ) -> None:
         self.struct = struct
         self._baseline = struct.model_copy(deep=True)
@@ -165,12 +166,17 @@ class EnrichmentRunner:
         self._options = options
         # Filtré une fois ici (classification déjà traitée séparément, modules désactivés ou
         # inconnus) plutôt que dans `run()`, pour ne créer une task et émettre un `ModuleRunEvent`
-        # "running" que pour les modules réellement interrogés.
-        self._enrichment_ids = [
+        # "running" que pour les modules réellement interrogés. Trié par priorité croissante :
+        # `run()` applique les résultats dans cet ordre, donc le module le plus prioritaire est
+        # traité en dernier et l'emporte sur les autres en cas de conflit sur un champ mono-valeur
+        # (voir `_MONOVALUE_FIELDS`). Avant ce tri, l'ordre était celui d'enregistrement des
+        # modules dans `bootstrap.py` (alphabétique), sans rapport avec `ModuleMeta.priority`.
+        candidates = [
             m
             for m in applicable
             if m != classification_id and m not in off and get_module(m) is not None
         ]
+        self._enrichment_ids = sorted(candidates, key=lambda m: priorities.get(m, 0))
 
     async def collect_one_module(
         self, module_id: str
@@ -283,7 +289,7 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
     struct = resolved
 
     applicable = modules_possibles(struct.domaine, trees) or []
-    runner = EnrichmentRunner(struct, classification_id, applicable, off, options)
+    runner = EnrichmentRunner(struct, classification_id, applicable, off, options, priorities)
     async for _event in runner.run():
         pass  # /generate ignore la progression intermédiaire ; /generate/stream l'observe.
 
@@ -529,7 +535,7 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
         ]
         yield _sse(PlanEvent(classification_id=classification_id, modules=enrichment_ids))
 
-        runner = EnrichmentRunner(struct, classification_id, applicable, off, options)
+        runner = EnrichmentRunner(struct, classification_id, applicable, off, options, priorities)
         async for module_event in runner.run():
             yield _sse(
                 ModuleStatusEvent(
