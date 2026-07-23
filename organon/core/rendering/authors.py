@@ -41,6 +41,7 @@ from pathlib import Path
 import yaml
 
 from organon.core.models import Struct
+from organon.core.rendering.support import est_similaire
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -127,13 +128,21 @@ def _dates_window(dates: str) -> tuple[int, int] | None:
 
 def _lookup_normalise(table: dict, token: str) -> dict | None:
     """Essaie la clé exacte, puis une variante sans espace après un point (ex. "A. DC." vs
-    "A.DC.") — une variance de formatage courante entre une chaîne de citation "en clair" et la
-    forme figée de la table (pas une résolution floue par ressemblance, juste une normalisation
-    de ponctuation)."""
+    "A.DC.") et enfin, en dernier repli, une comparaison casse/accent-insensible (voir
+    est_similaire) — utile quand une source (GBIF, ITIS...) rapporte un nom sans diacritique
+    alors que la table n'a que la forme accentuée (ex. "Veron" vs "Véron"). Ce repli ne résout
+    que s'il trouve un candidat unique dans la table : deux homonymes qui ne diffèrent que par
+    l'accent ne doivent pas être devinés."""
     entry = table.get(token)
     if entry is not None:
         return entry
-    return table.get(re.sub(r"\.\s+", ".", token))
+    entry = table.get(re.sub(r"\.\s+", ".", token))
+    if entry is not None:
+        return entry
+    candidats = [valeur for cle, valeur in table.items() if est_similaire(cle, token)]
+    if len(candidats) == 1:
+        return candidats[0]
+    return None
 
 
 def _resolve_botaniste(token: str) -> tuple[str | None, dict | None]:
