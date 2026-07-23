@@ -751,12 +751,12 @@ categories:
         derniere_maj: "version 2.4, publiée le 2 janvier 2026 (vérifié en direct, jeu de données également archivé sur Zenodo)"
       - id: msw
         nom: "Mammal Species of the World (MSW)"
-        url: null
-        statut: ecarte
+        url: "https://www.departments.bucknell.edu/biology/resources/msw3/"
+        statut: disponible
         classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping HTML (pages .asp statiques), aucune API trouvée"}
-        derniere_maj: null
+        elements_recoltes: [auteur, identifiant]
+        acces: {type: scraping, detail: "scraping HTML (pages .asp statiques, aucune API) : recherche plein texte en GET sur search.asp?s=<nom>, auteur récupéré sur la fiche détail browse.asp?s=y&id=<id>"}
+        derniere_maj: "2026-07-23"
       - id: reptile_database
         nom: "The Reptile Database"
         url: null
