@@ -18,7 +18,7 @@
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 
-derniere_maj: "2026-07-13"
+derniere_maj: "2026-07-23"
 
 categories:
   - id: generalistes
@@ -563,12 +563,12 @@ categories:
         derniere_maj: null
       - id: funet
         nom: FUNET
-        url: null
+        url: "https://ftp.funet.fi/pub/sci/bio/life/"
         statut: ecarte
-        classification: {possible: true, estime: true, detail: "miroir statique d'un ancien Tree of Life"}
+        classification: {possible: false, estime: false, detail: "aucun rang explicite dans le HTML : uniquement déductible de la profondeur de dossiers, laquelle varie par règne (4 niveaux classe→genre chez les mammifères, 5 chez les plantes avec sous-embranchement) — même fragilité que taxonomicon/ifpni, déjà écartés pour ce motif"}
         elements_recoltes: []
-        acces: {type: scraping, detail: "page atteignable, site statique, pas d'API"}
-        derniere_maj: null
+        acces: {type: scraping, detail: "sondage approfondi (pages réelles inspectées, pas seulement la racine) : HTML en réalité bien structuré par classes sémantiques (div.TN/span.CN/ul.SN/div.MENTIONS), recherche par nom fonctionnelle (cgi-bin/life/goto, gère résultat direct/liste d'homonymes inter-règnes/aucun résultat) — auteur+année et synonymes/sous-taxons seraient extractibles proprement, mais écarté : pas de rang exploitable (voir classification), noms vernaculaires seulement fi/en/sv (jamais fr, contrairement à EOL/OEPP/VASCAN/Tela Botanica déjà intégrés), site figé par branches entières (ex. Panthera daté 26.5.2007) malgré une page d'accueil mise à jour 2023, et le site lui-même avertit que « the taxonomic information is copied from various sources, and may include many inaccuracies »"}
+        derniere_maj: "2026-07-23"
       - id: ion
         nom: "Index to Organism Names (ION)"
         url: null
