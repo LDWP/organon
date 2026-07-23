@@ -16,6 +16,8 @@ taxons sans rapport partageant un même préfixe (ex. un virus nommé d'après s
 
 from __future__ import annotations
 
+import re
+
 from fastapi import APIRouter
 
 from organon.api.schemas import SearchMatch, SearchResponse
@@ -23,11 +25,14 @@ from organon.core.domains import KINGDOM_MAP
 from organon.core.rendering.grammar import wp_nom_rang
 from organon.modules.gbif.adapter import GbifAdapter
 from organon.modules.gbif.ranks import gbif_cherche_rang
+from organon.modules.wikidata.adapter import WikidataAdapter
 
 router = APIRouter()
 
 MAX_MATCHES = 8
 MAX_VERNACULAR_PER_MATCH = 5
+
+_QID_RE = re.compile(r"^Q[1-9]\d*$", re.IGNORECASE)
 
 
 def _preferred_vernaculars(raw: list[dict]) -> list[str]:
@@ -68,6 +73,9 @@ async def search(q: str) -> SearchResponse:
     if not query:
         return SearchResponse(query=q, matches=[])
 
+    if _QID_RE.match(query):
+        return await _search_by_qid(query.upper())
+
     adapter = GbifAdapter()
     try:
         raw_results = await adapter.search_any(query, limit=30)
@@ -104,3 +112,28 @@ async def search(q: str) -> SearchResponse:
     # exacte pourrait être perdue si elle arrive après la position MAX_MATCHES côté GBIF.
     matches = sorted(seen.values(), key=lambda m: _relevance(m, query))[:MAX_MATCHES]
     return SearchResponse(query=q, matches=matches)
+
+
+async def _search_by_qid(qid: str) -> SearchResponse:
+    """Résout un QID Wikidata en un `SearchMatch` unique porteur des identifiants externes déjà
+    connus par l'item (voir `WikidataAdapter.external_ids`) — pas de logique de pertinence ni de
+    dédoublonnage, un QID désigne un item précis, pas une requête floue."""
+    adapter = WikidataAdapter()
+    try:
+        entity = await adapter.get_entity(qid)
+        if entity is None:
+            return SearchResponse(query=qid, matches=[])
+
+        nom = adapter.taxon_name(entity)
+        if not nom:
+            return SearchResponse(query=qid, matches=[])
+
+        match = SearchMatch(
+            scientific_name=nom,
+            source="Wikidata",
+            qid=qid,
+            external_ids=adapter.external_ids(entity),
+        )
+        return SearchResponse(query=qid, matches=[match])
+    finally:
+        await adapter.aclose()

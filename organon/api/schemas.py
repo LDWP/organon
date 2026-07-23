@@ -105,6 +105,13 @@ class GenerateResponse(BaseModel):
     classification — signe possible d'homonymie inter-règnes (voir RegneIncoherence).
     Détection partielle : seuls quelques modules (GBIF/ITIS/WoRMS) exposent ce signal sans coût
     réseau supplémentaire ; son absence ne garantit donc pas la cohérence."""
+    milieu: str = ""
+    """`Struct.milieu` ('marin'/'terrestre'), copié tel quel depuis la source qui l'a détecté
+    (ex. WoRMS via isMarine/isTerrestrial) ; vide si aucune source ne l'a renseigné."""
+    distribution: dict[str, list[str]] = {}
+    """Pour chaque module ayant rapporté une répartition géographique, la liste (triée,
+    dédupliquée) des noms de pays qu'il rapporte — fusion de `DistributionEntry.certain` et
+    `.uncertain` (la distinction n'est pas utile à ce niveau d'affichage synthétique)."""
 
 
 class ModuleStatusEvent(BaseModel):
@@ -167,6 +174,13 @@ class SearchMatch(BaseModel):
     source: str = "GBIF"
     gbif_key: int | None = None
     parent_key: int | None = None
+    qid: str | None = None
+    """QID Wikidata, uniquement renseigné quand la recherche portait sur un item Wikidata (voir
+    `organon.api.routes.search._search_by_qid`)."""
+    external_ids: dict[str, str] = {}
+    """Identifiants externes portés par l'item Wikidata (clé = id de module organon, ex. "gbif",
+    "itis"), pour un futur branchement sur la résolution par id plutôt que par nom des modules
+    d'enrichissement — non câblé pour l'instant, seulement exposé."""
 
 
 class SearchResponse(BaseModel):

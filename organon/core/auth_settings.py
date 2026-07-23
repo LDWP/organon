@@ -56,6 +56,19 @@ class AuthSettings(BaseSettings):
     # identification (OAuth seul, sans édition) fonctionne indépendamment de ce flag.
     bot_edit_enabled: bool = False
 
+    # Correction Wikidata assistée (organon.modules.wikidata ne fait pour l'instant que lire et
+    # diagnostiquer des écarts, jamais écrire) — contrairement au bot Taxobot ci-dessus, une
+    # correction Wikidata doit être attribuée au compte de l'utilisateur lui-même (norme des
+    # outils d'assistance comme QuickStatements, pas un compte bot séparé). Deux décisions
+    # restent ouvertes avant toute implémentation d'écriture, volontairement non tranchées ici :
+    # (1) enregistrer un consumer OAuth distinct de `oauth_client_id` ci-dessus, avec les droits
+    # d'édition Wikibase (le consumer actuel n'a que le scope profil/identification) ; (2) le
+    # mode de conservation du jeton d'accès entre le callback OAuth et l'action de correction —
+    # `sign_session` ci-dessous ne fait que signer, jamais chiffrer, donc pas un stockage sûr
+    # pour un jeton capable d'écrire sur Wikidata.
+    wikidata_api_url: str = "https://www.wikidata.org/w/api.php"
+    wikidata_edit_enabled: bool = False
+
 
 _settings: AuthSettings | None = None
 
