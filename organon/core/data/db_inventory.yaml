@@ -266,12 +266,12 @@ categories:
         derniere_maj: null
       - id: hesperomys
         nom: Hesperomys
-        url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "taxonomie mammalienne"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, API non confirmée"}
-        derniere_maj: null
+        url: "https://hesperomys.com"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "taxonomie mammalienne (extant et fossile), classe Mammalia comme plafond de la chaîne remontée (voir organon/modules/hesperomys/adapter.py)"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", synonymes, éteint, identifiant]
+        acces: {type: api_rest, detail: "API GraphQL non documentée (hesperomys.com/graphql), accès confirmé directement par l'auteur du site en 2024 ; export Zenodo statique en repli (dernier connu : https://zenodo.org/records/10481656) mais non utilisé, l'API en direct couvre les besoins"}
+        derniere_maj: "2026-07-23"
         notes: "Déjà demandé comme fonctionnalité (docs/backlog.md)."
 
   - id: paleo_paleobotanique
