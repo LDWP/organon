@@ -50,6 +50,16 @@ class GenerateOptions(BaseModel):
         default="n",
         description="Mode de traitement des auteurs : s=standard, n=nouveau, n1=nouveau+ajout réponse unique",
     )
+    auteur_source: str | None = Field(
+        default=None,
+        description=(
+            "Identifiant du module à retenir pour l'auteur du taxon (ex. \"itis\"), au lieu du "
+            "vote majoritaire entre modules (voir `_auteur_majoritaire`) — utile quand un module "
+            "rapporte une citation d'auteur plus complète que les autres (ex. GBIF/WoRMS tronqués "
+            "face à ITIS sur un genre donné). Ignoré si absent des candidats de "
+            "`GenerateResponse.auteur_candidats`."
+        ),
+    )
 
     liens_synonymes: bool = Field(default=True, description="Ajouter des wikiliens autour des synonymes")
     liens_inf_sp: bool = Field(
