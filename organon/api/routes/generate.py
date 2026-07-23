@@ -58,7 +58,7 @@ from organon.core.registry import (
 from organon.core.rendering.authors import resoudre_auteur_principal
 from organon.core.rendering.engine import render, render_subtaxa_block, render_taxobox_block
 from organon.core.rendering.sections import compute_rank_lines
-from organon.core.rendering.support import ajoute_si_besoin
+from organon.core.rendering.support import ajoute_si_besoin, data_pays_code
 from organon.core.selectors.categorization import compute_fin_liens
 from organon.core.selectors.coherence import detect_regne_incoherences
 from organon.modules.bootstrap import ensure_modules_registered
@@ -451,6 +451,12 @@ def _assemble_response(
 
     data_found = _compute_data_found(struct, classification_id)
 
+    distribution_merged: dict[str, list[str]] = {}
+    for module_id, entry in struct.distribution.items():
+        noms = sorted(dict.fromkeys(data_pays_code(code) for code in {**entry.certain, **entry.uncertain}))
+        if noms:
+            distribution_merged[module_id] = noms
+
     return GenerateResponse(
         taxon_requested=req.taxon,
         taxon_resolved=struct.taxon.nom,
@@ -473,6 +479,8 @@ def _assemble_response(
         elapsed_seconds=round(time.monotonic() - started, 3),
         truncated=truncated,
         regne_incoherences=regne_incoherences,
+        milieu=struct.milieu or "",
+        distribution=distribution_merged,
     )
 
 

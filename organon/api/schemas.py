@@ -94,6 +94,13 @@ class GenerateResponse(BaseModel):
     classification — signe possible d'homonymie inter-règnes (voir RegneIncoherence).
     Détection partielle : seuls quelques modules (GBIF/ITIS/WoRMS) exposent ce signal sans coût
     réseau supplémentaire ; son absence ne garantit donc pas la cohérence."""
+    milieu: str = ""
+    """`Struct.milieu` ('marin'/'terrestre'), copié tel quel depuis la source qui l'a détecté
+    (ex. WoRMS via isMarine/isTerrestrial) ; vide si aucune source ne l'a renseigné."""
+    distribution: dict[str, list[str]] = {}
+    """Pour chaque module ayant rapporté une répartition géographique, la liste (triée,
+    dédupliquée) des noms de pays qu'il rapporte — fusion de `DistributionEntry.certain` et
+    `.uncertain` (la distinction n'est pas utile à ce niveau d'affichage synthétique)."""
 
 
 class ModuleStatusEvent(BaseModel):

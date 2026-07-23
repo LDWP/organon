@@ -99,7 +99,7 @@ function flattenDisambiguationTree(nodes, depth = 0, out = []) {
 // licence et auteur(s).
 const AUTHOR_NAME = "Auteurs et crédits";
 const LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html";
-const BUG_REPORT_URL = "https://fr.wikipedia.org/wiki/Discussion_Wikipédia/Organon";
+const BUG_REPORT_URL = "https://fr.wikipedia.org/wiki/Discussion_Projet:Biologie/Organon";
 const REPO_URL = "https://github.com/LDWP/organon";
 const DOCS_URL = "https://github.com/LDWP/organon/blob/master/README.md";
 
@@ -248,7 +248,7 @@ export default function App() {
   const [gererConflits, setGererConflits] = useState(false);
   const [resultView, setResultView] = useState("result"); // "result" | "data"
   // Sous-onglets thématiques du panneau Résultat, un clic = un aspect de la taxobox à changer.
-  const [resultSubTab, setResultSubTab] = useState("classification"); // "classification" | "image"
+  const [resultSubTab, setResultSubTab] = useState("classification"); // "classification" | "image" | "autres"
   // Nom de fichier Commons choisi dans la galerie (voir ImageGallery.jsx), appliqué au wikitexte
   // affiché par applyImageSelection() plutôt que persisté dans resultsBySource : survit ainsi à
   // un changement d'onglet de classification, sans dupliquer l'état par source.
@@ -579,6 +579,14 @@ export default function App() {
     setManualWikitext(null);
   }
 
+  // TODO: l'onglet "Noms & synonymes" n'existe pas encore (tâche séparée en cours) — brancher ce
+  // handler sur son activation (ex. setResultView("names")) une fois qu'il sera créé, à la place
+  // de ce no-op.
+  function handleGoToNamesTab() {}
+
+  // TODO: idem pour l'onglet "Autres informations" (pastille "éteint").
+  function handleGoToOtherInfoTab() {}
+
   const activeEntry = activeSource ? resultsBySource[activeSource] : null;
   const activeData = activeEntry?.status === "ok" ? activeEntry.data : null;
 
@@ -657,6 +665,24 @@ export default function App() {
       if (!rankDisagreements[rang].has(nom)) rankDisagreements[rang].set(nom, m.id);
     }
   }
+
+  // Accord entre sources sur l'auteur du taxon : fusionne les candidats bruts rapportés par
+  // chaque module (voir GenerateResponse.auteur_candidats, organon/api/schemas.py) pour
+  // l'ensemble des classifications déjà résolues, pas seulement la source active — deux
+  // générations différentes interrogent en général les mêmes modules d'enrichissement, donc
+  // l'union couvre plus de candidats que ne le ferait le seul auteur_candidats de la source
+  // affichée si une autre source (encore en préchargement) n'était pas prise en compte.
+  const auteurCandidats = {};
+  for (const m of classificationModules) {
+    const entry = resultsBySource[m.id];
+    if (entry?.status === "ok") Object.assign(auteurCandidats, entry.data.auteur_candidats);
+  }
+  const normalizeAuteur = (s) => s.trim().replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ");
+  const auteurValeurs = Object.values(auteurCandidats).filter(Boolean);
+  const auteurVariantes = new Set(auteurValeurs.map(normalizeAuteur));
+  // À défaut de l'auteur rapporté par la source affichée, retombe sur le premier candidat connu
+  // (ex. la source active n'a elle-même pas rapporté d'auteur mais une autre source si).
+  const auteurAffiche = auteurCandidats[activeSource] || auteurValeurs[0] || null;
 
   // Remplace, dans les lignes propres à la source taxobox affichée, celles dont le rang est
   // contesté par au moins une autre source par un {{Taxobox conflit}} listant chaque nom
@@ -963,12 +989,37 @@ export default function App() {
         {query && (
           <div className="results">
             <div className="result-head">
+              {activeData?.eteint && (
+                <button type="button" className="id-badge id-badge-eteint id-badge-clickable" onClick={handleGoToOtherInfoTab}>
+                  ✝ éteint
+                </button>
+              )}
               <h2>
                 <em>{activeData?.taxon_resolved || query.taxon}</em>
               </h2>
+              {activeData && (
+                <button
+                  type="button"
+                  className={
+                    "id-author" +
+                    (auteurValeurs.length === 0 ? " id-author-missing" : auteurVariantes.size > 1 ? " id-author-conflict" : " id-author-ok")
+                  }
+                  onClick={handleGoToNamesTab}
+                  title={auteurVariantes.size > 1 ? `Auteurs en désaccord entre sources : ${[...auteurVariantes].join(" / ")}` : undefined}
+                >
+                  {auteurValeurs.length === 0 ? "auteur ?" : auteurAffiche}
+                </button>
+              )}
+              {activeData?.regne && <span className="id-badge">{activeData.regne}</span>}
+              {/* TODO(écozone) : pastille écozone — donnée pas encore exposée dans activeData au
+                  moment de cette tâche ; brancher ici une fois disponible côté API/frontend. */}
+              {activeData?.vernacular_names?.length > 0 && (
+                <button type="button" className="id-vernacular id-vernacular-clickable" onClick={handleGoToNamesTab}>
+                  {activeData.vernacular_names[0]}
+                  {activeData.vernacular_names.length > 1 ? "…" : ""}
+                </button>
+              )}
             </div>
-            {initialLoading && <p className="result-sub">Génération en cours…</p>}
-
             <div className="tabs result-view-tabs" role="tablist" aria-label="Vue du résultat">
               <button
                 type="button"
@@ -1056,15 +1107,6 @@ export default function App() {
               </div>
             ) : (
               <>
-                {activeData && (activeData.regne || activeData.eteint || activeData.vernacular_names.length > 0) && (
-                  <div className="identity-card">
-                    {activeData.regne && <span className="id-badge">{activeData.regne}</span>}
-                    {activeData.eteint && <span className="id-badge id-badge-eteint">éteint</span>}
-                    {activeData.vernacular_names.length > 0 && (
-                      <span className="id-vernacular">{activeData.vernacular_names.join(", ")}</span>
-                    )}
-                  </div>
-                )}
 
                 {activeData?.regne_incoherences?.length > 0 && (
                   <div className="regne-alert">
@@ -1103,9 +1145,47 @@ export default function App() {
                   >
                     Image
                   </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={resultSubTab === "autres"}
+                    className={"tab" + (resultSubTab === "autres" ? " on" : "")}
+                    onClick={() => setResultSubTab("autres")}
+                  >
+                    Autres informations
+                  </button>
                 </div>
 
-                {resultSubTab === "image" ? (
+                {resultSubTab === "autres" ? (
+                  <div className="panel">
+                    {activeData ? (
+                      <>
+                        {activeData.milieu && (
+                          <div className="field-box">
+                            <span className="field-label">Écozone</span>
+                            <p>{activeData.milieu === "marin" ? "Marin" : "Terrestre"}</p>
+                          </div>
+                        )}
+                        <div className="field-box">
+                          <span className="field-label">Répartition</span>
+                          {activeData.distribution && Object.keys(activeData.distribution).length > 0 ? (
+                            <ul>
+                              {Object.entries(activeData.distribution).map(([moduleId, pays]) => (
+                                <li key={moduleId}>
+                                  <strong>{moduleId.toUpperCase()}</strong> : {pays.join(", ")}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="panel-empty">Aucune répartition disponible.</p>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="panel-empty">Aucune donnée disponible.</p>
+                    )}
+                  </div>
+                ) : resultSubTab === "image" ? (
                   <div className="panel">
                     <ImageGallery
                       taxon={activeData?.taxon_resolved || query?.taxon || null}
@@ -1216,7 +1296,11 @@ export default function App() {
                     <div className="panel" id="result-panel" role="tabpanel" aria-labelledby={activeSource ? `tab-${activeSource}` : undefined} tabIndex={-1}>
                       {!activeEntry && (
                         <div className="panel-loading">
-                          <p>En attente du préchargement de {activeSource?.toUpperCase()}…</p>
+                          <p>
+                            {activeSource
+                              ? `En attente du préchargement de ${activeSource.toUpperCase()}…`
+                              : "Génération en cours…"}
+                          </p>
                         </div>
                       )}
 
