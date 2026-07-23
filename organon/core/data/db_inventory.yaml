@@ -398,12 +398,12 @@ categories:
         notes: "Intégré après la rédaction de cet inventaire (qui le classait encore « à trancher ») ; corrigé ici après lecture du code (organon/modules/tropicos)."
       - id: wfo
         nom: "World Flora Online (WFO)"
-        url: null
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "vérifié côté PHP : classif=false malgré une couverture botanique complète"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping HTML, aucune API trouvée"}
-        derniere_maj: null
+        url: "https://www.worldfloraonline.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "confirmé en sondage direct : la fiche détail affiche une hiérarchie (Angiosperms > ordre > famille > genre > ...) mais elle ne descend pas jusqu'au règne/embranchement et mélange des nœuds génériques sans auteur (ex. « Angiosperms ») avec des rangs réels — jugée insuffisamment fiable, comme déjà tranché côté ancien PHP"}
+        elements_recoltes: [identifiant, auteur, "statut taxonomique (nom accepté/synonyme/non vérifié)"]
+        acces: {type: scraping, detail: "scraping HTML de /search par expression régulière ciblée, aucune API trouvée"}
+        derniere_maj: "2026-07-23"
       - id: wcsp
         nom: "World Checklist of Selected Plant Families (WCSP)"
         url: null
