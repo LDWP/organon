@@ -156,6 +156,13 @@ class SearchMatch(BaseModel):
     source: str = "GBIF"
     gbif_key: int | None = None
     parent_key: int | None = None
+    qid: str | None = None
+    """QID Wikidata, uniquement renseigné quand la recherche portait sur un item Wikidata (voir
+    `organon.api.routes.search._search_by_qid`)."""
+    external_ids: dict[str, str] = {}
+    """Identifiants externes portés par l'item Wikidata (clé = id de module organon, ex. "gbif",
+    "itis"), pour un futur branchement sur la résolution par id plutôt que par nom des modules
+    d'enrichissement — non câblé pour l'instant, seulement exposé."""
 
 
 class SearchResponse(BaseModel):
