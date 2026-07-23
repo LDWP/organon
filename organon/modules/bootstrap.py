@@ -21,6 +21,7 @@ from organon.modules.ipni import module as _ipni  # noqa: F401
 from organon.modules.irmng import module as _irmng  # noqa: F401
 from organon.modules.itis import module as _itis  # noqa: F401
 from organon.modules.mnhn import module as _mnhn  # noqa: F401
+from organon.modules.msw import module as _msw  # noqa: F401
 from organon.modules.ncbi import module as _ncbi  # noqa: F401
 from organon.modules.oepp import module as _oepp  # noqa: F401
 from organon.modules.powo import module as _powo  # noqa: F401
