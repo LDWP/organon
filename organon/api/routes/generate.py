@@ -298,6 +298,24 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
     )
 
 
+def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
+    """Auteur brut rapporté par chaque module ayant contribué à ce taxon, avant vote majoritaire
+    — exposé via `GenerateResponse.auteur_candidats` pour permettre à l'utilisateur d'imposer une
+    source via `GenerateOptions.auteur_source` plutôt que de subir le vote automatique de
+    `_auteur_majoritaire`. Même périmètre que ce vote (mêmes exclusions, ex. CoL sous
+    `liens['col']['bundles']`), mais un candidat par module plutôt qu'un multi-ensemble : ici
+    seule la liste des sources disponibles compte, pas leur poids dans un vote."""
+    candidats: dict[str, str] = {}
+    classification_auteur = (struct.taxon.auteur or "").strip()
+    if classification_auteur:
+        candidats[classification_id] = classification_auteur
+    for module_id, data in struct.liens.items():
+        auteur = data.get("auteur")
+        if auteur:
+            candidats[module_id] = auteur.strip()
+    return candidats
+
+
 def _auteur_majoritaire(struct: Struct) -> str:
     """Retient l'auteur que le plus de modules rapportent à l'identique, plutôt que celui du
     seul module de classification (qui peut très bien n'avoir rien trouvé alors qu'un module
@@ -384,7 +402,11 @@ def _assemble_response(
 
     struct.liens["fin"] = compute_fin_liens(struct, options)
 
-    struct.taxon.auteur = _auteur_majoritaire(struct)
+    auteur_candidats = _auteur_candidats(struct, classification_id)
+    if options.auteur_source and options.auteur_source in auteur_candidats:
+        struct.taxon.auteur = auteur_candidats[options.auteur_source]
+    else:
+        struct.taxon.auteur = _auteur_majoritaire(struct)
     struct.taxon.auteur_resolu, auteur_warnings = resoudre_auteur_principal(struct)
     warnings = warnings + auteur_warnings
 
@@ -445,6 +467,7 @@ def _assemble_response(
         rank_lines=rank_lines,
         external_links=external_links,
         data_found=data_found,
+        auteur_candidats=auteur_candidats,
         logs=logs,
         warnings=warnings,
         elapsed_seconds=round(time.monotonic() - started, 3),

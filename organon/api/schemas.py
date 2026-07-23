@@ -79,6 +79,12 @@ class GenerateResponse(BaseModel):
     sous-taxons/synonymes, quelles clés de noms vernaculaires/répartition sont non vides...)
     plutôt que maintenue à la main module par module. Alimente la colonne "Informations" de
     l'onglet Données côté frontend."""
+    auteur_candidats: dict[str, str] = {}
+    """Pour chaque module ayant rapporté un auteur pour ce taxon, l'auteur brut qu'il rapporte —
+    avant vote majoritaire entre modules (voir `_auteur_majoritaire`). Permet à l'utilisateur
+    d'imposer une source via `GenerateOptions.auteur_source` plutôt que de subir le vote
+    automatique (ex. Campylobacter : ITIS rapporte une citation d'auteur plus complète que
+    GBIF/WoRMS)."""
     logs: list[str] = []
     warnings: list[str] = []
     elapsed_seconds: float
