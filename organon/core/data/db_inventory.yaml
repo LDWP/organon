@@ -186,16 +186,16 @@ categories:
         statut: bloque_temporaire
         classification: {possible: false, estime: false, detail: "côté PHP, mod_inpn.php déclare classif=false"}
         elements_recoltes: []
-        acces: {type: bloque, detail: "API réelle (taxref.mnhn.fr) : « services temporairement interrompus », revérifié en direct — toujours indisponible"}
-        derniere_maj: null
+        acces: {type: bloque, detail: "resondé en direct le 2026-07-23 : le site legacy (taxref.mnhn.fr/taxref-web) a migré vers un frontend Angular (inpn.mnhn.fr) ; l'ancien endpoint /api/taxa/search redirige (302) vers la page d'accueil SPA, le swagger documenté (/api/v2/api-docs) renvoie 404, et la page de démo d'API (inpn.mnhn.fr/docs-web/docs/apiDemo2) renvoie une Erreur 403 côté Angular — aucune API REST publique fonctionnelle trouvée, toujours indisponible"}
+        derniere_maj: "2026-07-23"
       - id: taxref
         nom: TAXREF
         url: "https://taxref.mnhn.fr"
         statut: bloque_temporaire
         classification: {possible: false, estime: false, detail: "même service que INPN côté PHP"}
         elements_recoltes: []
-        acces: {type: bloque, detail: "même blocage temporaire que INPN"}
-        derniere_maj: null
+        acces: {type: bloque, detail: "même blocage que INPN, resondé le 2026-07-23 (voir détail INPN)"}
+        derniere_maj: "2026-07-23"
       - id: taxonomicon
         nom: "The Taxonomicon"
         url: "http://taxonomicon.taxonomy.nl"
