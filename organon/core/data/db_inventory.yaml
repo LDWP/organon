@@ -18,7 +18,7 @@
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 
-derniere_maj: "2026-07-13"
+derniere_maj: "2026-07-23"
 
 categories:
   - id: generalistes
@@ -198,12 +198,12 @@ categories:
         derniere_maj: null
       - id: taxonomicon
         nom: "The Taxonomicon"
-        url: null
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "côté PHP : rang réutilisé de la classification principale, comme d'autres modules"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping HTML, jugé « mono-auteur, peu automatisé » par le projet lui-même — écarté"}
-        derniere_maj: null
+        url: "http://taxonomicon.taxonomy.nl"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "rang réutilisé de la classification principale, comme d'autres modules"}
+        elements_recoltes: [identifiant, "nom vérifié", auteur]
+        acces: {type: scraping, detail: "scraping HTML ciblé par regex, aucune API trouvée ; recherche scopée par groupe de rang (subject=Genus/Family/High/Species/Low) pour éviter les entités non biologiques homonymes de la recherche générale du site ; auteur complet récupéré par un second appel vers la fiche de nomenclature"}
+        derniere_maj: "2026-07-23"
       - id: tolweb
         nom: "Tree of Life Web Project (ToLWeb)"
         url: "https://tolweb.org"
