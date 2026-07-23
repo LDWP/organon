@@ -783,10 +783,10 @@ categories:
         derniere_maj: null
       - id: wsc
         nom: "World Spider Catalog (WSC)"
-        url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "taxonomie des araignées"}
+        url: "https://wsc.nmbe.ch"
+        statut: disponible
+        classification: {possible: true, estime: true, detail: "taxonomie des araignées (famille/genre/espèce/sous-espèce), synonymes résolus via validSpeciesId"}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "réponses incohérentes selon l'URL testée — non concluant"}
-        derniere_maj: null
-        notes: "Déjà demandé comme fonctionnalité (docs/backlog.md)."
+        acces: {type: export, detail: "export CSV quotidien public sans clé (https://wsc.nmbe.ch/resources/species_export_YYYYMMDD.csv, ~7,8 Mo, colonnes speciesId/species_lsid/family/genus/species/subspecies/author/year/distribution/taxonStatus/validSpeciesId) — confirmé accessible en direct (HTTP 200, Last-Modified du jour). Une API REST/JSON existe aussi (api/lsid/<LSID>, api/updates) mais nécessite inscription WSCA + clé API, donc écartée au profit du CSV. Licence CC BY-NC-SA 4.0 : attribution requise, usage non-commercial."}
+        derniere_maj: "2026-07-22 (fichier daté du jour, vérifié en direct le 2026-07-23)"
+        notes: "Déjà demandé comme fonctionnalité (docs/backlog.md). Ancien sondage 'non concluant' invalidé : l'export CSV documenté sur wsc.nmbe.ch/dataresources n'avait pas été trouvé."
