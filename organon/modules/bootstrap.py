@@ -27,6 +27,7 @@ from organon.modules.msw import module as _msw  # noqa: F401
 from organon.modules.ncbi import module as _ncbi  # noqa: F401
 from organon.modules.oepp import module as _oepp  # noqa: F401
 from organon.modules.powo import module as _powo  # noqa: F401
+from organon.modules.taxonomicon import module as _taxonomicon  # noqa: F401
 from organon.modules.telametro import module as _telametro  # noqa: F401
 from organon.modules.tpdb import module as _tpdb  # noqa: F401
 from organon.modules.tropicos import module as _tropicos  # noqa: F401
