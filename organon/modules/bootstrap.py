@@ -9,6 +9,7 @@ du retrait)."""
 
 from __future__ import annotations
 
+from organon.modules.adw import module as _adw  # noqa: F401
 from organon.modules.algaebase import module as _algaebase  # noqa: F401
 from organon.modules.cites import module as _cites  # noqa: F401
 from organon.modules.col import module as _col  # noqa: F401

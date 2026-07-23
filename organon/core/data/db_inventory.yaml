@@ -539,12 +539,12 @@ categories:
     sources:
       - id: adw
         nom: "Animal Diversity Web (ADW)"
-        url: null
-        statut: ecarte
+        url: "https://animaldiversity.org"
+        statut: disponible
         classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping HTML, extraction d'auteur par regex complexe — écarté (complexité/valeur)"}
-        derniere_maj: null
+        elements_recoltes: [auteur, date]
+        acces: {type: scraping, detail: "scraping HTML de la fiche taxon (accounts/<nom>/), extraction d'auteur[s]/année par regex sur le paragraphe \"To cite this page:\""}
+        derniere_maj: "2026-07-23"
       - id: animalbase
         nom: AnimalBase
         url: null
