@@ -57,6 +57,13 @@ class GbifAdapter:
         resp.raise_for_status()
         return resp.json()
 
+    async def iucn_red_list_category(self, key: int) -> dict | None:
+        resp = await self._client.get(f"{BASE_URL}/species/{key}/iucnRedListCategory")
+        if resp.status_code == 404:
+            return None
+        resp.raise_for_status()
+        return resp.json()
+
     async def children_page(self, key: int, offset: int = 0) -> dict:
         resp = await self._client.get(f"{BASE_URL}/species/{key}/children", params={"offset": offset})
         resp.raise_for_status()

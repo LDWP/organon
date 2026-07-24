@@ -45,6 +45,9 @@ class GenerateResponse(BaseModel):
     domain_used: str
     regne: str = ""
     eteint: bool = False
+    uicn_statut: str = ""
+    """Code de statut de conservation UICN (LC/NT/VU/EN/CR/EW/EX/DD/NE...), rapporté par GBIF
+    via `/species/{key}/iucnRedListCategory` (voir `organon.modules.gbif`) ; vide si absent."""
     vernacular_names: list[str] = []
     wikitext: str
     taxobox_wikitext: str

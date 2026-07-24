@@ -139,6 +139,16 @@ class GbifModule(TaxonomyModule):
             if regne_detecte:
                 struct.liens["gbif"]["regne_detecte"] = regne_detecte
 
+        # Placé ici (avant le `if not is_classification` plus bas) plutôt que dans la branche
+        # classification uniquement : GBIF tourne aussi en enrichissement quand une autre source
+        # pilote la classification (domaine "all"), et c'est le seul endroit où `key` est connu
+        # dans les deux cas — un module `iucn` séparé ne verrait pas cette clé en enrichissement
+        # (les modules d'enrichissement tournent en parallèle sur des copies indépendantes du
+        # struct pré-enrichissement, voir `EnrichmentRunner`).
+        iucn = await adapter.iucn_red_list_category(key)
+        if iucn and iucn.get("code"):
+            struct.liens["uicn"] = {"risque": iucn["code"]}
+
         accepted_key = cur.get("acceptedKey")
         is_synonym = accepted_key is not None and accepted_key != key
         if is_synonym:

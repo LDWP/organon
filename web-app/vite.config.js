@@ -12,9 +12,7 @@ export default defineConfig({
       // '/api/v1' (pas juste '/api') : le proxy de Vite matche par préfixe de chaîne brut,
       // '/api' interceptait aussi les requêtes de modules JS comme /apiClient.js.
       '/api/v1': {
-        // NOTE session locale : pointé temporairement sur 8301 (serveur autonome de
-        // vérification manuelle dans ce worktree isolé) ; remettre 8123 avant commit.
-        target: 'http://127.0.0.1:8301',
+        target: 'http://127.0.0.1:8123',
         changeOrigin: true,
       },
     },

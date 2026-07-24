@@ -17,6 +17,21 @@ import { getStorageConsent, setStorageConsent } from "./storagePreferences.js";
 const EXAMPLE_TAXON = "Gadus morhua";
 const MORE_EXAMPLES = ["Panthera leo", "Quercus robur", "Amanita muscaria"];
 
+// Libellés français des codes de statut UICN (voir GenerateResponse.uicn_statut,
+// organon.api.schemas) — mêmes codes que {{Taxobox UICN}} sur frwiki.
+const UICN_LABELS = {
+  EX: "Éteinte",
+  EW: "Éteinte à l'état sauvage",
+  RE: "Disparue au niveau régional",
+  CR: "En danger critique d'extinction",
+  EN: "En danger",
+  VU: "Vulnérable",
+  NT: "Quasi menacée",
+  LC: "Préoccupation mineure",
+  DD: "Données insuffisantes",
+  NE: "Non évaluée",
+};
+
 // Miroir de wp_est_italique() (organon/core/rendering/grammar.py) : dans la plupart des règnes
 // (végétal, champignon, bactérie, archaea, virus…) l'italique est systématique quel que soit le
 // rang. Seuls les règnes suivants (proches de la convention zoologique) réservent l'italique au
@@ -1263,6 +1278,16 @@ export default function App() {
                           <div className="field-box">
                             <span className="field-label">Écozone</span>
                             <p>{activeData.milieu === "marin" ? "Marin" : "Terrestre"}</p>
+                          </div>
+                        )}
+                        {activeData.uicn_statut && (
+                          <div className="field-box">
+                            <span className="field-label">Statut de conservation UICN</span>
+                            <p>
+                              <strong>{activeData.uicn_statut}</strong>
+                              {UICN_LABELS[activeData.uicn_statut] ? ` — ${UICN_LABELS[activeData.uicn_statut]}` : ""}
+                              {" "}(source : GBIF)
+                            </p>
                           </div>
                         )}
                         <div className="field-box">
