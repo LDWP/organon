@@ -4,6 +4,8 @@ Ne fait aucun appel HTTP directement, voir adapter.py.
 
 from __future__ import annotations
 
+import html as _html
+
 from organon.core.config import GenerateOptions
 from organon.core.models import (
     Basionym,
@@ -236,7 +238,11 @@ class GbifModule(TaxonomyModule):
 
         async def fetch_vernacular(offset: int) -> tuple[list[str], bool]:
             page = await adapter.vernacular_names_page(key, offset)
-            names = [c["vernacularName"] for c in page.get("results", []) if c.get("language") == "fra"]
+            names = [
+                _html.unescape(c["vernacularName"])
+                for c in page.get("results", [])
+                if c.get("language") == "fra"
+            ]
             return names, page.get("endOfRecords", True)
 
         vernaculaire, _ = await collect_pages(fetch_vernacular)
