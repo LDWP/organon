@@ -302,8 +302,22 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 .id-badge-btn.on { outline: 2px solid var(--ink); outline-offset: 1px; }
 .id-badge-conflict { background: var(--amber); color: var(--amber-ink); }
 .id-badge-conflict.on { outline-color: var(--amber); }
+/* Indicateur non cliquable (onglet Classification) de la source actuellement choisie pour la
+   Taxobox — le choix lui-même se fait uniquement dans le tableau de l'onglet Wikitexte > Taxobox,
+   pas de cursor/hover ici pour ne pas suggérer une action possible. */
+.id-badge-current { outline: 2px solid var(--ink); outline-offset: 1px; }
 .classification-compare-table th { vertical-align: middle; }
 .conflict-cell { background: color-mix(in srgb, var(--amber) 16%, transparent); }
+.chosen-col { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.classification-compare-table tbody th abbr { text-decoration-color: var(--ink-soft); cursor: help; }
+/* Largeurs figées pour tenir dans le cadre sans défilement horizontal : la colonne libellé et la
+   colonne "gérer" (case à cocher seule) ont une largeur fixe, les colonnes source se partagent le
+   reste à parts égales (table-layout: fixed ne calcule les largeurs que sur la 1ʳᵉ ligne). */
+.classification-compare-wrap { overflow-x: visible; }
+.classification-compare-table { table-layout: fixed; }
+.classification-compare-table th:first-child, .classification-compare-table td:first-child { width: 110px; }
+.classification-compare-table th:last-child, .classification-compare-table td:last-child { width: 28px; padding-left: 2px; padding-right: 2px; }
+.classification-compare-table td { overflow-wrap: break-word; }
 
 /* ---------- statuts de module (classification/enrichissement) ----------
    Remplace l'ancien `.dot`/`.dot warn`/`.dot off` (couleur seule, pas accessible aux
@@ -404,6 +418,15 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
   display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
 }
 .data-table td:nth-child(2) { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
+/* Les deux règles ci-dessus visent le tableau de l'onglet Données (badge+lien, icône+statut) —
+   ça casse la mise en page de ligne du tableau de comparaison par rang de l'onglet Classification
+   (colonnes rang + une par source, sans ce besoin de flex) : on y repasse ces deux colonnes en
+   cellules de table normales. */
+.classification-compare-table td:first-child,
+.classification-compare-table td:nth-child(2) {
+  display: table-cell;
+  white-space: normal;
+}
 .data-table a {
   font-family: var(--mono); font-size: 11.5px; color: var(--accent); text-decoration: none; border: 1px solid var(--line);
   border-radius: 5px; padding: 3px 8px;

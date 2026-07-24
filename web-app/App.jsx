@@ -32,6 +32,44 @@ const UICN_LABELS = {
   NE: "Non évaluée",
 };
 
+// Sous-onglets du bloc wikitexte (voir wikitextSubTab côté App) : chacun affiche un seul bloc
+// isolé renvoyé par le serveur, sauf "tout" qui garde le comportement historique (composé,
+// éditable).
+const WIKITEXT_SUBTABS = [
+  { id: "tout", label: "Tout" },
+  { id: "taxobox", label: "Taxobox" },
+  { id: "subrangs", label: "Sous-rangs" },
+  { id: "references", label: "Références taxonomiques" },
+];
+
+// Abréviations officielles de {{Modèle:Taxoboxoutils rang}} sur frwiki : seule la branche
+// "embranchement" a une forme courte (format=court) — classe/ordre/famille/genre et leurs
+// composés (super-classe, sous-ordre…) n'ont pas d'abréviation standard côté frwiki et
+// restent en toutes lettres dans le tableau de comparaison.
+const RANK_ABBR = {
+  "super-embranchement": "Super-embr.",
+  "sous-embranchement": "Sous-embr.",
+  "infra-embranchement": "Infra-embr.",
+  "micro-embranchement": "Micro-embr.",
+  "parv-embranchement": "Parv-embr.",
+};
+
+// Regroupe des colonnes consécutives (dans l'ordre de `sources`) qui partagent la même valeur
+// affichée, pour le tableau de comparaison Taxobox — évite de répéter une valeur identique sur
+// plusieurs colonnes adjacentes (ex. ITIS et WoRMS d'accord sur "classe"). Ne fusionne que des
+// sources consécutives : ne réordonne jamais les colonnes, pour garder une position stable d'un
+// rang à l'autre.
+function mergeAdjacentEqual(sources, valueFor) {
+  const groups = [];
+  for (const source of sources) {
+    const value = valueFor(source);
+    const last = groups[groups.length - 1];
+    if (last && last.value === value) last.sources.push(source);
+    else groups.push({ value, sources: [source] });
+  }
+  return groups;
+}
+
 // Miroir de wp_est_italique() (organon/core/rendering/grammar.py) : dans la plupart des règnes
 // (végétal, champignon, bactérie, archaea, virus…) l'italique est systématique quel que soit le
 // rang. Seuls les règnes suivants (proches de la convention zoologique) réservent l'italique au
@@ -266,11 +304,11 @@ export default function App() {
   // sous-taxons.
   const [taxoboxSourceOverride, setTaxoboxSourceOverride] = useState(null);
   const [subtaxaSourceOverride, setSubtaxaSourceOverride] = useState(null);
-  // Active applyRankConflicts (insertion de {{Taxobox conflit}} en cas de désaccord de rang entre
-  // sources) — désactivé par défaut car la majorité des groupes ne présentent pas de divergence
-  // taxonomique significative ; à cocher au cas par cas pour les groupes qui en ont (poissons,
-  // insectes...).
-  const [gererConflits, setGererConflits] = useState(false);
+  // Rangs pour lesquels l'utilisateur a explicitement demandé à signaler le désaccord de source
+  // dans le rendu (insertion de {{Taxobox conflit}}) — par rang plutôt qu'un interrupteur global,
+  // pour laisser géré un rang contesté (ex. "classe") sans en marquer d'autres qui ne posent pas
+  // de vrai problème éditorial. Coché depuis le tableau de comparaison de l'onglet Taxobox.
+  const [managedRankConflicts, setManagedRankConflicts] = useState({});
   // Onglet actif de la coquille à navigation latérale du résultat.
   const [resultView, setResultView] = useState("wikitexte"); // "wikitexte" | "classification" | "noms" | "image" | "autres" | "data"
   // Nom de fichier Commons choisi dans la galerie (voir ImageGallery.jsx), appliqué au wikitexte
@@ -432,6 +470,7 @@ export default function App() {
     setCommonsImagesCache({});
     setTaxoboxSourceOverride(null);
     setSubtaxaSourceOverride(null);
+    setManagedRankConflicts({});
     setInitialLoading(true);
     const { data, error } = await fetchSource(taxonName, domaineValue, classification, gbifKey);
     setInitialLoading(false);
@@ -603,6 +642,10 @@ export default function App() {
     setManualWikitext(null);
   }
 
+  function toggleRankConflictManaged(rang) {
+    setManagedRankConflicts((prev) => ({ ...prev, [rang]: !prev[rang] }));
+  }
+
   function handleGoToNamesTab() {
     setResultView("noms");
   }
@@ -744,13 +787,16 @@ export default function App() {
 
   // Remplace, dans les lignes propres à la source taxobox affichée, celles dont le rang est
   // contesté par au moins une autre source par un {{Taxobox conflit}} listant chaque nom
-  // concurrent et sa source — laisse les autres lignes intactes. N'agit que si la case "gérer
-  // les conflits de classification" est cochée (voir gererConflits).
+  // concurrent et sa source — laisse les autres lignes intactes. N'agit que sur les rangs
+  // explicitement cochés "gérer" dans le tableau de comparaison (voir managedRankConflicts) :
+  // la majorité des désaccords de rang ne posent pas de vrai problème éditorial, donc rien
+  // n'est signalé par défaut.
   function applyRankConflicts(wikitext, rankLines) {
-    if (!rankLines || !gererConflits) return wikitext;
+    if (!rankLines) return wikitext;
     let result = wikitext;
     const rangsResolus = new Set();
     for (const { rang, line } of rankLines) {
+      if (!managedRankConflicts[rang]) continue;
       const parNom = rankDisagreements[rang];
       if (!parNom || parNom.size < 2) continue;
       if (rangsResolus.has(rang)) {
@@ -1096,6 +1142,19 @@ export default function App() {
               </div>
             )}
 
+            {hasRankConflicts && (
+              <div className="regne-alert">
+                <p className="regne-alert-title">⚠ Désaccord de classification entre sources</p>
+                <p className="regne-alert-hint">
+                  Voir l'onglet{" "}
+                  <button type="button" className="footer-link" onClick={() => setResultView("classification")}>
+                    Classification
+                  </button>{" "}
+                  — les rangs en désaccord y sont surlignés en marron.
+                </p>
+              </div>
+            )}
+
             <div className="result-shell">
               <nav className="result-nav" role="tablist" aria-label="Vue du résultat">
                 {RESULT_VIEWS.map(({ id, label }) => (
@@ -1123,23 +1182,6 @@ export default function App() {
                     {availableSources.length > 0 && (
                       <div className="facet-controls">
                         <div className="field-box">
-                          <label className="field-label" htmlFor="taxobox-source-select">
-                            Taxobox
-                          </label>
-                          <select
-                            id="taxobox-source-select"
-                            value={taxoboxSourceId || ""}
-                            onChange={(e) => handleTaxoboxSourceChange(e.target.value)}
-                          >
-                            {availableSources.map((m) => (
-                              <option key={m.id} value={m.id}>
-                                {m.id.toUpperCase()}
-                                {m.id === recommendedTaxoboxSource ? " (recommandé)" : ""}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="field-box">
                           <label className="field-label" htmlFor="subtaxa-source-select">
                             Taxons inférieurs
                           </label>
@@ -1156,17 +1198,6 @@ export default function App() {
                             ))}
                           </select>
                         </div>
-                        {hasRankConflicts && (
-                          <button
-                            type="button"
-                            className={"id-badge id-badge-btn id-badge-conflict" + (gererConflits ? " on" : "")}
-                            aria-pressed={gererConflits}
-                            onClick={() => setGererConflits((v) => !v)}
-                            title="Signaler dans le wikitexte les rangs où les sources sont en désaccord"
-                          >
-                            ⚠ Conflits{gererConflits ? " gérés" : ""}
-                          </button>
-                        )}
                       </div>
                     )}
 
@@ -1255,6 +1286,86 @@ export default function App() {
                               </button>
                             </div>
                           </div>
+                          <div className="tabs subtabs" role="tablist" aria-label="Bloc de wikitexte à afficher">
+                            {WIKITEXT_SUBTABS.map(({ id, label }) => (
+                              <button
+                                key={id}
+                                type="button"
+                                role="tab"
+                                aria-selected={wikitextSubTab === id}
+                                className={"tab" + (wikitextSubTab === id ? " on" : "")}
+                                onClick={() => setWikitextSubTab(id)}
+                              >
+                                {label}
+                              </button>
+                            ))}
+                          </div>
+                          {wikitextSubTab === "taxobox" && availableSources.length > 0 && (
+                            <div className="data-table-wrap classification-compare-wrap">
+                              <table className="data-table classification-compare-table">
+                                <thead>
+                                  <tr>
+                                    <th></th>
+                                    {availableSources.map((m) => (
+                                      <th key={m.id}>
+                                        <button
+                                          type="button"
+                                          className={"id-badge id-badge-btn" + (taxoboxSourceId === m.id ? " on" : "")}
+                                          onClick={() => handleTaxoboxSourceChange(m.id)}
+                                          title={m.id === recommendedTaxoboxSource ? "Recommandé" : "Choisir cette source pour la Taxobox"}
+                                        >
+                                          {m.id.toUpperCase()}
+                                          {m.id === recommendedTaxoboxSource ? " ★" : ""}
+                                        </button>
+                                      </th>
+                                    ))}
+                                    <th></th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {classificationTableRows.order.map((rang) => {
+                                    const conflict = rankDisagreements[rang]?.size > 1;
+                                    const valueFor = (m) => {
+                                      const noms = classificationTableRows.perModule[m.id]?.[rang] || [];
+                                      return noms.length > 0 ? noms.join(", ") : "—";
+                                    };
+                                    const chosenValue = taxoboxNomByRang[rang] || "—";
+                                    const groups = mergeAdjacentEqual(availableSources, valueFor);
+                                    const abbr = RANK_ABBR[rang];
+                                    return (
+                                      <tr key={rang}>
+                                        <th>{abbr ? <abbr title={rang}>{abbr}</abbr> : rang}</th>
+                                        {groups.map((g, gi) => {
+                                          const isChosen = g.sources.some((m) => m.id === taxoboxSourceId);
+                                          const isDiff = conflict && !isChosen && g.value !== "—" && g.value !== chosenValue;
+                                          return (
+                                            <td
+                                              key={gi}
+                                              colSpan={g.sources.length}
+                                              className={isDiff ? "conflict-cell" : isChosen ? "chosen-col" : undefined}
+                                            >
+                                              {g.value}
+                                            </td>
+                                          );
+                                        })}
+                                        <td>
+                                          {conflict && (
+                                            <input
+                                              type="checkbox"
+                                              checked={!!managedRankConflicts[rang]}
+                                              onChange={() => toggleRankConflictManaged(rang)}
+                                              aria-label={`Gérer le désaccord sur le rang ${rang} dans le rendu`}
+                                              title="Gérer ce désaccord dans le rendu"
+                                            />
+                                          )}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
                           <textarea
                             className="wikitext"
                             aria-labelledby="wikitext-label"
@@ -1284,14 +1395,12 @@ export default function App() {
                               <th>Rang</th>
                               {availableSources.map((m) => (
                                 <th key={m.id}>
-                                  <button
-                                    type="button"
-                                    className={"id-badge id-badge-btn" + (taxoboxSourceId === m.id ? " on" : "")}
-                                    onClick={() => handleTaxoboxSourceChange(m.id)}
-                                    title="Utiliser cette source pour la taxobox"
+                                  <span
+                                    className={"id-badge" + (taxoboxSourceId === m.id ? " id-badge-current" : "")}
+                                    title={taxoboxSourceId === m.id ? "Source actuelle de la Taxobox — à changer depuis l'onglet Wikitexte > Taxobox" : undefined}
                                   >
                                     {m.id.toUpperCase()}
-                                  </button>
+                                  </span>
                                 </th>
                               ))}
                             </tr>
@@ -1301,12 +1410,7 @@ export default function App() {
                               const conflict = rankDisagreements[rang]?.size > 1;
                               return (
                                 <tr key={rang}>
-                                  <td>
-                                    {rang}
-                                    {conflict && (
-                                      <span className="id-badge id-badge-conflict" title="Désaccord entre sources">⚠</span>
-                                    )}
-                                  </td>
+                                  <td>{rang}</td>
                                   {availableSources.map((m) => {
                                     const noms = classificationTableRows.perModule[m.id]?.[rang] || [];
                                     const differs = conflict && noms.length > 0 && !noms.includes(taxoboxNomByRang[rang]);
