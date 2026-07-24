@@ -31,6 +31,15 @@ def render_subtaxa_block(struct: Struct, options: GenerateOptions) -> str:
     return sections.render_inf(struct, options)
 
 
+def render_references_items_block(struct: Struct) -> list[tuple[str, str]]:
+    """Rendu isolé des références taxonomiques en paires (module_id, wikitext), réutilisé par
+    l'API selon le même principe que `render_taxobox_block`/`render_subtaxa_block` : n'est pas
+    appelé par `render()` (ce bloc reste inclus dans la section "Liens externes" de l'article
+    complet via `sections.render_voir_aussi`), seulement exposé séparément pour le frontend
+    (voir `organon.api.schemas.ReferenceItem`)."""
+    return sections.render_references_items(struct)
+
+
 def render(struct: Struct, options: GenerateOptions, ext_only: bool = False) -> str:
     """Assemble l'article complet. `ext_only=True` ne génère que la zone "Voir aussi" / liens
     externes, sans le reste de l'article."""

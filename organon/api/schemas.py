@@ -27,6 +27,20 @@ class ExternalLink(BaseModel):
     html: str
 
 
+class ReferenceItem(BaseModel):
+    """Une référence taxonomique individuelle (`module.render_bioref`), attribuée à son module
+    d'origine — pendant structuré de `GenerateResponse.references_wikitext` qui permet au
+    frontend de cocher/décocher chaque référence plutôt que de recevoir uniquement le bloc déjà
+    joint (voir l'onglet Wikitexte > Références taxonomiques)."""
+
+    module_id: str
+    wikitext: str
+    default_checked: bool = True
+    """False si le domaine déclaré du module (`ModuleMeta.domains`) exclut le règne retenu pour
+    ce taxon (voir `organon.core.selectors.coherence.reference_module_coherente`) — reste
+    cochable manuellement, seule la case initiale change."""
+
+
 class RankLine(BaseModel):
     """Un rang de la taxobox (voir `organon.core.rendering.sections.compute_rank_lines`), avec
     sa ligne wikitexte déjà mise en forme — exposé structuré pour permettre de comparer les
@@ -59,6 +73,17 @@ class GenerateResponse(BaseModel):
     """La section "Liste des taxons de rang inférieur" isolée du reste de `wikitext`, selon le
     même principe que `taxobox_wikitext` — permet de choisir indépendamment la source qui
     alimente la taxobox et celle qui alimente les sous-taxons plutôt qu'un bloc unique."""
+    references_wikitext: str = ""
+    """Les références taxonomiques (liens `render_bioref` de chaque module) isolées du reste de
+    `wikitext`, selon le même principe que `taxobox_wikitext`/`subtaxa_wikitext` — exclut
+    volontairement le bloc `{{Autres projets}}` (Commons/Wikispecies/Wiktionnaire), qui n'est
+    pas une référence taxonomique au sens strict. Dérivé de `reference_items` (tri alphabétique
+    + jointure) ; conservé pour compatibilité avec les appelants qui consomment déjà ce bloc."""
+    reference_items: list[ReferenceItem] = []
+    """Pendant structuré de `references_wikitext` : une entrée par ligne de référence plutôt
+    qu'un bloc déjà joint, pour permettre au frontend de cocher/décocher chaque référence
+    individuellement (le backend n'a aucun moyen de détecter automatiquement une source
+    incohérente, donc toutes cochées par défaut)."""
     taxobox_completeness_score: int = 0
     """Mesure de complétude de la taxobox de cette classification (nombre de rangs trouvés) —
     sert à recommander automatiquement une source pour la facette "taxobox" du zoom

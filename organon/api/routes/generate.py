@@ -42,6 +42,7 @@ from organon.api.schemas import (
     ModuleStatusEvent,
     PlanEvent,
     RankLine,
+    ReferenceItem,
     ResultEvent,
 )
 from organon.core.config import GenerateOptions
@@ -56,11 +57,16 @@ from organon.core.registry import (
     module_priorities,
 )
 from organon.core.rendering.authors import resoudre_auteur_principal
-from organon.core.rendering.engine import render, render_subtaxa_block, render_taxobox_block
+from organon.core.rendering.engine import (
+    render,
+    render_references_items_block,
+    render_subtaxa_block,
+    render_taxobox_block,
+)
 from organon.core.rendering.sections import compute_rank_lines
 from organon.core.rendering.support import ajoute_si_besoin, data_pays_code
 from organon.core.selectors.categorization import compute_fin_liens
-from organon.core.selectors.coherence import detect_regne_incoherences
+from organon.core.selectors.coherence import detect_regne_incoherences, reference_module_coherente
 from organon.modules.bootstrap import ensure_modules_registered
 
 router = APIRouter()
@@ -416,6 +422,17 @@ def _assemble_response(
     wikitext = render(struct, options, ext_only=req.juste_ext)
     taxobox_wikitext = "" if req.juste_ext else render_taxobox_block(struct, options)
     subtaxa_wikitext = "" if req.juste_ext else render_subtaxa_block(struct, options)
+    reference_items = [
+        ReferenceItem(
+            module_id=module_id,
+            wikitext=wikitext,
+            default_checked=reference_module_coherente(module_id, struct.regne),
+        )
+        for module_id, wikitext in render_references_items_block(struct)
+    ]
+    references_wikitext = (
+        "\n".join(f"* {item.wikitext}" for item in reference_items) + "\n" if reference_items else ""
+    )
     rank_lines = (
         []
         if req.juste_ext
@@ -472,6 +489,8 @@ def _assemble_response(
         wikitext=wikitext,
         taxobox_wikitext=taxobox_wikitext,
         subtaxa_wikitext=subtaxa_wikitext,
+        references_wikitext=references_wikitext,
+        reference_items=reference_items,
         taxobox_completeness_score=taxobox_completeness_score,
         subtaxa_completeness_score=subtaxa_completeness_score,
         rank_lines=rank_lines,

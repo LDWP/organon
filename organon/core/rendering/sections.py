@@ -376,8 +376,44 @@ def render_originale(struct: Struct, options: GenerateOptions) -> str:
     return resu
 
 
+def _compute_ext_liens_items(struct: Struct) -> list[tuple[str, str]]:
+    """Liste (non triée) de paires (module_id, ligne wikitexte) de référence taxonomique
+    produites par `module.render_bioref` pour chaque module ayant contribué — factorisé de
+    `render_voir_aussi` pour être réutilisé par `render_references_items` sans dupliquer la
+    boucle. Un module dont `render_bioref` retourne plusieurs lignes produit une paire par
+    ligne, toutes rattachées au même `module_id`."""
+    items: list[tuple[str, str]] = []
+    for module_id, data in struct.liens.items():
+        module = None
+        from organon.core.registry import get_module  # import tardif : évite un cycle
+
+        module = get_module(module_id)
+        if module is None:
+            continue
+        rendu = module.render_bioref(struct)
+        if not rendu:
+            continue
+        if isinstance(rendu, list):
+            items.extend((module_id, ligne) for ligne in rendu)
+        else:
+            items.append((module_id, rendu))
+    return items
+
+
+def _compute_ext_liens(struct: Struct) -> list[str]:
+    """Liste (non triée) des liens de référence taxonomique — voir `_compute_ext_liens_items`."""
+    return [wikitext for _module_id, wikitext in _compute_ext_liens_items(struct)]
+
+
+def render_references_items(struct: Struct) -> list[tuple[str, str]]:
+    """Paires (module_id, wikitext) des références taxonomiques, triées alphabétiquement par
+    wikitext (même tri que le bloc "Liens externes" de `render_voir_aussi`) — exposées à l'API
+    pour permettre au frontend de cocher/décocher chaque référence individuellement plutôt que
+    de recevoir uniquement le bloc déjà joint."""
+    return sorted(_compute_ext_liens_items(struct), key=lambda item: item[1])
+
+
 def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
-    ext: list[str] = []
     autres: list[str] = []
 
     externe = struct.liens.get("externe", {})
@@ -398,20 +434,7 @@ def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
         if (externe.get("frwiktionary") or {}).get("page"):
             autres.append(f"wiktionary={externe['frwiktionary']['page']}")
 
-    for module_id, data in struct.liens.items():
-        module = None
-        from organon.core.registry import get_module  # import tardif : évite un cycle
-
-        module = get_module(module_id)
-        if module is None:
-            continue
-        rendu = module.render_bioref(struct)
-        if not rendu:
-            continue
-        if isinstance(rendu, list):
-            ext.extend(rendu)
-        else:
-            ext.append(rendu)
+    ext = _compute_ext_liens(struct)
 
     if not ext and not autres:
         if rendu_vide("externes", options):

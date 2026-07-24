@@ -298,8 +298,20 @@ export default function App() {
   // pour laisser géré un rang contesté (ex. "classe") sans en marquer d'autres qui ne posent pas
   // de vrai problème éditorial. Coché depuis le tableau de comparaison de l'onglet Taxobox.
   const [managedRankConflicts, setManagedRankConflicts] = useState({});
+  // Cases cochées/décochées manuellement dans le sous-onglet "Références taxonomiques" (voir
+  // GenerateResponse.reference_items), par-dessus le défaut calculé côté backend
+  // (item.default_checked, voir organon.core.selectors.coherence.reference_module_coherente) —
+  // clé = module_id::wikitext de la ligne. `undefined` = pas de choix explicite, on suit le
+  // défaut ; une entrée ici (true ou false) prime toujours sur ce défaut.
+  const [referenceCheckedOverrides, setReferenceCheckedOverrides] = useState({});
   // Onglet actif de la coquille à navigation latérale du résultat.
   const [resultView, setResultView] = useState("wikitexte"); // "wikitexte" | "classification" | "noms" | "image" | "autres" | "data"
+  // Bloc de wikitexte affiché sous l'onglet "wikitexte" : "tout" reproduit le comportement
+  // historique (article composé, éditable) ; "taxobox"/"subrangs" isolent un seul bloc du
+  // serveur en lecture seule (voir GenerateResponse.taxobox_wikitext/subtaxa_wikitext) ;
+  // "references" recompose côté client le bloc à partir de reference_items et des cases cochées
+  // (voir checkedReferencesWikitext) — aucun ne passe par la composition finalWikitext.
+  const [wikitextSubTab, setWikitextSubTab] = useState("tout"); // "tout" | "taxobox" | "subrangs" | "references"
   // Nom de fichier Commons choisi dans la galerie (voir ImageGallery.jsx), appliqué au wikitexte
   // affiché par applyImageSelection() plutôt que persisté dans resultsBySource : survit ainsi à
   // un changement d'onglet de classification, sans dupliquer l'état par source.
@@ -465,6 +477,7 @@ export default function App() {
     setTaxoboxSourceOverride(null);
     setSubtaxaSourceOverride(null);
     setManagedRankConflicts({});
+    setReferenceCheckedOverrides({});
     setInitialLoading(true);
     const { data, error } = await fetchSource(taxonName, domaineValue, classification, gbifKey);
     setInitialLoading(false);
@@ -650,6 +663,14 @@ export default function App() {
     setManagedRankConflicts((prev) => ({ ...prev, [rang]: !prev[rang] }));
   }
 
+  function referenceItemKey(item) {
+    return `${item.module_id}::${item.wikitext}`;
+  }
+
+  function toggleReferenceItem(key, currentChecked) {
+    setReferenceCheckedOverrides((prev) => ({ ...prev, [key]: !currentChecked }));
+  }
+
   function handleGoToNamesTab() {
     setResultView("noms");
   }
@@ -829,6 +850,29 @@ export default function App() {
   // élément du "zoom" classification lui-même.
   const finalWikitext = applyImageSelection(manualWikitext ?? displayWikitext, selectedCommonsImage);
 
+  // Items de référence de la source taxobox active (voir GenerateResponse.reference_items) et
+  // recomposition côté client du bloc "Liens externes" à partir des seules références cochées
+  // (défaut item.default_checked, prime par referenceCheckedOverrides) — même tri alphabétique
+  // que l'ancien bloc `references_wikitext` déjà joint côté serveur, puisque reference_items est
+  // déjà trié par le backend.
+  const referenceItems = taxoboxData?.reference_items || [];
+  const checkedReferenceLines = referenceItems.filter(
+    (item) => referenceCheckedOverrides[referenceItemKey(item)] ?? item.default_checked
+  );
+  const checkedReferencesWikitext = checkedReferenceLines.length
+    ? checkedReferenceLines.map((item) => `* ${item.wikitext}`).join("\n") + "\n"
+    : "";
+
+  // Texte affiché par chaque sous-onglet du bloc wikitexte (voir wikitextSubTab) : "taxobox",
+  // "subrangs" et "references" isolent un seul bloc du serveur, indépendamment de la
+  // composition finalWikitext/editedText qui ne concerne que "tout".
+  const wikitextSubTabText = {
+    tout: editing ? editedText : finalWikitext,
+    taxobox: taxoboxData?.taxobox_wikitext || "",
+    subrangs: subtaxaData?.subtaxa_wikitext || "",
+    references: checkedReferencesWikitext,
+  }[wikitextSubTab];
+
   function startEditing() {
     if (!finalWikitext) return;
     setEditedText(finalWikitext);
@@ -863,8 +907,7 @@ export default function App() {
     setManualWikitext(editedText);
   }
 
-  async function handleCopy() {
-    const text = editing ? editedText : finalWikitext;
+  async function handleCopy(text) {
     if (!text) return;
     try {
       await navigator.clipboard.writeText(text);
@@ -1277,15 +1320,17 @@ export default function App() {
                               </span>
                             </div>
                             <div style={{ display: "flex", gap: 8 }}>
-                              <button
-                                type="button"
-                                className="edit-btn"
-                                aria-pressed={editing}
-                                onClick={editing ? stopEditing : startEditing}
-                              >
-                                {editing ? "✓ Terminé" : "✎ Éditer"}
-                              </button>
-                              <button type="button" className="edit-btn" onClick={handleCopy}>
+                              {wikitextSubTab === "tout" && (
+                                <button
+                                  type="button"
+                                  className="edit-btn"
+                                  aria-pressed={editing}
+                                  onClick={editing ? stopEditing : startEditing}
+                                >
+                                  {editing ? "✓ Terminé" : "✎ Éditer"}
+                                </button>
+                              )}
+                              <button type="button" className="edit-btn" onClick={() => handleCopy(wikitextSubTabText)}>
                                 {copied ? "Copié ✓" : "Copier"}
                               </button>
                             </div>
@@ -1370,13 +1415,36 @@ export default function App() {
                               </table>
                             </div>
                           )}
+                          {wikitextSubTab === "references" && referenceItems.length > 0 && (
+                            <div className="reference-checklist">
+                              {referenceItems.map((item) => {
+                                const key = referenceItemKey(item);
+                                const checked = referenceCheckedOverrides[key] ?? item.default_checked;
+                                return (
+                                  <label key={key} className="reference-checklist-row">
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() => toggleReferenceItem(key, checked)}
+                                      aria-label={`Inclure la référence ${item.module_id} dans les liens externes`}
+                                    />
+                                    <span className="id-badge">{item.module_id.toUpperCase()}</span>
+                                    {!item.default_checked && (
+                                      <span className="id-badge id-badge-conflict">hors domaine</span>
+                                    )}
+                                    <code>{item.wikitext}</code>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
                           <textarea
                             className="wikitext"
                             aria-labelledby="wikitext-label"
                             spellCheck="false"
-                            readOnly={!editing}
-                            value={editing ? editedText : finalWikitext}
-                            onChange={(e) => setEditedText(e.target.value)}
+                            readOnly={wikitextSubTab !== "tout" || !editing}
+                            value={wikitextSubTabText}
+                            onChange={wikitextSubTab === "tout" ? (e) => setEditedText(e.target.value) : undefined}
                           />
                         </>
                       )}

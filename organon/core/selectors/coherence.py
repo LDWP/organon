@@ -11,7 +11,9 @@ partir de `Struct` déjà résolu — donc il vit ici plutôt que dans `organon.
 
 from __future__ import annotations
 
+from organon.core.domains import build_module_domain_tree, rec_strict_domaine
 from organon.core.models import RegneIncoherence, Struct
+from organon.core.registry import get_module
 
 _REGNE_INCONNU = "neutre"
 """Valeur sentinelle utilisée par les tables kingdom->règne (GBIF/ITIS/WoRMS) quand le libellé
@@ -34,3 +36,19 @@ def detect_regne_incoherences(struct: Struct, classification_id: str) -> list[Re
                 RegneIncoherence(module=module_id, regne_suggere=regne_detecte, regne_retenu=struct.regne)
             )
     return incoherences
+
+
+def reference_module_coherente(module_id: str, regne: str) -> bool:
+    """Un module de référence taxonomique est-il cohérent avec le règne retenu pour ce taxon ?
+    S'appuie sur `ModuleMeta.domains` (déjà utilisé pour sélectionner les classifications
+    possibles, voir `organon.core.domains`) plutôt que sur une liste ad hoc : un module dont le
+    domaine déclaré exclut le règne du taxon (ex. IndexFungorum, réservé aux champignons,
+    référencé sur un animal) est jugé incohérent. Règne vide ou "neutre" (rang au-dessus de
+    l'espèce, ou règne non résolu) : aucune détection fiable possible, jugé cohérent par défaut
+    plutôt que de décocher à tort."""
+    if not regne or regne == _REGNE_INCONNU:
+        return True
+    module = get_module(module_id)
+    if module is None:
+        return True
+    return rec_strict_domaine(regne, build_module_domain_tree(module.meta.domains))
