@@ -189,6 +189,16 @@ const STATUS_GROUPS = [
   { statuses: ["error"], label: "Erreur réseau" },
 ];
 
+// Onglets de la coquille à navigation latérale du résultat, dans leur ordre d'affichage.
+const RESULT_VIEWS = [
+  { id: "wikitexte", label: "Wikitexte" },
+  { id: "classification", label: "Classification" },
+  { id: "noms", label: "Noms & synonymes" },
+  { id: "image", label: "Image" },
+  { id: "autres", label: "Autres informations" },
+  { id: "data", label: "Données" },
+];
+
 // Certains modules combinent plusieurs liens externes en un seul bloc HTML (ex. "externe" :
 // Wikidata + Species + Commons + Commons catégorie, séparés par un espace) — les sépare en
 // entrées distinctes, une par lien, pour qu'elles apparaissent sur des lignes propres du
@@ -261,9 +271,8 @@ export default function App() {
   // taxonomique significative ; à cocher au cas par cas pour les groupes qui en ont (poissons,
   // insectes...).
   const [gererConflits, setGererConflits] = useState(false);
-  const [resultView, setResultView] = useState("result"); // "result" | "data"
-  // Sous-onglets thématiques du panneau Résultat, un clic = un aspect de la taxobox à changer.
-  const [resultSubTab, setResultSubTab] = useState("classification"); // "classification" | "image" | "autres"
+  // Onglet actif de la coquille à navigation latérale du résultat.
+  const [resultView, setResultView] = useState("wikitexte"); // "wikitexte" | "classification" | "noms" | "image" | "autres" | "data"
   // Nom de fichier Commons choisi dans la galerie (voir ImageGallery.jsx), appliqué au wikitexte
   // affiché par applyImageSelection() plutôt que persisté dans resultsBySource : survit ainsi à
   // un changement d'onglet de classification, sans dupliquer l'état par source.
@@ -594,13 +603,13 @@ export default function App() {
     setManualWikitext(null);
   }
 
-  // TODO: l'onglet "Noms & synonymes" n'existe pas encore (tâche séparée en cours) — brancher ce
-  // handler sur son activation (ex. setResultView("names")) une fois qu'il sera créé, à la place
-  // de ce no-op.
-  function handleGoToNamesTab() {}
+  function handleGoToNamesTab() {
+    setResultView("noms");
+  }
 
-  // TODO: idem pour l'onglet "Autres informations" (pastille "éteint").
-  function handleGoToOtherInfoTab() {}
+  function handleGoToOtherInfoTab() {
+    setResultView("autres");
+  }
 
   const activeEntry = activeSource ? resultsBySource[activeSource] : null;
   const activeData = activeEntry?.status === "ok" ? activeEntry.data : null;
@@ -679,6 +688,40 @@ export default function App() {
       if (!rankDisagreements[rang]) rankDisagreements[rang] = new Map();
       if (!rankDisagreements[rang].has(nom)) rankDisagreements[rang].set(nom, m.id);
     }
+  }
+  const hasRankConflicts = Object.values(rankDisagreements).some((parNom) => parNom.size > 1);
+
+  // Sources utilisables pour les sélecteurs de facette et la comparaison par rang : uniquement
+  // celles déjà résolues avec succès (une source en erreur ou encore en cours de préchargement
+  // ne peut alimenter ni la taxobox ni les sous-taxons).
+  const availableSources = classificationModules.filter((m) => resultsBySource[m.id]?.status === "ok");
+
+  // Version tabulaire de rankDisagreements pour l'onglet Classification : pour chaque rang (dans
+  // l'ordre de première apparition), les noms rapportés par chaque source, afin de comparer les
+  // classifications côte à côte plutôt que de ne garder que le premier nom rencontré par rang.
+  const classificationTableRows = (() => {
+    const order = [];
+    const seen = new Set();
+    const perModule = {};
+    for (const m of availableSources) {
+      perModule[m.id] = {};
+      for (const { rang, nom } of resultsBySource[m.id].data.rank_lines || []) {
+        if (!seen.has(rang)) {
+          seen.add(rang);
+          order.push(rang);
+        }
+        if (!perModule[m.id][rang]) perModule[m.id][rang] = [];
+        if (!perModule[m.id][rang].includes(nom)) perModule[m.id][rang].push(nom);
+      }
+    }
+    return { order, perModule };
+  })();
+
+  // Nom retenu par rang pour la source taxobox actuellement affichée — sert à ne mettre en
+  // évidence, dans le tableau de comparaison, que les noms qui *diffèrent* de ce choix.
+  const taxoboxNomByRang = {};
+  for (const { rang, nom } of taxoboxData?.rank_lines || []) {
+    if (!(rang in taxoboxNomByRang)) taxoboxNomByRang[rang] = nom;
   }
 
   // Accord entre sources sur l'auteur du taxon : fusionne les candidats bruts rapportés par
@@ -1035,349 +1078,97 @@ export default function App() {
                 </button>
               )}
             </div>
-            <div className="tabs result-view-tabs" role="tablist" aria-label="Vue du résultat">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={resultView === "result"}
-                className={"tab" + (resultView === "result" ? " on" : "")}
-                onClick={() => setResultView("result")}
-              >
-                Résultat
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={resultView === "data"}
-                className={"tab" + (resultView === "data" ? " on" : "")}
-                onClick={() => setResultView("data")}
-              >
-                Données
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={resultView === "names"}
-                className={"tab" + (resultView === "names" ? " on" : "")}
-                onClick={() => setResultView("names")}
-              >
-                Noms &amp; synonymes
-              </button>
-            </div>
-
-            {resultView === "names" ? (
-              <div className="panel">
-                <div className="panel-head">
-                  <span className="t">Noms &amp; synonymes — {activeSource ? activeSource.toUpperCase() : "…"}</span>
-                </div>
-                {!activeData ? (
-                  <p className="panel-empty">Aucune donnée disponible pour le moment.</p>
-                ) : (
-                  <>
-                    <div className="data-table-wrap">
-                      <h4 className="data-table-title">Auteur</h4>
-                      {activeData.auteur_consolide ? (
-                        <table className="data-table">
-                          <thead>
-                            <tr>
-                              <th>Retenu (vote majoritaire)</th>
-                              <th>Candidats par source</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>{activeData.auteur_consolide}</td>
-                              <td>
-                                {Object.entries(activeData.auteur_candidats).map(([moduleId, auteur]) => (
-                                  <div key={moduleId}>
-                                    <span className="id-badge">{moduleId.toUpperCase()}</span> {auteur}
-                                  </div>
-                                ))}
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      ) : (
-                        <p className="panel-empty">Aucun auteur rapporté pour ce taxon.</p>
-                      )}
-                    </div>
-
-                    <div className="data-table-wrap">
-                      <h4 className="data-table-title">Noms vernaculaires</h4>
-                      {activeData.vernacular_names.length > 0 ? (
-                        <p>{activeData.vernacular_names.join(", ")}</p>
-                      ) : (
-                        <p className="panel-empty">Aucun nom vernaculaire rapporté.</p>
-                      )}
-                    </div>
-
-                    <div className="data-table-wrap">
-                      <h4 className="data-table-title">
-                        Synonymes
-                        {activeData.synonymes_source ? ` — source : ${activeData.synonymes_source.toUpperCase()}` : ""}
-                      </h4>
-                      {activeData.synonymes.length > 0 ? (
-                        <table className="data-table">
-                          <thead>
-                            <tr>
-                              <th>Nom</th>
-                              <th>Auteur</th>
-                              <th>Rang</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {activeData.synonymes.map((s, i) => (
-                              <tr key={i}>
-                                <td><em>{s.nom}</em></td>
-                                <td>{s.auteur || "—"}</td>
-                                <td>{s.rang || "—"}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      ) : (
-                        <p className="panel-empty">Aucun synonyme rapporté.</p>
-                      )}
-                    </div>
-
-                    <div className="data-table-wrap">
-                      <h4 className="data-table-title">Basionyme</h4>
-                      {activeData.basionyme ? (
-                        <p>
-                          <em>{activeData.basionyme.nom}</em>
-                          {activeData.basionyme.auteur ? ` ${activeData.basionyme.auteur}` : ""}{" "}
-                          <span className="id-badge">{activeData.basionyme.source.toUpperCase()}</span>
-                        </p>
-                      ) : (
-                        <p className="panel-empty">Aucun basionyme rapporté.</p>
-                      )}
-                    </div>
-                  </>
-                )}
+            {activeData?.regne_incoherences?.length > 0 && (
+              <div className="regne-alert">
+                <p className="regne-alert-title">
+                  ⚠ Possible homonymie inter-règnes : {activeData.regne_incoherences.length === 1 ? "une source" : "des sources"} suggère{activeData.regne_incoherences.length === 1 ? "" : "nt"} un règne différent.
+                </p>
+                <ul>
+                  {activeData.regne_incoherences.map((inc, i) => (
+                    <li key={i}>
+                      <strong>{inc.module.toUpperCase()}</strong> suggère « {inc.regne_suggere} », règne retenu : « {inc.regne_retenu} »
+                    </li>
+                  ))}
+                </ul>
+                <p className="regne-alert-hint">
+                  Ce nom pourrait désigner un autre taxon — vérifiez le titre de l'article ou l'homonymie avant publication.
+                </p>
               </div>
-            ) : resultView === "data" ? (
-              <div className="panel">
-                <div className="panel-head">
-                  <span className="t">Données — {activeSource ? activeSource.toUpperCase() : "…"}</span>
-                </div>
-                <div>
-                  {activeData?.warnings.length > 0 && (
-                    <div className="warnlist">
-                      {activeData.warnings.map((w, i) => (
-                        <p key={i}>⚠ {w}</p>
-                      ))}
-                    </div>
-                  )}
+            )}
 
-                  {activeEntry?.moduleStatuses && Object.keys(activeEntry.moduleStatuses).length > 0 ? (
-                    STATUS_GROUPS.map(({ statuses, label }) => {
-                      const rows = Object.entries(activeEntry.moduleStatuses).filter(([, info]) =>
-                        statuses.includes(info.status)
-                      );
-                      if (rows.length === 0) return null;
-                      return (
-                        <div className="data-table-wrap" key={label}>
-                          <h4 className="data-table-title">{label}</h4>
-                          <table className="data-table">
-                            <thead>
-                              <tr>
-                                <th>Source</th>
-                                <th>Statut</th>
-                                <th>Informations</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {rows.flatMap(([moduleId, info]) => {
-                                const link = activeData?.external_links.find((l) => l.module_id === moduleId);
-                                const entries = link ? splitLinks(link.html) : [{ label: null, html: null }];
-                                // Types d'information effectivement rapportés par ce module pour
-                                // ce taxon (voir GenerateResponse.data_found côté backend) —
-                                // dérivé de la structure déjà présente dans la réponse plutôt
-                                // que deviné ici module par module.
-                                const found = activeData?.data_found?.[moduleId] || [];
-                                return entries.map((entry, i) => (
-                                  <tr key={`${moduleId}-${i}`}>
-                                    <td>
-                                      <span className="id-badge">{moduleId.toUpperCase()}</span>
-                                      {entry.html && <span dangerouslySetInnerHTML={{ __html: entry.html }} />}
-                                    </td>
-                                    <td>
-                                      <ModuleStatusIcon status={info.status} />{" "}
-                                      {info.status === "error" && info.message ? `erreur (${info.message})` : MODULE_STATUS_LABELS[info.status]}
-                                    </td>
-                                    <td>{i === 0 ? found.join(", ") : ""}</td>
-                                  </tr>
-                                ));
-                              })}
-                            </tbody>
-                          </table>
-                        </div>
-                      );
-                    })
-                  ) : (
-                    <p className="panel-empty">Aucun suivi disponible pour le moment.</p>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <>
-
-                {activeData?.regne_incoherences?.length > 0 && (
-                  <div className="regne-alert">
-                    <p className="regne-alert-title">
-                      ⚠ Possible homonymie inter-règnes : {activeData.regne_incoherences.length === 1 ? "une source" : "des sources"} suggère{activeData.regne_incoherences.length === 1 ? "" : "nt"} un règne différent.
-                    </p>
-                    <ul>
-                      {activeData.regne_incoherences.map((inc, i) => (
-                        <li key={i}>
-                          <strong>{inc.module.toUpperCase()}</strong> suggère « {inc.regne_suggere} », règne retenu : « {inc.regne_retenu} »
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="regne-alert-hint">
-                      Ce nom pourrait désigner un autre taxon — vérifiez le titre de l'article ou l'homonymie avant publication.
-                    </p>
-                  </div>
-                )}
-
-                <div className="tabs subtabs" role="tablist" aria-label="Aspect de la taxobox à modifier">
+            <div className="result-shell">
+              <nav className="result-nav" role="tablist" aria-label="Vue du résultat">
+                {RESULT_VIEWS.map(({ id, label }) => (
                   <button
+                    key={id}
                     type="button"
+                    id={`nav-tab-${id}`}
                     role="tab"
-                    aria-selected={resultSubTab === "classification"}
-                    className={"tab" + (resultSubTab === "classification" ? " on" : "")}
-                    onClick={() => setResultSubTab("classification")}
+                    aria-selected={resultView === id}
+                    className={"tab" + (resultView === id ? " on" : "")}
+                    onClick={() => setResultView(id)}
                   >
-                    Classification
+                    {label}
                   </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={resultSubTab === "image"}
-                    className={"tab" + (resultSubTab === "image" ? " on" : "")}
-                    onClick={() => setResultSubTab("image")}
-                  >
-                    Image
-                  </button>
-                  <button
-                    type="button"
-                    role="tab"
-                    aria-selected={resultSubTab === "autres"}
-                    className={"tab" + (resultSubTab === "autres" ? " on" : "")}
-                    onClick={() => setResultSubTab("autres")}
-                  >
-                    Autres informations
-                  </button>
-                </div>
+                ))}
+              </nav>
 
-                {resultSubTab === "autres" ? (
-                  <div className="panel">
-                    {activeData ? (
-                      <>
-                        {activeData.milieu && (
-                          <div className="field-box">
-                            <span className="field-label">Écozone</span>
-                            <p>{activeData.milieu === "marin" ? "Marin" : "Terrestre"}</p>
-                          </div>
-                        )}
-                        {activeData.uicn_statut && (
-                          <div className="field-box">
-                            <span className="field-label">Statut de conservation UICN</span>
-                            <p>
-                              <strong>{activeData.uicn_statut}</strong>
-                              {UICN_LABELS[activeData.uicn_statut] ? ` — ${UICN_LABELS[activeData.uicn_statut]}` : ""}
-                              {" "}(source : GBIF)
-                            </p>
-                          </div>
-                        )}
+              <div
+                className="result-panel-wrap"
+                role="tabpanel"
+                aria-labelledby={`nav-tab-${resultView}`}
+              >
+                {resultView === "wikitexte" && (
+                  <div className="wikitexte-tab">
+                    {availableSources.length > 0 && (
+                      <div className="facet-controls">
                         <div className="field-box">
-                          <span className="field-label">Répartition</span>
-                          {activeData.distribution && Object.keys(activeData.distribution).length > 0 ? (
-                            <ul>
-                              {Object.entries(activeData.distribution).map(([moduleId, pays]) => (
-                                <li key={moduleId}>
-                                  <strong>{moduleId.toUpperCase()}</strong> : {pays.join(", ")}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="panel-empty">Aucune répartition disponible.</p>
-                          )}
+                          <label className="field-label" htmlFor="taxobox-source-select">
+                            Taxobox
+                          </label>
+                          <select
+                            id="taxobox-source-select"
+                            value={taxoboxSourceId || ""}
+                            onChange={(e) => handleTaxoboxSourceChange(e.target.value)}
+                          >
+                            {availableSources.map((m) => (
+                              <option key={m.id} value={m.id}>
+                                {m.id.toUpperCase()}
+                                {m.id === recommendedTaxoboxSource ? " (recommandé)" : ""}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                      </>
-                    ) : (
-                      <p className="panel-empty">Aucune donnée disponible.</p>
+                        <div className="field-box">
+                          <label className="field-label" htmlFor="subtaxa-source-select">
+                            Taxons inférieurs
+                          </label>
+                          <select
+                            id="subtaxa-source-select"
+                            value={subtaxaSourceId || ""}
+                            onChange={(e) => handleSubtaxaSourceChange(e.target.value)}
+                          >
+                            {availableSources.map((m) => (
+                              <option key={m.id} value={m.id}>
+                                {m.id.toUpperCase()}
+                                {m.id === recommendedSubtaxaSource ? " (recommandé)" : ""}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {hasRankConflicts && (
+                          <button
+                            type="button"
+                            className={"id-badge id-badge-btn id-badge-conflict" + (gererConflits ? " on" : "")}
+                            aria-pressed={gererConflits}
+                            onClick={() => setGererConflits((v) => !v)}
+                            title="Signaler dans le wikitexte les rangs où les sources sont en désaccord"
+                          >
+                            ⚠ Conflits{gererConflits ? " gérés" : ""}
+                          </button>
+                        )}
+                      </div>
                     )}
-                  </div>
-                ) : resultSubTab === "image" ? (
-                  <div className="panel">
-                    <ImageGallery
-                      taxon={activeData?.taxon_resolved || query?.taxon || null}
-                      selectedFileName={selectedCommonsImage}
-                      onSelect={handleSelectCommonsImage}
-                      onDeselect={handleDeselectCommonsImage}
-                      cache={commonsImagesCache}
-                      onCacheChange={setCommonsImagesCache}
-                    />
-                  </div>
-                ) : (
-                  <>
-                    {(() => {
-                      // Sources utilisables pour les sélecteurs de facette : uniquement celles
-                      // déjà résolues avec succès (une source en erreur ou encore en cours de
-                      // préchargement ne peut alimenter ni la taxobox ni les sous-taxons).
-                      const availableSources = classificationModules.filter(
-                        (m) => resultsBySource[m.id]?.status === "ok"
-                      );
-                      return (
-                        availableSources.length > 0 && (
-                          <div className="facet-controls">
-                            <div className="field-box">
-                              <label className="field-label" htmlFor="taxobox-source-select">
-                                Taxobox
-                              </label>
-                              <select
-                                id="taxobox-source-select"
-                                value={taxoboxSourceId || ""}
-                                onChange={(e) => handleTaxoboxSourceChange(e.target.value)}
-                              >
-                                {availableSources.map((m) => (
-                                  <option key={m.id} value={m.id}>
-                                    {m.id.toUpperCase()}
-                                    {m.id === recommendedTaxoboxSource ? " (recommandé)" : ""}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="field-box">
-                              <label className="field-label" htmlFor="subtaxa-source-select">
-                                Taxons inférieurs
-                              </label>
-                              <select
-                                id="subtaxa-source-select"
-                                value={subtaxaSourceId || ""}
-                                onChange={(e) => handleSubtaxaSourceChange(e.target.value)}
-                              >
-                                {availableSources.map((m) => (
-                                  <option key={m.id} value={m.id}>
-                                    {m.id.toUpperCase()}
-                                    {m.id === recommendedSubtaxaSource ? " (recommandé)" : ""}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <label className="facet-checkbox">
-                              <input
-                                type="checkbox"
-                                checked={gererConflits}
-                                onChange={(e) => setGererConflits(e.target.checked)}
-                              />
-                              Gérer les conflits de classification
-                            </label>
-                          </div>
-                        )
-                      );
-                    })()}
 
                     <div className="tabs" role="tablist" aria-label="Parcourir les données brutes par source">
                       {/* Un module de classification qui n'a rien trouvé pour ce taxon (ex. AlgaeBase
@@ -1474,11 +1265,280 @@ export default function App() {
                           />
                         </>
                       )}
-                </div>
-              </>
-            )}
-              </>
-            )}
+                    </div>
+                  </div>
+                )}
+
+                {resultView === "classification" && (
+                  <div className="panel">
+                    <div className="panel-head">
+                      <span className="t">Classification — comparaison par source</span>
+                    </div>
+                    {availableSources.length === 0 ? (
+                      <p className="panel-empty">Aucune source résolue pour le moment.</p>
+                    ) : (
+                      <div className="data-table-wrap">
+                        <table className="data-table classification-compare-table">
+                          <thead>
+                            <tr>
+                              <th>Rang</th>
+                              {availableSources.map((m) => (
+                                <th key={m.id}>
+                                  <button
+                                    type="button"
+                                    className={"id-badge id-badge-btn" + (taxoboxSourceId === m.id ? " on" : "")}
+                                    onClick={() => handleTaxoboxSourceChange(m.id)}
+                                    title="Utiliser cette source pour la taxobox"
+                                  >
+                                    {m.id.toUpperCase()}
+                                  </button>
+                                </th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {classificationTableRows.order.map((rang) => {
+                              const conflict = rankDisagreements[rang]?.size > 1;
+                              return (
+                                <tr key={rang}>
+                                  <td>
+                                    {rang}
+                                    {conflict && (
+                                      <span className="id-badge id-badge-conflict" title="Désaccord entre sources">⚠</span>
+                                    )}
+                                  </td>
+                                  {availableSources.map((m) => {
+                                    const noms = classificationTableRows.perModule[m.id]?.[rang] || [];
+                                    const differs = conflict && noms.length > 0 && !noms.includes(taxoboxNomByRang[rang]);
+                                    return (
+                                      <td key={m.id} className={differs ? "conflict-cell" : undefined}>
+                                        {noms.length > 0 ? noms.join(", ") : "—"}
+                                      </td>
+                                    );
+                                  })}
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {resultView === "noms" && (
+                  <div className="panel">
+                    <div className="panel-head">
+                      <span className="t">Noms &amp; synonymes — {activeSource ? activeSource.toUpperCase() : "…"}</span>
+                    </div>
+                    {!activeData ? (
+                      <p className="panel-empty">Aucune donnée disponible pour le moment.</p>
+                    ) : (
+                      <>
+                        <div className="data-table-wrap">
+                          <h4 className="data-table-title">Auteur</h4>
+                          {activeData.auteur_consolide ? (
+                            <table className="data-table">
+                              <thead>
+                                <tr>
+                                  <th>Retenu (vote majoritaire)</th>
+                                  <th>Candidats par source</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>{activeData.auteur_consolide}</td>
+                                  <td>
+                                    {Object.entries(activeData.auteur_candidats).map(([moduleId, auteur]) => (
+                                      <div key={moduleId}>
+                                        <span className="id-badge">{moduleId.toUpperCase()}</span> {auteur}
+                                      </div>
+                                    ))}
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="panel-empty">Aucun auteur rapporté pour ce taxon.</p>
+                          )}
+                        </div>
+
+                        <div className="data-table-wrap">
+                          <h4 className="data-table-title">Noms vernaculaires</h4>
+                          {activeData.vernacular_names.length > 0 ? (
+                            <p>{activeData.vernacular_names.join(", ")}</p>
+                          ) : (
+                            <p className="panel-empty">Aucun nom vernaculaire rapporté.</p>
+                          )}
+                        </div>
+
+                        <div className="data-table-wrap">
+                          <h4 className="data-table-title">
+                            Synonymes
+                            {activeData.synonymes_source ? ` — source : ${activeData.synonymes_source.toUpperCase()}` : ""}
+                          </h4>
+                          {activeData.synonymes.length > 0 ? (
+                            <table className="data-table">
+                              <thead>
+                                <tr>
+                                  <th>Nom</th>
+                                  <th>Auteur</th>
+                                  <th>Rang</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {activeData.synonymes.map((s, i) => (
+                                  <tr key={i}>
+                                    <td><em>{s.nom}</em></td>
+                                    <td>{s.auteur || "—"}</td>
+                                    <td>{s.rang || "—"}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          ) : (
+                            <p className="panel-empty">Aucun synonyme rapporté.</p>
+                          )}
+                        </div>
+
+                        <div className="data-table-wrap">
+                          <h4 className="data-table-title">Basionyme</h4>
+                          {activeData.basionyme ? (
+                            <p>
+                              <em>{activeData.basionyme.nom}</em>
+                              {activeData.basionyme.auteur ? ` ${activeData.basionyme.auteur}` : ""}{" "}
+                              <span className="id-badge">{activeData.basionyme.source.toUpperCase()}</span>
+                            </p>
+                          ) : (
+                            <p className="panel-empty">Aucun basionyme rapporté.</p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {resultView === "image" && (
+                  <div className="panel">
+                    <ImageGallery
+                      taxon={activeData?.taxon_resolved || query?.taxon || null}
+                      selectedFileName={selectedCommonsImage}
+                      onSelect={handleSelectCommonsImage}
+                      onDeselect={handleDeselectCommonsImage}
+                      cache={commonsImagesCache}
+                      onCacheChange={setCommonsImagesCache}
+                    />
+                  </div>
+                )}
+
+                {resultView === "autres" && (
+                  <div className="panel">
+                    {activeData ? (
+                      <>
+                        {activeData.milieu && (
+                          <div className="field-box">
+                            <span className="field-label">Écozone</span>
+                            <p>{activeData.milieu === "marin" ? "Marin" : "Terrestre"}</p>
+                          </div>
+                        )}
+                        {activeData.uicn_statut && (
+                          <div className="field-box">
+                            <span className="field-label">Statut de conservation UICN</span>
+                            <p>
+                              <strong>{activeData.uicn_statut}</strong>
+                              {UICN_LABELS[activeData.uicn_statut] ? ` — ${UICN_LABELS[activeData.uicn_statut]}` : ""}
+                              {" "}(source : GBIF)
+                            </p>
+                          </div>
+                        )}
+                        <div className="field-box">
+                          <span className="field-label">Répartition</span>
+                          {activeData.distribution && Object.keys(activeData.distribution).length > 0 ? (
+                            <ul>
+                              {Object.entries(activeData.distribution).map(([moduleId, pays]) => (
+                                <li key={moduleId}>
+                                  <strong>{moduleId.toUpperCase()}</strong> : {pays.join(", ")}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="panel-empty">Aucune répartition disponible.</p>
+                          )}
+                        </div>
+                      </>
+                    ) : (
+                      <p className="panel-empty">Aucune donnée disponible.</p>
+                    )}
+                  </div>
+                )}
+
+                {resultView === "data" && (
+                  <div className="panel">
+                    <div className="panel-head">
+                      <span className="t">Données — {activeSource ? activeSource.toUpperCase() : "…"}</span>
+                    </div>
+                    <div>
+                      {activeData?.warnings.length > 0 && (
+                        <div className="warnlist">
+                          {activeData.warnings.map((w, i) => (
+                            <p key={i}>⚠ {w}</p>
+                          ))}
+                        </div>
+                      )}
+
+                      {activeEntry?.moduleStatuses && Object.keys(activeEntry.moduleStatuses).length > 0 ? (
+                        STATUS_GROUPS.map(({ statuses, label }) => {
+                          const rows = Object.entries(activeEntry.moduleStatuses).filter(([, info]) =>
+                            statuses.includes(info.status)
+                          );
+                          if (rows.length === 0) return null;
+                          return (
+                            <div className="data-table-wrap" key={label}>
+                              <h4 className="data-table-title">{label}</h4>
+                              <table className="data-table">
+                                <thead>
+                                  <tr>
+                                    <th>Source</th>
+                                    <th>Statut</th>
+                                    <th>Informations</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {rows.flatMap(([moduleId, info]) => {
+                                    const link = activeData?.external_links.find((l) => l.module_id === moduleId);
+                                    const entries = link ? splitLinks(link.html) : [{ label: null, html: null }];
+                                    // Types d'information effectivement rapportés par ce module pour
+                                    // ce taxon (voir GenerateResponse.data_found côté backend) —
+                                    // dérivé de la structure déjà présente dans la réponse plutôt
+                                    // que deviné ici module par module.
+                                    const found = activeData?.data_found?.[moduleId] || [];
+                                    return entries.map((entry, i) => (
+                                      <tr key={`${moduleId}-${i}`}>
+                                        <td>
+                                          <span className="id-badge">{moduleId.toUpperCase()}</span>
+                                          {entry.html && <span dangerouslySetInnerHTML={{ __html: entry.html }} />}
+                                        </td>
+                                        <td>
+                                          <ModuleStatusIcon status={info.status} />{" "}
+                                          {info.status === "error" && info.message ? `erreur (${info.message})` : MODULE_STATUS_LABELS[info.status]}
+                                        </td>
+                                        <td>{i === 0 ? found.join(", ") : ""}</td>
+                                      </tr>
+                                    ));
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="panel-empty">Aucun suivi disponible pour le moment.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
           </>

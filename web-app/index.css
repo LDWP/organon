@@ -159,7 +159,6 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
   font-family: var(--mono); cursor: help; user-select: none;
 }
 
-.result-view-tabs { margin-bottom: 10px; }
 
 /* position + pile d'empilement propres : le formulaire ne doit jamais peindre
    par-dessus le panneau de résultat qui le suit, quelle que soit la largeur de
@@ -280,6 +279,31 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 .tab.on { color: var(--ink); border-color: var(--accent); }
 .tab:hover { color: var(--ink); }
 .tab:disabled { opacity: 0.45; cursor: default; }
+
+/* ---------- coquille de résultat à navigation latérale ---------- */
+.result-shell { display: grid; grid-template-columns: 176px 1fr; gap: 20px; align-items: start; }
+.result-nav { display: flex; flex-direction: column; gap: 2px; border-bottom: none; }
+.result-nav .tab {
+  width: 100%; margin: 0; padding: 10px 12px; text-align: left; border-bottom: none;
+  border-left: 2px solid transparent; border-radius: 0 6px 6px 0; margin-bottom: 0;
+}
+.result-nav .tab.on { background: var(--bg-alt); border-left-color: var(--accent); }
+.result-panel-wrap > .panel { border-top: 1px solid var(--line); border-radius: 12px; }
+.wikitexte-tab .facet-controls { align-items: center; }
+@media (max-width: 640px) {
+  .result-shell { grid-template-columns: 1fr; }
+  .result-nav { flex-direction: row; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
+  .result-nav .tab { width: auto; border-left: none; border-bottom: 2px solid transparent; border-radius: 4px; }
+  .result-nav .tab.on { border-bottom-color: var(--accent); }
+}
+
+.id-badge-btn { border: none; cursor: pointer; font: inherit; }
+.id-badge-btn:hover { filter: brightness(1.08); }
+.id-badge-btn.on { outline: 2px solid var(--ink); outline-offset: 1px; }
+.id-badge-conflict { background: var(--amber); color: var(--amber-ink); }
+.id-badge-conflict.on { outline-color: var(--amber); }
+.classification-compare-table th { vertical-align: middle; }
+.conflict-cell { background: color-mix(in srgb, var(--amber) 16%, transparent); }
 
 /* ---------- statuts de module (classification/enrichissement) ----------
    Remplace l'ancien `.dot`/`.dot warn`/`.dot off` (couleur seule, pas accessible aux
