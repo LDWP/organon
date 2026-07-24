@@ -20,6 +20,7 @@ from organon.api.routes import (
     modules,
     search,
     sources,
+    subtaxa_merge,
     taxobox_refresh,
 )
 from organon.modules.bootstrap import ensure_modules_registered
@@ -61,6 +62,7 @@ def create_app() -> FastAPI:
     app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
     app.include_router(taxobox_refresh.router, prefix="/api/v1", tags=["taxobox"])
     app.include_router(commons_images.router, prefix="/api/v1", tags=["commons-images"])
+    app.include_router(subtaxa_merge.router, prefix="/api/v1", tags=["subtaxa-merge"])
 
     @app.get("/api/v1/version")
     async def version() -> dict[str, str]:

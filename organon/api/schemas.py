@@ -55,6 +55,11 @@ class RankLine(BaseModel):
 class GenerateResponse(BaseModel):
     taxon_requested: str
     taxon_resolved: str
+    taxon_rang: str = ""
+    """`struct.taxon.rang` — rang du taxon lui-même (ex. "genre", "famille"), pas exposé
+    ailleurs dans la réponse (`rank_lines` ne porte que les rangs *supérieurs*). Nécessaire côté
+    frontend pour appeler `POST /api/v1/subtaxa-merge` (accord grammatical "il"/"elle" de la
+    phrase introductive, voir `organon.core.rendering.subtaxa_merge`)."""
     classification_used: str
     domain_used: str
     regne: str = ""
@@ -73,6 +78,11 @@ class GenerateResponse(BaseModel):
     """La section "Liste des taxons de rang inférieur" isolée du reste de `wikitext`, selon le
     même principe que `taxobox_wikitext` — permet de choisir indépendamment la source qui
     alimente la taxobox et celle qui alimente les sous-taxons plutôt qu'un bloc unique."""
+    subtaxa_liste: list[RankName] = []
+    """`struct.sous_taxons.liste` telle quelle (nom/rang/auteur/eteint), sans mise en forme —
+    pendant structuré de `subtaxa_wikitext` (déjà rendu en wikitexte pour une seule source).
+    Permet au frontend de recouper les sous-taxons de plusieurs sources déjà résolues (voir
+    `POST /api/v1/subtaxa-merge`) sans reparser `subtaxa_wikitext`."""
     references_wikitext: str = ""
     """Les références taxonomiques (liens `render_bioref` de chaque module) isolées du reste de
     `wikitext`, selon le même principe que `taxobox_wikitext`/`subtaxa_wikitext` — exclut
@@ -264,6 +274,51 @@ class CommonsImagesResponse(BaseModel):
     search_url: str
     category_url: str | None = None
     suggestions: list[CommonsImageSuggestion] = []
+
+
+class MergedSpeciesOut(BaseModel):
+    """Un sous-taxon fusionné (voir `organon.core.rendering.subtaxa_merge.MergedSpecies`)."""
+
+    nom: str
+    line: str
+    default_checked: bool
+
+
+class MergedGroupOut(BaseModel):
+    """Un groupe d'espèces rapportées par exactement le même ensemble de sources (voir
+    `organon.core.rendering.subtaxa_merge.MergedGroup`)."""
+
+    sources: list[str]
+    kind: Literal["anchor", "autres", "disjoint"]
+    intro: str
+    species: list[MergedSpeciesOut]
+
+
+class MergedSubtaxaResponse(BaseModel):
+    """Réponse de `POST /api/v1/subtaxa-merge` (voir
+    `organon.core.rendering.subtaxa_merge.merge_subtaxa`)."""
+
+    rang_txt: str
+    rang_txt_singulier: str
+    pronoun: Literal["il", "elle"]
+    taxon_phrase: str
+    groups: list[MergedGroupOut]
+
+
+class SubtaxaMergeSource(BaseModel):
+    """Une source déjà résolue par le frontend (voir `GenerateResponse.subtaxa_liste`), fournie
+    telle quelle à `POST /api/v1/subtaxa-merge` — aucun appel réseau supplémentaire, seulement du
+    recoupement local entre listes déjà en mémoire côté client."""
+
+    module_id: str
+    liste: list[RankName] = Field(default_factory=list)
+
+
+class SubtaxaMergeRequest(BaseModel):
+    taxon_rang: str = Field(..., description="Rang du taxon principal (ex. 'genre', 'famille')")
+    taxon_nom: str = Field(..., description="Nom du taxon principal (ex. 'Panthera')")
+    regne: str = ""
+    sources: list[SubtaxaMergeSource] = Field(default_factory=list)
 
 
 class TaxoboxRefreshRequest(BaseModel):

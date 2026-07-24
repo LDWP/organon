@@ -6,6 +6,7 @@ import {
   generateTaxonStream,
   LOGIN_URL,
   logout,
+  mergeSubtaxa,
   searchTaxa,
 } from "./apiClient.js";
 import SourcesPage from "./SourcesPage.jsx";
@@ -293,6 +294,17 @@ export default function App() {
   // sous-taxons.
   const [taxoboxSourceOverride, setTaxoboxSourceOverride] = useState(null);
   const [subtaxaSourceOverride, setSubtaxaSourceOverride] = useState(null);
+  // Active le mode "sous-taxons fusionnés" (recoupement de toutes les sources déjà résolues, voir
+  // POST /api/v1/subtaxa-merge) à la place de la source unique choisie par subtaxaSourceId.
+  const [subtaxaFusionEnabled, setSubtaxaFusionEnabled] = useState(false);
+  // Résultat de la fusion (MergedSubtaxaResponse) une fois calculé, `null` tant qu'il n'y a pas
+  // au moins deux sources avec des sous-taxons ou que l'appel est en cours/en erreur.
+  const [subtaxaMerge, setSubtaxaMerge] = useState(null);
+  // Case à cocher par espèce (clé = nom), indépendante du nombre de sources qui la rapportent —
+  // initialisée depuis `default_checked` à l'arrivée de chaque espèce, puis laissée au contrôle
+  // de l'utilisateur (voir toggleSubtaxaChecked). Une espèce déjà connue garde son état choisi
+  // même si `subtaxaMerge` est recalculé (ex. une source de plus termine son préchargement).
+  const [subtaxaChecked, setSubtaxaChecked] = useState({});
   // Rangs pour lesquels l'utilisateur a explicitement demandé à signaler le désaccord de source
   // dans le rendu (insertion de {{Taxobox conflit}}) — par rang plutôt qu'un interrupteur global,
   // pour laisser géré un rang contesté (ex. "classe") sans en marquer d'autres qui ne posent pas
@@ -476,6 +488,9 @@ export default function App() {
     setCommonsImagesCache({});
     setTaxoboxSourceOverride(null);
     setSubtaxaSourceOverride(null);
+    setSubtaxaFusionEnabled(false);
+    setSubtaxaMerge(null);
+    setSubtaxaChecked({});
     setManagedRankConflicts({});
     setReferenceCheckedOverrides({});
     setInitialLoading(true);
@@ -764,6 +779,106 @@ export default function App() {
   // ne peut alimenter ni la taxobox ni les sous-taxons).
   const availableSources = classificationModules.filter((m) => resultsBySource[m.id]?.status === "ok");
 
+  // Sources utilisables pour la fusion des sous-taxons (voir POST /api/v1/subtaxa-merge) :
+  // celles qui ont effectivement rapporté des sous-taxons (GenerateResponse.subtaxa_liste),
+  // sous-ensemble d'availableSources qui exige en plus une liste non vide.
+  const subtaxaMergeSources = availableSources
+    .map((m) => ({ id: m.id, liste: resultsBySource[m.id]?.data?.subtaxa_liste || [] }))
+    .filter((s) => s.liste.length > 0);
+  // Signature stable (id + nombre d'espèces par source) : dépendance d'effet pour ne relancer
+  // l'appel /subtaxa-merge que lorsque l'ensemble de sources disponibles change réellement,
+  // plutôt qu'à chaque rendu (subtaxaMergeSources est un nouveau tableau à chaque appel).
+  const subtaxaMergeSignature = subtaxaMergeSources.map((s) => `${s.id}:${s.liste.length}`).join(",");
+
+  // `false` tant qu'il n'y a pas au moins deux sources avec des sous-taxons : dans ce cas
+  // l'effet ci-dessous n'a rien à faire (pas d'appel réseau), et `subtaxaMerge` est ignoré au
+  // profit de `effectiveSubtaxaMerge` (dérivé, pas besoin d'un setState synchrone dans l'effet
+  // pour "réinitialiser" un état qui peut se déduire directement du rendu courant).
+  const subtaxaMergeReady = subtaxaMergeSources.length >= 2 && !!baseData;
+  const effectiveSubtaxaMerge = subtaxaMergeReady ? subtaxaMerge : null;
+
+  // Calcule (ou recalcule) la fusion dès qu'au moins deux sources ont des sous-taxons — pas
+  // besoin d'attendre que l'utilisateur ouvre le sous-onglet correspondant, l'appel est un pur
+  // calcul local côté serveur (aucun accès réseau tiers, voir organon/api/routes/
+  // subtaxa_merge.py), donc peu coûteux à anticiper pendant le préchargement en arrière-plan.
+  useEffect(() => {
+    if (!subtaxaMergeReady) return;
+    let cancelled = false;
+    mergeSubtaxa({
+      taxon_rang: baseData.taxon_rang,
+      taxon_nom: baseData.taxon_resolved,
+      regne: baseData.regne,
+      sources: subtaxaMergeSources.map((s) => ({ module_id: s.id, liste: s.liste })),
+    })
+      .then((data) => {
+        if (cancelled) return;
+        setSubtaxaMerge(data);
+        // Une espèce déjà connue garde l'état choisi par l'utilisateur ; seules les espèces
+        // nouvellement apparues (ex. une source de plus vient de terminer son préchargement)
+        // reçoivent leur default_checked.
+        setSubtaxaChecked((prev) => {
+          const next = { ...prev };
+          for (const g of data.groups) {
+            for (const s of g.species) {
+              if (!(s.nom in next)) next[s.nom] = s.default_checked;
+            }
+          }
+          return next;
+        });
+      })
+      .catch(() => {
+        if (!cancelled) setSubtaxaMerge(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subtaxaMergeReady, subtaxaMergeSignature, baseData?.taxon_rang, baseData?.taxon_resolved, baseData?.regne]);
+
+  function toggleSubtaxaChecked(nom) {
+    setSubtaxaChecked((prev) => ({ ...prev, [nom]: !prev[nom] }));
+  }
+
+  // Fragments de phrase par nature de groupe (voir MergedGroup.kind côté serveur) — seul le
+  // compte (réactif aux cases cochées) et ce texte fixe restent à composer ici ; la citation
+  // Bioref par source (group.intro) et le rendu wikitexte par espèce (species[].line) sont déjà
+  // mis en forme côté serveur (voir organon/core/rendering/subtaxa_merge.py), pas dupliqués ici.
+  // Accord singulier/pluriel : rangTxt/rangTxtSingulier viennent du serveur (ex.
+  // "espèces"/"espèce") — le compte étant réactif aux cases cochées, seul le choix entre les
+  // deux formes déjà fournies se fait ici, jamais une pluralisation devinée en JS.
+  const SUBTAXA_MERGE_MIDDLE = {
+    anchor: (n, rangTxt, rangTxtSingulier) => `comprend ${n} ${n === 1 ? rangTxtSingulier : rangTxt}`,
+    autres: (n, rangTxt, rangTxtSingulier) =>
+      n === 1 ? `comprend 1 autre ${rangTxtSingulier}` : `comprend ${n} autres ${rangTxt}`,
+    disjoint: (n, rangTxt, rangTxtSingulier) =>
+      `comprend ${n} ${n === 1 ? rangTxtSingulier : rangTxt} ne figurant dans aucune de ces listes`,
+  };
+
+  // Compose le bloc "sous-taxons" en mode fusionné : une phrase par groupe non vide (un groupe
+  // entièrement décoché disparaît du rendu), suivie des lignes déjà rendues des espèces cochées.
+  // La toute première phrase effectivement rendue nomme le taxon ("le genre X comprend...") ;
+  // les suivantes reprennent l'anaphore `pronoun` ("il comprend..."). Basé sur la première
+  // phrase RENDUE (pas sur `kind === "anchor"`) : si l'utilisateur décoche entièrement le groupe
+  // ancre, la phrase suivante doit nommer le taxon puisque rien n'a encore été dit dans le
+  // rendu final.
+  function renderSubtaxaMergeWikitext() {
+    if (!effectiveSubtaxaMerge) return "";
+    const { rang_txt: rangTxt, rang_txt_singulier: rangTxtSingulier, pronoun, taxon_phrase: taxonPhrase } =
+      effectiveSubtaxaMerge;
+    const parts = [];
+    for (const group of effectiveSubtaxaMerge.groups) {
+      const checked = group.species.filter((s) => subtaxaChecked[s.nom] ?? s.default_checked);
+      if (checked.length === 0) continue;
+      const sujet = parts.length === 0 ? taxonPhrase : pronoun;
+      const middle = SUBTAXA_MERGE_MIDDLE[group.kind](checked.length, rangTxt, rangTxtSingulier);
+      parts.push(`${group.intro}, ${sujet} ${middle} :\n${checked.map((s) => s.line).join("")}`);
+    }
+    if (parts.length === 0) return "";
+    return `\n== Liste des ${rangTxt} ==\n${parts.join("\n")}`;
+  }
+
+  const subtaxaMergeWikitext = subtaxaFusionEnabled ? renderSubtaxaMergeWikitext() : "";
+
   // Version tabulaire de rankDisagreements pour l'onglet Classification : pour chaque rang (dans
   // l'ordre de première apparition), les noms rapportés par chaque source, afin de comparer les
   // classifications côte à côte plutôt que de ne garder que le premier nom rencontré par rang.
@@ -839,9 +954,16 @@ export default function App() {
     return result;
   }
 
+  // En mode fusion, ne substitue le bloc sous-taxons qu'une fois `subtaxaMerge` effectivement
+  // reçu : tant qu'il est `null` (appel encore en vol), retomber sur le bloc mono-source évite
+  // de faire disparaître la section le temps du calcul (spliceBlock viderait le bloc si on lui
+  // passait déjà un altBlock vide).
+  const effectiveSubtaxaWikitext =
+    subtaxaFusionEnabled && effectiveSubtaxaMerge ? subtaxaMergeWikitext : subtaxaData?.subtaxa_wikitext;
+
   const displayWikitext = baseData
     ? applyRankConflicts(
-        spliceBlock(baseData.wikitext, baseData.subtaxa_wikitext, subtaxaData?.subtaxa_wikitext),
+        spliceBlock(baseData.wikitext, baseData.subtaxa_wikitext, effectiveSubtaxaWikitext),
         taxoboxData?.rank_lines
       )
     : activeData?.wikitext ?? null;
@@ -869,7 +991,7 @@ export default function App() {
   const wikitextSubTabText = {
     tout: editing ? editedText : finalWikitext,
     taxobox: taxoboxData?.taxobox_wikitext || "",
-    subrangs: subtaxaData?.subtaxa_wikitext || "",
+    subrangs: effectiveSubtaxaWikitext || "",
     references: checkedReferencesWikitext,
   }[wikitextSubTab];
 
@@ -1245,6 +1367,16 @@ export default function App() {
                             ))}
                           </select>
                         </div>
+                        {subtaxaMergeSources.length > 1 && (
+                          <label className="facet-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={subtaxaFusionEnabled}
+                              onChange={(e) => setSubtaxaFusionEnabled(e.target.checked)}
+                            />
+                            Fusionner les sources ({subtaxaMergeSources.length})
+                          </label>
+                        )}
                       </div>
                     )}
 
@@ -1436,6 +1568,40 @@ export default function App() {
                                   </label>
                                 );
                               })}
+                            </div>
+                          )}
+                          {wikitextSubTab === "subrangs" && subtaxaFusionEnabled && (
+                            <div className="data-table-wrap subtaxa-merge-groups">
+                              {!effectiveSubtaxaMerge && <p>Calcul de la fusion en cours…</p>}
+                              {effectiveSubtaxaMerge?.groups.length === 0 && <p>Aucun sous-taxon à fusionner.</p>}
+                              {effectiveSubtaxaMerge?.groups.map((group, gi) => (
+                                <div key={gi} className="subtaxa-merge-group">
+                                  <p className="subtaxa-merge-group-head">
+                                    {group.sources.map((s) => (
+                                      <span key={s} className="id-badge">
+                                        {s.toUpperCase()}
+                                      </span>
+                                    ))}
+                                    {group.kind === "disjoint" && (
+                                      <span className="id-badge id-badge-conflict">non recoupé</span>
+                                    )}
+                                  </p>
+                                  <ul className="subtaxa-merge-species-list">
+                                    {group.species.map((sp) => (
+                                      <li key={sp.nom}>
+                                        <label className="facet-checkbox">
+                                          <input
+                                            type="checkbox"
+                                            checked={subtaxaChecked[sp.nom] ?? sp.default_checked}
+                                            onChange={() => toggleSubtaxaChecked(sp.nom)}
+                                          />
+                                          {sp.nom}
+                                        </label>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              ))}
                             </div>
                           )}
                           <textarea

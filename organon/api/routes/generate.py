@@ -480,6 +480,7 @@ def _assemble_response(
     return GenerateResponse(
         taxon_requested=req.taxon,
         taxon_resolved=struct.taxon.nom,
+        taxon_rang=struct.taxon.rang or "",
         classification_used=classification_id,
         domain_used=struct.domaine,
         regne=struct.regne,
@@ -489,6 +490,7 @@ def _assemble_response(
         wikitext=wikitext,
         taxobox_wikitext=taxobox_wikitext,
         subtaxa_wikitext=subtaxa_wikitext,
+        subtaxa_liste=struct.sous_taxons.liste if struct.sous_taxons else [],
         references_wikitext=references_wikitext,
         reference_items=reference_items,
         taxobox_completeness_score=taxobox_completeness_score,

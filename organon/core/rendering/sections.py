@@ -11,7 +11,7 @@ sous-système (elle ne fait que du rendu de texte à partir de données déjà r
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
+from organon.core.models import RankName, Struct
 from organon.core.rendering.grammar import (
     lien_pour_auteur,
     lien_pour_basionyme,
@@ -151,6 +151,61 @@ def render_taxobox(struct: Struct, options: GenerateOptions, ebauche: list[str])
     return resu
 
 
+def compute_rang_txt(liste: list[RankName]) -> tuple[str, str, str]:
+    """Calcule `(rang_txt, rang_txt_singulier, rang_defaut)` pour une liste de sous-taxons :
+    `rang_txt`/`rang_txt_singulier` sont le(s) nom(s) de rang rencontrés dans `liste` au pluriel
+    et au singulier (ex. "espèces"/"espèce", ou "espèces et sous-espèces"/"espèce et
+    sous-espèce" si la liste mélange les rangs) ; `rang_defaut` le premier rencontré, au
+    pluriel — utilisé comme rang de repli pour les éléments qui ne portent pas leur propre rang
+    (voir `render_subtaxon_line` : ce repli est conservé tel quel, y compris son effet de bord
+    déjà présent avant l'extraction de cette fonction — un `rang_defaut` au pluriel n'est pas
+    une clé de rang valide pour `wp_est_italique`/`wp_inf_rang`, mais ce cas ne se présente que
+    pour un sous-taxon sans son propre rang, ce qui n'arrive pas en pratique avec les modules
+    actuels). Extrait de `render_inf` pour être partagé avec
+    `organon.core.rendering.subtaxa_merge` (rendu fusionné multi-sources, où `rang_txt_singulier`
+    sert à l'accord grammatical du compte d'espèces) sans dupliquer cette logique."""
+    rang_keys: list[str] = []
+    rang_names: dict[str, str] = {}
+    for sous_taxon in liste:
+        nom_rang = wp_nom_rang(sous_taxon.rang, lien=False, maj=False, plur=True)
+        if nom_rang == "NOTFOUND":
+            continue
+        if nom_rang not in rang_names:
+            rang_names[nom_rang] = nom_rang
+            rang_keys.append(sous_taxon.rang)
+    noms_rang = list(rang_names.values())
+
+    if not noms_rang:
+        rang_txt = "taxons de rang inférieur"
+        rang_txt_singulier = "taxon de rang inférieur"
+    else:
+        noms_singulier = [wp_nom_rang(k, lien=False, maj=False, plur=False) for k in rang_keys]
+        rang_txt = noms_rang[0]
+        rang_txt_singulier = noms_singulier[0]
+        for i in range(1, len(noms_rang)):
+            rang_txt += " et " + noms_rang[i] if i == len(noms_rang) - 1 else ", " + noms_rang[i]
+            rang_txt_singulier += (
+                " et " + noms_singulier[i] if i == len(noms_rang) - 1 else ", " + noms_singulier[i]
+            )
+
+    rang_defaut = noms_rang[0] if noms_rang else "espèce"
+    return rang_txt, rang_txt_singulier, rang_defaut
+
+
+def render_subtaxon_line(sous_taxon: RankName, regne: str, rang_defaut: str) -> str:
+    """Rendu wikitexte d'une ligne de sous-taxon (`"* ''Nom'' Auteur\\n"`, italiques/éteint
+    compris) — extrait de `render_inf` pour être partagé avec
+    `organon.core.rendering.subtaxa_merge` (mêmes règles de mise en forme pour le rendu
+    mono-source et le rendu fusionné multi-sources)."""
+    rang_affiche = sous_taxon.rang or rang_defaut
+    auteur = " " + format_auteur(sous_taxon.auteur) if sous_taxon.auteur else ""
+    wikilien = not wp_inf_rang(rang_affiche)
+    cible = wp_met_italiques(sous_taxon.nom, rang_affiche, regne, lien=wikilien)
+    if sous_taxon.eteint:
+        cible = "† " + cible
+    return f"* {cible}{auteur}\n"
+
+
 def render_inf(struct: Struct, options: GenerateOptions) -> str:
     cdate = dates_recupere()
     sous_taxons = struct.sous_taxons
@@ -159,37 +214,14 @@ def render_inf(struct: Struct, options: GenerateOptions) -> str:
             return "\n== Liste des taxons de rang inférieur ==\n{{Section vide ou incomplète}}\n"
         return ""
 
-    rang_names: dict[str, str] = {}
-    for sous_taxon in sous_taxons.liste:
-        nom_rang = wp_nom_rang(sous_taxon.rang, lien=False, maj=False, plur=True)
-        if nom_rang == "NOTFOUND":
-            continue
-        rang_names[nom_rang] = nom_rang
-    noms_rang = list(rang_names.values())
-
-    if not noms_rang:
-        rang_txt = "taxons de rang inférieur"
-    elif len(noms_rang) == 1:
-        rang_txt = noms_rang[0]
-    else:
-        rang_txt = noms_rang[0]
-        for i in range(1, len(noms_rang)):
-            rang_txt += " et " + noms_rang[i] if i == len(noms_rang) - 1 else ", " + noms_rang[i]
-
-    rang_defaut = noms_rang[0] if noms_rang else "espèce"
+    rang_txt, _, rang_defaut = compute_rang_txt(sous_taxons.liste)
     module_source = sous_taxons.source
 
     ret = f"\n== Liste des {rang_txt} ==\nSelon {{{{Bioref|{module_source}|{cdate}}}}} :\n"
 
     ret0 = ""
     for sous_taxon in sous_taxons.liste:
-        rang_affiche = sous_taxon.rang or rang_defaut
-        auteur = " " + format_auteur(sous_taxon.auteur) if sous_taxon.auteur else ""
-        wikilien = not wp_inf_rang(rang_affiche)
-        cible = wp_met_italiques(sous_taxon.nom, rang_affiche, struct.regne, lien=wikilien)
-        if sous_taxon.eteint:
-            cible = "† " + cible
-        ret0 += f"* {cible}{auteur}\n"
+        ret0 += render_subtaxon_line(sous_taxon, struct.regne, rang_defaut)
 
     if est_colonnes(len(sous_taxons.liste), options):
         ret += colonnes_contenu(ret0)

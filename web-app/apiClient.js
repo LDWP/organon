@@ -43,6 +43,23 @@ export function fetchCommonsImages(taxon) {
   return apiGet(`/commons-images?taxon=${encodeURIComponent(taxon)}`);
 }
 
+// Fusionne les sous-taxons de plusieurs sources déjà résolues (voir prefetchOtherClassifications
+// dans App.jsx) — recoupement par nom exact + rendu wikitexte par espèce fait côté serveur (voir
+// organon/api/routes/subtaxa_merge.py, organon/core/rendering/subtaxa_merge.py) pour réutiliser
+// les mêmes règles d'italiques/auteur/éteint que subtaxa_wikitext, sans les dupliquer ici.
+export async function mergeSubtaxa(payload) {
+  const res = await fetch(`${API_BASE}/subtaxa-merge`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || `Erreur API (${res.status})`);
+  }
+  return data;
+}
+
 export const LOGIN_URL = `${API_BASE}/auth/login`;
 
 export async function logout() {

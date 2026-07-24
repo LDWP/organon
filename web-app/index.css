@@ -428,6 +428,14 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
    plutôt que sur la cellule elle-même (pastille+lien de la 1ʳᵉ colonne, message+bouton Réessayer
    de la 2ᵉ, onglet Données). */
 .data-table-cell-flex { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
+/* ---------- fusion des sous-taxons (onglet Wikitexte > Sous-rangs) ---------- */
+.subtaxa-merge-groups { display: flex; flex-direction: column; gap: 16px; }
+.subtaxa-merge-group-head { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; }
+.subtaxa-merge-species-list {
+  list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px;
+}
+.subtaxa-merge-species-list li { font-size: 13px; }
 .data-table-duration { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .data-table a {
   font-family: var(--mono); font-size: 11.5px; color: var(--accent); text-decoration: none; border: 1px solid var(--line);
