@@ -126,14 +126,18 @@ class HesperomysModule(TaxonomyModule):
         struct.classification_taxobox = "Hesperomys"
 
         ancestors = await adapter.ancestors(detail.get("parent"))
-        struct.rangs = [
-            RankName(
-                nom=a["validName"],
-                rang=hesperomys_cherche_rang(a.get("rank")),
-                auteur=_citation(a.get("baseName")),
+        rangs: list[RankName] = []
+        for a in ancestors:
+            anc_rang = hesperomys_cherche_rang(a.get("rank"))
+            if anc_rang == "NOTFOUND":
+                # Rang cladistique non standard (ex. "clade") sans équivalent Wikipédia — exclu
+                # plutôt que de laisser fuiter le sentinelle (même convention que INPN, voir
+                # organon/modules/inpn/module.py).
+                continue
+            rangs.append(
+                RankName(nom=a["validName"], rang=anc_rang, auteur=_citation(a.get("baseName")))
             )
-            for a in ancestors
-        ]
+        struct.rangs = rangs
 
         limit = as_limit(options.limite_listes)
         synonymes_liste = [
