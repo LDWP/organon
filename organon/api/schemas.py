@@ -130,6 +130,8 @@ class ModuleStatusEvent(BaseModel):
     status: Literal["running", "found", "empty", "error"]
     message: str | None = None
     """Détail de l'erreur, uniquement quand status == "error"."""
+    duration_seconds: float | None = None
+    """Temps écoulé entre le "running" et ce statut terminal — absent quand status == "running"."""
 
 
 class PlanEvent(BaseModel):

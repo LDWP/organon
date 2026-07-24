@@ -216,17 +216,6 @@ function ModuleStatusIcon({ status }) {
   );
 }
 
-// Onglet Données : un tableau par état plutôt qu'une liste unique, pour que les modules qui
-// n'ont rien trouvé (le cas courant) n'inondent pas ceux qui ont vraiment quelque chose à
-// montrer. "running"/"pending" regroupés sous un même intitulé : la distinction entre les deux
-// n'a d'intérêt que pendant le chargement initial, déjà visible ailleurs (icônes des onglets).
-const STATUS_GROUPS = [
-  { statuses: ["running", "pending"], label: "En cours" },
-  { statuses: ["found"], label: "Données récoltées" },
-  { statuses: ["empty"], label: "Aucun résultat" },
-  { statuses: ["error"], label: "Erreur réseau" },
-];
-
 // Onglets de la coquille à navigation latérale du résultat, dans leur ordre d'affichage.
 const RESULT_VIEWS = [
   { id: "wikitexte", label: "Wikitexte" },
@@ -237,18 +226,18 @@ const RESULT_VIEWS = [
   { id: "data", label: "Données" },
 ];
 
-// Certains modules combinent plusieurs liens externes en un seul bloc HTML (ex. "externe" :
-// Wikidata + Species + Commons + Commons catégorie, séparés par un espace) — les sépare en
-// entrées distinctes, une par lien, pour qu'elles apparaissent sur des lignes propres du
-// tableau plutôt qu'agglutinées dans une seule cellule. Un module à lien unique (cas courant)
-// ressort inchangé, en une seule entrée sans étiquette propre.
-function splitLinks(html) {
-  const anchors = html.match(/<a[^>]*>.*?<\/a>/g);
-  if (!anchors || anchors.length <= 1) return [{ label: null, html }];
-  return anchors.map((anchorHtml) => {
-    const label = anchorHtml.match(/>([^<]*)<\/a>/);
-    return { label: label ? label[1] : null, html: anchorHtml };
-  });
+// Extrait la cible du premier lien d'un bloc HTML de lien externe (voir ExternalLink côté
+// backend, organon/api/schemas.py) pour en faire la cible du nom de module de l'onglet Données.
+// Les attributs href des modules sont construits avec des guillemets simples (voir
+// simple_debug_link, organon/modules/common.py) — accepter les deux évite de rater ces liens.
+function extractHref(html) {
+  const match = html?.match(/href=["']([^"']+)["']/);
+  return match ? match[1] : null;
+}
+
+// "0,6 s" plutôt que "0.6s" : convention décimale française déjà utilisée ailleurs dans l'app.
+function formatDuration(seconds) {
+  return `${seconds.toLocaleString("fr-FR", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} s`;
 }
 
 // Commentaire laissé par render_taxobox() (organon/core/rendering/sections.py) tant qu'aucune
@@ -401,7 +390,12 @@ export default function App() {
           ...prev[moduleId],
           moduleStatuses: {
             ...prev[moduleId]?.moduleStatuses,
-            [event.module_id]: { role: event.role, status: event.status, message: event.message },
+            [event.module_id]: {
+              role: event.role,
+              status: event.status,
+              message: event.message,
+              durationSeconds: event.duration_seconds,
+            },
           },
         },
       }));
@@ -625,6 +619,16 @@ export default function App() {
     if (existing?.status === "error") {
       fetchSource(query.taxon, query.domaine, moduleId);
     }
+  }
+
+  // Relance manuelle d'un module en erreur depuis l'onglet Données. Un module d'enrichissement
+  // n'a pas de point d'entrée propre côté backend (voir EnrichmentRunner, organon/api/routes/
+  // generate.py) : seule la source de classification entière peut être régénérée, ce qui relance
+  // au passage tous ses modules, y compris celui en erreur — même mécanisme que handleTabClick
+  // pour une source dont le fetch initial a échoué.
+  function handleModuleRetry() {
+    if (!query || !activeSource) return;
+    fetchSource(query.taxon, query.domaine, activeSource);
   }
 
   // Une édition en cours ("Éditer") porte sur le wikitexte composé pour la sélection de
@@ -1591,50 +1595,64 @@ export default function App() {
                       )}
 
                       {activeEntry?.moduleStatuses && Object.keys(activeEntry.moduleStatuses).length > 0 ? (
-                        STATUS_GROUPS.map(({ statuses, label }) => {
-                          const rows = Object.entries(activeEntry.moduleStatuses).filter(([, info]) =>
-                            statuses.includes(info.status)
-                          );
-                          if (rows.length === 0) return null;
-                          return (
-                            <div className="data-table-wrap" key={label}>
-                              <h4 className="data-table-title">{label}</h4>
-                              <table className="data-table">
-                                <thead>
-                                  <tr>
-                                    <th>Source</th>
-                                    <th>Statut</th>
-                                    <th>Informations</th>
+                        <div className="data-table-wrap">
+                          <table className="data-table">
+                            <thead>
+                              <tr>
+                                <th>Source</th>
+                                <th>Informations</th>
+                                <th>Temps d'exécution</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {Object.entries(activeEntry.moduleStatuses).map(([moduleId, info]) => {
+                                const link = activeData?.external_links.find((l) => l.module_id === moduleId);
+                                const href = link ? extractHref(link.html) : null;
+                                // Types d'information effectivement rapportés par ce module pour
+                                // ce taxon (voir GenerateResponse.data_found côté backend) —
+                                // dérivé de la structure déjà présente dans la réponse plutôt
+                                // que deviné ici module par module.
+                                const found = activeData?.data_found?.[moduleId] || [];
+                                return (
+                                  <tr key={moduleId}>
+                                    <td>
+                                      <span className="data-table-cell-flex">
+                                        <span
+                                          className={`status-dot status-dot-${info.status}`}
+                                          role="img"
+                                          aria-label={MODULE_STATUS_LABELS[info.status] || info.status}
+                                          title={MODULE_STATUS_LABELS[info.status] || info.status}
+                                        />
+                                        {href ? (
+                                          <a href={href} target="_blank" rel="noreferrer">
+                                            {moduleId.toUpperCase()}
+                                          </a>
+                                        ) : (
+                                          moduleId.toUpperCase()
+                                        )}
+                                      </span>
+                                    </td>
+                                    <td>
+                                      {info.status === "error" ? (
+                                        <span className="data-table-cell-flex">
+                                          <span>{info.message ? `Erreur : ${info.message}` : "Erreur réseau"}</span>
+                                          <button type="button" className="footer-link" onClick={handleModuleRetry}>
+                                            Réessayer
+                                          </button>
+                                        </span>
+                                      ) : (
+                                        found.join(", ")
+                                      )}
+                                    </td>
+                                    <td className="data-table-duration">
+                                      {info.durationSeconds != null ? formatDuration(info.durationSeconds) : "—"}
+                                    </td>
                                   </tr>
-                                </thead>
-                                <tbody>
-                                  {rows.flatMap(([moduleId, info]) => {
-                                    const link = activeData?.external_links.find((l) => l.module_id === moduleId);
-                                    const entries = link ? splitLinks(link.html) : [{ label: null, html: null }];
-                                    // Types d'information effectivement rapportés par ce module pour
-                                    // ce taxon (voir GenerateResponse.data_found côté backend) —
-                                    // dérivé de la structure déjà présente dans la réponse plutôt
-                                    // que deviné ici module par module.
-                                    const found = activeData?.data_found?.[moduleId] || [];
-                                    return entries.map((entry, i) => (
-                                      <tr key={`${moduleId}-${i}`}>
-                                        <td>
-                                          <span className="id-badge">{moduleId.toUpperCase()}</span>
-                                          {entry.html && <span dangerouslySetInnerHTML={{ __html: entry.html }} />}
-                                        </td>
-                                        <td>
-                                          <ModuleStatusIcon status={info.status} />{" "}
-                                          {info.status === "error" && info.message ? `erreur (${info.message})` : MODULE_STATUS_LABELS[info.status]}
-                                        </td>
-                                        <td>{i === 0 ? found.join(", ") : ""}</td>
-                                      </tr>
-                                    ));
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
-                          );
-                        })
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
                       ) : (
                         <p className="panel-empty">Aucun suivi disponible pour le moment.</p>
                       )}

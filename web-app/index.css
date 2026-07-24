@@ -340,6 +340,15 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
   .module-status-spinner { animation-duration: 2.4s; }
 }
 
+/* Pastille de statut de la colonne Source du tableau de l'onglet Données — couleur seule
+   (contrairement à .module-status-icon) car le nom du module et le contenu de la colonne
+   Informations suffisent déjà à distinguer les statuts sans dépendre de la forme. */
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.status-dot-found { background: var(--accent); }
+.status-dot-empty { background: var(--amber); }
+.status-dot-error { background: var(--danger); }
+.status-dot-running, .status-dot-pending { background: var(--ink-soft); opacity: 0.6; }
+
 .panel { background: var(--card); border: 1px solid var(--line); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
 .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--line); background: var(--card-hi); flex-wrap: wrap; }
 .panel-head .t { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
@@ -413,20 +422,13 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
   color: var(--ink-soft); padding: 8px 10px; border-bottom: 1px solid var(--line);
 }
 .data-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-.data-table td:first-child {
-  font-family: var(--mono); font-weight: 600; color: var(--ink);
-  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
-}
-.data-table td:nth-child(2) { display: flex; align-items: center; gap: 7px; white-space: nowrap; }
-/* Les deux règles ci-dessus visent le tableau de l'onglet Données (badge+lien, icône+statut) —
-   ça casse la mise en page de ligne du tableau de comparaison par rang de l'onglet Classification
-   (colonnes rang + une par source, sans ce besoin de flex) : on y repasse ces deux colonnes en
-   cellules de table normales. */
-.classification-compare-table td:first-child,
-.classification-compare-table td:nth-child(2) {
-  display: table-cell;
-  white-space: normal;
-}
+.data-table td:first-child { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+/* `display:flex` posé directement sur un `<td>` casse sa participation à la ligne de table (la
+   cellule suivante retombe sur une nouvelle ligne) — le flex va donc sur ce wrapper interne
+   plutôt que sur la cellule elle-même (pastille+lien de la 1ʳᵉ colonne, message+bouton Réessayer
+   de la 2ᵉ, onglet Données). */
+.data-table-cell-flex { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+.data-table-duration { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .data-table a {
   font-family: var(--mono); font-size: 11.5px; color: var(--accent); text-decoration: none; border: 1px solid var(--line);
   border-radius: 5px; padding: 3px 8px;

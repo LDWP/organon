@@ -139,6 +139,7 @@ class ModuleRunEvent:
     module_id: str
     status: str  # "running" | "found" | "empty" | "error"
     message: str | None = None
+    duration_seconds: float | None = None
 
 
 class EnrichmentRunner:
@@ -215,6 +216,7 @@ class EnrichmentRunner:
         porte que la clé de son propre module, donc un simple `update()` les fusionne sans
         conflit ; seuls les champs mono-valeur de `_MONOVALUE_FIELDS` nécessitent un choix par
         priorité, tranché en comparant chaque copie à `self._baseline`."""
+        started: dict[str, float] = {module_id: time.monotonic() for module_id in self._enrichment_ids}
         tasks = [
             asyncio.create_task(self.collect_one_module(module_id), name=module_id)
             for module_id in self._enrichment_ids
@@ -225,21 +227,22 @@ class EnrichmentRunner:
         results: dict[str, Struct] = {}
         for task in asyncio.as_completed(tasks):
             module_id, updated, exc = await task
+            duration = time.monotonic() - started[module_id]
             if exc is not None:
                 logger.warning(
                     "Module '%s' (enrichissement) : erreur réseau (%s), ignoré.", module_id, exc
                 )
-                yield ModuleRunEvent(module_id, "error", message=str(exc))
+                yield ModuleRunEvent(module_id, "error", message=str(exc), duration_seconds=duration)
             elif updated is not None:
                 results[module_id] = updated
-                yield ModuleRunEvent(module_id, "found")
+                yield ModuleRunEvent(module_id, "found", duration_seconds=duration)
             else:
                 # Pas d'entrée dans `self.warnings` : un module d'enrichissement qui ne
                 # trouve rien pour ce taxon est le cas courant (la plupart des ~20 modules
                 # ne couvrent qu'un domaine restreint), pas une anomalie à afficher dans le
                 # wikitexte final — le statut "empty" reste visible module par module via
                 # `ModuleRunEvent`/l'onglet Données côté frontend.
-                yield ModuleRunEvent(module_id, "empty")
+                yield ModuleRunEvent(module_id, "empty", duration_seconds=duration)
 
         for module_id in self._enrichment_ids:
             if module_id not in results:
@@ -528,6 +531,7 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
         warnings: list[str] = []
 
         yield _sse(ModuleStatusEvent(module_id=classification_id, role="classification", status="running"))
+        classification_started = time.monotonic()
 
         struct = Struct(taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine)
         try:
@@ -538,7 +542,11 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
             logger.warning("Module de classification '%s' : erreur réseau (%s)", classification_id, exc)
             yield _sse(
                 ModuleStatusEvent(
-                    module_id=classification_id, role="classification", status="error", message=str(exc)
+                    module_id=classification_id,
+                    role="classification",
+                    status="error",
+                    message=str(exc),
+                    duration_seconds=time.monotonic() - classification_started,
                 )
             )
             yield _sse(
@@ -552,7 +560,11 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
         if resolved is None:
             yield _sse(
                 ModuleStatusEvent(
-                    module_id=classification_id, role="classification", status="error", message="taxon non trouvé"
+                    module_id=classification_id,
+                    role="classification",
+                    status="error",
+                    message="taxon non trouvé",
+                    duration_seconds=time.monotonic() - classification_started,
                 )
             )
             yield _sse(
@@ -563,7 +575,14 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
             )
             return
         struct = resolved
-        yield _sse(ModuleStatusEvent(module_id=classification_id, role="classification", status="found"))
+        yield _sse(
+            ModuleStatusEvent(
+                module_id=classification_id,
+                role="classification",
+                status="found",
+                duration_seconds=time.monotonic() - classification_started,
+            )
+        )
 
         applicable = modules_possibles(struct.domaine, trees) or []
         enrichment_ids = [
@@ -579,6 +598,7 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
                     role="enrichment",
                     status=module_event.status,
                     message=module_event.message,
+                    duration_seconds=module_event.duration_seconds,
                 )
             )
 
