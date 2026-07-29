@@ -1483,7 +1483,7 @@ export default function App() {
                           </div>
                           {wikitextSubTab === "taxobox" && availableSources.length > 0 && (
                             <div className="data-table-wrap classification-compare-wrap">
-                              <table className="data-table classification-compare-table">
+                              <table className="data-table classification-compare-table classification-compare-table--managed">
                                 <thead>
                                   <tr>
                                     <th></th>
@@ -1633,7 +1633,7 @@ export default function App() {
                     {availableSources.length === 0 ? (
                       <p className="panel-empty">Aucune source résolue pour le moment.</p>
                     ) : (
-                      <div className="data-table-wrap">
+                      <div className="data-table-wrap classification-compare-wrap">
                         <table className="data-table classification-compare-table">
                           <thead>
                             <tr>
@@ -1653,15 +1653,21 @@ export default function App() {
                           <tbody>
                             {classificationTableRows.order.map((rang) => {
                               const conflict = rankDisagreements[rang]?.size > 1;
+                              const valueFor = (m) => {
+                                const noms = classificationTableRows.perModule[m.id]?.[rang] || [];
+                                return noms.length > 0 ? noms.join(", ") : "—";
+                              };
+                              const chosenValue = taxoboxNomByRang[rang];
+                              const groups = mergeAdjacentEqual(availableSources, valueFor);
                               return (
                                 <tr key={rang}>
                                   <td>{rang}</td>
-                                  {availableSources.map((m) => {
-                                    const noms = classificationTableRows.perModule[m.id]?.[rang] || [];
-                                    const differs = conflict && noms.length > 0 && !noms.includes(taxoboxNomByRang[rang]);
+                                  {groups.map((g, gi) => {
+                                    const noms = classificationTableRows.perModule[g.sources[0].id]?.[rang] || [];
+                                    const differs = conflict && g.value !== "—" && !noms.includes(chosenValue);
                                     return (
-                                      <td key={m.id} className={differs ? "conflict-cell" : undefined}>
-                                        {noms.length > 0 ? noms.join(", ") : "—"}
+                                      <td key={gi} colSpan={g.sources.length} className={differs ? "conflict-cell" : undefined}>
+                                        {g.value}
                                       </td>
                                     );
                                   })}

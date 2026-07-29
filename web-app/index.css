@@ -310,14 +310,18 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 .conflict-cell { background: color-mix(in srgb, var(--amber) 16%, transparent); }
 .chosen-col { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .classification-compare-table tbody th abbr { text-decoration-color: var(--ink-soft); cursor: help; }
-/* Largeurs figées pour tenir dans le cadre sans défilement horizontal : la colonne libellé et la
-   colonne "gérer" (case à cocher seule) ont une largeur fixe, les colonnes source se partagent le
-   reste à parts égales (table-layout: fixed ne calcule les largeurs que sur la 1ʳᵉ ligne). */
+/* Largeurs figées pour tenir dans le cadre sans défilement horizontal (les deux tableaux de
+   comparaison — Taxobox et Classification par source — partagent cette base) : la colonne
+   libellé a une largeur fixe, les colonnes source se partagent le reste à parts égales
+   (table-layout: fixed ne calcule les largeurs que sur la 1ʳᵉ ligne). */
 .classification-compare-wrap { overflow-x: visible; }
 .classification-compare-table { table-layout: fixed; }
 .classification-compare-table th:first-child, .classification-compare-table td:first-child { width: 110px; }
-.classification-compare-table th:last-child, .classification-compare-table td:last-child { width: 28px; padding-left: 2px; padding-right: 2px; }
 .classification-compare-table td { overflow-wrap: break-word; }
+/* Colonne "gérer" (case à cocher seule) — uniquement le tableau Taxobox, qui a une colonne de
+   fin dédiée au désaccord ; le tableau Classification par source n'en a pas, sa dernière colonne
+   est une vraie colonne de données et ne doit pas être réduite. */
+.classification-compare-table--managed th:last-child, .classification-compare-table--managed td:last-child { width: 28px; padding-left: 2px; padding-right: 2px; }
 
 /* ---------- statuts de module (classification/enrichissement) ----------
    Remplace l'ancien `.dot`/`.dot warn`/`.dot off` (couleur seule, pas accessible aux
