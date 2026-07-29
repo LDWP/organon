@@ -9,10 +9,16 @@ comme identiques. Limitation assumée plutôt qu'un rapprochement flou qui masqu
 positifs — documentée ici et à répercuter dans toute UI qui consomme `merge_subtaxa`.
 
 Les espèces sont groupées par ensemble EXACT de sources qui les rapportent, puis les groupes
-sont ordonnés : le plus grand groupe en premier (l'« ancre »), puis, en boucle, le plus grand
-groupe restant partageant au moins une source avec l'union des sources déjà placées (glouton :
-équivaut à un parcours en largeur des groupes connectés par source partagée), puis les groupes
-restants qui démarrent une nouvelle composante disjointe, plus grand d'abord.
+sont répartis en composantes connexes (deux groupes sont reliés s'ils partagent au moins une
+source). La composante contenant le plus grand groupe est la composante "principale" : ses
+groupes sont ordonnés par parcours glouton (le plus grand groupe en premier, l'« ancre », puis
+en boucle le plus grand groupe restant de la composante partageant une source avec l'union déjà
+placée — cette union ne progresse que sur des groupes de la composante principale, donc chaque
+étape trouve toujours un candidat, la connexité du graphe le garantit). Tous les groupes des
+AUTRES composantes sont "disjoint" (décochés
+par défaut), plus grand groupe d'abord au sein de chaque composante — jamais promus en "autres"
+même s'ils partagent une source entre eux, puisqu'aucun d'eux n'est relié à la composante
+principale.
 """
 
 from __future__ import annotations
@@ -148,10 +154,31 @@ def merge_subtaxa(
     def largest(candidates: list[frozenset[str]]) -> frozenset[str]:
         return max(candidates, key=lambda k: (len(group_names[k]), -group_order.index(k)))
 
+    # Composantes connexes (union-find par repères) : deux groupes sont reliés s'ils partagent au
+    # moins une source. Peu de groupes en pratique, pas besoin de path compression.
+    root: dict[frozenset[str], frozenset[str]] = {k: k for k in group_order}
+
+    def find_root(k: frozenset[str]) -> frozenset[str]:
+        while root[k] != k:
+            k = root[k]
+        return k
+
+    for i, a in enumerate(group_order):
+        for b in group_order[i + 1 :]:
+            if a & b:
+                ra, rb = find_root(a), find_root(b)
+                if ra != rb:
+                    root[ra] = rb
+
+    anchor_key = largest(group_order)
+    main_component = find_root(anchor_key)
+
+    main_group = [k for k in group_order if find_root(k) == main_component]
+    other_groups = [k for k in group_order if find_root(k) != main_component]
+
     placed: list[tuple[frozenset[str], GroupKind]] = []
     seen_sources: set[str] = set()
-    remaining = list(group_order)
-
+    remaining = list(main_group)
     while remaining:
         sharing = [k for k in remaining if k & seen_sources]
         if not placed:
@@ -161,11 +188,30 @@ def merge_subtaxa(
             pick = largest(sharing)
             kind = "autres"
         else:
+            # Ne peut pas arriver : main_group est une composante connexe, donc tant qu'il en
+            # reste, un groupe non placé partage forcément une source avec l'union déjà placée.
             pick = largest(remaining)
-            kind = "disjoint"
+            kind = "autres"
         placed.append((pick, kind))
         remaining.remove(pick)
         seen_sources |= pick
+
+    # Composantes isolées : toujours "disjoint", ordre par composante puis par taille décroissante
+    # au sein de chaque composante — jamais mélangées entre elles via un "seen_sources" partagé.
+    remaining_components: dict[frozenset[str], list[frozenset[str]]] = {}
+    for k in other_groups:
+        remaining_components.setdefault(find_root(k), []).append(k)
+
+    def component_size(comp_keys: list[frozenset[str]]) -> tuple[int, int]:
+        biggest = largest(comp_keys)
+        return (len(group_names[biggest]), -group_order.index(biggest))
+
+    for comp_keys in sorted(remaining_components.values(), key=component_size, reverse=True):
+        local_remaining = list(comp_keys)
+        while local_remaining:
+            pick = largest(local_remaining)
+            placed.append((pick, "disjoint"))
+            local_remaining.remove(pick)
 
     cdate = dates_recupere()
     groups = []
