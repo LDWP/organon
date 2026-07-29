@@ -1,7 +1,5 @@
 """Point d'import unique qui enregistre tous les modules disponibles dans le registre (voir
-organon.core.registry). Remplace le scan de répertoire `scandir("./modules")` de l'ancien
-`cherche_modules()` : ici, ajouter un module au Phase 2+ signifie ajouter une ligne d'import
-ici, explicite et visible dans les diffs — pas un fichier découvert « par magie » au démarrage.
+organon.core.registry).
 
 Les modules sous `organon.modules._archive` ne sont volontairement pas importés ici : leur code
 reste dans le dépôt mais ils ne s'enregistrent plus (voir le docstring de chacun pour le motif
@@ -13,6 +11,7 @@ from organon.modules.adw import module as _adw  # noqa: F401
 from organon.modules.algaebase import module as _algaebase  # noqa: F401
 from organon.modules.cites import module as _cites  # noqa: F401
 from organon.modules.col import module as _col  # noqa: F401
+from organon.modules.doris import module as _doris  # noqa: F401
 from organon.modules.eflora import module as _eflora  # noqa: F401
 from organon.modules.eol import module as _eol  # noqa: F401
 from organon.modules.externe import module as _externe  # noqa: F401

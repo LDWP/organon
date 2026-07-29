@@ -143,11 +143,11 @@ categories:
       - id: doris
         nom: DORIS
         url: "https://doris.ffessm.fr"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "base française faune/flore subaquatique"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "/Especes/api renvoie 404, pas de documentation API publique trouvée en un sondage rapide"}
-        derniere_maj: null
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "aucune donnée de classification exploitable, juste un groupe DORIS simplifié"}
+        elements_recoltes: ["identifiant de fiche", "nom vernaculaire"]
+        acces: {type: scraping, detail: "aucune API (/Especes/api -> 404) ; recherche HTML (POST /content/action, (name)=requête), filtrage par correspondance exacte du nom scientifique côté client"}
+        derniere_maj: "2026-07-29"
       - id: gisd
         nom: "Global Invasive Species Database (GISD)"
         url: null
