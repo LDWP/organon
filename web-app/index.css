@@ -450,6 +450,9 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 }
 .reference-checklist-row:last-child { border-bottom: none; }
 .reference-checklist-row code { font-family: var(--mono); font-size: 11.5px; color: var(--ink); overflow-wrap: anywhere; }
+.reference-checklist-row-locked { cursor: default; color: var(--ink-soft); }
+.reference-checklist-lock { font-size: 12px; flex-shrink: 0; }
+.reference-checklist-note { font-size: 11px; color: var(--ink-soft); }
 
 footer { padding: 24px 0; border-top: 1px solid var(--line); margin-top: 56px; }
 footer p { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); margin: 0; }

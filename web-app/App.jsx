@@ -1547,8 +1547,15 @@ export default function App() {
                               </table>
                             </div>
                           )}
-                          {wikitextSubTab === "references" && referenceItems.length > 0 && (
+                          {wikitextSubTab === "references" && (
                             <div className="reference-checklist">
+                              <div className="reference-checklist-row reference-checklist-row-locked">
+                                <span className="reference-checklist-lock" aria-hidden="true">🔒</span>
+                                <span className="id-badge">Autres projets</span>
+                                <span className="reference-checklist-note">
+                                  toujours inclus — fait partie des liens externes, pas des références taxonomiques
+                                </span>
+                              </div>
                               {referenceItems.map((item) => {
                                 const key = referenceItemKey(item);
                                 const checked = referenceCheckedOverrides[key] ?? item.default_checked;
