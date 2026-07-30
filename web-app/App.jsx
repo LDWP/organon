@@ -1687,76 +1687,93 @@ export default function App() {
                       <p className="panel-empty">Aucune donnée disponible pour le moment.</p>
                     ) : (
                       <>
-                        <div className="data-table-wrap">
-                          <h4 className="data-table-title">Auteur</h4>
+                        <div className="noms-card">
+                          <div className="noms-card-head">
+                            <span className="noms-card-title">Auteur</span>
+                          </div>
                           {activeData.auteur_consolide ? (
-                            <table className="data-table">
-                              <thead>
-                                <tr>
-                                  <th>Retenu (vote majoritaire)</th>
-                                  <th>Candidats par source</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td>{activeData.auteur_consolide}</td>
-                                  <td>
-                                    {Object.entries(activeData.auteur_candidats).map(([moduleId, auteur]) => (
-                                      <div key={moduleId}>
-                                        <span className="id-badge">{moduleId.toUpperCase()}</span> {auteur}
-                                      </div>
+                            <div className="data-table-wrap classification-compare-wrap">
+                              <table className="data-table classification-compare-table">
+                                <thead>
+                                  <tr>
+                                    {availableSources.map((m) => {
+                                      const candidat = activeData.auteur_candidats[m.id];
+                                      const retenu = candidat && normalizeAuteur(candidat) === normalizeAuteur(activeData.auteur_consolide);
+                                      return (
+                                        <th key={m.id}>
+                                          <span className="id-badge" title={retenu ? "Retenu (vote majoritaire)" : undefined}>
+                                            {m.id.toUpperCase()}
+                                            {retenu ? " ★" : ""}
+                                          </span>
+                                        </th>
+                                      );
+                                    })}
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    {mergeAdjacentEqual(availableSources, (m) => activeData.auteur_candidats[m.id] || "—").map((g, gi) => (
+                                      <td key={gi} colSpan={g.sources.length}>{g.value}</td>
                                     ))}
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
                           ) : (
                             <p className="panel-empty">Aucun auteur rapporté pour ce taxon.</p>
                           )}
                         </div>
 
-                        <div className="data-table-wrap">
-                          <h4 className="data-table-title">Noms vernaculaires</h4>
+                        <div className="noms-card">
+                          <div className="noms-card-head">
+                            <span className="noms-card-title">Noms vernaculaires</span>
+                          </div>
                           {activeData.vernacular_names.length > 0 ? (
-                            <p>{activeData.vernacular_names.join(", ")}</p>
+                            <p className="noms-card-body">{activeData.vernacular_names.join(", ")}</p>
                           ) : (
                             <p className="panel-empty">Aucun nom vernaculaire rapporté.</p>
                           )}
                         </div>
 
-                        <div className="data-table-wrap">
-                          <h4 className="data-table-title">
-                            Synonymes
-                            {activeData.synonymes_source ? ` — source : ${activeData.synonymes_source.toUpperCase()}` : ""}
-                          </h4>
+                        <div className="noms-card">
+                          <div className="noms-card-head">
+                            <span className="noms-card-title">
+                              Synonymes
+                              {activeData.synonymes_source ? ` — source : ${activeData.synonymes_source.toUpperCase()}` : ""}
+                            </span>
+                          </div>
                           {activeData.synonymes.length > 0 ? (
-                            <table className="data-table">
-                              <thead>
-                                <tr>
-                                  <th>Nom</th>
-                                  <th>Auteur</th>
-                                  <th>Rang</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {activeData.synonymes.map((s, i) => (
-                                  <tr key={i}>
-                                    <td><em>{s.nom}</em></td>
-                                    <td>{s.auteur || "—"}</td>
-                                    <td>{s.rang || "—"}</td>
+                            <div className="data-table-wrap">
+                              <table className="data-table">
+                                <thead>
+                                  <tr>
+                                    <th>Nom</th>
+                                    <th>Auteur</th>
+                                    <th>Rang</th>
                                   </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                                </thead>
+                                <tbody>
+                                  {activeData.synonymes.map((s, i) => (
+                                    <tr key={i}>
+                                      <td><em>{s.nom}</em></td>
+                                      <td>{s.auteur || "—"}</td>
+                                      <td>{s.rang || "—"}</td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
                           ) : (
                             <p className="panel-empty">Aucun synonyme rapporté.</p>
                           )}
                         </div>
 
-                        <div className="data-table-wrap">
-                          <h4 className="data-table-title">Basionyme</h4>
+                        <div className="noms-card">
+                          <div className="noms-card-head">
+                            <span className="noms-card-title">Basionyme</span>
+                          </div>
                           {activeData.basionyme ? (
-                            <p>
+                            <p className="noms-card-body">
                               <em>{activeData.basionyme.nom}</em>
                               {activeData.basionyme.auteur ? ` ${activeData.basionyme.auteur}` : ""}{" "}
                               <span className="id-badge">{activeData.basionyme.source.toUpperCase()}</span>
