@@ -72,7 +72,7 @@ categories:
         elements_recoltes: []
         acces: {type: api_rest, detail: "API REST/JSON (api.opentreeoflife.org), accessible uniquement par l'API"}
         derniere_maj: null
-        notes: "Module intégré puis retiré : aucune page web consultable pour une source OTL donnée, seulement l'API — incompatible avec la vérifiabilité attendue d'une source citée dans un article. Code conservé dans organon/modules/_archive/otl."
+        notes: "Intégré puis retiré : aucune page web consultable, seulement l'API — incompatible avec la vérifiabilité attendue. Code conservé dans _archive/otl."
       - id: inaturalist
         nom: iNaturalist
         url: "https://www.inaturalist.org"
@@ -81,7 +81,7 @@ categories:
         elements_recoltes: []
         acces: {type: api_rest, detail: "API REST/JSON (api.inaturalist.org)"}
         derniere_maj: null
-        notes: "Module intégré puis retiré : site collaboratif (identifications participatives), pas une autorité nomenclaturale. Code conservé dans organon/modules/_archive/inaturalist."
+        notes: "Intégré puis retiré : site collaboratif, pas une autorité nomenclaturale. Code conservé dans _archive/inaturalist."
       - id: cites
         nom: "CITES / Species+"
         url: "https://www.speciesplus.net"
@@ -122,7 +122,7 @@ categories:
         elements_recoltes: [auteur, "noms vernaculaires français", identifiant]
         acces: {type: api_rest, detail: "API REST/JSON publique, sans clé (eol.org/api/search/1.0, /api/pages/1.0)"}
         derniere_maj: null
-        notes: "Absent de la version précédente de cet inventaire par omission ; intégré et vérifié directement dans le code (organon/modules/eol)."
+        notes: "Absent de la version précédente par omission ; vérifié dans le code (organon/modules/eol)."
       - id: externe
         nom: "Liens transversaux Wikimédia (Wikidata, Commons, Wikispecies, Wiktionnaire)"
         url: "https://www.wikidata.org"
@@ -131,7 +131,7 @@ categories:
         elements_recoltes: ["identifiant Wikidata (QID)", "existence de page Commons (article et catégorie)", "existence de page Wikispecies", "existence de page Wiktionnaire francophone"]
         acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire)"}
         derniere_maj: null
-        notes: "Absent de la version précédente de cet inventaire par omission ; module technique transversal plutôt qu'une base taxonomique à proprement parler."
+        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique."
       - id: biolib
         nom: BioLib
         url: null
@@ -313,7 +313,7 @@ categories:
         elements_recoltes: [auteur, rang, règne, "chaîne de classification", "sous-taxons", éteint, identifiant]
         acces: {type: api_rest, detail: "API REST/JSON (api2.algaebase.org, clé de session)"}
         derniere_maj: null
-        notes: "Synonymes/basionyme non implémentés — TODO déjà présent dans le PHP d'origine, non résolu."
+        notes: "Synonymes/basionyme non implémentés (TODO hérité du PHP d'origine)."
 
   - id: champignons
     nom: Champignons
@@ -386,7 +386,7 @@ categories:
         elements_recoltes: ["identifiant(s) par flore régionale (Amérique du Nord, Chine, Pakistan)", "nom vérifié"]
         acces: {type: scraping, detail: "scraping HTML ciblé par regex, aucune API trouvée"}
         derniere_maj: null
-        notes: "Couvre aussi Flora of China et Flora of North America, servies par le même site efloras.org (flora_id 1 et 2)."
+        notes: "Couvre aussi Flora of China et Flora of North America (même site, flora_id 1 et 2)."
       - id: tropicos
         nom: Tropicos
         url: "https://www.tropicos.org"
@@ -395,7 +395,7 @@ categories:
         elements_recoltes: [auteur, identifiant]
         acces: {type: api_rest, detail: "API REST/JSON avec jeton Bearer (jeton public utilisé par le widget de recherche du site lui-même)"}
         derniere_maj: null
-        notes: "Intégré après la rédaction de cet inventaire (qui le classait encore « à trancher ») ; corrigé ici après lecture du code (organon/modules/tropicos)."
+        notes: "Intégré après cet inventaire (classé « à trancher ») ; corrigé après lecture du code."
       - id: wfo
         nom: "World Flora Online (WFO)"
         url: "https://www.worldfloraonline.org"
@@ -420,7 +420,7 @@ categories:
         elements_recoltes: [auteur, rang, règne, "chaîne de classification", synonymes, distribution, identifiant]
         acces: {type: api_rest, detail: "via la bibliothèque pykew (API JSON powo.science.kew.org/api/2) ; l'accès direct par requests nu reste bloqué (403 WAF sans en-tête User-Agent de navigateur, voir organon/modules/powo/adapter.py)"}
         derniere_maj: "2026-07-13"
-        notes: "World Checklist of Vascular Plants (WCVP), listée séparément dans un inventaire antérieur, est retirée ici : wcvp.science.kew.org redirige désormais vers powo.science.kew.org (même infrastructure, même jeu de données WCVP sous-jacent) — entrée redondante avec celle-ci."
+        notes: "WCVP (listée séparément avant) est retirée ici : wcvp.science.kew.org redirige vers powo.science.kew.org, même données — entrée redondante."
       - id: grin
         nom: "Germplasm Resources Information Network (GRIN)"
         url: "https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomysearch.aspx"
@@ -789,4 +789,4 @@ categories:
         elements_recoltes: []
         acces: {type: export, detail: "export CSV quotidien public sans clé (https://wsc.nmbe.ch/resources/species_export_YYYYMMDD.csv, ~7,8 Mo, colonnes speciesId/species_lsid/family/genus/species/subspecies/author/year/distribution/taxonStatus/validSpeciesId) — confirmé accessible en direct (HTTP 200, Last-Modified du jour). Une API REST/JSON existe aussi (api/lsid/<LSID>, api/updates) mais nécessite inscription WSCA + clé API, donc écartée au profit du CSV. Licence CC BY-NC-SA 4.0 : attribution requise, usage non-commercial."}
         derniere_maj: "2026-07-22 (fichier daté du jour, vérifié en direct le 2026-07-23)"
-        notes: "Déjà demandé comme fonctionnalité (docs/backlog.md). Ancien sondage 'non concluant' invalidé : l'export CSV documenté sur wsc.nmbe.ch/dataresources n'avait pas été trouvé."
+        notes: "Déjà demandé (docs/backlog.md). Ancien sondage 'non concluant' invalidé : l'export CSV n'avait alors pas été trouvé."
