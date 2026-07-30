@@ -684,13 +684,78 @@ export default function App() {
     handleExampleClick(EXAMPLE_TAXON);
   }
 
-  // Relance manuelle d'un module en erreur depuis l'onglet Données. Un module d'enrichissement
-  // n'a pas de point d'entrée propre côté backend (voir EnrichmentRunner, organon/api/routes/
-  // generate.py) : seule la source de classification entière peut être régénérée, ce qui relance
-  // au passage tous ses modules, y compris celui en erreur.
-  function handleModuleRetry() {
+  // Relance manuelle d'un module en erreur depuis l'onglet Données. Une erreur de classification
+  // n'a encore rien collecté pour cette source : repart d'une régénération complète (même chemin
+  // que la recherche initiale). Un module d'enrichissement en erreur, lui, n'a pas de point
+  // d'entrée propre côté backend, mais `GenerateOptions.off` permet de désactiver tous les autres
+  // modules déjà résolus pour que seul celui-ci soit effectivement rappelé sur le réseau (la
+  // classification, elle, est ré-exécutée dans tous les cas : le backend ne conserve aucun état
+  // entre deux requêtes). Seules ses données namespacées par module (data_found/distribution/
+  // auteur_candidats/external_links) sont ensuite fusionnées dans le résultat déjà affiché — le
+  // reste (wikitexte composé, noms vernaculaires...) resterait tronqué si on le prenait de cette
+  // réponse partielle, puisque les autres modules n'y ont pas tourné.
+  function retryModule(moduleId) {
     if (!query || !activeSource) return;
-    fetchSource(query.taxon, query.domaine, activeSource);
+    const statuses = resultsBySource[activeSource]?.moduleStatuses || {};
+    if (statuses[moduleId]?.role !== "enrichment") {
+      fetchSource(query.taxon, query.domaine, activeSource);
+      return;
+    }
+    const off = Object.entries(statuses)
+      .filter(([id, info]) => info.role === "enrichment" && id !== moduleId)
+      .map(([id]) => id);
+
+    generateTaxonStream(
+      { taxon: query.taxon, domaine: query.domaine, classification: activeSource, off },
+      {
+        onEvent: (event) => {
+          if (event.type === "module_status" && event.module_id === moduleId) {
+            handleGenerationEvent(activeSource, event);
+          }
+        },
+      }
+    )
+      .then((data) => {
+        setResultsBySource((prev) => {
+          const prevData = prev[activeSource]?.data;
+          if (!prevData) return prev;
+          return {
+            ...prev,
+            [activeSource]: {
+              ...prev[activeSource],
+              data: {
+                ...prevData,
+                data_found: moduleId in data.data_found
+                  ? { ...prevData.data_found, [moduleId]: data.data_found[moduleId] }
+                  : prevData.data_found,
+                distribution: moduleId in data.distribution
+                  ? { ...prevData.distribution, [moduleId]: data.distribution[moduleId] }
+                  : prevData.distribution,
+                auteur_candidats: moduleId in data.auteur_candidats
+                  ? { ...prevData.auteur_candidats, [moduleId]: data.auteur_candidats[moduleId] }
+                  : prevData.auteur_candidats,
+                external_links: [
+                  ...prevData.external_links.filter((l) => l.module_id !== moduleId),
+                  ...data.external_links.filter((l) => l.module_id === moduleId),
+                ],
+              },
+            },
+          };
+        });
+      })
+      .catch((err) => {
+        const message = err.message || "Erreur inconnue lors de la génération.";
+        setResultsBySource((prev) => ({
+          ...prev,
+          [activeSource]: {
+            ...prev[activeSource],
+            moduleStatuses: {
+              ...prev[activeSource].moduleStatuses,
+              [moduleId]: { ...prev[activeSource].moduleStatuses[moduleId], status: "error", message },
+            },
+          },
+        }));
+      });
   }
 
   // Une édition (en cours ou déjà validée par "Terminé") porte sur le contenu affiché pour la
@@ -1937,7 +2002,7 @@ export default function App() {
                                       {info.status === "error" ? (
                                         <span className="data-table-cell-flex">
                                           <span>{info.message ? `Erreur : ${info.message}` : "Erreur réseau"}</span>
-                                          <button type="button" className="footer-link" onClick={handleModuleRetry}>
+                                          <button type="button" className="footer-link" onClick={() => retryModule(moduleId)}>
                                             Réessayer
                                           </button>
                                         </span>
