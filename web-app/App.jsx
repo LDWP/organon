@@ -1086,7 +1086,9 @@ export default function App() {
   // retirés de ces aperçus isolés (sans objet hors composition dans "tout").
   const sourceTextBySubTab = {
     tout: finalWikitext,
-    taxobox: manualOverrides.taxobox ?? trimBlockForDisplay(taxoboxData?.taxobox_wikitext || ""),
+    taxobox:
+      manualOverrides.taxobox ??
+      trimBlockForDisplay(applyRankConflicts(taxoboxData?.taxobox_wikitext || "", taxoboxData?.rank_lines)),
     subrangs: manualOverrides.subrangs ?? trimBlockForDisplay(effectiveSubtaxaWikitext || ""),
     references: manualOverrides.references ?? trimBlockForDisplay(checkedReferencesWikitext),
   };
