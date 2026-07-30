@@ -63,4 +63,4 @@ def render(struct: Struct, options: GenerateOptions, ext_only: bool = False) -> 
     while "\n\n\n" in ret:
         ret = ret.replace("\n\n\n", "\n\n")
 
-    return ret
+    return ret.rstrip("\n")
