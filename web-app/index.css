@@ -262,8 +262,7 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 .regne-alert-hint { margin: 0; font-size: 12px; color: var(--ink-soft); }
 
 /* ---------- sélection modulaire par facette (taxobox / sous-taxons) ---------- */
-.facet-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 0 0 18px; }
-.facet-controls .field-box { min-width: 190px; }
+.generation-status { margin: 0 0 18px; font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); }
 .facet-checkbox {
   display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 12px;
   color: var(--ink-soft); padding: 8px 12px 8px 0;
@@ -289,7 +288,6 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 }
 .result-nav .tab.on { background: var(--bg-alt); border-left-color: var(--accent); }
 .result-panel-wrap > .panel { border-top: 1px solid var(--line); border-radius: 12px; }
-.wikitexte-tab .facet-controls { align-items: center; }
 @media (max-width: 640px) {
   .result-shell { grid-template-columns: 1fr; }
   .result-nav { flex-direction: row; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 4px; }
@@ -302,10 +300,6 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 .id-badge-btn.on { outline: 2px solid var(--ink); outline-offset: 1px; }
 .id-badge-conflict { background: var(--amber); color: var(--amber-ink); }
 .id-badge-conflict.on { outline-color: var(--amber); }
-/* Indicateur non cliquable (onglet Classification) de la source actuellement choisie pour la
-   Taxobox — le choix lui-même se fait uniquement dans le tableau de l'onglet Wikitexte > Taxobox,
-   pas de cursor/hover ici pour ne pas suggérer une action possible. */
-.id-badge-current { outline: 2px solid var(--ink); outline-offset: 1px; }
 .classification-compare-table th { vertical-align: middle; }
 .conflict-cell { background: color-mix(in srgb, var(--amber) 16%, transparent); }
 .chosen-col { background: color-mix(in srgb, var(--accent) 12%, transparent); }
@@ -370,6 +364,21 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 }
 .wikitext:focus { outline: none; background: var(--bg-alt); }
 .wikitext[readonly] { cursor: default; }
+
+/* ---------- carte des sous-onglets Taxobox/Sous-rangs/Références (bloc "contrôles" — tableau de
+   comparaison, case à cocher, checklist des références — et bloc "rendu" du wikitexte isolé) :
+   chaque groupe d'informations est une carte à part entière, jamais imbriquée dans une autre. */
+.render-box { margin: 14px 16px 16px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.render-box + .render-box { margin-top: 16px; }
+.render-box-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 8px 12px; background: var(--card-hi); border-bottom: 1px solid var(--line);
+}
+.render-box-title {
+  margin: 0; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-soft); font-weight: 600;
+}
+.render-box-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .banner {
   display: flex; align-items: center; gap: 8px; margin: 0; padding: 9px 16px; font-family: var(--mono); font-size: 11.5px;
   background: color-mix(in srgb, var(--amber) 14%, transparent); color: var(--amber); border-bottom: 1px solid var(--line);

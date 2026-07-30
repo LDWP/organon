@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   fetchAuthStatus,
+  fetchCommonsImages,
   fetchDomains,
   fetchModules,
   generateTaxonStream,
@@ -39,9 +40,19 @@ const UICN_LABELS = {
 const WIKITEXT_SUBTABS = [
   { id: "tout", label: "Tout" },
   { id: "taxobox", label: "Taxobox" },
+  { id: "image", label: "Image" },
   { id: "subrangs", label: "Sous-rangs" },
   { id: "references", label: "Références taxonomiques" },
 ];
+
+// Titre de la boîte "rendu" affichée sous les contrôles de chaque sous-onglet en lecture seule
+// (voir WIKITEXT_SUBTABS) — délimite visuellement le bloc de wikitexte du reste du sous-onglet.
+// "tout" n'y figure pas : c'est l'article complet éditable, pas un aperçu d'un bloc isolé.
+const RENDER_BOX_TITLES = {
+  taxobox: "Rendu — bloc Taxobox",
+  subrangs: "Rendu — liste des sous-rangs",
+  references: "Rendu — liens externes",
+};
 
 // Abréviations officielles de {{Modèle:Taxoboxoutils rang}} sur frwiki : seule la branche
 // "embranchement" a une forme courte (format=court) — classe/ordre/famille/genre et leurs
@@ -219,10 +230,8 @@ function ModuleStatusIcon({ status }) {
 
 // Onglets de la coquille à navigation latérale du résultat, dans leur ordre d'affichage.
 const RESULT_VIEWS = [
-  { id: "wikitexte", label: "Wikitexte" },
-  { id: "classification", label: "Classification" },
+  { id: "wikitexte", label: "Résultats" },
   { id: "noms", label: "Noms & synonymes" },
-  { id: "image", label: "Image" },
   { id: "autres", label: "Autres informations" },
   { id: "data", label: "Données" },
 ];
@@ -251,6 +260,14 @@ const IMAGE_PLACEHOLDER = "<!-- insérez une image -->";
 function applyImageSelection(wikitext, fileName) {
   if (!fileName || !wikitext) return wikitext;
   return wikitext.replace(IMAGE_PLACEHOLDER, fileName);
+}
+
+// Les blocs isolés (taxobox_wikitext, subtaxa_wikitext...) portent des retours à la ligne de
+// tête/fin qui ne servent qu'à les séparer proprement lors de la composition dans le wikitexte
+// complet (voir spliceBlock) — sans objet pour un aperçu isolé (onglets Taxobox/Sous-rangs/
+// Références), où ils ne feraient qu'ajouter une ligne vide inutile en haut ou en bas.
+function trimBlockForDisplay(text) {
+  return text.replace(/^\n+/, "").replace(/\n+$/, "");
 }
 
 export default function App() {
@@ -286,17 +303,12 @@ export default function App() {
   // le préchargement en arrière-plan des autres sources (voir prefetchOtherClassifications)
   // n'écrase jamais le suivi d'une source déjà terminée.
   const [resultsBySource, setResultsBySource] = useState({});
-  // Choix manuel de l'utilisateur pour chaque facette du "zoom" classification (voir les deux
-  // sélecteurs sous l'onglet Classification) — `null` tant qu'aucun choix explicite n'a été
-  // fait, auquel cas la recommandation automatique par facette s'applique (voir
-  // recommendedTaxoboxSource/recommendedSubtaxaSource ci-dessous). Les deux facettes sont
-  // indépendantes : rien n'oblige à choisir la même source pour la taxobox et pour les
-  // sous-taxons.
+  // Choix manuel de l'utilisateur pour la facette taxobox du "zoom" classification (voir le
+  // tableau de comparaison sous l'onglet Résultats > Taxobox) — `null` tant qu'aucun choix
+  // explicite n'a été fait, auquel cas la recommandation automatique s'applique (voir
+  // recommendedTaxoboxSource ci-dessous). La facette sous-taxons n'a plus de choix manuel : elle
+  // suit toujours recommendedSubtaxaSource (voir subtaxaSourceId).
   const [taxoboxSourceOverride, setTaxoboxSourceOverride] = useState(null);
-  const [subtaxaSourceOverride, setSubtaxaSourceOverride] = useState(null);
-  // Active le mode "sous-taxons fusionnés" (recoupement de toutes les sources déjà résolues, voir
-  // POST /api/v1/subtaxa-merge) à la place de la source unique choisie par subtaxaSourceId.
-  const [subtaxaFusionEnabled, setSubtaxaFusionEnabled] = useState(false);
   // Résultat de la fusion (MergedSubtaxaResponse) une fois calculé, `null` tant qu'il n'y a pas
   // au moins deux sources avec des sous-taxons ou que l'appel est en cours/en erreur.
   const [subtaxaMerge, setSubtaxaMerge] = useState(null);
@@ -317,13 +329,15 @@ export default function App() {
   // défaut ; une entrée ici (true ou false) prime toujours sur ce défaut.
   const [referenceCheckedOverrides, setReferenceCheckedOverrides] = useState({});
   // Onglet actif de la coquille à navigation latérale du résultat.
-  const [resultView, setResultView] = useState("wikitexte"); // "wikitexte" | "classification" | "noms" | "image" | "autres" | "data"
+  const [resultView, setResultView] = useState("wikitexte"); // "wikitexte" | "noms" | "autres" | "data"
   // Bloc de wikitexte affiché sous l'onglet "wikitexte" : "tout" reproduit le comportement
   // historique (article composé, éditable) ; "taxobox"/"subrangs" isolent un seul bloc du
-  // serveur en lecture seule (voir GenerateResponse.taxobox_wikitext/subtaxa_wikitext) ;
+  // serveur en lecture seule (voir GenerateResponse.taxobox_wikitext/subtaxa_wikitext) ; "image"
+  // affiche la galerie Commons (voir ImageGallery.jsx), sans bloc de wikitexte associé ;
   // "references" recompose côté client le bloc à partir de reference_items et des cases cochées
-  // (voir checkedReferencesWikitext) — aucun ne passe par la composition finalWikitext.
-  const [wikitextSubTab, setWikitextSubTab] = useState("tout"); // "tout" | "taxobox" | "subrangs" | "references"
+  // (voir checkedReferencesWikitext) — aucun des quatre autres ne passe par la composition
+  // finalWikitext.
+  const [wikitextSubTab, setWikitextSubTab] = useState("tout"); // "tout" | "taxobox" | "image" | "subrangs" | "references"
   // Nom de fichier Commons choisi dans la galerie (voir ImageGallery.jsx), appliqué au wikitexte
   // affiché par applyImageSelection() plutôt que persisté dans resultsBySource : survit ainsi à
   // un changement d'onglet de classification, sans dupliquer l'état par source.
@@ -338,15 +352,28 @@ export default function App() {
   // asynchrone longue) de détecter qu'une recherche plus récente a démarré entretemps et de
   // s'arrêter, plutôt que de continuer à peupler le cache d'une recherche obsolète.
   const searchGeneration = useRef(0);
-  const [editing, setEditing] = useState(false);
-  const [editedText, setEditedText] = useState("");
-  // Wikitexte édité et validé ("Terminé"), en remplacement du wikitexte composé (voir
-  // displayWikitext) — distinct de `resultsBySource[...].data.wikitext` puisque le texte
-  // affiché est désormais composé dynamiquement (article de la source taxobox + bloc
-  // sous-taxons de la source sélectionnée pour cette facette, voir spliceBlock). Remis à `null`
-  // à chaque nouvelle recherche ou changement de sélection de facette, un peu comme `editing` :
-  // une édition ne survit pas à un changement de ce qui est affiché.
-  const [manualWikitext, setManualWikitext] = useState(null);
+  // Zone de wikitexte en cours d'édition (voir WIKITEXT_SUBTABS) — chaque zone (Tout, Taxobox,
+  // Sous-rangs, Références) a son propre bouton Éditer et s'édite indépendamment des autres,
+  // une seule à la fois puisqu'une seule est visible (celle de `wikitextSubTab`). `null` si
+  // aucune édition en cours. `editedTexts` garde le texte en cours de saisie par zone, tant
+  // qu'elle est en édition.
+  const [editingSubTab, setEditingSubTab] = useState(null);
+  const [editedTexts, setEditedTexts] = useState({});
+  // Wikitexte édité et validé ("Terminé"), par zone — remplace le texte propre recalculé (voir
+  // sourceTextBySubTab) tant qu'une nouvelle recherche ou un changement de facette ne l'a pas
+  // réinitialisé. Pour "tout" ceci remplace le wikitexte composé (voir displayWikitext),
+  // distinct de `resultsBySource[...].data.wikitext` puisque le texte affiché est désormais
+  // composé dynamiquement (article de la source taxobox + bloc sous-taxons de la source
+  // sélectionnée pour cette facette, voir spliceBlock). Les trois autres zones n'ont pas
+  // d'incidence sur le reste de l'article : éditer une zone n'y sert qu'à ajuster le texte
+  // affiché avant de le copier, mais l'ajustement reste visible tant qu'on ne relance pas de
+  // recherche ou de changement de facette — sans quoi cliquer "Terminé" n'aurait aucun effet
+  // visible.
+  const [manualOverrides, setManualOverrides] = useState({});
+  // Zones "contrôles" (choix par rang de la Taxobox, checklist des références, bascule de
+  // fusion des sous-rangs) repliées par l'utilisateur — repliée une fois le choix fait, pour
+  // ne garder que l'en-tête et réduire l'encombrement visuel.
+  const [collapsedControlBoxes, setCollapsedControlBoxes] = useState({});
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -397,6 +424,11 @@ export default function App() {
   }
 
   const classificationModules = modules.filter((m) => m.can_classify);
+  // Modules de classification encore en cours (jamais interrogés ou en vol) — sert à la puce de
+  // chargement sur l'onglet "Résultats".
+  const pendingModules = classificationModules.filter(
+    (m) => !resultsBySource[m.id] || resultsBySource[m.id].status === "loading"
+  );
 
   // Consomme les événements de POST /api/v1/generate/stream (voir organon/api/routes/
   // generate.py) pour peupler le suivi module par module *de la source `moduleId` concernée*
@@ -460,8 +492,8 @@ export default function App() {
   }
 
   // Précharge en arrière-plan, toutes en parallèle, les sources de classification autres que
-  // celle déjà affichée — pour qu'un clic sur un onglet de source ne déclenche plus jamais de
-  // nouvelle requête visible (voir handleTabClick). Jusqu'à ~8 API taxonomiques tierces
+  // celle déjà affichée — pour que changer de source dans les sélecteurs de facette ne déclenche
+  // plus jamais de nouvelle requête visible. Jusqu'à ~8 API taxonomiques tierces
   // sollicitées d'un coup par recherche : assumé pour la réactivité perçue plutôt qu'un
   // préchargement séquentiel qui ménageait ces API mais faisait traîner l'affichage des
   // sources les moins prioritaires.
@@ -482,13 +514,12 @@ export default function App() {
     setResultsBySource({});
     setActiveSource(null);
     setSubmitError(null);
-    setEditing(false);
-    setManualWikitext(null);
+    setEditingSubTab(null);
+    setEditedTexts({});
+    setManualOverrides({});
     setSelectedCommonsImage(null);
     setCommonsImagesCache({});
     setTaxoboxSourceOverride(null);
-    setSubtaxaSourceOverride(null);
-    setSubtaxaFusionEnabled(false);
     setSubtaxaMerge(null);
     setSubtaxaChecked({});
     setManagedRankConflicts({});
@@ -630,48 +661,23 @@ export default function App() {
     handleExampleClick(EXAMPLE_TAXON);
   }
 
-  // Changer d'onglet ne relance plus de requête : toutes les sources sont déjà en cours de
-  // préchargement en arrière-plan depuis le lancement (voir prefetchOtherClassifications) — un
-  // clic ne fait que basculer l'affichage sur le cache déjà là (ou en cours de préchargement).
-  // Seule exception : un onglet en erreur peut être relancé manuellement (action explicite de
-  // l'utilisateur, pas une requête automatique au clic). Ces onglets ne pilotent plus la
-  // composition de l'article (voir taxoboxSourceId/subtaxaSourceId ci-dessous, choisis
-  // indépendamment via les sélecteurs de facette) : ils ne servent qu'à consulter les données
-  // brutes d'une source (onglet Données, encart d'identité...).
-  function handleTabClick(moduleId) {
-    if (!query || moduleId === activeSource) return;
-    setActiveSource(moduleId);
-    setEditing(false);
-    setManualWikitext(null);
-    const existing = resultsBySource[moduleId];
-    if (existing?.status === "error") {
-      fetchSource(query.taxon, query.domaine, moduleId);
-    }
-  }
-
   // Relance manuelle d'un module en erreur depuis l'onglet Données. Un module d'enrichissement
   // n'a pas de point d'entrée propre côté backend (voir EnrichmentRunner, organon/api/routes/
   // generate.py) : seule la source de classification entière peut être régénérée, ce qui relance
-  // au passage tous ses modules, y compris celui en erreur — même mécanisme que handleTabClick
-  // pour une source dont le fetch initial a échoué.
+  // au passage tous ses modules, y compris celui en erreur.
   function handleModuleRetry() {
     if (!query || !activeSource) return;
     fetchSource(query.taxon, query.domaine, activeSource);
   }
 
-  // Une édition en cours ("Éditer") porte sur le wikitexte composé pour la sélection de
-  // facette affichée au moment où elle a commencé : changer l'une ou l'autre facette invalide
-  // ce texte édité, comme un changement d'onglet le faisait déjà (voir handleTabClick).
+  // Une édition (en cours ou déjà validée par "Terminé") porte sur le contenu affiché pour la
+  // sélection de facette au moment où elle a eu lieu (le choix de source alimente aussi bien
+  // "tout" que "taxobox" et "références") : changer la facette invalide toute édition, quelle
+  // que soit la zone.
   function handleTaxoboxSourceChange(moduleId) {
     setTaxoboxSourceOverride(moduleId);
-    setEditing(false);
-    setManualWikitext(null);
-  }
-
-  function handleSubtaxaSourceChange(moduleId) {
-    setSubtaxaSourceOverride(moduleId);
-    setEditing(false);
-    setManualWikitext(null);
+    setEditingSubTab(null);
+    setManualOverrides({});
   }
 
   function toggleRankConflictManaged(rang) {
@@ -696,6 +702,26 @@ export default function App() {
 
   const activeEntry = activeSource ? resultsBySource[activeSource] : null;
   const activeData = activeEntry?.status === "ok" ? activeEntry.data : null;
+
+  // Lance la recherche d'images Commons dès que le taxon est connu, sans attendre que
+  // l'utilisateur ouvre le sous-onglet "Image" (voir WIKITEXT_SUBTABS) — ImageGallery.jsx est
+  // démonté/remonté à chaque bascule de sous-onglet, un effet posé là-bas manquerait donc les
+  // recherches précédentes tant que l'onglet n'a jamais été ouvert.
+  const commonsTaxon = activeData?.taxon_resolved || query?.taxon || null;
+  useEffect(() => {
+    if (!commonsTaxon || commonsImagesCache[commonsTaxon]) return;
+    setCommonsImagesCache((prev) => ({ ...prev, [commonsTaxon]: { status: "loading" } }));
+    fetchCommonsImages(commonsTaxon)
+      .then((data) => {
+        setCommonsImagesCache((prev) => ({ ...prev, [commonsTaxon]: { status: "ok", data } }));
+      })
+      .catch((err) => {
+        setCommonsImagesCache((prev) => ({
+          ...prev,
+          [commonsTaxon]: { status: "error", error: err.message || "Erreur inconnue." },
+        }));
+      });
+  }, [commonsTaxon, commonsImagesCache]);
 
   // Recommandation automatique, indépendante par facette (taxobox / sous-taxons) : un unique
   // `completeness_score` agrégé masquait le fait qu'une classification peut avoir la meilleure
@@ -732,7 +758,7 @@ export default function App() {
   // recommandation automatique, elle-même prime sur l'onglet actif tant qu'aucune source n'a
   // encore abouti.
   const taxoboxSourceId = taxoboxSourceOverride ?? recommendedTaxoboxSource ?? activeSource;
-  const subtaxaSourceId = subtaxaSourceOverride ?? recommendedSubtaxaSource ?? activeSource;
+  const subtaxaSourceId = recommendedSubtaxaSource ?? activeSource;
 
   const taxoboxEntry = taxoboxSourceId ? resultsBySource[taxoboxSourceId] : null;
   const taxoboxData = taxoboxEntry?.status === "ok" ? taxoboxEntry.data : null;
@@ -772,8 +798,6 @@ export default function App() {
       if (!rankDisagreements[rang].has(nom)) rankDisagreements[rang].set(nom, m.id);
     }
   }
-  const hasRankConflicts = Object.values(rankDisagreements).some((parNom) => parNom.size > 1);
-
   // Sources utilisables pour les sélecteurs de facette et la comparaison par rang : uniquement
   // celles déjà résolues avec succès (une source en erreur ou encore en cours de préchargement
   // ne peut alimenter ni la taxobox ni les sous-taxons).
@@ -796,6 +820,9 @@ export default function App() {
   // pour "réinitialiser" un état qui peut se déduire directement du rendu courant).
   const subtaxaMergeReady = subtaxaMergeSources.length >= 2 && !!baseData;
   const effectiveSubtaxaMerge = subtaxaMergeReady ? subtaxaMerge : null;
+  // Fusion systématique dès qu'elle est possible : plus de bascule manuelle vers la source
+  // unique (redondante avec le repli/dépli de la carte "Sous-rangs", voir collapsedControlBoxes).
+  const subtaxaFusionEnabled = subtaxaMergeReady;
 
   // Calcule (ou recalcule) la fusion dès qu'au moins deux sources ont des sous-taxons — pas
   // besoin d'attendre que l'utilisateur ouvre le sous-onglet correspondant, l'appel est un pur
@@ -879,9 +906,10 @@ export default function App() {
 
   const subtaxaMergeWikitext = subtaxaFusionEnabled ? renderSubtaxaMergeWikitext() : "";
 
-  // Version tabulaire de rankDisagreements pour l'onglet Classification : pour chaque rang (dans
-  // l'ordre de première apparition), les noms rapportés par chaque source, afin de comparer les
-  // classifications côte à côte plutôt que de ne garder que le premier nom rencontré par rang.
+  // Version tabulaire de rankDisagreements pour le tableau de comparaison de l'onglet Résultats >
+  // Taxobox : pour chaque rang (dans l'ordre de première apparition), les noms rapportés par
+  // chaque source, afin de comparer les classifications côte à côte plutôt que de ne garder que
+  // le premier nom rencontré par rang.
   const classificationTableRows = (() => {
     const order = [];
     const seen = new Set();
@@ -961,72 +989,119 @@ export default function App() {
   const effectiveSubtaxaWikitext =
     subtaxaFusionEnabled && effectiveSubtaxaMerge ? subtaxaMergeWikitext : subtaxaData?.subtaxa_wikitext;
 
+  // Items de référence de la source taxobox active (voir GenerateResponse.reference_items) et
+  // recomposition côté client du bloc "Liens externes" à partir des seules références cochées
+  // (défaut item.default_checked, prime par referenceCheckedOverrides) — même tri alphabétique
+  // que l'ancien bloc `references_wikitext` déjà joint côté serveur, puisque reference_items est
+  // déjà trié par le backend. `reference_items` exclut volontairement le bloc `{{Autres
+  // projets}}` (Commons/Wikispecies/Wiktionnaire, voir GenerateResponse.references_wikitext) —
+  // ce n'est pas une référence taxonomique au sens strict, mais l'onglet "Références
+  // taxonomiques" est bien celui qui alimente toute la section "Liens externes" de l'article
+  // (voir RENDER_BOX_TITLES.references), donc on le retrouve ici dans le wikitexte complet de
+  // la même source plutôt que dupliquer sa logique de génération (voir render_voir_aussi,
+  // organon/core/rendering/sections.py) côté frontend.
+  const referenceItems = taxoboxData?.reference_items || [];
+  const checkedReferenceLines = referenceItems.filter(
+    (item) => referenceCheckedOverrides[referenceItemKey(item)] ?? item.default_checked
+  );
+  const autresProjetsMatch = baseData?.wikitext?.match(/\{\{Autres projets\n(?:\|[^\n]*\n)*\}\}\n/);
+  const autresProjetsBlock = autresProjetsMatch ? autresProjetsMatch[0] : "";
+  const checkedReferencesLinesText = checkedReferenceLines.map((item) => `* ${item.wikitext}`).join("\n");
+  const checkedReferencesWikitext =
+    autresProjetsBlock || checkedReferencesLinesText
+      ? `== Liens externes ==\n${autresProjetsBlock}${checkedReferencesLinesText ? checkedReferencesLinesText + "\n" : ""}`
+      : "";
+  // Bloc "Liens externes" tel qu'il apparaît dans le wikitexte complet d'origine (avant filtrage
+  // par case à cocher) — repère pour le substituer par sa version filtrée lors de la composition
+  // de "tout" (voir spliceBlock ci-dessous), sur le même principe que
+  // taxobox_wikitext/subtaxa_wikitext.
+  const originalLiensExternesMatch = baseData?.wikitext?.match(/== Liens externes ==\n[\s\S]*?(?=\n== |$)/);
+  const originalLiensExternesBlock = originalLiensExternesMatch ? originalLiensExternesMatch[0] : "";
+
+  // Composition de "tout" à partir des trois zones structurées : une édition validée ("Terminé")
+  // sur la zone Taxobox/Sous-rangs/Références (voir manualOverrides) prime sur la valeur
+  // fraîchement recalculée, pour que modifier une zone se répercute dans l'article complet.
+  // Seule "tout" reste un texte de repli terminal, jamais décomposé en retour vers les autres
+  // zones : un texte libre ne peut pas être reparsé de façon fiable en blocs structurés, alors
+  // que l'inverse (structuré -> texte) est un simple remplacement de bloc.
+  const effectiveTaxoboxWikitext = manualOverrides.taxobox ?? (taxoboxData?.taxobox_wikitext || "");
+  const effectiveSubtaxaWikitextForTout = manualOverrides.subrangs ?? effectiveSubtaxaWikitext;
+  const effectiveReferencesWikitextForTout = manualOverrides.references ?? checkedReferencesWikitext;
+
   const displayWikitext = baseData
     ? applyRankConflicts(
-        spliceBlock(baseData.wikitext, baseData.subtaxa_wikitext, effectiveSubtaxaWikitext),
+        spliceBlock(
+          spliceBlock(
+            spliceBlock(baseData.wikitext, baseData.taxobox_wikitext, effectiveTaxoboxWikitext),
+            baseData.subtaxa_wikitext,
+            effectiveSubtaxaWikitextForTout
+          ),
+          originalLiensExternesBlock,
+          effectiveReferencesWikitextForTout
+        ),
         taxoboxData?.rank_lines
       )
     : activeData?.wikitext ?? null;
   // Choix d'image appliqué en dernier, par-dessus le composé base+taxobox+conflits : c'est une
   // simple substitution de commentaire indépendante de la classification affichée, pas un
   // élément du "zoom" classification lui-même.
-  const finalWikitext = applyImageSelection(manualWikitext ?? displayWikitext, selectedCommonsImage);
+  const finalWikitext = applyImageSelection(manualOverrides.tout ?? displayWikitext, selectedCommonsImage);
 
-  // Items de référence de la source taxobox active (voir GenerateResponse.reference_items) et
-  // recomposition côté client du bloc "Liens externes" à partir des seules références cochées
-  // (défaut item.default_checked, prime par referenceCheckedOverrides) — même tri alphabétique
-  // que l'ancien bloc `references_wikitext` déjà joint côté serveur, puisque reference_items est
-  // déjà trié par le backend.
-  const referenceItems = taxoboxData?.reference_items || [];
-  const checkedReferenceLines = referenceItems.filter(
-    (item) => referenceCheckedOverrides[referenceItemKey(item)] ?? item.default_checked
-  );
-  const checkedReferencesWikitext = checkedReferenceLines.length
-    ? checkedReferenceLines.map((item) => `* ${item.wikitext}`).join("\n") + "\n"
-    : "";
+  // Texte "propre" (non édité, ni persisté par une précédente édition — voir manualOverrides) de
+  // chaque zone du bloc wikitexte (voir wikitextSubTab) : "taxobox", "subrangs" et "references"
+  // isolent un seul bloc du serveur, indépendamment de la composition finalWikitext qui ne
+  // concerne que "tout" — voir trimBlockForDisplay pour les retours à la ligne de tête/fin
+  // retirés de ces aperçus isolés (sans objet hors composition dans "tout").
+  const sourceTextBySubTab = {
+    tout: finalWikitext,
+    taxobox: manualOverrides.taxobox ?? trimBlockForDisplay(taxoboxData?.taxobox_wikitext || ""),
+    subrangs: manualOverrides.subrangs ?? trimBlockForDisplay(effectiveSubtaxaWikitext || ""),
+    references: manualOverrides.references ?? trimBlockForDisplay(checkedReferencesWikitext),
+  };
+  // Texte effectivement affiché pour la zone actuellement montrée : le brouillon en cours si
+  // elle est en édition, sinon le texte propre recalculé ci-dessus.
+  const wikitextSubTabText =
+    editingSubTab === wikitextSubTab ? editedTexts[wikitextSubTab] ?? "" : sourceTextBySubTab[wikitextSubTab];
 
-  // Texte affiché par chaque sous-onglet du bloc wikitexte (voir wikitextSubTab) : "taxobox",
-  // "subrangs" et "references" isolent un seul bloc du serveur, indépendamment de la
-  // composition finalWikitext/editedText qui ne concerne que "tout".
-  const wikitextSubTabText = {
-    tout: editing ? editedText : finalWikitext,
-    taxobox: taxoboxData?.taxobox_wikitext || "",
-    subrangs: effectiveSubtaxaWikitext || "",
-    references: checkedReferencesWikitext,
-  }[wikitextSubTab];
-
-  function startEditing() {
-    if (!finalWikitext) return;
-    setEditedText(finalWikitext);
-    setEditing(true);
+  function startEditingSubTab(id) {
+    if (!sourceTextBySubTab[id]) return;
+    setEditedTexts((prev) => ({ ...prev, [id]: sourceTextBySubTab[id] }));
+    setEditingSubTab(id);
   }
 
   function handleSelectCommonsImage(fileName) {
     setSelectedCommonsImage(fileName);
-    if (editing) {
-      // En édition, le texte affiché vient de editedText (indépendant du composé recalculé) :
-      // sans ça, choisir une image pendant une édition en cours resterait invisible jusqu'à
-      // "Terminé".
-      setEditedText((prev) => applyImageSelection(prev, fileName));
+    if (editingSubTab === "tout") {
+      // En édition de "tout", le texte affiché vient de editedTexts.tout (indépendant du
+      // composé recalculé) : sans ça, choisir une image pendant une édition en cours resterait
+      // invisible jusqu'à "Terminé".
+      setEditedTexts((prev) => ({ ...prev, tout: applyImageSelection(prev.tout, fileName) }));
     }
   }
 
   // Symétrique de handleSelectCommonsImage : revient à l'état "pas d'image" (IMAGE_PLACEHOLDER).
   // Hors édition, rien à faire sur le texte lui-même : displayWikitext est recomposé à chaque
   // rendu depuis le wikitexte d'origine (jamais muté), donc il contient toujours le placeholder
-  // tant que selectedCommonsImage est vide. En édition en revanche, editedText a déjà reçu la
-  // substitution en dur (voir handleSelectCommonsImage ci-dessus) : il faut l'inverser
-  // explicitement pour que le placeholder réapparaisse dans le textarea.
+  // tant que selectedCommonsImage est vide. En édition de "tout" en revanche, editedTexts.tout a
+  // déjà reçu la substitution en dur (voir handleSelectCommonsImage ci-dessus) : il faut
+  // l'inverser explicitement pour que le placeholder réapparaisse dans le textarea.
   function handleDeselectCommonsImage() {
-    if (editing && selectedCommonsImage) {
-      setEditedText((prev) => prev.split(selectedCommonsImage).join(IMAGE_PLACEHOLDER));
+    if (editingSubTab === "tout" && selectedCommonsImage) {
+      setEditedTexts((prev) => ({ ...prev, tout: prev.tout.split(selectedCommonsImage).join(IMAGE_PLACEHOLDER) }));
     }
     setSelectedCommonsImage(null);
   }
 
-  function stopEditing() {
-    setEditing(false);
-    setManualWikitext(editedText);
+  // "Terminé" persiste l'édition de la zone dans manualOverrides, quelle que soit la zone : sans
+  // ça, le texte affiché retomberait aussitôt sur la valeur recalculée et l'édition semblerait
+  // n'avoir eu aucun effet.
+  function stopEditingSubTab() {
+    setManualOverrides((prev) => ({ ...prev, [editingSubTab]: editedTexts[editingSubTab] }));
+    setEditingSubTab(null);
+  }
+
+  function toggleControlBoxCollapsed(id) {
+    setCollapsedControlBoxes((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   async function handleCopy(text) {
@@ -1311,19 +1386,6 @@ export default function App() {
               </div>
             )}
 
-            {hasRankConflicts && (
-              <div className="regne-alert">
-                <p className="regne-alert-title">⚠ Désaccord de classification entre sources</p>
-                <p className="regne-alert-hint">
-                  Voir l'onglet{" "}
-                  <button type="button" className="footer-link" onClick={() => setResultView("classification")}>
-                    Classification
-                  </button>{" "}
-                  — les rangs en désaccord y sont surlignés en marron.
-                </p>
-              </div>
-            )}
-
             <div className="result-shell">
               <nav className="result-nav" role="tablist" aria-label="Vue du résultat">
                 {RESULT_VIEWS.map(({ id, label }) => (
@@ -1337,6 +1399,7 @@ export default function App() {
                     onClick={() => setResultView(id)}
                   >
                     {label}
+                    {id === "wikitexte" && pendingModules.length > 0 && <ModuleStatusIcon status="running" />}
                   </button>
                 ))}
               </nav>
@@ -1348,140 +1411,58 @@ export default function App() {
               >
                 {resultView === "wikitexte" && (
                   <div className="wikitexte-tab">
-                    {availableSources.length > 0 && (
-                      <div className="facet-controls">
-                        <div className="field-box">
-                          <label className="field-label" htmlFor="subtaxa-source-select">
-                            Taxons inférieurs
-                          </label>
-                          <select
-                            id="subtaxa-source-select"
-                            value={subtaxaSourceId || ""}
-                            onChange={(e) => handleSubtaxaSourceChange(e.target.value)}
-                          >
-                            {availableSources.map((m) => (
-                              <option key={m.id} value={m.id}>
-                                {m.id.toUpperCase()}
-                                {m.id === recommendedSubtaxaSource ? " (recommandé)" : ""}
-                              </option>
-                            ))}
-                          </select>
+                    {!activeEntry && activeSource && (
+                      <div className="render-box">
+                        <div className="panel-loading">
+                          <p>En attente du préchargement de {activeSource.toUpperCase()}…</p>
                         </div>
-                        {subtaxaMergeSources.length > 1 && (
-                          <label className="facet-checkbox">
-                            <input
-                              type="checkbox"
-                              checked={subtaxaFusionEnabled}
-                              onChange={(e) => setSubtaxaFusionEnabled(e.target.checked)}
-                            />
-                            Fusionner les sources ({subtaxaMergeSources.length})
-                          </label>
-                        )}
                       </div>
                     )}
 
-                    <div className="tabs" role="tablist" aria-label="Parcourir les données brutes par source">
-                      {/* Un module de classification qui n'a rien trouvé pour ce taxon (ex. AlgaeBase
-                          pour un poisson) ne doit pas apparaître ici : le lister sans qu'il n'y ait
-                          jamais de contenu ne fait que polluer la lisibilité des onglets. Ces onglets
-                          servent uniquement à consulter les données brutes d'une source (onglet
-                          Données, encart d'identité...) — le choix de la source qui alimente la
-                          taxobox et celle qui alimente les sous-taxons se fait indépendamment via les
-                          sélecteurs ci-dessus. */}
-                      {classificationModules
-                        .filter((m) => resultsBySource[m.id]?.status !== "error")
-                        .map((m) => {
-                        const entry = resultsBySource[m.id];
-                        const tabStatus = !entry
-                          ? "pending"
-                          : entry.status === "loading"
-                            ? "running"
-                            : entry.status === "ok"
-                              ? "found"
-                              : "error";
-                        return (
-                          <button
-                            key={m.id}
-                            id={`tab-${m.id}`}
-                            type="button"
-                            role="tab"
-                            aria-selected={activeSource === m.id}
-                            aria-controls="result-panel"
-                            className={"tab" + (activeSource === m.id ? " on" : "")}
-                            onClick={() => handleTabClick(m.id)}
-                            disabled={initialLoading}
-                          >
-                            <ModuleStatusIcon status={tabStatus} />
-                            {m.id.toUpperCase()}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="panel" id="result-panel" role="tabpanel" aria-labelledby={activeSource ? `tab-${activeSource}` : undefined} tabIndex={-1}>
-                      {!activeEntry && (
-                        <div className="panel-loading">
-                          <p>
-                            {activeSource
-                              ? `En attente du préchargement de ${activeSource.toUpperCase()}…`
-                              : "Génération en cours…"}
-                          </p>
-                        </div>
-                      )}
-
-                      {activeEntry?.status === "loading" && (
+                    {activeEntry?.status === "loading" && (
+                      <div className="render-box">
                         <div className="panel-loading">
                           <p>Interrogation de {activeSource?.toUpperCase()}…</p>
                         </div>
-                      )}
+                      </div>
+                    )}
 
-                      {activeEntry?.status === "error" && (
+                    {activeEntry?.status === "error" && (
+                      <div className="render-box">
                         <div className="panel-empty">Aucune donnée disponible via {activeSource?.toUpperCase()} pour ce taxon.</div>
-                      )}
+                      </div>
+                    )}
 
-                      {activeData && (
-                        <>
-                          <div className="panel-head">
-                            <div className="panel-head-title">
-                              <span className="t" id="wikitext-label">Wikitexte</span>
-                              <span className="id-badge" title="Source utilisée pour la taxobox et le reste de l'article">
-                                Taxobox : {taxoboxSourceId ? taxoboxSourceId.toUpperCase() : "—"}
-                              </span>
-                              <span className="id-badge" title="Source utilisée pour la liste des taxons de rang inférieur">
-                                Taxons inférieurs : {subtaxaSourceId ? subtaxaSourceId.toUpperCase() : "—"}
-                              </span>
-                            </div>
-                            <div style={{ display: "flex", gap: 8 }}>
-                              {wikitextSubTab === "tout" && (
-                                <button
-                                  type="button"
-                                  className="edit-btn"
-                                  aria-pressed={editing}
-                                  onClick={editing ? stopEditing : startEditing}
-                                >
-                                  {editing ? "✓ Terminé" : "✎ Éditer"}
+                    {activeData && (
+                      <>
+                        <div className="tabs subtabs" role="tablist" aria-label="Bloc de wikitexte à afficher">
+                          {WIKITEXT_SUBTABS.map(({ id, label }) => (
+                            <button
+                              key={id}
+                              type="button"
+                              role="tab"
+                              aria-selected={wikitextSubTab === id}
+                              className={"tab" + (wikitextSubTab === id ? " on" : "")}
+                              onClick={() => setWikitextSubTab(id)}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {wikitextSubTab === "taxobox" && availableSources.length > 0 && (
+                          <div className="render-box">
+                            <div className="render-box-header">
+                              <h4 className="render-box-title">
+                                Choisir la classification <br/><small>« Cocher » ajoute {"{{Taxobox conflit}}"} pour les rangs en désaccord</small>
+                              </h4>
+                              <span className="render-box-actions">
+                                <button type="button" className="footer-link" onClick={() => toggleControlBoxCollapsed("taxobox")}>
+                                  {collapsedControlBoxes.taxobox ? "Déplier" : "Replier"}
                                 </button>
-                              )}
-                              <button type="button" className="edit-btn" onClick={() => handleCopy(wikitextSubTabText)}>
-                                {copied ? "Copié ✓" : "Copier"}
-                              </button>
+                              </span>
                             </div>
-                          </div>
-                          <div className="tabs subtabs" role="tablist" aria-label="Bloc de wikitexte à afficher">
-                            {WIKITEXT_SUBTABS.map(({ id, label }) => (
-                              <button
-                                key={id}
-                                type="button"
-                                role="tab"
-                                aria-selected={wikitextSubTab === id}
-                                className={"tab" + (wikitextSubTab === id ? " on" : "")}
-                                onClick={() => setWikitextSubTab(id)}
-                              >
-                                {label}
-                              </button>
-                            ))}
-                          </div>
-                          {wikitextSubTab === "taxobox" && availableSources.length > 0 && (
+                            {!collapsedControlBoxes.taxobox && (
                             <div className="data-table-wrap classification-compare-wrap">
                               <table className="data-table classification-compare-table classification-compare-table--managed">
                                 <thead>
@@ -1546,8 +1527,35 @@ export default function App() {
                                 </tbody>
                               </table>
                             </div>
-                          )}
-                          {wikitextSubTab === "references" && (
+                            )}
+                          </div>
+                        )}
+
+                        {wikitextSubTab === "image" && (
+                          <div className="render-box">
+                            <ImageGallery
+                              taxon={commonsTaxon}
+                              selectedFileName={selectedCommonsImage}
+                              onSelect={handleSelectCommonsImage}
+                              onDeselect={handleDeselectCommonsImage}
+                              cache={commonsImagesCache}
+                            />
+                          </div>
+                        )}
+
+                        {wikitextSubTab === "references" && (
+                          <div className="render-box">
+                            <div className="render-box-header">
+                              <h4 className="render-box-title">
+                                Références disponibles — décocher celles hors-sujet
+                              </h4>
+                              <span className="render-box-actions">
+                                <button type="button" className="footer-link" onClick={() => toggleControlBoxCollapsed("references")}>
+                                  {collapsedControlBoxes.references ? "Déplier" : "Replier"}
+                                </button>
+                              </span>
+                            </div>
+                            {!collapsedControlBoxes.references && (
                             <div className="reference-checklist">
                               <div className="reference-checklist-row reference-checklist-row-locked">
                                 <span className="reference-checklist-lock" aria-hidden="true">🔒</span>
@@ -1576,107 +1584,96 @@ export default function App() {
                                 );
                               })}
                             </div>
-                          )}
-                          {wikitextSubTab === "subrangs" && subtaxaFusionEnabled && (
-                            <div className="data-table-wrap subtaxa-merge-groups">
-                              {!effectiveSubtaxaMerge && <p>Calcul de la fusion en cours…</p>}
-                              {effectiveSubtaxaMerge?.groups.length === 0 && <p>Aucun sous-taxon à fusionner.</p>}
-                              {effectiveSubtaxaMerge?.groups.map((group, gi) => (
-                                <div key={gi} className="subtaxa-merge-group">
-                                  <p className="subtaxa-merge-group-head">
-                                    {group.sources.map((s) => (
-                                      <span key={s} className="id-badge">
-                                        {s.toUpperCase()}
-                                      </span>
-                                    ))}
-                                    {group.kind === "disjoint" && (
-                                      <span className="id-badge id-badge-conflict">non recoupé</span>
-                                    )}
-                                  </p>
-                                  <ul className="subtaxa-merge-species-list">
-                                    {group.species.map((sp) => (
-                                      <li key={sp.nom}>
-                                        <label className="facet-checkbox">
-                                          <input
-                                            type="checkbox"
-                                            checked={subtaxaChecked[sp.nom] ?? sp.default_checked}
-                                            onChange={() => toggleSubtaxaChecked(sp.nom)}
-                                          />
-                                          {sp.nom}
-                                        </label>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              ))}
+                            )}
+                          </div>
+                        )}
+
+                        {wikitextSubTab === "subrangs" && subtaxaMergeSources.length > 1 && (
+                          <div className="render-box">
+                            <div className="render-box-header">
+                              <h4 className="render-box-title">Sous-taxons</h4>
+                              <span className="render-box-actions">
+                                <button type="button" className="footer-link" onClick={() => toggleControlBoxCollapsed("subrangs")}>
+                                  {collapsedControlBoxes.subrangs ? "Déplier" : "Replier"}
+                                </button>
+                              </span>
                             </div>
-                          )}
+                            {subtaxaFusionEnabled && !collapsedControlBoxes.subrangs && (
+                              <div className="data-table-wrap subtaxa-merge-groups">
+                                {!effectiveSubtaxaMerge && <p>Calcul de la fusion en cours…</p>}
+                                {effectiveSubtaxaMerge?.groups.length === 0 && <p>Aucun sous-taxon à fusionner.</p>}
+                                {effectiveSubtaxaMerge?.groups.map((group, gi) => (
+                                  <div key={gi} className="subtaxa-merge-group">
+                                    <p className="subtaxa-merge-group-head">
+                                      {group.sources.map((s) => (
+                                        <span key={s} className="id-badge">
+                                          {s.toUpperCase()}
+                                        </span>
+                                      ))}
+                                      {group.kind === "disjoint" && (
+                                        <span className="id-badge id-badge-conflict">non recoupé</span>
+                                      )}
+                                    </p>
+                                    <ul className="subtaxa-merge-species-list">
+                                      {group.species.map((sp) => (
+                                        <li key={sp.nom}>
+                                          <label className="facet-checkbox">
+                                            <input
+                                              type="checkbox"
+                                              checked={subtaxaChecked[sp.nom] ?? sp.default_checked}
+                                              onChange={() => toggleSubtaxaChecked(sp.nom)}
+                                            />
+                                            {sp.nom}
+                                          </label>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {wikitextSubTab !== "image" && (
+                        <div className="render-box">
+                          <div className="render-box-header">
+                            <h4 className="render-box-title" id="wikitext-label">
+                              {wikitextSubTab === "tout" ? "Wikitexte" : RENDER_BOX_TITLES[wikitextSubTab]}
+                            </h4>
+                            <span className="render-box-actions">
+                              <button
+                                type="button"
+                                className="edit-btn"
+                                aria-pressed={editingSubTab === wikitextSubTab}
+                                onClick={
+                                  editingSubTab === wikitextSubTab
+                                    ? stopEditingSubTab
+                                    : () => startEditingSubTab(wikitextSubTab)
+                                }
+                              >
+                                {editingSubTab === wikitextSubTab ? "✓ Terminé" : "✎ Éditer"}
+                              </button>
+                              <button type="button" className="edit-btn" onClick={() => handleCopy(wikitextSubTabText)}>
+                                {copied ? "Copié ✓" : "Copier"}
+                              </button>
+                            </span>
+                          </div>
                           <textarea
                             className="wikitext"
                             aria-labelledby="wikitext-label"
                             spellCheck="false"
-                            readOnly={wikitextSubTab !== "tout" || !editing}
+                            readOnly={editingSubTab !== wikitextSubTab}
                             value={wikitextSubTabText}
-                            onChange={wikitextSubTab === "tout" ? (e) => setEditedText(e.target.value) : undefined}
+                            onChange={
+                              editingSubTab === wikitextSubTab
+                                ? (e) => setEditedTexts((prev) => ({ ...prev, [wikitextSubTab]: e.target.value }))
+                                : undefined
+                            }
                           />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {resultView === "classification" && (
-                  <div className="panel">
-                    <div className="panel-head">
-                      <span className="t">Classification — comparaison par source</span>
-                    </div>
-                    {availableSources.length === 0 ? (
-                      <p className="panel-empty">Aucune source résolue pour le moment.</p>
-                    ) : (
-                      <div className="data-table-wrap classification-compare-wrap">
-                        <table className="data-table classification-compare-table">
-                          <thead>
-                            <tr>
-                              <th>Rang</th>
-                              {availableSources.map((m) => (
-                                <th key={m.id}>
-                                  <span
-                                    className={"id-badge" + (taxoboxSourceId === m.id ? " id-badge-current" : "")}
-                                    title={taxoboxSourceId === m.id ? "Source actuelle de la Taxobox — à changer depuis l'onglet Wikitexte > Taxobox" : undefined}
-                                  >
-                                    {m.id.toUpperCase()}
-                                  </span>
-                                </th>
-                              ))}
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {classificationTableRows.order.map((rang) => {
-                              const conflict = rankDisagreements[rang]?.size > 1;
-                              const valueFor = (m) => {
-                                const noms = classificationTableRows.perModule[m.id]?.[rang] || [];
-                                return noms.length > 0 ? noms.join(", ") : "—";
-                              };
-                              const chosenValue = taxoboxNomByRang[rang];
-                              const groups = mergeAdjacentEqual(availableSources, valueFor);
-                              return (
-                                <tr key={rang}>
-                                  <td>{rang}</td>
-                                  {groups.map((g, gi) => {
-                                    const noms = classificationTableRows.perModule[g.sources[0].id]?.[rang] || [];
-                                    const differs = conflict && g.value !== "—" && !noms.includes(chosenValue);
-                                    return (
-                                      <td key={gi} colSpan={g.sources.length} className={differs ? "conflict-cell" : undefined}>
-                                        {g.value}
-                                      </td>
-                                    );
-                                  })}
-                                </tr>
-                              );
-                            })}
-                          </tbody>
-                        </table>
-                      </div>
+                        </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -1770,19 +1767,6 @@ export default function App() {
                         </div>
                       </>
                     )}
-                  </div>
-                )}
-
-                {resultView === "image" && (
-                  <div className="panel">
-                    <ImageGallery
-                      taxon={activeData?.taxon_resolved || query?.taxon || null}
-                      selectedFileName={selectedCommonsImage}
-                      onSelect={handleSelectCommonsImage}
-                      onDeselect={handleDeselectCommonsImage}
-                      cache={commonsImagesCache}
-                      onCacheChange={setCommonsImagesCache}
-                    />
                   </div>
                 )}
 
