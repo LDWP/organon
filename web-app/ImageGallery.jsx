@@ -1,7 +1,4 @@
-import { useEffect } from "react";
-import { fetchCommonsImages } from "./apiClient.js";
-
-// Sous-onglet "Image" du panneau Résultat (voir App.jsx, resultSubTab === "image") : galerie de
+// Sous-onglet "Image" du bloc "Résultats" (voir App.jsx, wikitextSubTab === "image") : galerie de
 // suggestions Wikimedia Commons pour la taxobox, déjà filtrées côté serveur par licence
 // permissive et par distinction qualité/featured (voir organon/modules/commons_images/service.py)
 // — ce composant n'a plus qu'à afficher, jamais à re-filtrer.
@@ -10,29 +7,12 @@ import { fetchCommonsImages } from "./apiClient.js";
 // sélectionne le fichier pour la taxobox (`onSelect`), le lien "Voir sur Commons" à côté ouvre la
 // page du fichier dans un nouvel onglet sans rien sélectionner (stopPropagation + cible dédiée).
 //
-// Les suggestions sont mises en cache côté App.jsx (`cache`, indexé par taxon) plutôt que dans un
-// état local : le rendu conditionnel du sous-onglet démonte ce composant à chaque fois qu'on
-// bascule sur un autre onglet, un état local perdrait donc les résultats déjà récupérés et
-// relancerait la recherche à chaque retour sur "Image". `onCacheChange` reçoit toujours une
-// fonction de mise à jour (jamais l'objet complet) pour ne jamais écraser l'entrée d'un autre
-// taxon déjà en cache pendant que celle en cours de résolution.
-export default function ImageGallery({ taxon, selectedFileName, onSelect, onDeselect, cache, onCacheChange }) {
+// La recherche elle-même est déclenchée côté App.jsx dès que le taxon est connu, pas ici : ce
+// sous-onglet est démonté/remonté à chaque bascule, un effet posé ici manquerait donc les
+// recherches lancées avant sa première ouverture. `cache` (indexé par taxon) peut donc déjà
+// contenir l'entrée en arrivant sur ce composant.
+export default function ImageGallery({ taxon, selectedFileName, onSelect, onDeselect, cache }) {
   const entry = taxon ? cache[taxon] : null;
-
-  useEffect(() => {
-    if (!taxon || entry) return; // déjà en cache (recherche précédente ou retour d'onglet)
-    onCacheChange((prev) => ({ ...prev, [taxon]: { status: "loading" } }));
-    fetchCommonsImages(taxon)
-      .then((data) => {
-        onCacheChange((prev) => ({ ...prev, [taxon]: { status: "ok", data } }));
-      })
-      .catch((err) => {
-        onCacheChange((prev) => ({
-          ...prev,
-          [taxon]: { status: "error", error: err.message || "Erreur inconnue." },
-        }));
-      });
-  }, [taxon, entry, onCacheChange]);
 
   if (!taxon) {
     return <div className="panel-empty">Lancez une génération pour voir les images disponibles.</div>;
