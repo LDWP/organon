@@ -407,6 +407,7 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--ink-soft); font-weight: 600;
 }
+.noms-card-hint { margin-left: 8px; font-size: 11px; color: var(--ink-soft); font-weight: 400; text-transform: none; }
 .noms-card > .data-table-wrap { padding: 10px 12px 12px; }
 .noms-card-body { margin: 0; padding: 10px 12px 12px; }
 

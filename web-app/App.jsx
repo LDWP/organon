@@ -82,6 +82,25 @@ function mergeAdjacentEqual(sources, valueFor) {
   return groups;
 }
 
+// Réordonne `sources` pour rassembler celles qui partagent la même valeur, même non consécutives
+// dans l'ordre d'origine — contrairement à mergeAdjacentEqual, qui ne fusionne que des colonnes
+// déjà adjacentes. Les groupes de valeurs gardent l'ordre de leur première apparition. Réservé
+// aux tableaux à une seule ligne de données (ex. Auteur) : sur plusieurs lignes, un ordre qui
+// regroupe bien une ligne peut désaligner les suivantes.
+function groupSourcesByValue(sources, valueFor) {
+  const bucket = new Map();
+  const order = [];
+  for (const source of sources) {
+    const value = valueFor(source);
+    if (!bucket.has(value)) {
+      bucket.set(value, []);
+      order.push(value);
+    }
+    bucket.get(value).push(source);
+  }
+  return order.flatMap((value) => bucket.get(value));
+}
+
 // Miroir de wp_est_italique() (organon/core/rendering/grammar.py) : dans la plupart des règnes
 // (végétal, champignon, bactérie, archaea, virus…) l'italique est systématique quel que soit le
 // rang. Seuls les règnes suivants (proches de la convention zoologique) réservent l'italique au
@@ -1703,20 +1722,25 @@ export default function App() {
                         <div className="noms-card">
                           <div className="noms-card-head">
                             <span className="noms-card-title">Auteur</span>
+                            <small className="noms-card-hint">plusieurs choix parfois possibles</small>
                           </div>
                           {activeData.auteur_consolide ? (() => {
-                            const recommendedAuteurSource = availableSources.find((m) => {
+                            const auteurValueFor = (m) => {
                               const candidat = activeData.auteur_candidats[m.id];
-                              return candidat && normalizeAuteur(candidat) === normalizeAuteur(activeData.auteur_consolide);
-                            })?.id;
+                              return candidat ? normalizeAuteur(candidat) : "—";
+                            };
+                            const orderedAuteurSources = groupSourcesByValue(availableSources, auteurValueFor);
+                            const recommendedAuteurSource = orderedAuteurSources.find(
+                              (m) => auteurValueFor(m) === normalizeAuteur(activeData.auteur_consolide)
+                            )?.id;
                             const chosenAuteurSourceId = auteurSourceOverride ?? recommendedAuteurSource ?? null;
-                            const groups = mergeAdjacentEqual(availableSources, (m) => activeData.auteur_candidats[m.id] || "—");
+                            const groups = mergeAdjacentEqual(orderedAuteurSources, auteurValueFor);
                             return (
                               <div className="data-table-wrap classification-compare-wrap">
                                 <table className="data-table classification-compare-table">
                                   <thead>
                                     <tr>
-                                      {availableSources.map((m) => (
+                                      {orderedAuteurSources.map((m) => (
                                         <th key={m.id}>
                                           <button
                                             type="button"
