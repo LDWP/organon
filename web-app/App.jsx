@@ -309,6 +309,10 @@ export default function App() {
   // recommendedTaxoboxSource ci-dessous). La facette sous-taxons n'a plus de choix manuel : elle
   // suit toujours recommendedSubtaxaSource (voir subtaxaSourceId).
   const [taxoboxSourceOverride, setTaxoboxSourceOverride] = useState(null);
+  // Choix manuel de la source d'auteur dans la carte "Auteur" de l'onglet Noms & synonymes —
+  // `null` tant qu'aucun choix explicite n'a été fait, auquel cas le vote majoritaire du backend
+  // (auteur_consolide) s'applique.
+  const [auteurSourceOverride, setAuteurSourceOverride] = useState(null);
   // Résultat de la fusion (MergedSubtaxaResponse) une fois calculé, `null` tant qu'il n'y a pas
   // au moins deux sources avec des sous-taxons ou que l'appel est en cours/en erreur.
   const [subtaxaMerge, setSubtaxaMerge] = useState(null);
@@ -680,6 +684,10 @@ export default function App() {
     setManualOverrides({});
   }
 
+  function handleAuteurSourceChange(moduleId) {
+    setAuteurSourceOverride(moduleId);
+  }
+
   function toggleRankConflictManaged(rang) {
     setManagedRankConflicts((prev) => ({ ...prev, [rang]: !prev[rang] }));
   }
@@ -950,8 +958,13 @@ export default function App() {
   const auteurValeurs = Object.values(auteurCandidats).filter(Boolean);
   const auteurVariantes = new Set(auteurValeurs.map(normalizeAuteur));
   // À défaut de l'auteur rapporté par la source affichée, retombe sur le premier candidat connu
-  // (ex. la source active n'a elle-même pas rapporté d'auteur mais une autre source si).
-  const auteurAffiche = auteurCandidats[activeSource] || auteurValeurs[0] || null;
+  // (ex. la source active n'a elle-même pas rapporté d'auteur mais une autre source si). Un choix
+  // manuel dans la carte "Auteur" (voir auteurSourceOverride) prime sur ces deux repli.
+  const auteurAffiche =
+    (auteurSourceOverride && auteurCandidats[auteurSourceOverride]) ||
+    auteurCandidats[activeSource] ||
+    auteurValeurs[0] ||
+    null;
 
   // Remplace, dans les lignes propres à la source taxobox affichée, celles dont le rang est
   // contesté par au moins une autre source par un {{Taxobox conflit}} listant chaque nom
@@ -1691,35 +1704,49 @@ export default function App() {
                           <div className="noms-card-head">
                             <span className="noms-card-title">Auteur</span>
                           </div>
-                          {activeData.auteur_consolide ? (
-                            <div className="data-table-wrap classification-compare-wrap">
-                              <table className="data-table classification-compare-table">
-                                <thead>
-                                  <tr>
-                                    {availableSources.map((m) => {
-                                      const candidat = activeData.auteur_candidats[m.id];
-                                      const retenu = candidat && normalizeAuteur(candidat) === normalizeAuteur(activeData.auteur_consolide);
-                                      return (
+                          {activeData.auteur_consolide ? (() => {
+                            const recommendedAuteurSource = availableSources.find((m) => {
+                              const candidat = activeData.auteur_candidats[m.id];
+                              return candidat && normalizeAuteur(candidat) === normalizeAuteur(activeData.auteur_consolide);
+                            })?.id;
+                            const chosenAuteurSourceId = auteurSourceOverride ?? recommendedAuteurSource ?? null;
+                            const groups = mergeAdjacentEqual(availableSources, (m) => activeData.auteur_candidats[m.id] || "—");
+                            return (
+                              <div className="data-table-wrap classification-compare-wrap">
+                                <table className="data-table classification-compare-table">
+                                  <thead>
+                                    <tr>
+                                      {availableSources.map((m) => (
                                         <th key={m.id}>
-                                          <span className="id-badge" title={retenu ? "Retenu (vote majoritaire)" : undefined}>
+                                          <button
+                                            type="button"
+                                            className={"id-badge id-badge-btn" + (chosenAuteurSourceId === m.id ? " on" : "")}
+                                            onClick={() => handleAuteurSourceChange(m.id)}
+                                            title={m.id === recommendedAuteurSource ? "Recommandé (vote majoritaire)" : "Choisir cette source pour l'auteur"}
+                                          >
                                             {m.id.toUpperCase()}
-                                            {retenu ? " ★" : ""}
-                                          </span>
+                                            {m.id === recommendedAuteurSource ? " ★" : ""}
+                                          </button>
                                         </th>
-                                      );
-                                    })}
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  <tr>
-                                    {mergeAdjacentEqual(availableSources, (m) => activeData.auteur_candidats[m.id] || "—").map((g, gi) => (
-                                      <td key={gi} colSpan={g.sources.length}>{g.value}</td>
-                                    ))}
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </div>
-                          ) : (
+                                      ))}
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      {groups.map((g, gi) => {
+                                        const isChosen = g.sources.some((m) => m.id === chosenAuteurSourceId);
+                                        return (
+                                          <td key={gi} colSpan={g.sources.length} className={isChosen ? "chosen-col" : undefined}>
+                                            {g.value}
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            );
+                          })() : (
                             <p className="panel-empty">Aucun auteur rapporté pour ce taxon.</p>
                           )}
                         </div>
