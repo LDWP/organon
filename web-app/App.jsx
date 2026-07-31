@@ -944,6 +944,20 @@ export default function App() {
     return baseWikitext.split(baseBlock).join(altBlock);
   }
 
+  // Cas particulier des sous-taxons : la source recommandée pour la Taxobox (voir baseData) peut
+  // n'avoir rapporté aucun sous-taxon (baseData.subtaxa_wikitext vide) alors que la source
+  // recommandée pour cette facette (subtaxaSourceId) en a — spliceBlock ne peut alors rien
+  // remplacer faute d'ancre, et la liste disparaît silencieusement de "tout". On insère le bloc
+  // juste avant "== Systématique ==", qui suit toujours immédiatement la section sous-taxons dans
+  // l'ordre de rendu (voir organon/core/rendering/engine.py:render) : ça reproduit exactement la
+  // position qu'aurait occupée le bloc si la source de base l'avait elle-même rapporté.
+  function spliceSubtaxaBlock(baseWikitext, baseBlock, altBlock) {
+    if (!altBlock || baseBlock === altBlock) return baseWikitext;
+    if (baseBlock) return baseWikitext.split(baseBlock).join(altBlock);
+    const idx = baseWikitext.indexOf("== Systématique ==");
+    return idx === -1 ? baseWikitext : baseWikitext.slice(0, idx) + altBlock + baseWikitext.slice(idx);
+  }
+
   // Pour chaque rang, l'ensemble des noms distincts rapportés par les classifications déjà
   // résolues, avec la première source (dans l'ordre de priorité de `classificationModules`) à
   // avoir rapporté chacun — sert à repérer un désaccord de rang entre sources (ex. ITIS et
@@ -1220,7 +1234,7 @@ export default function App() {
   const displayWikitext = baseData
     ? applyRankConflicts(
         spliceBlock(
-          spliceBlock(
+          spliceSubtaxaBlock(
             spliceBlock(baseData.wikitext, baseData.taxobox_wikitext, effectiveTaxoboxWikitext),
             baseData.subtaxa_wikitext,
             effectiveSubtaxaWikitextForTout
