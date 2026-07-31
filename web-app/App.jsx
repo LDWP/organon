@@ -955,7 +955,10 @@ export default function App() {
     if (!altBlock || baseBlock === altBlock) return baseWikitext;
     if (baseBlock) return baseWikitext.split(baseBlock).join(altBlock);
     const idx = baseWikitext.indexOf("== Systématique ==");
-    return idx === -1 ? baseWikitext : baseWikitext.slice(0, idx) + altBlock + baseWikitext.slice(idx);
+    if (idx === -1) return baseWikitext;
+    const before = baseWikitext.slice(0, idx).replace(/\n+$/, "");
+    const trimmedAlt = altBlock.replace(/^\n+|\n+$/g, "");
+    return `${before}\n\n${trimmedAlt}\n\n${baseWikitext.slice(idx)}`;
   }
 
   // Pour chaque rang, l'ensemble des noms distincts rapportés par les classifications déjà
