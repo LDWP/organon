@@ -499,6 +499,21 @@ def _compute_data_found(struct: Struct, classification_id: str) -> dict[str, lis
     return found
 
 
+def _repli_eteint(struct: Struct) -> None:
+    """Filet de sécurité : la source de classification retenue peut n'avoir aucun signal
+    d'extinction pour ce taxon (ex. Hesperomys sans `age` renseigné à ce rang) alors qu'une
+    autre source consultée en enrichissement le sait (`isExtinct`/`isFossil`/`extinct` -> `True`
+    dans `struct.liens[<module>]["eteint"]`, voir modules irmng/wrms/algaebase/gbif/hesperomys).
+    Seul un `True` explicite compte : l'affichage ne distingue pas "non éteint" de "inconnu", donc
+    inutile de chercher un `False` à faire gagner. En revanche un `False` explicite de la source
+    de classification (elle a une opinion, contrairement à `None`) n'est pas écrasé : seule
+    l'absence de signal déclenche le repli."""
+    if struct.taxon.eteint is not None:
+        return
+    if any(entry.get("eteint") for entry in struct.liens.values()):
+        struct.taxon.eteint = True
+
+
 def _assemble_response(
     req: GenerateRequest,
     options: GenerateOptions,
@@ -514,6 +529,7 @@ def _assemble_response(
     wikitexte, liens externes, réponse. Ne fait plus aucun appel réseau (uniquement du calcul
     local) : peut donc être appelée telle quelle depuis le générateur SSE de `/generate/stream`
     sans considération de streaming."""
+    _repli_eteint(struct)
     regne_incoherences = detect_regne_incoherences(struct, classification_id)
 
     struct.liens["fin"] = compute_fin_liens(struct, options)
