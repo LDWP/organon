@@ -1056,6 +1056,10 @@ export default function App() {
         if (!perModule[m.id][rang].includes(nom)) perModule[m.id][rang].push(nom);
       }
     }
+    // rank_lines est ordonné du rang le plus proche du taxon au plus éloigné (voir
+    // compute_rank_lines, organon/core/rendering/sections.py) ; le tableau doit au contraire
+    // suivre l'ordre canonique domaine -> espèce (Modèle:Taxoboxoutils_rang), d'où l'inversion.
+    order.reverse();
     return { order, perModule };
   })();
 
