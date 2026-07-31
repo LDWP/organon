@@ -95,19 +95,26 @@ module n'a modifié un de ces champs, par rapport à la struct de base pré-enri
 sa valeur diffère de celle de `_BASELINE` — voir `EnrichmentRunner.run` pour la fusion."""
 
 
+_CLASSIFICATION_FALLBACK_TIMEOUT = 20.0
+"""Borne (s) par tentative de classification quand `options.timeout` vaut 0 (défaut jamais changé
+par le frontend) — sans ça, un module lancé en parallèle des autres peut bloquer la recherche
+entière indéfiniment plutôt que de céder la place aux modules qui répondent."""
+
+
 async def _collect_with_timeout(
-    module: TaxonomyModule, struct: Struct, *, is_classification: bool, options: GenerateOptions
+    module: TaxonomyModule,
+    struct: Struct,
+    *,
+    is_classification: bool,
+    options: GenerateOptions,
+    fallback_timeout: float | None = None,
 ) -> Struct | None:
-    """Appelle `module.collect(...)` en appliquant `options.timeout` (si non nul) à l'appel —
-    seul endroit qui lit ce champ (voir `GenerateOptions.timeout`, jusqu'ici mort code). Un
-    dépassement lève `TimeoutError` (alias `asyncio.TimeoutError` depuis Python 3.11), propagée
-    à l'appelant exactement comme n'importe quelle autre exception réseau : capturée par le
-    `try/except` dédié à la classification ci-dessous, ou par `EnrichmentRunner.run` pour
-    l'enrichissement — pas de traitement spécial ici pour rester au plus près du contrat
-    existant de `collect()`."""
+    """Applique `options.timeout` si non nul, sinon `fallback_timeout`, autour de
+    `module.collect(...)` (seul endroit qui lit `GenerateOptions.timeout`)."""
     coro = module.collect(struct, is_classification=is_classification, options=options)
-    if options.timeout > 0:
-        return await asyncio.wait_for(coro, timeout=options.timeout)
+    timeout = options.timeout if options.timeout > 0 else fallback_timeout
+    if timeout:
+        return await asyncio.wait_for(coro, timeout=timeout)
     return await coro
 
 
@@ -115,27 +122,67 @@ def _options_from_request(req: GenerateRequest) -> GenerateOptions:
     return GenerateOptions(**req.model_dump(exclude={"taxon"}))
 
 
-def _resolve_classification(
+def _classification_candidates(
     req: GenerateRequest, off: set[str], trees: dict[str, DomainTree], priorities: dict[str, int]
-) -> tuple[str, TaxonomyModule]:
-    """Détermine le module de classification à utiliser et le renvoie déjà résolu depuis le
-    registre. Ne fait aucun appel réseau (uniquement de la lecture de métadonnées) : peut donc
-    être appelé avant d'ouvrir un `StreamingResponse`, pour que ces erreurs de configuration
-    restent de vraies erreurs HTTP 400 plutôt que des événements SSE (le code de statut d'une
-    réponse en streaming est figé dès le premier octet envoyé, voir `FatalErrorEvent`)."""
-    classification_id = req.classification or meilleure_classification(
-        req.domaine,
-        classification_module_ids=[m for m in classification_modules() if m not in off],
+) -> list[tuple[str, TaxonomyModule]]:
+    """Modules de classification à interroger en parallèle. Choix explicite
+    (`req.classification`, ex. facette de source ou désambiguïsation GBIF) : un seul candidat.
+    Sinon : tous les modules applicables au domaine demandé, aucun privilégié a priori — voir
+    `_pick_classification_winner` pour le choix du gagnant une fois les résultats connus."""
+    if req.classification:
+        module = get_module(req.classification)
+        if module is None or req.classification in off:
+            raise HTTPException(
+                400, detail=f"Module de classification '{req.classification}' inconnu ou désactivé."
+            )
+        return [(req.classification, module)]
+
+    applicable = set(modules_possibles(req.domaine, trees) or [])
+    candidates = [
+        (m, get_module(m)) for m in classification_modules() if m in applicable and m not in off
+    ]
+    candidates = [(m, module) for m, module in candidates if module is not None]
+    if not candidates:
+        raise HTTPException(400, detail="Aucun module de classification disponible.")
+    return candidates
+
+
+async def _attempt_classification(
+    module_id: str, module: TaxonomyModule, req: GenerateRequest, options: GenerateOptions
+) -> tuple[str, Struct | None, Exception | None]:
+    """Ne lève jamais (même contrat que `EnrichmentRunner.collect_one_module`) : le résultat
+    porte l'erreur éventuelle plutôt que de la laisser se propager hors du `gather`/
+    `as_completed`."""
+    struct = Struct(taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine)
+    try:
+        resolved = await _collect_with_timeout(
+            module,
+            struct,
+            is_classification=True,
+            options=options,
+            fallback_timeout=_CLASSIFICATION_FALLBACK_TIMEOUT,
+        )
+        return module_id, resolved, None
+    except Exception as exc:  # noqa: BLE001 — dégradé en HTTPException par l'appelant
+        logger.warning("Module de classification '%s' : erreur réseau (%s)", module_id, exc)
+        return module_id, None, exc
+
+
+def _pick_classification_winner(
+    domaine: str, successes: list[str], trees: dict[str, DomainTree], priorities: dict[str, int]
+) -> str:
+    """Départage les modules de classification ayant réussi — par spécialisation au domaine
+    demandé (`meilleure_classification`), ou par simple priorité quand cette notion ne
+    s'applique pas (`domaine == "*"`, ou un seul succès)."""
+    if len(successes) == 1 or domaine == "*":
+        return max(successes, key=lambda m: priorities.get(m, 0))
+    return meilleure_classification(
+        domaine,
+        classification_module_ids=successes,
         module_trees=trees,
         module_priorities=priorities,
         default_module=default_classification_module(),
     )
-    if not classification_id:
-        raise HTTPException(400, detail="Aucun module de classification disponible.")
-    classification_module = get_module(classification_id)
-    if classification_module is None or classification_id in off:
-        raise HTTPException(400, detail=f"Module de classification '{classification_id}' inconnu ou désactivé.")
-    return classification_id, classification_module
 
 
 @dataclass
@@ -276,26 +323,23 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
     trees = module_domain_trees(exclude=off)
     priorities = module_priorities(exclude=off)
 
-    classification_id, classification_module = _resolve_classification(req, off, trees, priorities)
+    candidates = _classification_candidates(req, off, trees, priorities)
+    attempts = await asyncio.gather(*(_attempt_classification(cid, cm, req, options) for cid, cm in candidates))
+    results = {cid: (resolved, exc) for cid, resolved, exc in attempts}
+    successes = [cid for cid, (resolved, _) in results.items() if resolved is not None]
 
-    struct = Struct(taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine)
+    if not successes:
+        if all(exc is not None for _, exc in results.values()):
+            raise HTTPException(
+                502, detail=f"Modules de classification en erreur réseau : {', '.join(sorted(results))}."
+            )
+        raise HTTPException(
+            404, detail=f"Taxon « {req.taxon} » non trouvé (classifications essayées : {', '.join(sorted(results))})."
+        )
+
+    classification_id = _pick_classification_winner(req.domaine, successes, trees, priorities)
+    struct = results[classification_id][0]
     logs.append(f"Classification : {classification_id}")
-
-    try:
-        resolved = await _collect_with_timeout(
-            classification_module, struct, is_classification=True, options=options
-        )
-    except Exception as exc:  # noqa: BLE001 — dégrade en erreur HTTP propre plutôt qu'un 500 non géré,
-        # cohérent avec le traitement déjà en place côté /generate/stream (voir event_stream ci-dessous)
-        logger.warning("Module de classification '%s' : erreur réseau (%s)", classification_id, exc)
-        raise HTTPException(
-            502, detail=f"Module de classification '{classification_id}' : erreur réseau ({exc})."
-        ) from exc
-    if resolved is None:
-        raise HTTPException(
-            404, detail=f"Taxon « {req.taxon} » non trouvé via la classification '{classification_id}'."
-        )
-    struct = resolved
 
     applicable = modules_possibles(struct.domaine, trees) or []
     runner = EnrichmentRunner(struct, classification_id, applicable, off, options, priorities)
@@ -537,73 +581,69 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
     les cas puisqu'il est déjà envoyé au moment où le premier octet du flux part (voir
     `FatalErrorEvent`). Les erreurs de configuration qui ne dépendent d'aucun appel réseau (ex.
     module de classification inconnu) restent de vraies erreurs HTTP, levées par
-    `_resolve_classification` avant l'ouverture du flux.
+    `_classification_candidates` avant l'ouverture du flux.
     """
     ensure_modules_registered()
     options = _options_from_request(req)
     off = set(req.off)
     trees = module_domain_trees(exclude=off)
     priorities = module_priorities(exclude=off)
-    classification_id, classification_module = _resolve_classification(req, off, trees, priorities)
+    candidates = _classification_candidates(req, off, trees, priorities)
 
     async def event_stream() -> AsyncIterator[str]:
         started = time.monotonic()
-        logs = [f"Classification : {classification_id}"]
+        logs: list[str] = []
         warnings: list[str] = []
 
-        yield _sse(ModuleStatusEvent(module_id=classification_id, role="classification", status="running"))
         classification_started = time.monotonic()
+        for cid, _ in candidates:
+            yield _sse(ModuleStatusEvent(module_id=cid, role="classification", status="running"))
 
-        struct = Struct(taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine)
-        try:
-            resolved = await _collect_with_timeout(
-                classification_module, struct, is_classification=True, options=options
-            )
-        except Exception as exc:  # noqa: BLE001 — voir docstring : converti en événement, pas en exception ASGI
-            logger.warning("Module de classification '%s' : erreur réseau (%s)", classification_id, exc)
+        tasks = [asyncio.create_task(_attempt_classification(cid, cm, req, options)) for cid, cm in candidates]
+        results: dict[str, tuple[Struct | None, Exception | None]] = {}
+        for task in asyncio.as_completed(tasks):
+            module_id, resolved, exc = await task
+            results[module_id] = (resolved, exc)
+            if exc is not None:
+                status, message = "error", str(exc)
+            elif resolved is None:
+                status, message = "error", "taxon non trouvé"
+            else:
+                status, message = "found", None
             yield _sse(
                 ModuleStatusEvent(
-                    module_id=classification_id,
+                    module_id=module_id,
                     role="classification",
-                    status="error",
-                    message=str(exc),
+                    status=status,
+                    message=message,
                     duration_seconds=time.monotonic() - classification_started,
                 )
             )
-            yield _sse(
-                FatalErrorEvent(
-                    status_code=502,
-                    detail=f"Module de classification '{classification_id}' : erreur réseau ({exc}).",
+
+        # Ordre des candidats déclarés, pas `results` (rempli via `as_completed`, donc en ordre
+        # d'arrivée réseau) — sinon le départage par priorité de `_pick_classification_winner`
+        # devient non déterministe d'un appel à l'autre en cas d'égalité de priorité.
+        successes = [cid for cid, _ in candidates if results[cid][0] is not None]
+        if not successes:
+            if all(exc is not None for _, exc in results.values()):
+                yield _sse(
+                    FatalErrorEvent(
+                        status_code=502,
+                        detail=f"Modules de classification en erreur réseau : {', '.join(sorted(results))}.",
+                    )
                 )
-            )
+            else:
+                yield _sse(
+                    FatalErrorEvent(
+                        status_code=404,
+                        detail=f"Taxon « {req.taxon} » non trouvé (classifications essayées : {', '.join(sorted(results))}).",
+                    )
+                )
             return
 
-        if resolved is None:
-            yield _sse(
-                ModuleStatusEvent(
-                    module_id=classification_id,
-                    role="classification",
-                    status="error",
-                    message="taxon non trouvé",
-                    duration_seconds=time.monotonic() - classification_started,
-                )
-            )
-            yield _sse(
-                FatalErrorEvent(
-                    status_code=404,
-                    detail=f"Taxon « {req.taxon} » non trouvé via la classification '{classification_id}'.",
-                )
-            )
-            return
-        struct = resolved
-        yield _sse(
-            ModuleStatusEvent(
-                module_id=classification_id,
-                role="classification",
-                status="found",
-                duration_seconds=time.monotonic() - classification_started,
-            )
-        )
+        classification_id = _pick_classification_winner(req.domaine, successes, trees, priorities)
+        logs.append(f"Classification : {classification_id}")
+        struct = results[classification_id][0]
 
         applicable = modules_possibles(struct.domaine, trees) or []
         enrichment_ids = [

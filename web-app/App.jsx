@@ -582,16 +582,13 @@ export default function App() {
       return;
     }
 
-    // Mot-clé / Autocomplétion (soumission directe sans passer par une suggestion) : on lance
-    // la génération sur la meilleure correspondance (déjà triée par pertinence par le
-    // backend), sans jamais montrer la liste. Repli sur le texte brut si la recherche floue
-    // n'a rien trouvé — le module de classification peut malgré tout résoudre un nom
-    // scientifique exact par sa propre voie.
+    // Sans correspondance GBIF (seule source de /api/v1/search), pas de classification forcée :
+    // le backend interroge tous les modules applicables en parallèle.
     const best = matches[0];
     if (best) {
       await launchSearch(best.scientific_name, best.kingdom || domaineValue, "gbif");
     } else {
-      await launchSearch(name, domaineValue, "gbif");
+      await launchSearch(name, domaineValue, undefined);
     }
   }
 
@@ -1498,7 +1495,9 @@ export default function App() {
                     onClick={() => setResultView(id)}
                   >
                     {label}
-                    {id === "wikitexte" && pendingModules.length > 0 && <ModuleStatusIcon status="running" />}
+                    {id === "wikitexte" && !submitError && pendingModules.length > 0 && (
+                      <ModuleStatusIcon status="running" />
+                    )}
                   </button>
                 ))}
               </nav>
