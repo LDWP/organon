@@ -225,7 +225,7 @@ def merge_subtaxa(
                 species=[
                     MergedSpecies(
                         nom=nom,
-                        line=render_subtaxon_line(name_to_species[nom], regne, rang_defaut),
+                        line=render_subtaxon_line(name_to_species[nom], regne, rang_defaut, taxon_rang),
                         default_checked=(kind != "disjoint"),
                     )
                     for nom in group_names[key]

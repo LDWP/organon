@@ -22,6 +22,7 @@ from organon.core.rendering.grammar import (
     wp_le_rang,
     wp_met_italiques,
     wp_nom_rang,
+    wp_rang_plus_specifique,
     wp_un_rang,
 )
 from organon.core.rendering.support import (
@@ -192,14 +193,17 @@ def compute_rang_txt(liste: list[RankName]) -> tuple[str, str, str]:
     return rang_txt, rang_txt_singulier, rang_defaut
 
 
-def render_subtaxon_line(sous_taxon: RankName, regne: str, rang_defaut: str) -> str:
+def render_subtaxon_line(sous_taxon: RankName, regne: str, rang_defaut: str, taxon_rang: str) -> str:
     """Rendu wikitexte d'une ligne de sous-taxon (`"* ''Nom'' Auteur\\n"`, italiques/éteint
     compris) — extrait de `render_inf` pour être partagé avec
     `organon.core.rendering.subtaxa_merge` (mêmes règles de mise en forme pour le rendu
-    mono-source et le rendu fusionné multi-sources)."""
+    mono-source et le rendu fusionné multi-sources). Le wikilien est ajouté dès que le rang du
+    sous-taxon est plus spécifique que celui du taxon de l'article (`taxon_rang`) — et non plus
+    seulement au-dessus du niveau espèce : une liste de sous-taxons ne contient par construction
+    que des rangs inférieurs à celui du taxon, donc essentiellement toujours un lien."""
     rang_affiche = sous_taxon.rang or rang_defaut
     auteur = " " + format_auteur(sous_taxon.auteur) if sous_taxon.auteur else ""
-    wikilien = not wp_inf_rang(rang_affiche)
+    wikilien = wp_rang_plus_specifique(rang_affiche, taxon_rang)
     cible = wp_met_italiques(sous_taxon.nom, rang_affiche, regne, lien=wikilien)
     if sous_taxon.eteint:
         cible = "† " + cible
@@ -221,7 +225,7 @@ def render_inf(struct: Struct, options: GenerateOptions) -> str:
 
     ret0 = ""
     for sous_taxon in sous_taxons.liste:
-        ret0 += render_subtaxon_line(sous_taxon, struct.regne, rang_defaut)
+        ret0 += render_subtaxon_line(sous_taxon, struct.regne, rang_defaut, struct.taxon.rang)
 
     if est_colonnes(len(sous_taxons.liste), options):
         ret += colonnes_contenu(ret0)

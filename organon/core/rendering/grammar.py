@@ -152,6 +152,21 @@ def wp_inf_rang(rang: str, table: RankTable | None = None) -> bool | str:
     return table.ranks[rang].rang_inferieur_espece
 
 
+def wp_rang_plus_specifique(rang: str, reference: str, table: RankTable | None = None) -> bool:
+    """Indique si `rang` est plus spécifique (inférieur, au sens taxonomique) que `reference`,
+    selon l'ordre de `ranks.yaml` (du plus spécifique au plus large — l'ordre d'insertion du
+    dict `table.ranks` reflète l'ordre du fichier). Utilisé pour décider si un sous-taxon mérite
+    un wikilien par comparaison à son propre taxon plutôt qu'à un seuil absolu (voir
+    `sections.render_subtaxon_line`) : un rang absent de la table (donnée malformée) est
+    considéré comme plus spécifique par défaut, pour ne pas priver un sous-taxon légitime de son
+    lien sur un cas qui ne devrait pas se présenter en pratique."""
+    table = table or load_rank_table()
+    ordre = list(table.ranks)
+    if rang not in ordre or reference not in ordre:
+        return True
+    return ordre.index(rang) < ordre.index(reference)
+
+
 def wp_accorde_adjectif(
     nom_adjectif: str, genre: Literal["masculin", "féminin"], plur: bool = False,
     table: RankTable | None = None,
