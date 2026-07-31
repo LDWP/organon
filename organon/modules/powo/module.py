@@ -183,6 +183,15 @@ class PowoModule(TaxonomyModule):
             if c.get("fqId") != taxon_id and c.get("name")
         ]
         rangs.reverse()
+
+        # `classification` ne remonte que famille+genre (WCVP) : les rangs supérieurs
+        # (embranchement, classe, sous-classe, ordre) sont des champs scalaires séparés sur la
+        # fiche, absents de la chaîne — sans quoi la taxobox POWO s'arrêtait à la famille.
+        for field, rank_code in (("order", "ORDER"), ("subclass", "SUBCLASS"), ("clazz", "CLASS"), ("phylum", "PHYLUM")):
+            nom = detail.get(field)
+            if nom:
+                rangs.append(RankName(nom=nom, rang=powo_cherche_rang(rank_code)))
+
         struct.rangs = rangs
 
         return struct

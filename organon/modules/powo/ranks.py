@@ -8,6 +8,7 @@ POWO_RANKS: dict[str, str] = {
     "KINGDOM": "règne",
     "PHYLUM": "embranchement",
     "CLASS": "classe",
+    "SUBCLASS": "sous-classe",
     "ORDER": "ordre",
     "FAMILY": "famille",
     "TRIBE": "tribu",
