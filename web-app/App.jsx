@@ -66,6 +66,35 @@ const RANK_ABBR = {
   "parv-embranchement": "Parv-embr.",
 };
 
+// Fusionne les chaînes de rangs de chaque source (déjà en ordre domaine -> espèce) en une seule
+// liste pour le tableau de comparaison : la chaîne de la source recommandée (`backboneChain`)
+// sert de colonne vertébrale figée, les rangs propres aux autres sources (granularité plus fine,
+// ex. giga-classe chez WoRMS, ou un clade absent des autres) s'insèrent seulement entre les deux
+// rangs de la colonne vertébrale qui les encadrent réellement dans la chaîne de leur propre
+// source — jamais réordonnés au sein de cette chaîne. Un rang sans aucun ancrage dans la colonne
+// vertébrale (aucun voisin partagé) est relégué en fin de tableau plutôt que positionné au hasard.
+function mergeRankChains(backboneChain, otherChains) {
+  const result = [...backboneChain];
+  for (const chain of otherChains) {
+    let pendingRun = [];
+    const flushRun = (beforeIndex) => {
+      if (pendingRun.length === 0) return;
+      result.splice(beforeIndex ?? result.length, 0, ...pendingRun);
+      pendingRun = [];
+    };
+    for (const rang of chain) {
+      const idx = result.indexOf(rang);
+      if (idx !== -1) {
+        flushRun(idx);
+      } else if (!pendingRun.includes(rang)) {
+        pendingRun.push(rang);
+      }
+    }
+    flushRun(null);
+  }
+  return result;
+}
+
 // Regroupe des colonnes consécutives (dans l'ordre de `sources`) qui partagent la même valeur
 // affichée, pour le tableau de comparaison Taxobox — évite de répéter une valeur identique sur
 // plusieurs colonnes adjacentes (ex. ITIS et WoRMS d'accord sur "classe"). Ne fusionne que des
@@ -1038,29 +1067,37 @@ export default function App() {
   const subtaxaMergeWikitext = subtaxaFusionEnabled ? renderSubtaxaMergeWikitext() : "";
 
   // Version tabulaire de rankDisagreements pour le tableau de comparaison de l'onglet Résultats >
-  // Taxobox : pour chaque rang (dans l'ordre de première apparition), les noms rapportés par
-  // chaque source, afin de comparer les classifications côte à côte plutôt que de ne garder que
-  // le premier nom rencontré par rang.
+  // Taxobox : pour chaque rang, les noms rapportés par chaque source, afin de comparer les
+  // classifications côte à côte plutôt que de ne garder que le premier nom rencontré par rang.
+  // L'ordre des lignes fusionne les chaînes de rangs propres à chaque source (voir
+  // mergeRankChains) plutôt que de suivre une échelle taxonomique externe : la chaîne de la
+  // source recommandée (`recommendedTaxoboxSource`) sert de colonne vertébrale, les rangs propres
+  // aux autres sources ne s'insèrent qu'entre les rangs de cette colonne qui les encadrent
+  // réellement pour cette source — sans jamais réordonner la chaîne d'une source par rapport à
+  // elle-même. Un rang sans aucun ancrage dans la colonne vertébrale reste "décousu" en fin de
+  // tableau (les autres colonnes affichent "—") plutôt que d'être positionné au hasard.
   const classificationTableRows = (() => {
-    const order = [];
-    const seen = new Set();
     const perModule = {};
+    const chainByModule = {};
     for (const m of availableSources) {
       perModule[m.id] = {};
-      for (const { rang, nom } of resultsBySource[m.id].data.rank_lines || []) {
-        if (!seen.has(rang)) {
-          seen.add(rang);
-          order.push(rang);
-        }
+      const rankLines = resultsBySource[m.id].data.rank_lines || [];
+      const chain = [];
+      // rank_lines est ordonné du rang le plus proche du taxon au plus éloigné (voir
+      // compute_rank_lines, organon/core/rendering/sections.py) ; on le parcourt à l'envers pour
+      // obtenir la chaîne domaine -> espèce propre à cette source.
+      for (let i = rankLines.length - 1; i >= 0; i--) {
+        const { rang, nom } = rankLines[i];
+        if (!chain.includes(rang)) chain.push(rang);
         if (!perModule[m.id][rang]) perModule[m.id][rang] = [];
         if (!perModule[m.id][rang].includes(nom)) perModule[m.id][rang].push(nom);
       }
+      chainByModule[m.id] = chain;
     }
-    // rank_lines est ordonné du rang le plus proche du taxon au plus éloigné (voir
-    // compute_rank_lines, organon/core/rendering/sections.py) ; le tableau doit au contraire
-    // suivre l'ordre canonique domaine -> espèce (Modèle:Taxoboxoutils_rang), d'où l'inversion.
-    order.reverse();
-    return { order, perModule };
+    const backboneId = recommendedTaxoboxSource ?? availableSources[0]?.id;
+    const backboneChain = chainByModule[backboneId] || [];
+    const otherChains = availableSources.filter((m) => m.id !== backboneId).map((m) => chainByModule[m.id]);
+    return { order: mergeRankChains(backboneChain, otherChains), perModule };
   })();
 
   // Nom retenu par rang pour la source taxobox actuellement affichée — sert à ne mettre en
