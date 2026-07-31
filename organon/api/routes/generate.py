@@ -122,13 +122,22 @@ def _options_from_request(req: GenerateRequest) -> GenerateOptions:
     return GenerateOptions(**req.model_dump(exclude={"taxon"}))
 
 
+def _all_applicable_classification_modules(
+    domaine: str, off: set[str], trees: dict[str, DomainTree]
+) -> list[tuple[str, TaxonomyModule]]:
+    applicable = set(modules_possibles(domaine, trees) or [])
+    candidates = [(m, get_module(m)) for m in classification_modules() if m in applicable and m not in off]
+    return [(m, module) for m, module in candidates if module is not None]
+
+
 def _classification_candidates(
     req: GenerateRequest, off: set[str], trees: dict[str, DomainTree], priorities: dict[str, int]
 ) -> list[tuple[str, TaxonomyModule]]:
     """Modules de classification à interroger en parallèle. Choix explicite
-    (`req.classification`, ex. facette de source ou désambiguïsation GBIF) : un seul candidat.
-    Sinon : tous les modules applicables au domaine demandé, aucun privilégié a priori — voir
-    `_pick_classification_winner` pour le choix du gagnant une fois les résultats connus."""
+    (`req.classification`, ex. facette de source ou désambiguïsation GBIF) : un seul candidat —
+    voir `_classification_network_fallback` pour le repli si celui-ci échoue au réseau. Sinon :
+    tous les modules applicables au domaine demandé, aucun privilégié a priori (voir
+    `_pick_classification_winner`)."""
     if req.classification:
         module = get_module(req.classification)
         if module is None or req.classification in off:
@@ -137,14 +146,25 @@ def _classification_candidates(
             )
         return [(req.classification, module)]
 
-    applicable = set(modules_possibles(req.domaine, trees) or [])
-    candidates = [
-        (m, get_module(m)) for m in classification_modules() if m in applicable and m not in off
-    ]
-    candidates = [(m, module) for m, module in candidates if module is not None]
+    candidates = _all_applicable_classification_modules(req.domaine, off, trees)
     if not candidates:
         raise HTTPException(400, detail="Aucun module de classification disponible.")
     return candidates
+
+
+def _classification_network_fallback(
+    req: GenerateRequest, off: set[str], trees: dict[str, DomainTree], tried: dict[str, tuple]
+) -> list[tuple[str, TaxonomyModule]]:
+    """Un choix explicite qui échoue par erreur réseau (pas un "non trouvé", un signal fiable
+    qu'on respecte tel quel) n'est pas la faute du taxon — retente les autres modules
+    applicables plutôt que d'abandonner sur la seule panne d'un module."""
+    if not (req.classification and all(exc is not None for _, exc in tried.values())):
+        return []
+    return [
+        (m, module)
+        for m, module in _all_applicable_classification_modules(req.domaine, off, trees)
+        if m not in tried
+    ]
 
 
 async def _attempt_classification(
@@ -166,6 +186,39 @@ async def _attempt_classification(
     except Exception as exc:  # noqa: BLE001 — dégradé en HTTPException par l'appelant
         logger.warning("Module de classification '%s' : erreur réseau (%s)", module_id, exc)
         return module_id, None, exc
+
+
+async def _run_classification_batch(
+    batch: list[tuple[str, TaxonomyModule]],
+    req: GenerateRequest,
+    options: GenerateOptions,
+    results: dict[str, tuple[Struct | None, Exception | None]],
+    started: float,
+) -> AsyncIterator[str]:
+    """Lance un lot de candidats de classification en parallèle, en écrivant chaque résultat
+    dans `results` au fil de l'eau — partagé par le lot initial et le repli réseau de
+    `_classification_network_fallback` dans `event_stream()`."""
+    for cid, _ in batch:
+        yield _sse(ModuleStatusEvent(module_id=cid, role="classification", status="running"))
+    tasks = [asyncio.create_task(_attempt_classification(cid, cm, req, options)) for cid, cm in batch]
+    for task in asyncio.as_completed(tasks):
+        module_id, resolved, exc = await task
+        results[module_id] = (resolved, exc)
+        if exc is not None:
+            status, message = "error", str(exc)
+        elif resolved is None:
+            status, message = "error", "taxon non trouvé"
+        else:
+            status, message = "found", None
+        yield _sse(
+            ModuleStatusEvent(
+                module_id=module_id,
+                role="classification",
+                status=status,
+                message=message,
+                duration_seconds=time.monotonic() - started,
+            )
+        )
 
 
 def _pick_classification_winner(
@@ -326,6 +379,14 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
     candidates = _classification_candidates(req, off, trees, priorities)
     attempts = await asyncio.gather(*(_attempt_classification(cid, cm, req, options) for cid, cm in candidates))
     results = {cid: (resolved, exc) for cid, resolved, exc in attempts}
+
+    fallback = _classification_network_fallback(req, off, trees, results)
+    if fallback:
+        fallback_attempts = await asyncio.gather(
+            *(_attempt_classification(cid, cm, req, options) for cid, cm in fallback)
+        )
+        results.update({cid: (resolved, exc) for cid, resolved, exc in fallback_attempts})
+
     successes = [cid for cid, (resolved, _) in results.items() if resolved is not None]
 
     if not successes:
@@ -369,7 +430,7 @@ def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
     return candidats
 
 
-def _auteur_majoritaire(struct: Struct) -> str:
+def _auteur_majoritaire(struct: Struct, classification_id: str) -> str:
     """Retient l'auteur que le plus de modules rapportent à l'identique, plutôt que celui du
     seul module de classification (qui peut très bien n'avoir rien trouvé alors qu'un module
     d'enrichissement, lui, a l'info — ex. classifier via OTL/iNaturalist, qui n'exposent pas
@@ -382,7 +443,9 @@ def _auteur_majoritaire(struct: Struct) -> str:
     même endroit que les autres modules."""
     classification_auteur = (struct.taxon.auteur or "").strip()
     candidats = [classification_auteur] if classification_auteur else []
-    for data in struct.liens.values():
+    for module_id, data in struct.liens.items():
+        if module_id == classification_id:
+            continue  # déjà compté via classification_auteur — sinon double voix pour ce module
         auteur = data.get("auteur")
         if auteur:
             candidats.append(auteur.strip())
@@ -459,7 +522,7 @@ def _assemble_response(
     if options.auteur_source and options.auteur_source in auteur_candidats:
         struct.taxon.auteur = auteur_candidats[options.auteur_source]
     else:
-        struct.taxon.auteur = _auteur_majoritaire(struct)
+        struct.taxon.auteur = _auteur_majoritaire(struct, classification_id)
     struct.taxon.auteur_resolu, auteur_warnings = resoudre_auteur_principal(struct)
     warnings = warnings + auteur_warnings
 
@@ -544,6 +607,7 @@ def _assemble_response(
         data_found=data_found,
         auteur_candidats=auteur_candidats,
         auteur_consolide=struct.taxon.auteur or "",
+        auteur_resolu=struct.taxon.auteur_resolu or "",
         synonymes=struct.synonymes.liste if struct.synonymes else [],
         synonymes_source=struct.synonymes.source if struct.synonymes else "",
         basionyme=struct.basionyme,
@@ -596,34 +660,19 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
         warnings: list[str] = []
 
         classification_started = time.monotonic()
-        for cid, _ in candidates:
-            yield _sse(ModuleStatusEvent(module_id=cid, role="classification", status="running"))
-
-        tasks = [asyncio.create_task(_attempt_classification(cid, cm, req, options)) for cid, cm in candidates]
         results: dict[str, tuple[Struct | None, Exception | None]] = {}
-        for task in asyncio.as_completed(tasks):
-            module_id, resolved, exc = await task
-            results[module_id] = (resolved, exc)
-            if exc is not None:
-                status, message = "error", str(exc)
-            elif resolved is None:
-                status, message = "error", "taxon non trouvé"
-            else:
-                status, message = "found", None
-            yield _sse(
-                ModuleStatusEvent(
-                    module_id=module_id,
-                    role="classification",
-                    status=status,
-                    message=message,
-                    duration_seconds=time.monotonic() - classification_started,
-                )
-            )
+        async for event in _run_classification_batch(candidates, req, options, results, classification_started):
+            yield event
+
+        fallback = _classification_network_fallback(req, off, trees, results)
+        if fallback:
+            async for event in _run_classification_batch(fallback, req, options, results, classification_started):
+                yield event
 
         # Ordre des candidats déclarés, pas `results` (rempli via `as_completed`, donc en ordre
         # d'arrivée réseau) — sinon le départage par priorité de `_pick_classification_winner`
         # devient non déterministe d'un appel à l'autre en cas d'égalité de priorité.
-        successes = [cid for cid, _ in candidates if results[cid][0] is not None]
+        successes = [cid for cid, _ in candidates + fallback if results[cid][0] is not None]
         if not successes:
             if all(exc is not None for _, exc in results.values()):
                 yield _sse(

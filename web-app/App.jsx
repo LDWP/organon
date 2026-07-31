@@ -281,6 +281,17 @@ function applyImageSelection(wikitext, fileName) {
   return wikitext.replace(IMAGE_PLACEHOLDER, fileName);
 }
 
+// Substitue l'auteur wikifié (GenerateResponse.auteur_resolu) de la source taxobox active par
+// celui d'une autre source déjà préchargée (voir auteurSourceOverride/handleAuteurSourceChange)
+// — sans nouvel appel réseau, sur le même principe que applyImageSelection : un remplacement de
+// texte sur le wikitexte déjà en cache plutôt qu'une regénération serveur.
+function applyAuteurOverride(wikitext, activeAuteurResolu, overrideAuteurResolu) {
+  if (!wikitext || !activeAuteurResolu || !overrideAuteurResolu || activeAuteurResolu === overrideAuteurResolu) {
+    return wikitext;
+  }
+  return wikitext.split(activeAuteurResolu).join(overrideAuteurResolu);
+}
+
 // Les blocs isolés (taxobox_wikitext, subtaxa_wikitext...) portent des retours à la ligne de
 // tête/fin qui ne servent qu'à les séparer proprement lors de la composition dans le wikitexte
 // complet (voir spliceBlock) — sans objet pour un aperçu isolé (onglets Taxobox/Sous-rangs/
@@ -447,11 +458,14 @@ export default function App() {
   }
 
   const classificationModules = modules.filter((m) => m.can_classify);
-  // Modules de classification encore en cours (jamais interrogés ou en vol) — sert à la puce de
-  // chargement sur l'onglet "Résultats".
-  const pendingModules = classificationModules.filter(
-    (m) => !resultsBySource[m.id] || resultsBySource[m.id].status === "loading"
-  );
+  // Sert à la puce de chargement sur l'onglet "Résultats" : un module non applicable au domaine
+  // du taxon (ex. AlgaeBase pour une bactérie) n'est jamais interrogé et n'aura donc jamais
+  // d'entrée dans resultsBySource — le compter comme "en attente" au même titre qu'un module
+  // réellement en vol faisait tourner la puce indéfiniment (elle ne se réglait alors que sur
+  // l'absence d'erreur globale, pas sur l'état réel des requêtes). Ne regarder que les entrées
+  // existantes en "loading" reflète l'état réel, quel que soit le sous-ensemble de modules
+  // effectivement sollicité pour ce domaine.
+  const hasPendingClassification = Object.values(resultsBySource).some((entry) => entry.status === "loading");
 
   // Consomme les événements de POST /api/v1/generate/stream (voir organon/api/routes/
   // generate.py) pour peupler le suivi module par module *de la source `moduleId` concernée*
@@ -502,9 +516,24 @@ export default function App() {
         { taxon: taxonName, domaine: domaineValue, classification: moduleId, gbif_key: gbifKey },
         { onEvent: (event) => handleGenerationEvent(moduleId, event) }
       );
+      // `data.classification_used` peut différer de `moduleId` : un choix explicite qui échoue
+      // au réseau peut désormais aboutir sur un autre module en repli (voir
+      // _classification_network_fallback, organon/api/routes/generate.py). Sans mettre aussi à
+      // jour la clé `moduleId` (celle passée à "loading" plus haut), elle resterait bloquée à
+      // "loading" indéfiniment — c'est ce qui faisait tourner la puce de chargement sans fin. Le
+      // suivi module par module (moduleStatuses) accumulé pendant tout le streaming reste, lui,
+      // sous la clé `moduleId` (handleGenerationEvent l'utilise depuis la fermeture ci-dessus) :
+      // sans le reporter aussi sous `data.classification_used`, l'onglet Données de la source
+      // gagnante resterait vide malgré un suivi réellement disponible.
       setResultsBySource((prev) => ({
         ...prev,
-        [data.classification_used]: { ...prev[data.classification_used], status: "ok", data },
+        [moduleId]: { ...prev[moduleId], status: "ok", data },
+        [data.classification_used]: {
+          ...prev[data.classification_used],
+          status: "ok",
+          data,
+          moduleStatuses: prev[moduleId]?.moduleStatuses,
+        },
       }));
       return { data };
     } catch (err) {
@@ -695,7 +724,12 @@ export default function App() {
     if (!query || !activeSource) return;
     const statuses = resultsBySource[activeSource]?.moduleStatuses || {};
     if (statuses[moduleId]?.role !== "enrichment") {
-      fetchSource(query.taxon, query.domaine, activeSource);
+      // Un candidat de classification en erreur (ex. GBIF) n'est pas forcément `activeSource` —
+      // depuis le repli parallèle entre classifications (voir _classification_candidates,
+      // organon/api/routes/generate.py), plusieurs candidats peuvent apparaître ici, un seul
+      // ayant gagné. Relancer `activeSource` au lieu du module cliqué re-régénérait la source
+      // déjà réussie au lieu de retenter celle réellement en échec.
+      fetchSource(query.taxon, query.domaine, moduleId);
       return;
     }
     const off = Object.entries(statuses)
@@ -713,6 +747,14 @@ export default function App() {
       }
     )
       .then((data) => {
+        // `classification: activeSource` est explicite, mais peut désormais aboutir sur un
+        // autre module en repli réseau (voir _classification_network_fallback,
+        // organon/api/routes/generate.py) si activeSource lui-même échoue sur cette relance.
+        // Fusionner quand même reviendrait à attribuer les données d'enrichissement d'une autre
+        // classification à activeSource — on abandonne la fusion ciblée dans ce cas plutôt que
+        // de corrompre le cache (fetchSource, appelé séparément pour le vrai gagnant, prend le
+        // relais normalement).
+        if (data.classification_used !== activeSource) return;
         setResultsBySource((prev) => {
           const prevData = prev[activeSource]?.data;
           if (!prevData) return prev;
@@ -1038,14 +1080,24 @@ export default function App() {
   const normalizeAuteur = (s) => s.trim().replace(/\s+/g, " ").replace(/\s*,\s*/g, ", ");
   const auteurValeurs = Object.values(auteurCandidats).filter(Boolean);
   const auteurVariantes = new Set(auteurValeurs.map(normalizeAuteur));
-  // À défaut de l'auteur rapporté par la source affichée, retombe sur le premier candidat connu
-  // (ex. la source active n'a elle-même pas rapporté d'auteur mais une autre source si). Un choix
-  // manuel dans la carte "Auteur" (voir auteurSourceOverride) prime sur ces deux repli.
+  // Par défaut, l'auteur déjà retenu par le vote majoritaire backend (`auteur_consolide`, celui
+  // wikifié dans le wikitexte via `auteur_resolu`) — pas le texte brut du seul module actif,
+  // qui peut perdre le vote (ex. Campylobacter : ITIS classe le taxon mais WRMS+INPN l'emportent
+  // sur l'auteur à 2 voix contre 1). Repli sur le texte brut du module actif puis le premier
+  // candidat connu si le vote n'a rien retenu. Un choix manuel dans la carte "Auteur" (voir
+  // auteurSourceOverride) prime sur tout le reste.
   const auteurAffiche =
     (auteurSourceOverride && auteurCandidats[auteurSourceOverride]) ||
+    activeData?.auteur_consolide ||
     auteurCandidats[activeSource] ||
     auteurValeurs[0] ||
     null;
+  // Version wikifiée de l'auteur choisi dans la carte "Auteur", pour applyAuteurOverride —
+  // uniquement disponible si cette source a déjà été préchargée (voir prefetchOtherClassifications).
+  const auteurOverrideResolu =
+    auteurSourceOverride && resultsBySource[auteurSourceOverride]?.status === "ok"
+      ? resultsBySource[auteurSourceOverride].data.auteur_resolu
+      : null;
 
   // Remplace, dans les lignes propres à la source taxobox affichée, celles dont le rang est
   // contesté par au moins une autre source par un {{Taxobox conflit}} listant chaque nom
@@ -1118,7 +1170,9 @@ export default function App() {
   // Seule "tout" reste un texte de repli terminal, jamais décomposé en retour vers les autres
   // zones : un texte libre ne peut pas être reparsé de façon fiable en blocs structurés, alors
   // que l'inverse (structuré -> texte) est un simple remplacement de bloc.
-  const effectiveTaxoboxWikitext = manualOverrides.taxobox ?? (taxoboxData?.taxobox_wikitext || "");
+  const effectiveTaxoboxWikitext =
+    manualOverrides.taxobox ??
+    applyAuteurOverride(taxoboxData?.taxobox_wikitext || "", taxoboxData?.auteur_resolu, auteurOverrideResolu);
   const effectiveSubtaxaWikitextForTout = manualOverrides.subrangs ?? effectiveSubtaxaWikitext;
   const effectiveReferencesWikitextForTout = manualOverrides.references ?? checkedReferencesWikitext;
 
@@ -1150,7 +1204,13 @@ export default function App() {
     tout: finalWikitext,
     taxobox:
       manualOverrides.taxobox ??
-      trimBlockForDisplay(applyRankConflicts(taxoboxData?.taxobox_wikitext || "", taxoboxData?.rank_lines)),
+      trimBlockForDisplay(
+        applyAuteurOverride(
+          applyRankConflicts(taxoboxData?.taxobox_wikitext || "", taxoboxData?.rank_lines),
+          taxoboxData?.auteur_resolu,
+          auteurOverrideResolu
+        )
+      ),
     subrangs: manualOverrides.subrangs ?? trimBlockForDisplay(effectiveSubtaxaWikitext || ""),
     references: manualOverrides.references ?? trimBlockForDisplay(checkedReferencesWikitext),
   };
@@ -1495,7 +1555,7 @@ export default function App() {
                     onClick={() => setResultView(id)}
                   >
                     {label}
-                    {id === "wikitexte" && !submitError && pendingModules.length > 0 && (
+                    {id === "wikitexte" && !submitError && hasPendingClassification && (
                       <ModuleStatusIcon status="running" />
                     )}
                   </button>
@@ -1779,7 +1839,7 @@ export default function App() {
                 {resultView === "noms" && (
                   <div className="panel">
                     <div className="panel-head">
-                      <span className="t">Noms &amp; synonymes — {activeSource ? activeSource.toUpperCase() : "…"}</span>
+                      <span className="t">Noms &amp; synonymes</span>
                     </div>
                     {!activeData ? (
                       <p className="panel-empty">Aucune donnée disponible pour le moment.</p>

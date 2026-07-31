@@ -127,6 +127,12 @@ class GenerateResponse(BaseModel):
     """`struct.taxon.auteur` une fois le vote majoritaire (ou l'imposition manuelle via
     `auteur_source`) tranché — même valeur que celle wikifiée dans `wikitext`, mais en texte
     brut : `auteur_candidats` donne le détail par module, celui-ci donne le résultat retenu."""
+    auteur_resolu: str = ""
+    """`struct.taxon.auteur_resolu` — version wikifiée (liens `{{auteur|...}}`, années liées) de
+    `auteur_consolide`, telle qu'insérée dans le bloc `{{Taxobox taxon | ...}}` de `wikitext`.
+    Exposée séparément pour que le frontend puisse reprendre l'auteur déjà wikifié d'une autre
+    classification déjà préchargée (voir `resultsBySource` côté web-app) sans reconstruire le
+    wikilinking à la main côté client."""
     synonymes: list[RankName] = []
     """`struct.synonymes.liste`, si un module en a rapporté (voir `synonymes_source`) —
     déjà collecté pour alimenter la section "Systématique" du wikitexte, ici exposé structuré."""
