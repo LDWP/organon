@@ -51,8 +51,9 @@ NO_RESOLUTION_REGNES = {"virus"}
 
 _YEAR_RE = re.compile(r"^(1[3-9]\d\d|20\d\d)$")
 
+# Reconnaît aussi "et al." déjà wikifié ({{et al.}}) pour ne pas le redécouper.
 _SPECIAL_WORD_RE = re.compile(
-    r"(?<![\w'])(et al\.|and|emend\.|et non|nom\. nov\.|nom\. cons\.|corrig\.|ex\.|ex|in\.|in)(?![\w'])",
+    r"(?<![\w'])(\{\{et al\.\}\}|et al\.|and|emend\.|et non|nom\. nov\.|nom\. cons\.|corrig\.|ex\.|ex|in\.|in)(?![\w'])",
     re.IGNORECASE,
 )
 _SPECIAL_NORMALIZE = {"and": "&", "et al.": "{{et al.}}"}
