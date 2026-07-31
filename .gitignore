@@ -11,7 +11,6 @@ web-app/dev.cmd
 /docs
 /tests
 /scripts
-/organon/vexp.toml
 
 # Tout dossier commençant par un point reste local (config d'outils divers, jamais poussé).
 .*/
