@@ -38,13 +38,11 @@ class ItisModule(TaxonomyModule):
         if not results:
             return None
 
-        match = results[0]
-        if len(results) > 1:
-            exact = next((sn for sn in results if sn.get("combinedName") == taxon), None)
-            if exact is not None:
-                match = exact
-
-        if not match.get("tsn"):
+        # searchByScientificName fait une recherche floue (ex. "Boletus" retourne des espèces
+        # dont l'épithète est "boletus" dans d'autres genres, toutes règnes confondus) : sans ce
+        # filtre, `results[0]` peut être un taxon homonyme sans rapport avec un règne erroné.
+        match = next((sn for sn in results if sn.get("combinedName") == taxon), None)
+        if match is None or not match.get("tsn"):
             return None
         tsn = match["tsn"]
 
