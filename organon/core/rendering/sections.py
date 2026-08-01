@@ -138,7 +138,8 @@ def render_taxobox(struct: Struct, options: GenerateOptions, ebauche: list[str])
     resu += f"{{{{Taxobox taxon | {regne} | {rang} | {taxon} | {auteur}{eteint} }}}}\n"
 
     uicn = struct.liens.get("uicn")
-    if uicn and uicn.get("risque"):
+    est_espece_ou_inf = rang == "espèce" or wp_rang_plus_specifique(rang, "espèce")
+    if uicn and uicn.get("risque") and est_espece_ou_inf:
         critere = uicn.get("critere", "")
         resu += f"{{{{Taxobox UICN | {uicn['risque']} | {critere} }}}}\n"
 
