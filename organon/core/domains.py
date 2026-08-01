@@ -44,6 +44,7 @@ def _base_tree(accepte: bool) -> DomainTree:
                 "poisson": DomainNode(accepte),
                 "mammifère": DomainNode(accepte),
                 "amphibien": DomainNode(accepte),
+                "arachnide": DomainNode(accepte),
             },
         ),
         "archaea": DomainNode(accepte),

@@ -46,7 +46,11 @@ def _format_auteur_wsc(row: dict) -> str | None:
 
 class WscModule(TaxonomyModule):
     meta = ModuleMeta(
-        id="wsc", can_classify=True, can_render_external_link=False, domains="all", priority=990
+        id="wsc",
+        can_classify=True,
+        can_render_external_link=False,
+        domains=["arachnide"],
+        priority=990,
     )
 
     def __init__(self, adapter: WscAdapter | None = None) -> None:
