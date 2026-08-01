@@ -33,13 +33,16 @@ from __future__ import annotations
 from organon.core.config import GenerateOptions
 from organon.core.models import Basionym, RankName, Redirection, Struct, SynonymList, TaxonInfo
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, format_auteur, simple_debug_link
 from organon.modules.indexfungorum.adapter import IndexFungorumAdapter
 from organon.modules.indexfungorum.ranks import CLASSIFICATION_LADDER, UNRESOLVED_PLACEHOLDER, ixf_rang, ixf_regne
 
 MAX_NUMBER = 50
+
+_ESPECE_RANGS = {"espèce", "sous-espèce", "variété", "forme"}
+"""Rangs mappés sur `{{Fungorum espèce}}` — le genre et la famille ont chacun leur propre
+modèle, tout rang au-dessus de la famille retombe sur `{{Fungorum suprafamille}}`."""
 
 
 class IndexFungorumModule(TaxonomyModule):
@@ -149,22 +152,33 @@ class IndexFungorumModule(TaxonomyModule):
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        """Aucun modèle "Index Fungorum" sur Wikipédia en français (vérifié en direct via
-        l'API MediaWiki — 0 résultat dans l'espace de noms Modèle) : `{{Lien web}}` générique,
-        même convention que OTL/iNaturalist."""
+        """Quatre modèles dédiés selon le rang (`{{Fungorum espèce}}`, `{{Fungorum genre}}`,
+        `{{Fungorum famille}}`, `{{Fungorum suprafamille}}` pour tout rang au-dessus de la
+        famille), même signature positionnelle sur les quatre : `id | nom | auteur | validité`
+        (`nom` sans italique — géré par le modèle lui-même, contrairement à `wp_met_italiques`
+        utilisé pour les autres modules)."""
         data = struct.liens.get("indexfungorum")
         if not data or "id" not in data:
             return None
         cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], data.get("rang", struct.taxon.rang), struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        post = " <small>(non valide)</small>" if data.get("synonyme") else ""
-        url = f"http://www.indexfungorum.org/names/NamesRecord.asp?RecordID={data['id']}"
-        return (
-            f"{{{{Lien web | langue=en | titre={cible} | url={url} "
-            f"| site=Index Fungorum | consulté le={cdate} }}}}{post}"
-        )
+        rang = data.get("rang") or struct.taxon.rang
+        if rang in _ESPECE_RANGS:
+            modele = "Fungorum espèce"
+        elif rang == "genre":
+            modele = "Fungorum genre"
+        elif rang == "famille":
+            modele = "Fungorum famille"
+        else:
+            modele = "Fungorum suprafamille"
+        auteur = data.get("auteur", "")
+        validite = "nv" if data.get("synonyme") else ""
+        champs = [data["id"], data["nom"]]
+        if auteur or validite:
+            champs.append(auteur)
+        if validite:
+            champs.append(validite)
+        corps = " | ".join(champs)
+        return f"{{{{{modele} | {corps} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
         return simple_debug_link(
