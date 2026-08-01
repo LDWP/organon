@@ -66,7 +66,11 @@ from organon.core.rendering.engine import (
 from organon.core.rendering.sections import compute_rank_lines
 from organon.core.rendering.support import ajoute_si_besoin, data_pays_code
 from organon.core.selectors.categorization import compute_fin_liens
-from organon.core.selectors.coherence import detect_regne_incoherences, reference_module_coherente
+from organon.core.selectors.coherence import (
+    classification_regne_coherents,
+    detect_regne_incoherences,
+    reference_module_coherente,
+)
 from organon.modules.bootstrap import ensure_modules_registered
 
 router = APIRouter()
@@ -222,20 +226,51 @@ async def _run_classification_batch(
 
 
 def _pick_classification_winner(
-    domaine: str, successes: list[str], trees: dict[str, DomainTree], priorities: dict[str, int]
-) -> str:
+    domaine: str,
+    successes: list[str],
+    trees: dict[str, DomainTree],
+    priorities: dict[str, int],
+    results: dict[str, tuple[Struct | None, Exception | None]],
+) -> tuple[str, list[str]]:
     """Départage les modules de classification ayant réussi — par spécialisation au domaine
     demandé (`meilleure_classification`), ou par simple priorité quand cette notion ne
-    s'applique pas (`domaine == "*"`, ou un seul succès)."""
-    if len(successes) == 1 or domaine == "*":
-        return max(successes, key=lambda m: priorities.get(m, 0))
-    return meilleure_classification(
+    s'applique pas (`domaine == "*"`, ou un seul candidat retenu).
+
+    Écarte d'abord les candidats dont le règne est minoritaire face aux autres candidats
+    (`classification_regne_coherents` — voir docstring pour la définition de majorité retenue) :
+    un module plus spécialisé ou prioritaire ne doit pas l'emporter au détriment de la
+    cohérence globale si son résultat est un homonyme inter-règnes minoritaire. Retourne
+    également la liste des candidats ainsi écartés, pour que l'appelant en informe l'utilisateur
+    plutôt que de les faire disparaître silencieusement."""
+    regnes = {cid: results[cid][0].regne for cid in successes if results[cid][0] is not None}
+    coherents, exclus = classification_regne_coherents(successes, regnes)
+    pool = coherents or successes
+
+    if len(pool) == 1 or domaine == "*":
+        return max(pool, key=lambda m: priorities.get(m, 0)), exclus
+    winner = meilleure_classification(
         domaine,
-        classification_module_ids=successes,
+        classification_module_ids=pool,
         module_trees=trees,
         module_priorities=priorities,
         default_module=default_classification_module(),
     )
+    return winner, exclus
+
+
+def _avertissements_exclusion_regne(
+    exclus: list[str], results: dict[str, tuple[Struct | None, Exception | None]]
+) -> list[str]:
+    """Un candidat de classification écarté par `_pick_classification_winner` pour règne
+    minoritaire a bel et bien trouvé quelque chose (ex. ITIS retrouvant un homonyme bactérien
+    pour un genre de champignon) — le signaler plutôt que le faire disparaître silencieusement,
+    au même titre que les autres avertissements affichés dans le panneau Données."""
+    return [
+        f"{cid.upper()} écarté de la classification : règne « {results[cid][0].regne} » minoritaire "
+        f"face aux autres sources (possible homonyme inter-règnes)."
+        for cid in exclus
+        if results[cid][0] is not None
+    ]
 
 
 @dataclass
@@ -398,9 +433,10 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
             404, detail=f"Taxon « {req.taxon} » non trouvé (classifications essayées : {', '.join(sorted(results))})."
         )
 
-    classification_id = _pick_classification_winner(req.domaine, successes, trees, priorities)
+    classification_id, exclus_regne = _pick_classification_winner(req.domaine, successes, trees, priorities, results)
     struct = results[classification_id][0]
     logs.append(f"Classification : {classification_id}")
+    warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
 
     applicable = modules_possibles(struct.domaine, trees) or []
     runner = EnrichmentRunner(struct, classification_id, applicable, off, options, priorities)
@@ -706,8 +742,11 @@ async def generate_stream(req: GenerateRequest) -> StreamingResponse:
                 )
             return
 
-        classification_id = _pick_classification_winner(req.domaine, successes, trees, priorities)
+        classification_id, exclus_regne = _pick_classification_winner(
+            req.domaine, successes, trees, priorities, results
+        )
         logs.append(f"Classification : {classification_id}")
+        warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
         struct = results[classification_id][0]
 
         applicable = modules_possibles(struct.domaine, trees) or []

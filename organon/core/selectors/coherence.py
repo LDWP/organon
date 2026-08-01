@@ -11,6 +11,8 @@ partir de `Struct` déjà résolu — donc il vit ici plutôt que dans `organon.
 
 from __future__ import annotations
 
+from collections import Counter
+
 from organon.core.domains import build_module_domain_tree, rec_strict_domaine
 from organon.core.models import RegneIncoherence, Struct
 from organon.core.registry import get_module
@@ -36,6 +38,32 @@ def detect_regne_incoherences(struct: Struct, classification_id: str) -> list[Re
                 RegneIncoherence(module=module_id, regne_suggere=regne_detecte, regne_retenu=struct.regne)
             )
     return incoherences
+
+
+def classification_regne_coherents(
+    successes: list[str], regnes: dict[str, str]
+) -> tuple[list[str], list[str]]:
+    """Sépare les modules de classification ayant réussi entre ceux dont le règne rejoint la
+    majorité et ceux qui s'en écartent — un homonyme inter-règnes (ex. "Morus" : mûrier chez les
+    botanistes, fou de Bassan chez les zoologistes, voir le module-docstring) ne doit pas
+    l'emporter sur `meilleure_classification` au seul motif d'une spécialisation ou priorité de
+    module plus élevée que la majorité des autres sources.
+
+    Ne tranche que sur une VRAIE majorité (règne présent dans plus de la moitié des candidats
+    au règne connu) : à égalité ou en dessous, la situation est ambiguë (pas assez de signal
+    pour désigner un outlier) et aucun candidat n'est exclu. Règne vide/"neutre" : aucun signal
+    fiable, candidat toujours conservé quel que soit le résultat de la majorité."""
+    signalles = {cid: regnes[cid] for cid in successes if regnes.get(cid) and regnes[cid] != _REGNE_INCONNU}
+    if len(signalles) < 2:
+        return successes, []
+
+    regne_majoritaire, effectif_majoritaire = Counter(signalles.values()).most_common(1)[0]
+    if effectif_majoritaire * 2 <= len(signalles):
+        return successes, []
+
+    exclus = [cid for cid in successes if signalles.get(cid, regne_majoritaire) != regne_majoritaire]
+    coherents = [cid for cid in successes if cid not in exclus]
+    return coherents, exclus
 
 
 def reference_module_coherente(module_id: str, regne: str) -> bool:
