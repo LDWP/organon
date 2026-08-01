@@ -100,6 +100,27 @@ def extract_aphia_original_description(html_page: str) -> str | None:
     return texte or None
 
 
+def filter_ancestors_above_regne(
+    chain: list[dict], regne_nom: str, garder_regne: bool
+) -> list[dict]:
+    """Coupe une chaîne d'ancêtres (racine -> feuille, nom sous la clé `scientificname`) à
+    hauteur du règne : tout nœud au règne ou au-dessus (domaine, super-domaine, `Biota`...) est
+    écarté, quel que soit le rang que la source lui déclare (`Superdomain`, `Kingdom`,
+    `Clade`...) — seule la position dans l'arbre, repérée par le nom de règne déjà connu
+    (`regne_nom`, ex. `cur["kingdom"]`), fait foi. Partagé par WoRMS et IRMNG (même plateforme
+    Aphia, même forme d'arbre imbriqué — voir `_flatten_classification` dans chaque module.py).
+    Si `regne_nom` n'apparaît dans aucun nœud (cas non rencontré en pratique), la chaîne est
+    renvoyée telle quelle. `garder_regne` réintroduit le nœud du règne lui-même (algue/protiste,
+    voir CHARTES_GARDENT_REGNE)."""
+    boundary = next(
+        (i for i, node in enumerate(chain) if node.get("scientificname") == regne_nom), None
+    )
+    if boundary is None:
+        return chain
+    reste = chain[boundary + 1 :]
+    return [chain[boundary], *reste] if garder_regne else reste
+
+
 def simple_debug_link(struct: Struct, module_id: str, url_template: str, label: str) -> str | None:
     """Lien brut vers la fiche du taxon sur le site source, construit à partir de
     l'identifiant stocké dans `struct.liens[module_id]['id']`. `url_template` utilise `{id}`

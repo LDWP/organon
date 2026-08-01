@@ -23,9 +23,16 @@ from organon.core.models import Basionym, RankName, Redirection, Struct, SubTaxo
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, collect_pages, format_auteur, simple_debug_link
+from organon.modules.common import (
+    MAX_SYNONYM_HOPS,
+    as_limit,
+    collect_pages,
+    filter_ancestors_above_regne,
+    format_auteur,
+    simple_debug_link,
+)
 from organon.modules.irmng.adapter import IrmngAdapter
-from organon.modules.irmng.ranks import CHARTES_GARDENT_REGNE, RANGS_REGNE, irmng_charte, irmng_rang
+from organon.modules.irmng.ranks import CHARTES_GARDENT_REGNE, irmng_charte, irmng_rang
 
 PAGE_SIZE = 50
 
@@ -110,11 +117,12 @@ class IrmngModule(TaxonomyModule):
         classification_tree = await adapter.classification_by_id(irmng_id)
         rangs: list[RankName] = []
         if classification_tree is not None:
-            chain = _flatten_classification(classification_tree)
-            for node in chain[:-1]:  # le dernier élément est le taxon lui-même
+            chain = _flatten_classification(classification_tree)[:-1]  # le dernier est le taxon lui-même
+            chain = filter_ancestors_above_regne(
+                chain, cur["kingdom"], struct.regne in CHARTES_GARDENT_REGNE
+            )
+            for node in chain:
                 rang_wp = irmng_rang(node.get("rank") or "")
-                if rang_wp in RANGS_REGNE and struct.regne not in CHARTES_GARDENT_REGNE:
-                    continue
                 rangs.append(RankName(nom=node["scientificname"], rang=rang_wp))
             rangs.reverse()
         struct.rangs = rangs
