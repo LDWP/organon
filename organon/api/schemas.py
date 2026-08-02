@@ -156,6 +156,13 @@ class GenerateResponse(BaseModel):
     """Pour chaque module ayant rapporté une répartition géographique, la liste (triée,
     dédupliquée) des noms de pays qu'il rapporte — fusion de `DistributionEntry.certain` et
     `.uncertain` (la distinction n'est pas utile à ce niveau d'affichage synthétique)."""
+    external_ids: dict[str, str] = {}
+    """Pour chaque module ayant contribué à cette génération, son identifiant du taxon dans la
+    base qu'il interroge (`struct.liens[module_id]['id']`, converti en texte) — pendant
+    structuré des identifiants déjà présents mais noyés dans `external_links` (HTML) et
+    `reference_items` (wikitext). Absent pour un module qui a contribué sans porter
+    d'identifiant propre au taxon (ex. `externe`, ou `col` en cas d'homonymie non résolue, voir
+    `_compute_external_ids`)."""
 
 
 class ModuleStatusEvent(BaseModel):

@@ -456,6 +456,16 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
     )
 
 
+@router.get("/generate", response_model=GenerateResponse)
+async def generate_via_get(taxon: str) -> GenerateResponse:
+    """Alias GET de `POST /generate`, avec uniquement `taxon` en paramètre de requête (toutes
+    les autres options à leur valeur par défaut) — pour pouvoir déclencher une génération
+    depuis un simple lien ou la barre d'adresse d'un navigateur, sans construire de corps JSON.
+    Le frontend continue d'utiliser `POST /generate`/`POST /generate/stream`, qui exposent
+    l'intégralité de `GenerateOptions`."""
+    return await generate(GenerateRequest(taxon=taxon))
+
+
 def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
     """Auteur brut rapporté par chaque module ayant contribué à ce taxon, avant vote majoritaire
     — exposé via `GenerateResponse.auteur_candidats` pour permettre à l'utilisateur d'imposer une
@@ -541,6 +551,26 @@ def _compute_data_found(struct: Struct, classification_id: str) -> dict[str, lis
             add(module_id, "Auteur")
 
     return found
+
+
+def _compute_external_ids(struct: Struct, ran_modules: list[str]) -> dict[str, str]:
+    """Identifiant du taxon par module ayant contribué à cette génération — convention
+    `struct.liens[module_id]['id']` suivie par la quasi-totalité des modules (voir
+    `organon.modules.common.simple_debug_link`). Seule exception : `col`, qui porte son
+    identifiant sous `liens['col']['bundles'][0]['id']` (une entrée par homonyme non résolu,
+    voir `col/module.py:104`) — on retient le premier, comme le fait déjà `debug_link` pour
+    l'affichage. Un module dont l'entrée ne porte ni l'un ni l'autre (ex. `externe`, qui ne
+    référence aucune base externe propre) est simplement absent du résultat."""
+    ids: dict[str, str] = {}
+    for module_id in ran_modules:
+        data = struct.liens.get(module_id)
+        if not isinstance(data, dict):
+            continue
+        if data.get("id"):
+            ids[module_id] = str(data["id"])
+        elif data.get("bundles"):
+            ids[module_id] = str(data["bundles"][0]["id"])
+    return ids
 
 
 def _repli_eteint(struct: Struct) -> None:
@@ -678,6 +708,7 @@ def _assemble_response(
         regne_incoherences=regne_incoherences,
         milieu=struct.milieu or "",
         distribution=distribution_merged,
+        external_ids=_compute_external_ids(struct, ran_modules),
     )
 
 
