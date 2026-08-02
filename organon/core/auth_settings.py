@@ -69,6 +69,14 @@ class AuthSettings(BaseSettings):
     wikidata_api_url: str = "https://www.wikidata.org/w/api.php"
     wikidata_edit_enabled: bool = False
 
+    # LPSN (organon.modules.lpsn, classification bactéries/archées) — contrairement aux autres
+    # sources REST du projet, LPSN exige un compte DSMZ enregistré individuellement (gratuit,
+    # https://register.lpsn.dsmz.de/) : pas de jeton public partageable comme pour Tropicos.
+    # Vides par défaut -> le module échoue proprement (échec d'authentification) tant que ces
+    # deux variables ne sont pas positionnées, plutôt que d'embarquer un identifiant en dur.
+    lpsn_username: str = ""
+    lpsn_password: str = ""
+
 
 _settings: AuthSettings | None = None
 

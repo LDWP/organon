@@ -509,10 +509,10 @@ categories:
         nom: "List of Prokaryotic Names with Standing in Nomenclature (LPSN)"
         url: "https://api.lpsn.dsmz.de"
         statut: contact_requis
-        classification: {possible: true, estime: false, detail: "côté PHP"}
-        elements_recoltes: []
-        acces: {type: contact_requis, detail: "API REST réelle confirmée (api.lpsn.dsmz.de) mais compte enregistré requis (401 sans identifiants)"}
-        derniere_maj: null
+        classification: {possible: true, estime: false, detail: "organon.modules.lpsn — bloqué en pratique tant qu'un compte DSMZ n'est pas configuré (voir acces)"}
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", basionyme, "taxon-type", identifiant]
+        acces: {type: contact_requis, detail: "API REST réelle (api.lpsn.dsmz.de, auth Keycloak) ; compte DSMZ requis (ORGANON_LPSN_USERNAME/ORGANON_LPSN_PASSWORD, inscription gratuite sur register.lpsn.dsmz.de)"}
+        derniere_maj: "2026-08-02"
       - id: gtdb
         nom: "Genome Taxonomy Database (GTDB)"
         url: null
