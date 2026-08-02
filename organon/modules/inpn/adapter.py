@@ -11,7 +11,13 @@ la chance que l'entrée exacte soit présente ; la sélection stricte par `cdNom
 Fiche détail (`GET .../taxa/{cdNom}`) : page HTML (JSP), pas de JSON. Aucun endpoint
 équivalent à `getFullHierarchyFromTSN` (ITIS, un seul appel pour toute la lignée) n'a été
 trouvé : le fil d'Ariane de cette page donne les ancêtres (nom, id) en un seul appel, mais pas
-leur rang — resolu ancêtre par ancêtre via `search()` côté module.py."""
+leur rang — resolu ancêtre par ancêtre via `search()` côté module.py.
+
+WAF côté taxref.mnhn.fr : renvoie 403 sur l'IP Toolforge avec le `User-Agent` par défaut de
+httpx (`python-httpx/...`), alors que le même appel passe sans problème depuis un poste de
+développement classique (vérifié en direct) — même symptôme que POWO (voir
+`organon.modules.powo.adapter`), un WAF qui cible les signatures de client HTTP non-navigateur
+plutôt que l'IP seule. `_BROWSER_HEADERS` imite un navigateur pour contourner ce filtrage."""
 
 from __future__ import annotations
 
@@ -21,6 +27,14 @@ import httpx
 
 API_BASE = "https://taxref.mnhn.fr/taxref-web/api"
 WEB_BASE = "https://taxref.mnhn.fr/taxref-web"
+
+_BROWSER_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/138 Safari/537.36"
+    ),
+    "Accept": "application/json, text/html, */*",
+}
 
 _BREADCRUMB_RE = re.compile(r'<a href="/taxref-web/taxa/(?P<id>\d+)">(?P<nom>[^<]+)</a>\s*&rsaquo;')
 _VERNACULAR_BLOCK_RE = re.compile(
@@ -35,7 +49,7 @@ _VERNACULAR_ENTRY_RE = re.compile(
 
 class InpnAdapter:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
+        self._client = client or httpx.AsyncClient(timeout=10.0, headers=_BROWSER_HEADERS)
         self._owns_client = client is None
 
     async def aclose(self) -> None:
