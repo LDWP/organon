@@ -153,11 +153,21 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
   background: var(--bg-alt); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; cursor: pointer;
 }
 .search-mode-toggle button.on { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+.mode-help-wrap { position: relative; display: inline-flex; }
 .mode-help {
   display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;
   border-radius: 50%; border: 1px solid var(--line); color: var(--ink-soft); font-size: 11px;
-  font-family: var(--mono); cursor: help; user-select: none;
+  font-family: var(--mono); cursor: pointer; user-select: none; background: var(--bg-alt); padding: 0;
 }
+.mode-help[aria-expanded="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); }
+.mode-help-popover {
+  position: absolute; z-index: 3; top: calc(100% + 8px); left: 0; width: max(240px, min(320px, 80vw));
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  padding: 12px 14px;
+}
+.mode-help-popover p { margin: 0 0 8px; font-size: 12px; line-height: 1.5; color: var(--ink); }
+.mode-help-popover p:last-child { margin-bottom: 0; }
+.mode-help-popover strong { color: var(--accent); }
 
 
 /* position + pile d'empilement propres : le formulaire ne doit jamais peindre

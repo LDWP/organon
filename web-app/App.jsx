@@ -354,6 +354,10 @@ export default function App() {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const autocompleteTimer = useRef(null);
   const inputRef = useRef(null);
+  // Popover d'aide sur les modes de recherche : au clic (et non plus seulement au survol via
+  // `title`), pour rester accessible au tactile où il n'existe pas de hover.
+  const [modeHelpOpen, setModeHelpOpen] = useState(false);
+  const modeHelpRef = useRef(null);
   const [initialLoading, setInitialLoading] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [activeSource, setActiveSource] = useState(null);
@@ -448,6 +452,22 @@ export default function App() {
       /* pas grave si la préférence ne peut pas être sauvegardée */
     }
   }, [theme, storageConsent]);
+
+  useEffect(() => {
+    if (!modeHelpOpen) return;
+    function handlePointerDown(event) {
+      if (modeHelpRef.current && !modeHelpRef.current.contains(event.target)) setModeHelpOpen(false);
+    }
+    function handleKeyDown(event) {
+      if (event.key === "Escape") setModeHelpOpen(false);
+    }
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [modeHelpOpen]);
 
   function handleAcceptStorage() {
     setStorageConsent("accepted");
@@ -720,6 +740,7 @@ export default function App() {
     setSearchMode(mode);
     setAutocompleteOpen(false);
     setAutocompleteMatches([]);
+    setModeHelpOpen(false);
   }
 
   function handleSubmit(event) {
@@ -1414,16 +1435,25 @@ export default function App() {
           >
             Autocomplétion
           </button>
-          <span
-            className="mode-help"
-            aria-label="Différence entre les modes de recherche"
-            title={
-              "Mot-clé : recherche directe (nom vernaculaire, scientifique ou nom+auteur) — lance la génération tout de suite, sans liste.\n" +
-              "Liste : affiche les taxons correspondants pour choisir le bon avant de générer.\n" +
-              "Autocomplétion : suggestions de taxons en temps réel pendant la saisie."
-            }
-          >
-            ?
+          <span className="mode-help-wrap" ref={modeHelpRef}>
+            <button
+              type="button"
+              className="mode-help"
+              aria-label="Différence entre les modes de recherche"
+              aria-haspopup="true"
+              aria-expanded={modeHelpOpen}
+              aria-controls="mode-help-popover"
+              onClick={() => setModeHelpOpen((open) => !open)}
+            >
+              ?
+            </button>
+            {modeHelpOpen && (
+              <div className="mode-help-popover" id="mode-help-popover" role="region" aria-label="Différence entre les modes de recherche">
+                <p><strong>Mot-clé</strong> : recherche directe (nom vernaculaire, scientifique ou nom+auteur) — lance la génération tout de suite, sans liste.</p>
+                <p><strong>Liste</strong> : affiche les taxons correspondants pour choisir le bon avant de générer.</p>
+                <p><strong>Autocomplétion</strong> : suggestions de taxons en temps réel pendant la saisie.</p>
+              </div>
+            )}
           </span>
         </div>
 
