@@ -151,6 +151,33 @@ class GbifModule(TaxonomyModule):
         if iucn and iucn.get("code"):
             struct.liens["uicn"] = {"risque": iucn["code"]}
 
+        # Même raison que le bloc IUCN ci-dessus : les noms vernaculaires (`struct.vernaculaire`,
+        # namespacé par module, fusionné sans conflit avec les autres sources — voir
+        # `EnrichmentRunner.run`) ne doivent pas dépendre de savoir si GBIF pilote ou non la
+        # classification, sous peine de dépendre arbitrairement du module qui a gagné la
+        # classification (constaté en direct : absents dès que GBIF tourne en enrichissement
+        # derrière une autre source gagnante).
+        taxref_noms: list[str] = []
+
+        async def fetch_vernacular(offset: int) -> tuple[list[str], bool]:
+            page = await adapter.vernacular_names_page(key, offset)
+            results = [c for c in page.get("results", []) if c.get("language") == "fra"]
+            taxref_noms.extend(
+                _html.unescape(c["vernacularName"]) for c in results if c.get("source") == "TAXREF"
+            )
+            names = [_html.unescape(c["vernacularName"]) for c in results]
+            return names, page.get("endOfRecords", True)
+
+        vernaculaire, _ = await collect_pages(fetch_vernacular)
+        if vernaculaire:
+            struct.vernaculaire["GBIF"] = vernaculaire
+        if taxref_noms:
+            # Le référentiel MNHN/TAXREF (source de "INPN") est indisponible en accès direct
+            # (attaque informatique sur les serveurs du MNHN, durée indéterminée) : GBIF
+            # réexpose déjà ces mêmes noms via son propre endpoint (source="TAXREF" dans sa
+            # réponse), en secours le temps que taxref.mnhn.fr soit de nouveau joignable.
+            struct.vernaculaire["INPN"] = taxref_noms
+
         accepted_key = cur.get("acceptedKey")
         is_synonym = accepted_key is not None and accepted_key != key
         if is_synonym:
@@ -235,27 +262,6 @@ class GbifModule(TaxonomyModule):
             liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
             if liste:
                 struct.sous_taxons = SubTaxonList(liste=liste, source="GBIF", coupe=coupe)
-
-        taxref_noms: list[str] = []
-
-        async def fetch_vernacular(offset: int) -> tuple[list[str], bool]:
-            page = await adapter.vernacular_names_page(key, offset)
-            results = [c for c in page.get("results", []) if c.get("language") == "fra"]
-            taxref_noms.extend(
-                _html.unescape(c["vernacularName"]) for c in results if c.get("source") == "TAXREF"
-            )
-            names = [_html.unescape(c["vernacularName"]) for c in results]
-            return names, page.get("endOfRecords", True)
-
-        vernaculaire, _ = await collect_pages(fetch_vernacular)
-        if vernaculaire:
-            struct.vernaculaire["GBIF"] = vernaculaire
-        if taxref_noms:
-            # Le référentiel MNHN/TAXREF (source de "INPN") est indisponible en accès direct
-            # (attaque informatique sur les serveurs du MNHN, durée indéterminée) : GBIF
-            # réexpose déjà ces mêmes noms via son propre endpoint (source="TAXREF" dans sa
-            # réponse), en secours le temps que taxref.mnhn.fr soit de nouveau joignable.
-            struct.vernaculaire["INPN"] = taxref_noms
 
         async def fetch_synonyms(offset: int) -> tuple[list[RankName], bool]:
             page = await adapter.synonyms_page(key, offset)
