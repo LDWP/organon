@@ -42,12 +42,14 @@ def detect_regne_incoherences(struct: Struct, classification_id: str) -> list[Re
 
 def classification_regne_coherents(
     successes: list[str], regnes: dict[str, str]
-) -> tuple[list[str], list[str]]:
+) -> tuple[list[str], list[str], str | None]:
     """Sépare les modules de classification ayant réussi entre ceux dont le règne rejoint la
     majorité et ceux qui s'en écartent — un homonyme inter-règnes (ex. "Morus" : mûrier chez les
     botanistes, fou de Bassan chez les zoologistes, voir le module-docstring) ne doit pas
     l'emporter sur `meilleure_classification` au seul motif d'une spécialisation ou priorité de
-    module plus élevée que la majorité des autres sources.
+    module plus élevée que la majorité des autres sources. Retourne aussi ce règne majoritaire
+    (ou None si aucune majorité fiable) : `_pick_classification_winner` s'en sert pour arbitrer
+    par spécialisation même sans filtre explicite (`domaine == "*"`).
 
     Ne tranche que sur une VRAIE majorité (règne présent dans plus de la moitié des candidats
     au règne connu) : à égalité ou en dessous, la situation est ambiguë (pas assez de signal
@@ -55,15 +57,15 @@ def classification_regne_coherents(
     fiable, candidat toujours conservé quel que soit le résultat de la majorité."""
     signalles = {cid: regnes[cid] for cid in successes if regnes.get(cid) and regnes[cid] != _REGNE_INCONNU}
     if len(signalles) < 2:
-        return successes, []
+        return successes, [], None
 
     regne_majoritaire, effectif_majoritaire = Counter(signalles.values()).most_common(1)[0]
     if effectif_majoritaire * 2 <= len(signalles):
-        return successes, []
+        return successes, [], None
 
     exclus = [cid for cid in successes if signalles.get(cid, regne_majoritaire) != regne_majoritaire]
     coherents = [cid for cid in successes if cid not in exclus]
-    return coherents, exclus
+    return coherents, exclus, regne_majoritaire
 
 
 def reference_module_coherente(module_id: str, regne: str) -> bool:

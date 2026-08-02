@@ -234,17 +234,25 @@ def _pick_classification_winner(
 ) -> tuple[str, list[str]]:
     """Départage les modules de classification ayant réussi — par spécialisation au domaine
     demandé (`meilleure_classification`), ou par simple priorité quand cette notion ne
-    s'applique pas (`domaine == "*"`, ou un seul candidat retenu).
+    s'applique pas (un seul candidat retenu, ou aucun règne majoritaire exploitable sans filtre).
 
     Écarte d'abord les candidats dont le règne est minoritaire face aux autres candidats
     (`classification_regne_coherents` — voir docstring pour la définition de majorité retenue) :
     un module plus spécialisé ou prioritaire ne doit pas l'emporter au détriment de la
     cohérence globale si son résultat est un homonyme inter-règnes minoritaire. Retourne
     également la liste des candidats ainsi écartés, pour que l'appelant en informe l'utilisateur
-    plutôt que de les faire disparaître silencieusement."""
+    plutôt que de les faire disparaître silencieusement.
+
+    Sans filtre explicite (`domaine == "*"`), le règne majoritaire détecté par les modules eux-
+    mêmes (ex. GBIF/ITIS/WoRMS) sert de domaine de facto pour `meilleure_classification` — un
+    module spécialisé (LPSN pour une bactérie, POWO pour une plante...) doit l'emporter sur un
+    généraliste mieux priorisé même quand l'utilisateur n'a rien filtré à la recherche."""
     regnes = {cid: results[cid][0].regne for cid in successes if results[cid][0] is not None}
-    coherents, exclus = classification_regne_coherents(successes, regnes)
+    coherents, exclus, regne_majoritaire = classification_regne_coherents(successes, regnes)
     pool = coherents or successes
+
+    if domaine == "*" and regne_majoritaire:
+        domaine = regne_majoritaire
 
     if len(pool) == 1 or domaine == "*":
         return max(pool, key=lambda m: priorities.get(m, 0)), exclus
