@@ -164,6 +164,27 @@ ranks:
     genre: féminin
     page: Super-classe (biologie)
     rang_inferieur_espece: false
+  sous-phylum:
+    genre: masculin
+    rang_inferieur_espece: false
+  phylum:
+    genre: masculin
+    page: phylum
+    pluriel: phylum
+    rang_inferieur_espece: false
+  kingdom:
+    genre: masculin
+    page: Kingdom (biologie)
+    pluriel: kingdom
+    rang_inferieur_espece: false
+  sous-royaume:
+    genre: masculin
+    page: Royaume (virologie)
+    rang_inferieur_espece: false
+  royaume:
+    genre: masculin
+    page: Royaume (virologie)
+    rang_inferieur_espece: false
   micro-embranchement:
     genre: masculin
     rang_inferieur_espece: false
@@ -229,24 +250,6 @@ ranks:
   empire:
     genre: masculin
     page: Domaine (biologie)
-    rang_inferieur_espece: false
-  royaume:
-    genre: masculin
-    page: Royaume (virologie)
-    rang_inferieur_espece: false
-  sous-royaume:
-    genre: masculin
-    page: Royaume (virologie)
-    rang_inferieur_espece: false
-  phylum:
-    genre: masculin
-    page: phylum
-    pluriel: phylum
-    rang_inferieur_espece: false
-  kingdom:
-    genre: masculin
-    page: Kingdom (biologie)
-    pluriel: kingdom
     rang_inferieur_espece: false
 adjectives:
   éteint:

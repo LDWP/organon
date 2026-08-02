@@ -17,6 +17,7 @@ from organon.modules.eol import module as _eol  # noqa: F401
 from organon.modules.externe import module as _externe  # noqa: F401
 from organon.modules.gbif import module as _gbif  # noqa: F401
 from organon.modules.hesperomys import module as _hesperomys  # noqa: F401
+from organon.modules.ictv import module as _ictv  # noqa: F401
 from organon.modules.indexfungorum import module as _indexfungorum  # noqa: F401
 from organon.modules.inpn import module as _inpn  # noqa: F401
 from organon.modules.ipni import module as _ipni  # noqa: F401
