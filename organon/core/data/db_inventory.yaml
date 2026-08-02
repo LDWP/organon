@@ -56,6 +56,14 @@ categories:
         elements_recoltes: [auteur, rang, "identifiant (plusieurs entrées possibles en cas d'homonymie)"]
         acces: {type: api_rest, detail: "API REST/JSON (checklistbank.org)"}
         derniere_maj: null
+      - id: col_xr
+        nom: "Catalogue of Life Extended Release (COL XR)"
+        url: "https://www.checklistbank.org"
+        statut: disponible
+        classification: {possible: true, estime: false}
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", éteint, identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON (checklistbank.org, dataset 3LXR — taxonomie par défaut de GBIF depuis 2024)"}
+        derniere_maj: null
       - id: irmng
         nom: IRMNG
         url: "https://www.irmng.org"

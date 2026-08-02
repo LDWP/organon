@@ -7,7 +7,7 @@ from __future__ import annotations
 import httpx
 
 BASE_URL = "https://api.gbif.org/v1"
-DATASET_KEY = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"  # Backbone Taxonomy GBIF
+DATASET_KEY = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"  # Backbone Taxonomy GBIF (legacy, ids entiers)
 
 
 class GbifAdapter:
