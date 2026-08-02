@@ -32,7 +32,14 @@ sans distinction de statut) si `distribution` est absent.
 Ces codes TDWG/WGSRPD ne sont pas des codes pays ISO 3166 : `organon.core.rendering.support`
 attend des codes ISO mais retombe sur le code brut non lié pour tout code inconnu (comportement
 documenté), donc aucun crash — seulement un rendu moins soigné pour ces codes tant qu'aucune
-table de correspondance TDWG->ISO n'existe dans `organon/core`."""
+table de correspondance TDWG->ISO n'existe dans `organon/core`.
+
+Sous-taxons (mode classification uniquement, comme GBIF/COL/ITIS) : `detail["childNameUsages"]`
+donne directement les enfants acceptés du taxon consulté, quel que soit son rang (genres d'une
+famille, espèces d'un genre, sous-espèces d'une espèce...), un seul niveau, jamais récursif — pas
+besoin de requête supplémentaire ni de brancher sur le rang du taxon courant (voir docstring de
+`PowoAdapter` pour la vérification en direct). Absent (`None`, pas liste vide) si le taxon n'a
+aucun enfant enregistré."""
 
 from __future__ import annotations
 
@@ -42,6 +49,7 @@ from organon.core.models import (
     RankName,
     Redirection,
     Struct,
+    SubTaxonList,
     SynonymList,
     TaxonInfo,
 )
@@ -193,6 +201,30 @@ class PowoModule(TaxonomyModule):
                 rangs.append(RankName(nom=nom, rang=powo_cherche_rang(rank_code)))
 
         struct.rangs = rangs
+
+        children = [
+            c
+            for c in detail.get("childNameUsages") or []
+            if c.get("name") and c.get("taxonomicStatus") == "Accepted"
+        ]
+        if children:
+            limit = as_limit(options.limite_listes)
+            coupe = False
+            if limit is not None and len(children) > limit:
+                children = children[:limit]
+                coupe = True
+            struct.sous_taxons = SubTaxonList(
+                liste=[
+                    RankName(
+                        nom=c["name"],
+                        auteur=format_auteur(c.get("author")),
+                        rang=powo_cherche_rang(c.get("rank")),
+                    )
+                    for c in children
+                ],
+                source="POWO",
+                coupe=coupe,
+            )
 
         return struct
 

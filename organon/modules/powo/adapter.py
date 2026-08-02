@@ -33,7 +33,16 @@ Les deux correctifs sont appliqués une fois à l'import de ce module.
 Throttling : aucun mécanisme de rate limiting mutualisé n'existe dans `organon/core` (vérifié :
 aucun autre module n'en a besoin, chacun appelant `httpx` directement sans contrainte de débit
 documentée côté source tierce). Kew recommande de rester sous ~5 req/s côté POWO : `_throttle`
-impose un intervalle minimal entre appels via un verrou asyncio partagé au niveau du module."""
+impose un intervalle minimal entre appels via un verrou asyncio partagé au niveau du module.
+
+Sous-taxons (enfants directs, voir `powo/module.py`) : `lookup()` renvoie déjà un champ
+`childNameUsages` (liste des taxons acceptés directement rattachés au taxon consulté — genres
+d'une famille, espèces d'un genre, sous-espèces d'une espèce, etc., un seul niveau, jamais
+récursif) sans paramètre `include` supplémentaire ni requête réseau à part (vérifié en direct :
+présent que `include` vaille `None` ou `["distribution"]`). Pas de troncature côté API non plus
+(vérifié sur des genres à plusieurs milliers d'espèces, ex. Astragalus : 3145 entrées reçues en
+un seul appel) — inutile donc de passer par `search()` avec des filtres de rang comme GBIF le
+fait avec sa pagination par page ; POWO expose directement la relation parent/enfant."""
 
 from __future__ import annotations
 
