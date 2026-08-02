@@ -74,8 +74,8 @@ class AuthSettings(BaseSettings):
     # https://register.lpsn.dsmz.de/) : pas de jeton public partageable comme pour Tropicos.
     # Vides par défaut -> le module échoue proprement (échec d'authentification) tant que ces
     # deux variables ne sont pas positionnées, plutôt que d'embarquer un identifiant en dur.
-    lpsn_username: str = ""
-    lpsn_password: str = ""
+    lpsn_username: str = "" #envvars ORGANON_LPSN_USERNAME
+    lpsn_password: str = "" #envvars ORGANON_LPSN_PASSWORD
 
 
 _settings: AuthSettings | None = None
