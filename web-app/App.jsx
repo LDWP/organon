@@ -660,11 +660,12 @@ export default function App() {
       return;
     }
 
-    // Sans correspondance GBIF (seule source de /api/v1/search), pas de classification forcée :
-    // le backend interroge tous les modules applicables en parallèle.
+    // Pas de classification forcée : le backend arbitre par domaine
+    // (`meilleure_classification`, organon/core/domains.py) plutôt que de systématiquement
+    // privilégier GBIF, qui n'est qu'une source parmi d'autres candidates.
     const best = matches[0];
     if (best) {
-      await launchSearch(best.scientific_name, best.kingdom || domaineValue, "gbif");
+      await launchSearch(best.scientific_name, best.kingdom || domaineValue, undefined, best.gbif_key);
     } else {
       await launchSearch(name, domaineValue, undefined);
     }
@@ -674,14 +675,13 @@ export default function App() {
     setTaxon(match.scientific_name);
     setDomaine(match.kingdom || domaine);
     setDisambiguation(null);
-    // Tout résultat de recherche vient de GBIF (voir organon/api/routes/search.py) :
-    // on force ce classifieur pour la génération plutôt que de laisser le backend
-    // en choisir un automatiquement selon le domaine, ce qui pouvait échouer
-    // (ex. "Acanthocephala" + filtre "végétal" → tentative via AlgaeBase). On transmet
-    // aussi le gbif_key déjà résolu par la recherche de désambiguïsation : repartir du
-    // seul nom textuel peut résoudre vers un autre enregistrement GBIF (ex. un nom
+    // Le backend arbitre la classification par domaine plutôt que de forcer GBIF : une
+    // source spécialisée du domaine (ex. IndexFungorum pour les champignons) l'emporte quand
+    // elle est applicable. On transmet quand même le gbif_key déjà résolu par la recherche de
+    // désambiguïsation : si GBIF est sollicité (candidat parmi d'autres, ou domaine "*"),
+    // repartir du seul nom textuel peut résoudre vers un autre enregistrement GBIF (ex. un nom
     // d'hôte qui ressemble à un nom d'espèce sans rapport), voir GbifModule._collect.
-    launchSearch(match.scientific_name, match.kingdom || domaine, "gbif", match.gbif_key);
+    launchSearch(match.scientific_name, match.kingdom || domaine, undefined, match.gbif_key);
   }
 
   function handleTaxonInputChange(value) {
@@ -712,7 +712,7 @@ export default function App() {
     setAutocompleteOpen(false);
     setTaxon(match.scientific_name);
     setDomaine(match.kingdom || domaine);
-    launchSearch(match.scientific_name, match.kingdom || domaine, "gbif");
+    launchSearch(match.scientific_name, match.kingdom || domaine, undefined, match.gbif_key);
   }
 
   // Résultats d'autocomplétion filtrés côté client par le domaine sélectionné,
