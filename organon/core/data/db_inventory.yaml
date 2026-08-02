@@ -769,10 +769,10 @@ categories:
         nom: "The Reptile Database"
         url: "https://reptile-database.reptarium.cz"
         statut: disponible
-        classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: ["confirmation du nom binomial accepté", "auteur/année (si présents)"]
-        acces: {type: scraping, detail: "scraping HTML ciblé par regex sur le <h1> de la fiche espèce (/species?genus=&species=), aucune API trouvée"}
-        derniere_maj: "2026-07-23"
+        classification: {possible: true, estime: false, detail: "champ « Higher Taxa » de la fiche espèce exploité pour famille + ordre uniquement (aucun rang explicite dans le HTML, clades intermédiaires sous-famille/super-famille/sous-ordre à position incohérente d'une fiche à l'autre — ordre repéré par vocabulaire fermé des 4 ordres de reptiles vivants plutôt que par position)"}
+        elements_recoltes: ["confirmation du nom binomial accepté", "auteur/année (si présents)", rang, "chaîne de classification (genre → famille → ordre)"]
+        acces: {type: scraping, detail: "scraping HTML ciblé par regex sur le <h1> (confirmation du nom) et le champ « Higher Taxa » (/species?genus=&species=), aucune API trouvée ; ne classifie jamais au rang sous-espèce (le site n'indexe que le nom binomial)"}
+        derniere_maj: "2026-08-01"
       - id: tsf
         nom: "The Scorpion Files (TSF)"
         url: null
