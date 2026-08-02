@@ -911,15 +911,16 @@ export default function App() {
   // chaque rendu plutôt que stockée, pour suivre le préchargement en arrière-plan au fur et à
   // mesure que d'autres sources terminent.
   //
-  // Départage en cas d'égalité (choix assumé, à ajuster si besoin) : `classificationModules`
-  // est déjà trié par priorité décroissante côté backend (voir GET /api/v1/modules) ; on ne
-  // remplace la recommandation qu'à score strictement supérieur, donc à égalité c'est la
-  // source de plus haute priorité déclarée qui l'emporte — un critère simple et reproductible,
-  // pas une tentative de mesurer la "cohérence" avec les autres sources ou la
-  // "spécialisation" d'une source (nettement plus subjectif à définir).
+  // Départage en cas d'égalité : `activeSource` (le gagnant `classification_used` renvoyé par
+  // le backend, voir launchSearch) sert de point de départ plutôt qu'un score arbitraire — le
+  // backend arbitre déjà par spécialisation de domaine (`meilleure_classification`,
+  // organon/core/domains.py, y compris sans filtre explicite via le règne majoritaire détecté),
+  // donc à score de complétude égal ou non chargé, c'est ce choix qui doit rester affiché comme
+  // recommandation plutôt qu'un simple ordre de priorité. Une source seulement plus complète
+  // (score strictement supérieur) peut malgré tout la supplanter pour cette facette.
   function recommendedSourceForFacet(scoreField) {
-    let recommended = null;
-    let bestScore = -1;
+    let recommended = activeSource;
+    let bestScore = activeSource ? (resultsBySource[activeSource]?.data?.[scoreField] ?? 0) : -1;
     for (const m of classificationModules) {
       const entry = resultsBySource[m.id];
       if (entry?.status !== "ok") continue;
