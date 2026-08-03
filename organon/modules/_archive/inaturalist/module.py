@@ -30,9 +30,9 @@ from organon.core.models import RankName, Redirection, Struct, SubTaxonList, Tax
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
+from organon.modules._archive.inaturalist.adapter import InaturalistAdapter
+from organon.modules._archive.inaturalist.ranks import inat_rang
 from organon.modules.common import as_limit, simple_debug_link
-from organon.modules.inaturalist.adapter import InaturalistAdapter
-from organon.modules.inaturalist.ranks import inat_rang
 
 
 class InaturalistModule(TaxonomyModule):
