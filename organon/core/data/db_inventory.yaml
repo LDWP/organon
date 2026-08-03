@@ -579,12 +579,12 @@ categories:
         derniere_maj: null
       - id: sfs
         nom: "Species File Software (SFS)"
-        url: null
+        url: "https://orthoptera.speciesfile.org"
         statut: non_sonde
-        classification: {possible: true, estime: true, detail: "classification par ordre d'insectes, ex. Orthoptera Species File"}
+        classification: {possible: true, estime: true, detail: "classification par ordre d'insectes (sous-domaine dédié par ordre, ex. orthoptera.speciesfile.org, mantodea.speciesfile.org probable) ; recommandée par Wikipédia fr, modèles {{SpeciesFile}}/{{OrthopteraSF}}/{{MantodeaSF}}"}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "domaine testé injoignable (species-id.net) ; le vrai domaine est probablement speciesfile.org, à revérifier"}
-        derniere_maj: null
+        acces: {type: scraping, detail: "domaine correct confirmé 2026-08-01 : orthoptera.speciesfile.org atteignable (infrastructure TaxonWorks/Species File Group, licence CC-BY), recherche filtrée scrapable via /resources/tw/filter/dwc_otus, exports Darwin Core Archive disponibles — piste export DwC-A à privilégier sur le scraping page par page"}
+        derniere_maj: "2026-08-01"
       - id: zoobank
         nom: ZooBank
         url: null
@@ -631,12 +631,13 @@ categories:
         derniere_maj: null
       - id: coi_ioc
         nom: "Congrès ornithologique international (COI / IOC World Bird Names)"
-        url: null
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "côté PHP"}
+        url: "https://www.worldbirdnames.org"
+        statut: non_sonde
+        classification: {possible: true, estime: true, detail: "classification ornithologique de référence recommandée par Wikipédia fr, modèles {{COI}}/{{Avibase}}"}
         elements_recoltes: []
-        acces: {type: export, detail: "pas d'appel réseau : parse un fichier CSV local bundlé de 4,2 Mo — non porté, contraire à la philosophie « source vivante » du projet"}
-        derniere_maj: "à vérifier (version IOC non inspectée)"
+        acces: {type: scraping, detail: "site live confirmé (worldbirdnames.org) distinct du fichier CSV bundlé précédemment écarté : listes HTML par famille (family-index-2/) et par espèce (classification/species/) scrapables, plus exports XLSX/XML téléchargeables (master-list-2/) — même pattern que msw/reptile_database (scraping HTML ciblé), pas d'API REST connue"}
+        derniere_maj: "2026-08-01"
+        notes: "Réévalué 2026-08-01 : l'ancien statut 'ecarte' ne valait que pour la piste CSV bundlé hors-philosophie ; le site live n'avait pas été sondé."
       - id: ebird
         nom: eBird
         url: null
@@ -683,12 +684,12 @@ categories:
     sources:
       - id: asw
         nom: "Amphibian Species of the World (ASW)"
-        url: null
+        url: "https://amphibiansoftheworld.amnh.org"
         statut: non_sonde
         classification: {possible: true, estime: true, detail: "autorité taxonomique batraciens, AMNH"}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "403 — protection anti-bot probable, pas confirmé bloqué définitivement"}
-        derniere_maj: null
+        acces: {type: inconnu, detail: "403 reconfirmé 2026-08-01 sur le domaine principal — protection anti-bot probable, toujours pas confirmé bloqué définitivement (une autre méthode d'accès reste à essayer)"}
+        derniere_maj: "2026-08-01"
       - id: amphibiaweb
         nom: AmphibiaWeb
         url: null
@@ -708,11 +709,12 @@ categories:
       - id: fishbase
         nom: FishBase
         url: "https://github.com/ropensci/rfishbase"
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "côté PHP"}
+        statut: non_sonde
+        classification: {possible: true, estime: true, detail: "piste export CSV via rfishbase, pattern identique au module wsc déjà porté (export versionné plutôt que scraping)"}
         elements_recoltes: []
-        acces: {type: export, detail: "pas d'API propre (scraping HTML), mais le paquet communautaire rfishbase télécharge des tables CSV versionnées — piste d'export plus fiable que le scraping"}
-        derniere_maj: "dernières releases fb-21.06/slb-21.08 : septembre 2021 (~5 ans d'ancienneté au 2026-07-10) — à reconsidérer avant usage"
+        acces: {type: export, detail: "pas d'API propre ; scraping direct tenté 2026-08-01 sur fishbase.se (réponse vide) et le miroir fishbase.mnhn.fr (403) — non concluant côté scraping. Le paquet communautaire rfishbase télécharge des tables CSV versionnées depuis un dépôt distant : piste 'autre moyen direct' à privilégier, mais fraîcheur à revérifier (dernières releases connues fb-21.06/slb-21.08, sept. 2021)"}
+        derniere_maj: "2026-08-01"
+        notes: "Réévalué 2026-08-01 : 'ecarte' portait sur l'absence d'API REST, pas sur la piste CSV rfishbase, jamais vraiment écartée pour de bonnes raisons."
       - id: mussel_project
         nom: "The MUSSEL project"
         url: null
@@ -744,11 +746,12 @@ categories:
       - id: mdd
         nom: "Mammal Diversity Database (MDD)"
         url: "https://www.mammaldiversity.org"
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "côté PHP, groupé avec GRIN"}
+        statut: non_sonde
+        classification: {possible: true, estime: true, detail: "recommandée par Wikipédia fr en remplacement de MSW (obsolète) ; piste export CSV, pattern identique au module wsc déjà porté"}
         elements_recoltes: []
-        acces: {type: export, detail: "site reconstruit en SPA, pas d'API interrogeable trouvée, mais données publiées en CSV versionné (le dépôt GitHub mammaldiversity/mdd_api n'est qu'un outil de lecture locale du CSV, pas une API web)"}
-        derniere_maj: "version 2.4, publiée le 2 janvier 2026 (vérifié en direct, jeu de données également archivé sur Zenodo)"
+        acces: {type: export, detail: "site reconstruit en SPA, pas d'API REST interrogeable trouvée, mais données publiées en CSV versionné — confirmé 2026-08-01 : lien direct 'Download the latest version' pointant vers un ZIP hébergé sur GitHub (github.com/mammaldiversity/mammaldiversity.github.io/raw/refs/heads/master/assets/data/MDD.zip), même dépôt organisation que mdd_api ; version 2.4 publiée le 2 janvier 2026, également archivée sur Zenodo"}
+        derniere_maj: "2026-08-01"
+        notes: "Réévalué 2026-08-01 : 'ecarte' portait sur l'absence d'API REST, pas sur la piste CSV, jamais vraiment écartée pour de bonnes raisons — même pattern que wsc (export CSV plutôt que scraping/API)."
       - id: msw
         nom: "Mammal Species of the World (MSW)"
         url: "https://www.departments.bucknell.edu/biology/resources/msw3/"
@@ -767,20 +770,28 @@ categories:
         derniere_maj: "2026-08-01"
       - id: tsf
         nom: "The Scorpion Files (TSF)"
-        url: null
+        url: "https://www.ntnu.no/ub/scorpion-files"
         statut: non_sonde
         classification: {possible: true, estime: true, detail: "taxonomie des scorpions"}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, pas d'API connue"}
-        derniere_maj: null
+        acces: {type: scraping, detail: "page d'accueil atteignable (2941 espèces annoncées), sections 'Species List' (intro.php) et 'Species Biographies' (specieslist.php) identifiées 2026-08-01, mais structure exacte des URLs de fiche espèce et présence d'une hiérarchie famille/genre pas encore confirmées — à approfondir page par page"}
+        derniere_maj: "2026-08-01"
       - id: wco
         nom: "World Catalogue of Opiliones (WCO)"
         url: null
         statut: non_sonde
         classification: {possible: true, estime: true}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "404 sur l'URL devinée, probablement hébergé par le même institut (NMBE) que WSC"}
-        derniere_maj: null
+        acces: {type: inconnu, detail: "hypothèse d'hébergement par le NMBE (comme WSC) invalidée 2026-08-01 : wsc.nmbe.ch/wco → 404, et la page d'accueil wsc.nmbe.ch ne référence aucun site frère Opiliones/Pseudoscorpions/Scorpions dans son menu — vraie URL encore inconnue, à rechercher autrement"}
+        derniere_maj: "2026-08-01"
+      - id: pseudoscorpions_world
+        nom: "Pseudoscorpions of the World"
+        url: null
+        statut: non_sonde
+        classification: {possible: true, estime: true, detail: "catalogue taxonomique des pseudoscorpions cité par Wikipédia fr, jamais recensé dans cet inventaire avant 2026-08-01"}
+        elements_recoltes: []
+        acces: {type: inconnu, detail: "aucune URL confirmée : hypothèse wcp.nmbe.ch testée 2026-08-01 (DNS injoignable), hébergement NMBE probablement erroné (voir wco ci-dessus) — sondage à reprendre depuis zéro"}
+        derniere_maj: "2026-08-01"
       - id: wsc
         nom: "World Spider Catalog (WSC)"
         url: "https://wsc.nmbe.ch"
