@@ -418,8 +418,12 @@ def _compute_ext_liens_items(struct: Struct) -> list[tuple[str, str]]:
     produites par `module.render_bioref` pour chaque module ayant contribué — factorisé de
     `render_voir_aussi` pour être réutilisé par `render_references_items` sans dupliquer la
     boucle. Un module dont `render_bioref` retourne plusieurs lignes produit une paire par
-    ligne, toutes rattachées au même `module_id`."""
+    ligne, toutes rattachées au même `module_id`. Dédoublonne par ligne wikitexte exacte : deux
+    modules distincts peuvent résoudre la même fiche externe (ex. GbifModule ajoute un lien
+    {{CatalogueofLife}} via COL XR/ChecklistBank quand ColModule résout indépendamment le même
+    identifiant, voir gbif/module.py render_bioref)."""
     items: list[tuple[str, str]] = []
+    seen: set[str] = set()
     for module_id, data in struct.liens.items():
         module = None
         from organon.core.registry import get_module  # import tardif : évite un cycle
@@ -430,10 +434,12 @@ def _compute_ext_liens_items(struct: Struct) -> list[tuple[str, str]]:
         rendu = module.render_bioref(struct)
         if not rendu:
             continue
-        if isinstance(rendu, list):
-            items.extend((module_id, ligne) for ligne in rendu)
-        else:
-            items.append((module_id, rendu))
+        lignes = rendu if isinstance(rendu, list) else [rendu]
+        for ligne in lignes:
+            if ligne in seen:
+                continue
+            seen.add(ligne)
+            items.append((module_id, ligne))
     return items
 
 
