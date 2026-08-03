@@ -204,15 +204,10 @@ def wp_est_italique(rang: str, regne: str, table: RankTable | None = None) -> bo
 
 
 # Segments d'un nom scientifique qui doivent rester (ou passer) en italique séparément du nom
-# lui-même (abréviations de rang infraspécifique, marqueurs d'hybride, etc.).
-#
-# Bug latent, conservé tel quel plutôt que "corrigé" sans certitude du comportement voulu :
-# les motifs à espace de tête (" var[.]",
-# " sp[.]", " f[.]", " gen[.]", " ord[.]", " fam[.]", " sect[.]", " ser[.]", " tr[.]",
-# " cl[.]") sont enveloppés dans \b...\b. Le \b de fin échoue quand le motif est suivi d'un
-# espace (cas normal d'usage, ex. "var. macrocarpum") car un point suivi d'un espace ne
-# constitue pas une frontière de mot (les deux caractères sont non-alphanumériques) — la
-# substitution ne se déclenche donc quasiment jamais pour ces entrées précises en pratique.
+# lui-même (abréviations de rang infraspécifique, marqueurs d'hybride, etc.). Le motif exclu
+# est remplacé par lui-même entouré de '' '' ; combiné à l'enveloppe '' '' globale posée par
+# `wp_met_italiques` sur tout le nom, ce doublement d'apostrophes bascule l'italique en romain
+# pour ce segment précis (et le réactive juste après).
 _EXCLUSIONS: list[tuple[str, str]] = [
     (r" cl[.]", " ''cl.''"), (r"convar[.]", "''convar.''"), (r"f[.]sp[.]", "''f.sp.''"),
     (r" f[.]", " ''f.''"), (r" gen[.]", " ''gen.''"), (r"kl[.]", "''kl.''"),
@@ -228,7 +223,10 @@ _EXCLUSIONS: list[tuple[str, str]] = [
     (r"lysotype", "''lysotype''"), (r"phase", "''phase''"), (r"serotype", "''serotype''"),
     (r"state", "''state''"), (r"forma specialis", "''forma specialis''"),
 ]
-_EXCLUSIONS_COMPILED = [(re.compile(r"\b" + pattern + r"\b"), repl) for pattern, repl in _EXCLUSIONS]
+# Frontière de fin en lookahead négatif (pas \b) : un point suivi d'un espace n'est pas une
+# frontière de mot ("." et " " sont tous deux non-alphanumériques), ce qui ferait échouer \b
+# sur l'immense majorité des motifs ci-dessus (ex. "var. macrocarpum").
+_EXCLUSIONS_COMPILED = [(re.compile(r"\b" + pattern + r"(?!\w)"), repl) for pattern, repl in _EXCLUSIONS]
 
 
 def wp_met_italiques(
