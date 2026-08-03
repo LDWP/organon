@@ -31,6 +31,7 @@ class RankEntry(BaseModel):
     page: str | None = None
     pluriel: str | None = None
     invariant: bool = False
+    lang_en: bool = False
 
 
 class AdjectiveEntry(BaseModel):
@@ -77,9 +78,13 @@ def _forme_nom(nom_minuscule: str, entry: RankEntry, maj: bool, plur: bool) -> s
     """Calcule une des quatre formes (min/maj × sing/plur) du nom d'un rang à partir du nom
     minuscule canonique et des irrégularités éventuelles (pluriel, invariant). Un rang
     invariant (non-classé) ignore aussi bien le pluriel que la majuscule : les quatre formes
-    sont identiques au nom minuscule."""
+    sont identiques au nom minuscule. Un rang `lang_en` (ex. ICTV Realm/Subrealm) reste un
+    emprunt anglais non traduit et non pluralisé : toujours capitalisé et en italique via
+    {{lang|en|...}}, quels que soient `maj`/`plur`."""
     if entry.invariant:
         return nom_minuscule
+    if entry.lang_en:
+        return f"''{{{{lang|en|{_majuscule(nom_minuscule)}}}}}''"
     base = nom_minuscule
     if plur:
         base = entry.pluriel or f"{nom_minuscule}s"
@@ -89,7 +94,9 @@ def _forme_nom(nom_minuscule: str, entry: RankEntry, maj: bool, plur: bool) -> s
 def _forme_lien(nom_minuscule: str, entry: RankEntry, maj: bool) -> str:
     """Calcule un wikilien : bare [[Nom]] par défaut, ou [[Page|Nom]] si `page` diffère du nom
     (redirection/désambiguïsation). Cas particulier des rangs invariants (non-classé) : pas de
-    page réelle, seulement un texte de substitution entouré de tirets cadratins."""
+    page réelle, seulement un texte de substitution entouré de tirets cadratins. Cas particulier
+    des rangs `lang_en` : le texte affiché est l'emprunt anglais en italique ({{lang|en|...}}),
+    toujours lié à `page` (ex. [[Realm (virologie)|''{{lang|en|Realm}}'']])."""
     if entry.invariant:
         return f"— {nom_minuscule} —"
     affiche = _forme_nom(nom_minuscule, entry, maj, plur=False)

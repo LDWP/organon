@@ -251,6 +251,16 @@ ranks:
     genre: masculin
     page: Domaine (biologie)
     rang_inferieur_espece: false
+  subrealm:
+    genre: masculin
+    page: Realm (virologie)
+    lang_en: true
+    rang_inferieur_espece: false
+  realm:
+    genre: masculin
+    page: Realm (virologie)
+    lang_en: true
+    rang_inferieur_espece: false
 adjectives:
   éteint:
     masculin_singulier: éteint
