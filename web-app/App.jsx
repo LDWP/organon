@@ -1044,11 +1044,12 @@ export default function App() {
         // reçoivent leur default_checked.
         setSubtaxaChecked((prev) => {
           const next = { ...prev };
-          for (const g of data.groups) {
+          data.groups.forEach((g, gi) => {
             for (const s of g.species) {
-              if (!(s.nom in next)) next[s.nom] = s.default_checked;
+              const key = subtaxaCheckKey(gi, s.nom);
+              if (!(key in next)) next[key] = s.default_checked;
             }
-          }
+          });
           return next;
         });
       })
@@ -1061,24 +1062,41 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subtaxaMergeReady, subtaxaMergeSignature, baseData?.taxon_rang, baseData?.taxon_resolved, baseData?.regne]);
 
-  function toggleSubtaxaChecked(nom) {
-    setSubtaxaChecked((prev) => ({ ...prev, [nom]: !prev[nom] }));
+  // Les groupes "alternative" sont des listes complètes mais divergentes (voir
+  // organon/core/rendering/subtaxa_merge.py) : deux groupes différents peuvent rapporter le même
+  // nom d'espèce sans être identiques pour autant (ils ne s'accordent pas sur l'ensemble complet).
+  // La clé doit donc porter le groupe ET le nom, jamais le nom seul, sous peine de lier l'état
+  // coché d'une espèce à toutes ses réapparitions dans les autres groupes.
+  function subtaxaCheckKey(groupIndex, nom) {
+    return `${groupIndex}:${nom}`;
   }
 
-  // Fragments de phrase par nature de groupe (voir MergedGroup.kind côté serveur) — seul le
-  // compte (réactif aux cases cochées) et ce texte fixe restent à composer ici ; la citation
-  // Bioref par source (group.intro) et le rendu wikitexte par espèce (species[].line) sont déjà
-  // mis en forme côté serveur (voir organon/core/rendering/subtaxa_merge.py), pas dupliqués ici.
-  // Accord singulier/pluriel : rangTxt/rangTxtSingulier viennent du serveur (ex.
-  // "espèces"/"espèce") — le compte étant réactif aux cases cochées, seul le choix entre les
-  // deux formes déjà fournies se fait ici, jamais une pluralisation devinée en JS.
-  const SUBTAXA_MERGE_MIDDLE = {
-    anchor: (n, rangTxt, rangTxtSingulier) => `comprend ${n} ${n === 1 ? rangTxtSingulier : rangTxt}`,
-    autres: (n, rangTxt, rangTxtSingulier) =>
-      n === 1 ? `comprend 1 autre ${rangTxtSingulier}` : `comprend ${n} autres ${rangTxt}`,
-    disjoint: (n, rangTxt, rangTxtSingulier) =>
-      `comprend ${n} ${n === 1 ? rangTxtSingulier : rangTxt} ne figurant dans aucune de ces listes`,
-  };
+  function toggleSubtaxaChecked(groupIndex, nom) {
+    const key = subtaxaCheckKey(groupIndex, nom);
+    setSubtaxaChecked((prev) => ({ ...prev, [key]: !prev[key] }));
+  }
+
+  function setGroupChecked(groupIndex, group, checkedValue) {
+    setSubtaxaChecked((prev) => {
+      const next = { ...prev };
+      for (const sp of group.species) next[subtaxaCheckKey(groupIndex, sp.nom)] = checkedValue;
+      return next;
+    });
+  }
+
+  // Fragment de phrase commun à tous les groupes (voir MergedGroup.kind côté serveur) : chaque
+  // groupe porte désormais une liste COMPLÈTE (fusion seulement si les sources s'accordent
+  // parfaitement, voir organon/core/rendering/subtaxa_merge.py), donc plus de distinction
+  // "N espèces" / "N autres espèces" — seul le sujet de la phrase change (taxonPhrase pour le
+  // premier groupe rendu, pronom ensuite, voir renderSubtaxaMergeWikitext). Le compte (réactif
+  // aux cases cochées) et ce texte fixe restent à composer ici ; la citation Bioref par source
+  // (group.intro) et le rendu wikitexte par espèce (species[].line) sont déjà mis en forme côté
+  // serveur, pas dupliqués ici. Accord singulier/pluriel : rangTxt/rangTxtSingulier viennent du
+  // serveur (ex. "espèces"/"espèce") — le compte étant réactif aux cases cochées, seul le choix
+  // entre les deux formes déjà fournies se fait ici, jamais une pluralisation devinée en JS.
+  function subtaxaMergeMiddle(n, rangTxt, rangTxtSingulier) {
+    return `comprend ${n} ${n === 1 ? rangTxtSingulier : rangTxt}`;
+  }
 
   // Compose le bloc "sous-taxons" en mode fusionné : une phrase par groupe non vide (un groupe
   // entièrement décoché disparaît du rendu), suivie des lignes déjà rendues des espèces cochées.
@@ -1092,13 +1110,15 @@ export default function App() {
     const { rang_txt: rangTxt, rang_txt_singulier: rangTxtSingulier, pronoun, taxon_phrase: taxonPhrase } =
       effectiveSubtaxaMerge;
     const parts = [];
-    for (const group of effectiveSubtaxaMerge.groups) {
-      const checked = group.species.filter((s) => subtaxaChecked[s.nom] ?? s.default_checked);
-      if (checked.length === 0) continue;
+    effectiveSubtaxaMerge.groups.forEach((group, gi) => {
+      const checked = group.species.filter(
+        (s) => subtaxaChecked[subtaxaCheckKey(gi, s.nom)] ?? s.default_checked
+      );
+      if (checked.length === 0) return;
       const sujet = parts.length === 0 ? taxonPhrase : pronoun;
-      const middle = SUBTAXA_MERGE_MIDDLE[group.kind](checked.length, rangTxt, rangTxtSingulier);
+      const middle = subtaxaMergeMiddle(checked.length, rangTxt, rangTxtSingulier);
       parts.push(`${group.intro}, ${sujet} ${middle} :\n${checked.map((s) => s.line).join("")}`);
-    }
+    });
     if (parts.length === 0) return "";
     return `\n== Liste des ${rangTxt} ==\n${parts.join("\n")}`;
   }
@@ -1849,7 +1869,13 @@ export default function App() {
                               <div className="data-table-wrap subtaxa-merge-groups">
                                 {!effectiveSubtaxaMerge && <p>Calcul de la fusion en cours…</p>}
                                 {effectiveSubtaxaMerge?.groups.length === 0 && <p>Aucun sous-taxon à fusionner.</p>}
-                                {effectiveSubtaxaMerge?.groups.map((group, gi) => (
+                                {effectiveSubtaxaMerge?.groups.map((group, gi) => {
+                                  const groupCheckedCount = group.species.filter(
+                                    (sp) => subtaxaChecked[subtaxaCheckKey(gi, sp.nom)] ?? sp.default_checked
+                                  ).length;
+                                  const groupAllChecked = groupCheckedCount === group.species.length;
+                                  const { rang_txt: rangTxt, rang_txt_singulier: rangTxtSingulier } = effectiveSubtaxaMerge;
+                                  return (
                                   <div key={gi} className="subtaxa-merge-group">
                                     <p className="subtaxa-merge-group-head">
                                       {group.sources.map((s) => (
@@ -1857,9 +1883,16 @@ export default function App() {
                                           {s.toUpperCase()}
                                         </span>
                                       ))}
-                                      {group.kind === "disjoint" && (
-                                        <span className="id-badge id-badge-conflict">non recoupé</span>
-                                      )}
+                                      <span className="subtaxa-merge-group-count">
+                                        {group.species.length} {group.species.length === 1 ? rangTxtSingulier : rangTxt}
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className="subtaxa-merge-group-toggle"
+                                        onClick={() => setGroupChecked(gi, group, !groupAllChecked)}
+                                      >
+                                        {groupAllChecked ? "Tout exclure" : "Tout inclure"}
+                                      </button>
                                     </p>
                                     <ul className="subtaxa-merge-species-list">
                                       {group.species.map((sp) => (
@@ -1867,8 +1900,8 @@ export default function App() {
                                           <label className="facet-checkbox">
                                             <input
                                               type="checkbox"
-                                              checked={subtaxaChecked[sp.nom] ?? sp.default_checked}
-                                              onChange={() => toggleSubtaxaChecked(sp.nom)}
+                                              checked={subtaxaChecked[subtaxaCheckKey(gi, sp.nom)] ?? sp.default_checked}
+                                              onChange={() => toggleSubtaxaChecked(gi, sp.nom)}
                                             />
                                             {sp.nom}
                                           </label>
@@ -1876,7 +1909,8 @@ export default function App() {
                                       ))}
                                     </ul>
                                   </div>
-                                ))}
+                                  );
+                                })}
                               </div>
                             )}
                           </div>

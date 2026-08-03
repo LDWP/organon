@@ -8,17 +8,14 @@ différentes du même taxon (accentuation, orthographe, ordre auteur/nom) ne ser
 comme identiques. Limitation assumée plutôt qu'un rapprochement flou qui masquerait des faux
 positifs — documentée ici et à répercuter dans toute UI qui consomme `merge_subtaxa`.
 
-Les espèces sont groupées par ensemble EXACT de sources qui les rapportent, puis les groupes
-sont répartis en composantes connexes (deux groupes sont reliés s'ils partagent au moins une
-source). La composante contenant le plus grand groupe est la composante "principale" : ses
-groupes sont ordonnés par parcours glouton (le plus grand groupe en premier, l'« ancre », puis
-en boucle le plus grand groupe restant de la composante partageant une source avec l'union déjà
-placée — cette union ne progresse que sur des groupes de la composante principale, donc chaque
-étape trouve toujours un candidat, la connexité du graphe le garantit). Tous les groupes des
-AUTRES composantes sont "disjoint" (décochés
-par défaut), plus grand groupe d'abord au sein de chaque composante — jamais promus en "autres"
-même s'ils partagent une source entre eux, puisqu'aucun d'eux n'est relié à la composante
-principale.
+Les sources sont regroupées par ensemble EXACT d'espèces qu'elles rapportent : deux sources ne
+sont fusionnées en un seul groupe que si elles s'accordent parfaitement (même ensemble de noms).
+Dès qu'une source diverge ne serait-ce que d'une espèce, elle forme son propre groupe avec sa
+liste COMPLÈTE — jamais un reliquat "N espèces en plus" par rapport à un autre groupe. Les
+groupes sont ordonnés par taille décroissante (le plus d'espèces d'abord), à égalité par ordre
+d'apparition des sources dans `sources` — le premier groupe sert de "primary" (coché par défaut,
+phrase d'ouverture nommant le taxon), les suivants "alternative" (décochés par défaut, phrase
+reprenant le pronom anaphorique).
 """
 
 from __future__ import annotations
@@ -36,7 +33,7 @@ from organon.core.rendering.grammar import (
 from organon.core.rendering.sections import compute_rang_txt, render_subtaxon_line
 from organon.core.rendering.support import dates_recupere
 
-GroupKind = Literal["anchor", "autres", "disjoint"]
+GroupKind = Literal["primary", "alternative"]
 
 
 @dataclass
@@ -50,12 +47,12 @@ class MergedSpecies:
 @dataclass
 class MergedGroup:
     sources: list[str]
-    """Sources qui rapportent exactement ce groupe d'espèces, dans l'ordre où elles apparaissent
-    dans `sources` (paramètre de `merge_subtaxa`), pas un ordre alphabétique."""
+    """Sources qui rapportent EXACTEMENT ce même ensemble d'espèces, dans l'ordre où elles
+    apparaissent dans `sources` (paramètre de `merge_subtaxa`), pas un ordre alphabétique."""
     kind: GroupKind
-    """"anchor" : le premier groupe (le plus grand) — sert d'ancre à la phrase introductive.
-    "autres" : partage au moins une source avec un groupe déjà placé (case à cocher par défaut).
-    "disjoint" : ne partage aucune source avec ce qui précède (décoché par défaut)."""
+    """"primary" : le premier groupe (le plus grand) — coché par défaut, sert d'ancre à la
+    phrase introductive. "alternative" : liste complète mais divergente rapportée par une ou
+    plusieurs autres sources — décochée par défaut, l'utilisateur choisit laquelle retenir."""
     intro: str
     """Clause "Selon {{Bioref|...}} et {{Bioref|...}}" (plusieurs sources) ou "Pour {{Bioref|...}}"
     (une seule) déjà mise en forme avec citation Bioref par source, même convention que
@@ -125,98 +122,43 @@ def merge_subtaxa(
     taxon_rang: str, taxon_nom: str, regne: str, sources: list[tuple[str, list[RankName]]]
 ) -> MergedSubtaxa:
     source_order: list[str] = []
-    name_order: list[str] = []
+    source_liste: dict[str, list[RankName]] = {}
     name_to_species: dict[str, RankName] = {}
-    name_to_sources: dict[str, list[str]] = {}
 
     for module_id, liste in sources:
-        if module_id not in source_order:
-            source_order.append(module_id)
+        if module_id in source_liste:
+            continue
+        source_order.append(module_id)
+        source_liste[module_id] = liste
         for sp in liste:
             if sp.nom not in name_to_species:
                 name_to_species[sp.nom] = sp
-                name_to_sources[sp.nom] = []
-                name_order.append(sp.nom)
-            name_to_sources[sp.nom].append(module_id)
 
-    all_species = [name_to_species[n] for n in name_order]
+    all_species = [name_to_species[n] for n in name_to_species]
     rang_txt, rang_txt_singulier, rang_defaut = compute_rang_txt(all_species)
 
+    # Regroupe les sources qui rapportent EXACTEMENT le même ensemble d'espèces (par nom).
     group_order: list[frozenset[str]] = []
-    group_names: dict[frozenset[str], list[str]] = {}
-    for nom in name_order:
-        key = frozenset(name_to_sources[nom])
-        if key not in group_names:
-            group_names[key] = []
+    group_sources: dict[frozenset[str], list[str]] = {}
+    for module_id in source_order:
+        key = frozenset(sp.nom for sp in source_liste[module_id])
+        if key not in group_sources:
+            group_sources[key] = []
             group_order.append(key)
-        group_names[key].append(nom)
+        group_sources[key].append(module_id)
 
-    def largest(candidates: list[frozenset[str]]) -> frozenset[str]:
-        return max(candidates, key=lambda k: (len(group_names[k]), -group_order.index(k)))
-
-    # Composantes connexes (union-find par repères) : deux groupes sont reliés s'ils partagent au
-    # moins une source. Peu de groupes en pratique, pas besoin de path compression.
-    root: dict[frozenset[str], frozenset[str]] = {k: k for k in group_order}
-
-    def find_root(k: frozenset[str]) -> frozenset[str]:
-        while root[k] != k:
-            k = root[k]
-        return k
-
-    for i, a in enumerate(group_order):
-        for b in group_order[i + 1 :]:
-            if a & b:
-                ra, rb = find_root(a), find_root(b)
-                if ra != rb:
-                    root[ra] = rb
-
-    anchor_key = largest(group_order)
-    main_component = find_root(anchor_key)
-
-    main_group = [k for k in group_order if find_root(k) == main_component]
-    other_groups = [k for k in group_order if find_root(k) != main_component]
-
-    placed: list[tuple[frozenset[str], GroupKind]] = []
-    seen_sources: set[str] = set()
-    remaining = list(main_group)
-    while remaining:
-        sharing = [k for k in remaining if k & seen_sources]
-        if not placed:
-            pick = largest(remaining)
-            kind: GroupKind = "anchor"
-        elif sharing:
-            pick = largest(sharing)
-            kind = "autres"
-        else:
-            # Ne peut pas arriver : main_group est une composante connexe, donc tant qu'il en
-            # reste, un groupe non placé partage forcément une source avec l'union déjà placée.
-            pick = largest(remaining)
-            kind = "autres"
-        placed.append((pick, kind))
-        remaining.remove(pick)
-        seen_sources |= pick
-
-    # Composantes isolées : toujours "disjoint", ordre par composante puis par taille décroissante
-    # au sein de chaque composante — jamais mélangées entre elles via un "seen_sources" partagé.
-    remaining_components: dict[frozenset[str], list[frozenset[str]]] = {}
-    for k in other_groups:
-        remaining_components.setdefault(find_root(k), []).append(k)
-
-    def component_size(comp_keys: list[frozenset[str]]) -> tuple[int, int]:
-        biggest = largest(comp_keys)
-        return (len(group_names[biggest]), -group_order.index(biggest))
-
-    for comp_keys in sorted(remaining_components.values(), key=component_size, reverse=True):
-        local_remaining = list(comp_keys)
-        while local_remaining:
-            pick = largest(local_remaining)
-            placed.append((pick, "disjoint"))
-            local_remaining.remove(pick)
+    # Le plus grand groupe (le plus d'espèces) en premier ; à égalité, ordre d'apparition de sa
+    # première source dans `sources`.
+    group_order.sort(key=lambda k: (-len(k), source_order.index(group_sources[k][0])))
 
     cdate = dates_recupere()
     groups = []
-    for key, kind in placed:
-        ordered_sources = sorted(key, key=source_order.index)
+    for i, key in enumerate(group_order):
+        ordered_sources = group_sources[key]
+        kind: GroupKind = "primary" if i == 0 else "alternative"
+        # Liste complète telle que rapportée par la première source du groupe (toutes les
+        # sources du groupe s'accordent par construction sur ce même ensemble de noms).
+        species_names = [sp.nom for sp in source_liste[ordered_sources[0]]]
         groups.append(
             MergedGroup(
                 sources=ordered_sources,
@@ -226,9 +168,9 @@ def merge_subtaxa(
                     MergedSpecies(
                         nom=nom,
                         line=render_subtaxon_line(name_to_species[nom], regne, rang_defaut, taxon_rang),
-                        default_checked=(kind != "disjoint"),
+                        default_checked=(kind == "primary"),
                     )
-                    for nom in group_names[key]
+                    for nom in species_names
                 ],
             )
         )

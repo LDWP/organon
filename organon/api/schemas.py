@@ -302,7 +302,7 @@ class MergedGroupOut(BaseModel):
     `organon.core.rendering.subtaxa_merge.MergedGroup`)."""
 
     sources: list[str]
-    kind: Literal["anchor", "autres", "disjoint"]
+    kind: Literal["primary", "alternative"]
     intro: str
     species: list[MergedSpeciesOut]
 
