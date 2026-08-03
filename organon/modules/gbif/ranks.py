@@ -29,11 +29,6 @@ GBIF_MARKERS: dict[str, str] = {
     "cv.": "CULTIVAR", "strain": "STRAIN",
 }
 
-# GBIF -> rang Wikipédia. GBIF_WP["KINGDOM"] vaut "royaume" (pas "règne") et
-# GBIF_WP["SUBKINGDOM"] vaut "sous-royaume" (pas "sous-règne") : sans effet pratique pour
-# "KINGDOM" (le champ règne emprunte un chemin de traitement séparé, voir module.py), mais
-# "SUBKINGDOM" afficherait le mauvais libellé pour un taxon dont GBIF renseigne ce champ (cas
-# rare, pas encore rencontré en pratique).
 GBIF_WP: dict[str, str] = {
     "CLADE": "clade", "TYPE": "type", "GROUP": "groupe", "UNRANKED": "non-classé",
     "SUBFORM": "sous-forme", "FORM": "forme", "VARIETY": "variété", "PATHOVAR": "pathovar",
@@ -50,7 +45,7 @@ GBIF_WP: dict[str, str] = {
     "SUBPHYLUM": "sous-embranchement", "PHYLUM": "embranchement",
     "SUPERPHYLUM": "super-embranchement", "INFRADIVISION": "infra-division",
     "SUBDIVISION": "sous-division", "DIVISION": "division", "INFRAKINGDOM": "infra-règne",
-    "SUBKINGDOM": "sous-royaume", "KINGDOM": "royaume", "SUBDOMAIN": "sous-domaine",
+    "SUBKINGDOM": "sous-règne", "KINGDOM": "royaume", "SUBDOMAIN": "sous-domaine",
     "DOMAIN": "domaine", "SUPERDOMAIN": "super-domaine", "EMPIRE": "empire",
     "NOTFOUND": "NOTFOUND",
 }

@@ -19,6 +19,8 @@ from organon.core.models import (
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
+from organon.modules.col_xr.adapter import ColXrAdapter
+from organon.modules.col_xr.lookup import find_col_xr_id
 from organon.modules.common import (
     MAX_SYNONYM_HOPS,
     as_limit,
@@ -77,8 +79,11 @@ class GbifModule(TaxonomyModule):
         is_default_classification=True,
     )
 
-    def __init__(self, adapter: GbifAdapter | None = None) -> None:
+    def __init__(
+        self, adapter: GbifAdapter | None = None, col_xr_adapter: ColXrAdapter | None = None
+    ) -> None:
         self._adapter = adapter or GbifAdapter()
+        self._col_xr_adapter = col_xr_adapter or ColXrAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
@@ -127,8 +132,15 @@ class GbifModule(TaxonomyModule):
         if info is None:
             return None
 
+        # COL XR (ChecklistBank dataset 3LXR) est la taxonomie par défaut de GBIF depuis 2024 :
+        # quand ce même nom y est résolu, son identifiant alphanumérique remplace la clé
+        # numérique GBIF pour le rendu (Modèle:GBIF réformé pour accepter les deux formats,
+        # voir render_bioref) — la clé numérique `key` continue de piloter tous les appels GBIF
+        # ci-dessous, seul l'identifiant stocké pour l'affichage change.
+        col_xr_id = await find_col_xr_id(self._col_xr_adapter, info["nom"], struct.domaine)
+
         struct.liens["gbif"] = {
-            "id": key,
+            "id": col_xr_id or key,
             "auteur": format_auteur(info["auteur"]),
             "nom": info["nom"],
             **({"rang": info["rang"]} if "rang" in info else {}),
@@ -280,7 +292,7 @@ class GbifModule(TaxonomyModule):
 
         return struct
 
-    def render_bioref(self, struct: Struct) -> str | None:
+    def render_bioref(self, struct: Struct) -> list[str] | None:
         data = struct.liens.get("gbif")
         if not data or "id" not in data:
             return None
@@ -289,12 +301,22 @@ class GbifModule(TaxonomyModule):
         if data.get("auteur"):
             cible += " " + data["auteur"]
         sup = " | éteint=oui" if data.get("eteint") else ""
-        if data.get("synonyme"):
-            return f"{{{{GBIF | {data['id']} | {cible}{sup} | nv | consulté le={cdate} }}}}"
-        return f"{{{{GBIF | {data['id']} | {cible}{sup} | consulté le={cdate} }}}}"
+        nv = " | nv" if data.get("synonyme") else ""
+        out = [f"{{{{GBIF | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"]
+        if isinstance(data["id"], str):
+            # Identifiant ChecklistBank (COL XR) plutôt que la clé numérique GBIF legacy : la
+            # même fiche existe aussi sur catalogueoflife.org, d'où ce second lien.
+            out.append(
+                f"{{{{CatalogueofLife | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"
+            )
+        return out
 
     def debug_link(self, struct: Struct) -> str | None:
-        return simple_debug_link(struct, "gbif", "https://www.gbif.org/species/{id}", "GBIF")
+        data = struct.liens.get("gbif")
+        if not data or "id" not in data:
+            return None
+        path = "species" if isinstance(data["id"], int) else "taxon"
+        return simple_debug_link(struct, "gbif", f"https://www.gbif.org/{path}/{{id}}", "GBIF")
 
 
 register_module(GbifModule)
