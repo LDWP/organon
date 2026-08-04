@@ -199,7 +199,9 @@ def data_wgsrpd_code(code: str) -> str:
     (`entry["lien"]`), utilise {{Lien}} vers l'article anglais plutôt qu'un wikilien direct
     inexistant — avec une proposition de titre français (`fr`) seulement quand
     scripts/build_wgsrpd_yaml.py a pu en établir une de façon fiable, sinon le paramètre `fr`
-    est simplement omis (convention {{Lien}})."""
+    est simplement omis (convention {{Lien}}). Pour les codes sans article ni anglais ni
+    français (ex. subdivisions de la Russie d'Europe RUC/RUE/RUN/RUS/RUW), l'entrée ne porte
+    que `texte_affiche` : traduction en texte brut, sans lien."""
     wgsrpd = load_wgsrpd()
     entry = wgsrpd.get(code)
     if entry is None:
@@ -209,6 +211,8 @@ def data_wgsrpd_code(code: str) -> str:
         if entry.get("fr"):
             resu += f"|fr={entry['fr']}"
         return resu + "}}"
+    if "nom_page" not in entry:
+        return entry["texte_affiche"]
     if entry["texte_affiche"] == entry["nom_page"]:
         return f"[[{entry['nom_page']}]]"
     return f"[[{entry['nom_page']}|{entry['texte_affiche']}]]"

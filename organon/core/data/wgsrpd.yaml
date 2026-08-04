@@ -308,6 +308,8 @@ SCA:
 BZE-CE:
   texte_affiche: Ceará
   nom_page: Ceará
+RUC:
+  texte_affiche: Centre de la Russie d'Europe
 CPI:
   lien: true
   langue: en
@@ -453,6 +455,8 @@ SPA:
 BZL-ES:
   texte_affiche: Espírito Santo
   nom_page: Espírito Santo
+RUE:
+  texte_affiche: Est de la Russie d'Europe
 '72':
   texte_affiche: Est du Canada
   nom_page: Est du Canada
@@ -1037,9 +1041,13 @@ CHI-NX:
 NUE:
   texte_affiche: Niue
   nom_page: Niue
+RUN:
+  texte_affiche: Nord de la Russie d'Europe
 TVL-NW:
   texte_affiche: Nord-Ouest
   nom_page: Nord-Ouest (Afrique du Sud)
+RUW:
+  texte_affiche: Nord-Ouest de la Russie d'Europe
 TVL:
   lien: true
   langue: en
@@ -1541,6 +1549,8 @@ SUD:
 SRL:
   texte_affiche: Sri Lanka
   nom_page: Sri Lanka
+RUS:
+  texte_affiche: Sud de la Russie d'Europe
 SWI:
   texte_affiche: Suisse
   nom_page: Suisse
