@@ -30,6 +30,7 @@ from organon.core.rendering.support import (
     colonnes_contenu,
     conditionne_noms,
     data_pays_code,
+    data_wgsrpd_code,
     dates_recupere,
     est_colonnes,
     format_auteur,
@@ -366,8 +367,11 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
     wgsrpd_uncertain: list[str] = []
     for ref, entry in struct.distribution.items():
         source = ref
-        certain.extend(data_pays_code(code) for code in entry.certain)
-        uncertain.extend(data_pays_code(code) for code in entry.uncertain)
+        # POWO peuple ce champ avec des codes WGSRPD (pas ISO) : table de traduction dédiée
+        # (voir data_wgsrpd_code) plutôt que data_pays_code, qui ne les connaît pas.
+        traduit_code = data_wgsrpd_code if ref == "powo" else data_pays_code
+        certain.extend(traduit_code(code) for code in entry.certain)
+        uncertain.extend(traduit_code(code) for code in entry.uncertain)
         if ref == "powo":
             wgsrpd_certain.extend(entry.certain)
             wgsrpd_uncertain.extend(entry.uncertain)

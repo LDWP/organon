@@ -1,0 +1,2017 @@
+# Généré depuis la page Wikipédia (en) List of codes used in the World Geographical Scheme for Recording Plant Distributions par scripts/build_wgsrpd_yaml.py.
+
+BZN-AC:
+  texte_affiche: Acre
+  nom_page: Acre (Brésil)
+TCS-AD:
+  texte_affiche: Adjarie
+  nom_page: Adjarie
+AFG:
+  texte_affiche: Afghanistan
+  nom_page: Afghanistan
+'2':
+  texte_affiche: Afrique
+  nom_page: Afrique
+'27':
+  texte_affiche: Afrique australe
+  nom_page: Afrique australe
+'20':
+  texte_affiche: Afrique du Nord
+  nom_page: Afrique du Nord
+MXE-AG:
+  texte_affiche: Aguascalientes
+  nom_page: Aguascalientes (État)
+ALA:
+  texte_affiche: Alabama
+  nom_page: Alabama
+BZE-AL:
+  texte_affiche: Alagoas
+  nom_page: Alagoas
+ASK:
+  texte_affiche: Alaska
+  nom_page: Alaska
+ALB:
+  texte_affiche: Albanie
+  nom_page: Albanie
+ABT:
+  texte_affiche: Alberta
+  nom_page: Alberta
+ALD:
+  texte_affiche: Aldabra
+  nom_page: Aldabra
+ALG:
+  texte_affiche: Algérie
+  nom_page: Algérie
+GER:
+  texte_affiche: Allemagne
+  nom_page: Allemagne
+BZN-AP:
+  texte_affiche: Amapá
+  nom_page: Amapá
+BZN-AM:
+  texte_affiche: Amazonas
+  nom_page: Amazonas (Brésil)
+'80':
+  texte_affiche: Amérique centrale
+  nom_page: Amérique centrale
+'8':
+  texte_affiche: Amérique du Sud
+  nom_page: Amérique du Sud
+'7':
+  texte_affiche: Amérique septentrionale
+  nom_page: Amérique septentrionale
+IND-AP:
+  texte_affiche: Andhra Pradesh
+  nom_page: Andhra Pradesh
+SPA-AN:
+  texte_affiche: Andorre
+  nom_page: Andorre
+ANG:
+  texte_affiche: Angola
+  nom_page: Angola
+LEE-AG:
+  texte_affiche: Anguilla
+  nom_page: Anguilla
+CHS-AH:
+  texte_affiche: Anhui
+  nom_page: Anhui
+GGI-AN:
+  texte_affiche: Annobón
+  nom_page: Annobón (province)
+ANT:
+  texte_affiche: Antarctique
+  nom_page: Antarctique
+LEE-AB:
+  texte_affiche: Antigua-et-Barbuda
+  nom_page: Antigua-et-Barbuda
+NLA:
+  texte_affiche: Antilles néerlandaises
+  nom_page: Antilles néerlandaises
+'35':
+  texte_affiche: Arabie
+  nom_page: Arabie
+SAU:
+  texte_affiche: Arabie saoudite
+  nom_page: Arabie saoudite
+BIS:
+  texte_affiche: Archipel Bismarck
+  nom_page: Archipel Bismarck
+CRZ:
+  texte_affiche: Archipel Crozet
+  nom_page: Archipel Crozet
+JNF:
+  texte_affiche: Archipel Juan Fernández
+  nom_page: Archipel Juan Fernández
+NNS:
+  texte_affiche: Archipel Nansei
+  nom_page: Archipel Nansei
+TDC:
+  texte_affiche: Archipel Tristan da Cunha
+  nom_page: Archipel Tristan da Cunha
+HAW-HI:
+  texte_affiche: Archipel d'Hawaï
+  nom_page: Archipel d'Hawaï
+SWC-CC:
+  texte_affiche: Archipel de San Andrés, Providencia et Santa Catalina
+  nom_page: Archipel de San Andrés, Providencia et Santa Catalina
+SCI:
+  texte_affiche: Archipel de la Société
+  nom_page: Archipel de la Société
+CGS:
+  texte_affiche: Archipel des Chagos
+  nom_page: Archipel des Chagos
+ARI:
+  texte_affiche: Arizona
+  nom_page: Arizona
+ARK:
+  texte_affiche: Arkansas
+  nom_page: Arkansas
+TCS-AR:
+  texte_affiche: Arménie
+  nom_page: Arménie
+ARU:
+  texte_affiche: Aruba
+  nom_page: Aruba
+EHM-AP:
+  texte_affiche: Arunachal Pradesh
+  nom_page: Arunachal Pradesh
+'32':
+  texte_affiche: Asie centrale
+  nom_page: Asie centrale
+'34':
+  texte_affiche: Asie de l'Ouest
+  nom_page: Asie de l'Ouest
+'4':
+  lien: true
+  langue: en
+  trad: tropical Asia
+  fr: Asie tropicale
+ASS-AS:
+  texte_affiche: Assam
+  nom_page: Assam
+HAW-JI:
+  texte_affiche: Atoll Johnston
+  nom_page: Atoll Johnston
+'5':
+  texte_affiche: Australasie
+  nom_page: Australasie
+'50':
+  texte_affiche: Australie
+  nom_page: Australie
+SOA:
+  texte_affiche: Australie-Méridionale
+  nom_page: Australie-Méridionale
+WAU:
+  texte_affiche: Australie-Occidentale
+  nom_page: Australie-Occidentale
+AUT:
+  texte_affiche: Autriche
+  nom_page: Autriche
+TCS-AZ:
+  texte_affiche: Azerbaïdjan
+  nom_page: Azerbaïdjan
+AZO:
+  texte_affiche: Açores
+  nom_page: Açores
+BAH:
+  texte_affiche: Bahamas
+  nom_page: Bahamas
+BZE-BA:
+  texte_affiche: Bahia
+  nom_page: Bahia
+GST-BA:
+  texte_affiche: Bahreïn
+  nom_page: Bahreïn
+LSI-BA:
+  texte_affiche: Bali
+  nom_page: Bali (province)
+CPV:
+  texte_affiche: Bande de Caprivi
+  nom_page: Bande de Caprivi
+BAN:
+  texte_affiche: Bangladesh
+  nom_page: Bangladesh
+WIN-BA:
+  texte_affiche: Barbade
+  nom_page: Barbade
+MXN-BC:
+  texte_affiche: Basse-Californie
+  nom_page: Basse-Californie (État)
+MXN-BS:
+  texte_affiche: Basse-Californie du Sud
+  nom_page: Basse-Californie du Sud
+BGM:
+  texte_affiche: Belgique
+  nom_page: Belgique
+BLZ:
+  texte_affiche: Belize
+  nom_page: Belize
+IND-WB:
+  texte_affiche: Bengale-Occidental
+  nom_page: Bengale-Occidental
+BER:
+  texte_affiche: Bermudes
+  nom_page: Bermudes
+EHM-BH:
+  texte_affiche: Bhoutan
+  nom_page: Bhoutan
+IND-BI:
+  texte_affiche: Bihar
+  nom_page: Bihar
+GGI-BI:
+  texte_affiche: Bioko
+  nom_page: Bioko
+MYA:
+  texte_affiche: Birmanie
+  nom_page: Birmanie
+BLR:
+  texte_affiche: Biélorussie
+  nom_page: Biélorussie
+BOL:
+  texte_affiche: Bolivie
+  nom_page: Bolivie
+NLA-BO:
+  texte_affiche: Bonaire
+  nom_page: Bonaire
+BOR:
+  texte_affiche: Bornéo
+  nom_page: Bornéo
+YUG-BH:
+  texte_affiche: Bosnie-Herzégovine
+  nom_page: Bosnie-Herzégovine
+BOT:
+  texte_affiche: Botswana
+  nom_page: Botswana
+BRY:
+  texte_affiche: Bouriatie
+  nom_page: Bouriatie
+BOR-BR:
+  texte_affiche: Brunei
+  nom_page: Brunei
+'84':
+  texte_affiche: Brésil
+  nom_page: Brésil
+AGE-DF:
+  texte_affiche: Buenos Aires
+  nom_page: Buenos Aires
+BUL:
+  texte_affiche: Bulgarie
+  nom_page: Bulgarie
+BKN:
+  texte_affiche: Burkina Faso
+  nom_page: Burkina Faso
+BUR:
+  texte_affiche: Burundi
+  nom_page: Burundi
+BEN:
+  texte_affiche: Bénin
+  nom_page: Bénin
+CAB:
+  texte_affiche: Cabinda
+  nom_page: Cabinda
+CAL:
+  texte_affiche: Californie
+  nom_page: Californie
+CBD:
+  texte_affiche: Cambodge
+  nom_page: Cambodge
+CMN:
+  texte_affiche: Cameroun
+  nom_page: Cameroun
+MXT-CA:
+  texte_affiche: Campeche
+  nom_page: Campeche (État)
+CPP-NC:
+  texte_affiche: Cap-Nord
+  nom_page: Cap-Nord
+CPP-WC:
+  texte_affiche: Cap-Occidental
+  nom_page: Cap-Occidental
+CPP-EC:
+  texte_affiche: Cap-Oriental
+  nom_page: Cap-Oriental
+CVI:
+  texte_affiche: Cap-Vert
+  nom_page: Cap-Vert
+'81':
+  texte_affiche: Caraïbes
+  nom_page: Caraïbes
+NCA:
+  texte_affiche: Caroline du Nord
+  nom_page: Caroline du Nord
+SCA:
+  texte_affiche: Caroline du Sud
+  nom_page: Caroline du Sud
+'33':
+  texte_affiche: Caucase
+  nom_page: Caucase
+BZE-CE:
+  texte_affiche: Ceará
+  nom_page: Ceará
+CPI:
+  lien: true
+  langue: en
+  trad: Central American Pacific Islands
+IND-CH:
+  texte_affiche: Chandigarh
+  nom_page: Chandigarh
+KZN:
+  texte_affiche: Chaîne Kazan
+  nom_page: Chaîne Kazan
+IND-CT:
+  texte_affiche: Chhattisgarh
+  nom_page: Chhattisgarh
+MXT-CI:
+  texte_affiche: Chiapas
+  nom_page: Chiapas
+MXE-CU:
+  texte_affiche: Chihuahua
+  nom_page: Chihuahua (État)
+'36':
+  texte_affiche: Chine
+  nom_page: Chine
+CHC-CQ:
+  texte_affiche: Chongqing
+  nom_page: Chongqing
+CYP:
+  texte_affiche: Chypre
+  nom_page: Chypre (pays)
+NCS:
+  texte_affiche: Ciscaucasie
+  nom_page: Ciscaucasie
+MXE-CO:
+  texte_affiche: Coahuila
+  nom_page: Coahuila
+MXS-CL:
+  texte_affiche: Colima
+  nom_page: Colima (État)
+CLM:
+  texte_affiche: Colombie
+  nom_page: Colombie
+BRC:
+  texte_affiche: Colombie-Britannique
+  nom_page: Colombie-Britannique
+COL:
+  texte_affiche: Colorado
+  nom_page: Colorado
+COM:
+  texte_affiche: Comores
+  nom_page: Comores (pays)
+CNT:
+  texte_affiche: Connecticut
+  nom_page: Connecticut
+COR:
+  texte_affiche: Corse
+  nom_page: Corse
+KOR:
+  texte_affiche: Corée
+  nom_page: Corée
+KOR-NK:
+  texte_affiche: Corée du Nord
+  nom_page: Corée du Nord
+KOR-SK:
+  texte_affiche: Corée du Sud
+  nom_page: Corée du Sud
+COS:
+  texte_affiche: Costa Rica
+  nom_page: Costa Rica
+KRY:
+  texte_affiche: Crimée
+  nom_page: Crimée
+YUG-CR:
+  texte_affiche: Croatie
+  nom_page: Croatie
+KRI:
+  texte_affiche: Crète
+  nom_page: Crète
+CUB:
+  texte_affiche: Cuba
+  nom_page: Cuba
+NLA-CU:
+  texte_affiche: Curaçao
+  nom_page: Curaçao
+SUL:
+  texte_affiche: Célèbes
+  nom_page: Célèbes
+IVO:
+  texte_affiche: Côte d'Ivoire
+  nom_page: Côte d'Ivoire
+IND-DD:
+  texte_affiche: Dadra et Nagar Haveli
+  nom_page: Dadra et Nagar Haveli
+NCS-DA:
+  texte_affiche: Daghestan
+  nom_page: Daghestan
+NDA:
+  texte_affiche: Dakota du Nord
+  nom_page: Dakota du Nord
+SDA:
+  texte_affiche: Dakota du Sud
+  nom_page: Dakota du Sud
+DEN:
+  texte_affiche: Danemark
+  nom_page: Danemark (pays constitutif)
+EHM-DJ:
+  texte_affiche: Darjeeling
+  nom_page: Darjeeling (Inde)
+DEL:
+  texte_affiche: Delaware
+  nom_page: Delaware
+IND-DE:
+  texte_affiche: Delhi
+  nom_page: Delhi
+IND-DM:
+  texte_affiche: District de Daman
+  nom_page: District de Daman
+IND-DI:
+  texte_affiche: District de Diu
+  nom_page: District de Diu
+IND-MH:
+  texte_affiche: District de Mahé
+  nom_page: District de Mahé (Inde)
+BZC-DF:
+  texte_affiche: District fédéral
+  nom_page: District fédéral (Brésil)
+DJI:
+  texte_affiche: Djibouti
+  nom_page: Djibouti
+WIN-DO:
+  texte_affiche: Dominique
+  nom_page: Dominique (pays)
+MXE-DU:
+  texte_affiche: Durango
+  nom_page: Durango (État)
+SWC-HC:
+  texte_affiche: Département des Islas de la Bahía
+  nom_page: Département des Islas de la Bahía
+VNA:
+  texte_affiche: Dépendances fédérales du Venezuela
+  nom_page: Dépendances fédérales du Venezuela
+SPA:
+  texte_affiche: Espagne
+  nom_page: Espagne
+BZL-ES:
+  texte_affiche: Espírito Santo
+  nom_page: Espírito Santo
+'72':
+  texte_affiche: Est du Canada
+  nom_page: Est du Canada
+BLT-ES:
+  texte_affiche: Estonie
+  nom_page: Estonie
+SWZ:
+  texte_affiche: Eswatini
+  nom_page: Eswatini
+'1':
+  texte_affiche: Europe
+  nom_page: Europe
+'11':
+  texte_affiche: Europe centrale
+  nom_page: Europe centrale
+'14':
+  texte_affiche: Europe de l'Est
+  nom_page: Europe de l'Est
+'10':
+  texte_affiche: Europe du Nord
+  nom_page: Europe du Nord
+'31':
+  texte_affiche: Extrême-Orient russe
+  nom_page: Extrême-Orient russe
+BZE-FN:
+  texte_affiche: Fernando de Noronha
+  nom_page: Fernando de Noronha (archipel)
+FIJ:
+  texte_affiche: Fidji
+  nom_page: Fidji
+FIN:
+  texte_affiche: Finlande
+  nom_page: Finlande
+FLA:
+  texte_affiche: Floride
+  nom_page: Floride
+FRA:
+  texte_affiche: France
+  nom_page: France
+CHS-FJ:
+  texte_affiche: Fujian
+  nom_page: Fujian
+GAB:
+  texte_affiche: Gabon
+  nom_page: Gabon
+GAM:
+  texte_affiche: Gambie
+  nom_page: Gambie
+CHN-GS:
+  texte_affiche: Gansu
+  nom_page: Gansu
+TVL-GA:
+  texte_affiche: Gauteng
+  nom_page: Gauteng
+GHA:
+  texte_affiche: Ghana
+  nom_page: Ghana
+SPA-GI:
+  texte_affiche: Gibraltar
+  nom_page: Gibraltar
+IND-GO:
+  texte_affiche: Goa
+  nom_page: Goa
+BZC-GO:
+  texte_affiche: Goiás
+  nom_page: Goiás
+GGI:
+  texte_affiche: Golfe de Guinée
+  nom_page: Golfe de Guinée
+GRB:
+  texte_affiche: Grande-Bretagne
+  nom_page: Grande-Bretagne
+WIN-GR:
+  texte_affiche: Grenade
+  nom_page: Grenade (pays)
+GNL:
+  texte_affiche: Groenland
+  nom_page: Groenland
+GRC:
+  texte_affiche: Grèce
+  nom_page: Grèce
+LEE-GU:
+  texte_affiche: Guadeloupe
+  nom_page: Guadeloupe
+MRN-GU:
+  texte_affiche: Guam
+  nom_page: Guam
+MXE-GU:
+  texte_affiche: Guanajuato
+  nom_page: Guanajuato (État)
+CHS-GD:
+  texte_affiche: Guangdong
+  nom_page: Guangdong
+CHS-GX:
+  texte_affiche: Guangxi
+  nom_page: Guangxi
+GUA:
+  texte_affiche: Guatemala
+  nom_page: Guatemala
+MXS-GR:
+  texte_affiche: Guerrero
+  nom_page: Guerrero
+GUI:
+  texte_affiche: Guinée
+  nom_page: Guinée
+EQG:
+  texte_affiche: Guinée équatoriale
+  nom_page: Guinée équatoriale
+GNB:
+  texte_affiche: Guinée-Bissau
+  nom_page: Guinée-Bissau
+CHC-GZ:
+  texte_affiche: Guizhou
+  nom_page: Guizhou
+IND-GU:
+  texte_affiche: Gujarat
+  nom_page: Gujarat
+GUY:
+  texte_affiche: Guyana
+  nom_page: Guyana
+FRG:
+  texte_affiche: Guyane
+  nom_page: Guyane
+TCS-GR:
+  texte_affiche: Géorgie
+  nom_page: Géorgie (pays)
+GEO:
+  texte_affiche: Géorgie
+  nom_page: Géorgie (États-Unis)
+SGE:
+  texte_affiche: Géorgie du Sud
+  nom_page: Géorgie du Sud
+CHH:
+  texte_affiche: Hainan
+  nom_page: Hainan
+IND-HA:
+  texte_affiche: Haryana
+  nom_page: Haryana
+TCS-NK:
+  texte_affiche: Haut-Karabagh
+  nom_page: Haut-Karabagh
+HAW:
+  texte_affiche: Hawaï
+  nom_page: Hawaï
+HAI:
+  texte_affiche: Haïti
+  nom_page: Haïti
+CHN-HB:
+  texte_affiche: Hebei
+  nom_page: Hebei
+CHM-HJ:
+  texte_affiche: Heilongjiang
+  nom_page: Heilongjiang
+CHS-HE:
+  texte_affiche: Henan
+  nom_page: Henan
+MXE-HI:
+  texte_affiche: Hidalgo
+  nom_page: Hidalgo (État)
+WHM-HP:
+  texte_affiche: Himachal Pradesh
+  nom_page: Himachal Pradesh
+JAP-HK:
+  texte_affiche: Hokkaidō
+  nom_page: Hokkaidō
+HON:
+  texte_affiche: Honduras
+  nom_page: Honduras
+CHS-HK:
+  texte_affiche: Hong Kong
+  nom_page: Hong Kong
+HUN:
+  texte_affiche: Hongrie
+  nom_page: Hongrie
+JAP-HN:
+  texte_affiche: Honshū
+  nom_page: Honshū
+HBI:
+  lien: true
+  langue: en
+  trad: Howland and Baker Islands
+CHC-HU:
+  texte_affiche: Hubei
+  nom_page: Hubei
+CHS-HN:
+  texte_affiche: Hunan
+  nom_page: Hunan
+IDA:
+  texte_affiche: Idaho
+  nom_page: Idaho
+ILL:
+  texte_affiche: Illinois
+  nom_page: Illinois
+INI:
+  texte_affiche: Indiana
+  nom_page: Indiana
+'41':
+  texte_affiche: Indochine
+  nom_page: Indochine
+NCS-IN:
+  texte_affiche: Ingouchie
+  nom_page: Ingouchie
+IOW:
+  texte_affiche: Iowa
+  nom_page: Iowa
+IRQ:
+  texte_affiche: Irak
+  nom_page: Irak
+IRN:
+  texte_affiche: Iran
+  nom_page: Iran
+IRE:
+  texte_affiche: Irlande
+  nom_page: Irlande (île)
+IRE-IR:
+  texte_affiche: Irlande
+  nom_page: Irlande (pays)
+IRE-NI:
+  texte_affiche: Irlande du Nord
+  nom_page: Irlande du Nord
+LEE-AV:
+  texte_affiche: Isla de Aves
+  nom_page: Isla de Aves
+ICE:
+  texte_affiche: Islande
+  nom_page: Islande
+PAL-IS:
+  texte_affiche: Israël
+  nom_page: Israël
+ITA:
+  texte_affiche: Italie
+  nom_page: Italie
+MXS-JA:
+  texte_affiche: Jalisco
+  nom_page: Jalisco
+JAM:
+  texte_affiche: Jamaïque
+  nom_page: Jamaïque
+WHM-JK:
+  texte_affiche: Jammu-et-Cachemire
+  nom_page: Jammu-et-Cachemire (territoire de l'Union)
+JAP:
+  texte_affiche: Japon
+  nom_page: Japon
+JAW:
+  texte_affiche: Java
+  nom_page: Java (île)
+IND-JK:
+  texte_affiche: Jharkhand
+  nom_page: Jharkhand
+CHS-JS:
+  texte_affiche: Jiangsu
+  nom_page: Jiangsu
+CHS-JX:
+  texte_affiche: Jiangxi
+  nom_page: Jiangxi
+CHM-JL:
+  texte_affiche: Jilin
+  nom_page: Jilin
+PAL-JO:
+  texte_affiche: Jordanie
+  nom_page: Jordanie
+NCS-KB:
+  texte_affiche: Kabardino-Balkarie
+  nom_page: Kabardino-Balkarie
+BOR-KA:
+  texte_affiche: Kalimantan
+  nom_page: Kalimantan
+BLT-KA:
+  texte_affiche: Kaliningrad
+  nom_page: Kaliningrad
+KAN:
+  texte_affiche: Kansas
+  nom_page: Kansas
+NCS-KC:
+  texte_affiche: Karatchaïévo-Tcherkessie
+  nom_page: Karatchaïévo-Tcherkessie
+IND-KL:
+  texte_affiche: Karikal
+  nom_page: Karikal
+IND-KT:
+  texte_affiche: Karnataka
+  nom_page: Karnataka
+KAZ:
+  texte_affiche: Kazakhstan
+  nom_page: Kazakhstan
+KTY:
+  texte_affiche: Kentucky
+  nom_page: Kentucky
+KEN:
+  texte_affiche: Kenya
+  nom_page: Kenya
+IND-KE:
+  texte_affiche: Kerala
+  nom_page: Kerala
+CHS-KI:
+  texte_affiche: Kinmen
+  nom_page: Kinmen
+KGZ:
+  texte_affiche: Kirghizistan
+  nom_page: Kirghizistan
+LIN-KI:
+  lien: true
+  langue: en
+  trad: Kiribati Line Islands
+YUG-KO:
+  texte_affiche: Kosovo
+  nom_page: Kosovo
+KUW:
+  texte_affiche: Koweït
+  nom_page: Koweït
+KHA:
+  texte_affiche: Kraï de Khabarovsk
+  nom_page: Kraï de Khabarovsk
+NCS-KR:
+  texte_affiche: Kraï de Krasnodar
+  nom_page: Kraï de Krasnodar
+KRA:
+  texte_affiche: Kraï de Krasnoïarsk
+  nom_page: Kraï de Krasnoïarsk
+NCS-ST:
+  texte_affiche: Kraï de Stavropol
+  nom_page: Kraï de Stavropol
+ALT:
+  texte_affiche: Kraï de l'Altaï
+  nom_page: Kraï de l'Altaï
+KAM:
+  texte_affiche: Kraï du Kamtchatka
+  nom_page: Kraï du Kamtchatka
+PRM:
+  texte_affiche: Kraï du Primorié
+  nom_page: Kraï du Primorié
+NAT:
+  texte_affiche: KwaZulu-Natal
+  nom_page: KwaZulu-Natal
+JAP-KY:
+  texte_affiche: Kyūshū
+  nom_page: Kyūshū
+REU:
+  texte_affiche: La Réunion
+  nom_page: La Réunion
+LAB:
+  texte_affiche: Labrador
+  nom_page: Labrador
+LAO:
+  texte_affiche: Laos
+  nom_page: Laos
+LES:
+  texte_affiche: Lesotho
+  nom_page: Lesotho
+BLT-LA:
+  texte_affiche: Lettonie
+  nom_page: Lettonie
+CHM-LN:
+  texte_affiche: Liaoning
+  nom_page: Liaoning
+LBS-LB:
+  texte_affiche: Liban
+  nom_page: Liban
+LBR:
+  texte_affiche: Liberia
+  nom_page: Liberia
+LBY:
+  texte_affiche: Libye
+  nom_page: Libye
+AUT-LI:
+  texte_affiche: Liechtenstein
+  nom_page: Liechtenstein
+TVL-NP:
+  texte_affiche: Limpopo
+  nom_page: Limpopo (province)
+'90':
+  texte_affiche: Liste des îles subantarctiques
+  nom_page: Liste des îles subantarctiques
+BLT-LI:
+  texte_affiche: Lituanie
+  nom_page: Lituanie
+LOU:
+  texte_affiche: Louisiane
+  nom_page: Louisiane
+BGM-LU:
+  texte_affiche: Luxembourg
+  nom_page: Luxembourg
+CHS-MA:
+  texte_affiche: Macao
+  nom_page: Macao
+'21':
+  texte_affiche: Macaronésie
+  nom_page: Macaronésie
+YUG-MA:
+  texte_affiche: Macédoine du Nord
+  nom_page: Macédoine du Nord
+MDG:
+  texte_affiche: Madagascar
+  nom_page: Madagascar
+IND-MP:
+  texte_affiche: Madhya Pradesh
+  nom_page: Madhya Pradesh
+MDR:
+  texte_affiche: Madère
+  nom_page: Madère
+IND-MR:
+  texte_affiche: Maharashtra
+  nom_page: Maharashtra
+MAI:
+  texte_affiche: Maine
+  nom_page: Maine (États-Unis)
+MLY-PM:
+  texte_affiche: Malaisie péninsulaire
+  nom_page: Malaisie péninsulaire
+MLW:
+  texte_affiche: Malawi
+  nom_page: Malawi
+MDV:
+  texte_affiche: Maldives
+  nom_page: Maldives
+MLI:
+  texte_affiche: Mali
+  nom_page: Mali
+SIC-MA:
+  texte_affiche: Malte
+  nom_page: Malte
+'42':
+  texte_affiche: Malésie
+  nom_page: Malésie
+CHM:
+  texte_affiche: Mandchourie
+  nom_page: Mandchourie
+TOK-MA:
+  lien: true
+  langue: en
+  trad: Manihiki Islands
+  fr: Manihiki
+ASS-MA:
+  texte_affiche: Manipur
+  nom_page: Manipur
+MAN:
+  texte_affiche: Manitoba
+  nom_page: Manitoba
+BZE-MA:
+  texte_affiche: Maranhão
+  nom_page: Maranhão
+MOR:
+  texte_affiche: Maroc
+  nom_page: Maroc
+WIN-MA:
+  texte_affiche: Martinique
+  nom_page: Martinique
+MRY:
+  texte_affiche: Maryland
+  nom_page: Maryland
+MAS:
+  texte_affiche: Massachusetts
+  nom_page: Massachusetts
+BZC-MT:
+  texte_affiche: Mato Grosso
+  nom_page: Mato Grosso
+BZC-MS:
+  texte_affiche: Mato Grosso do Sul
+  nom_page: Mato Grosso do Sul
+MAU:
+  texte_affiche: Maurice
+  nom_page: Maurice (pays)
+MTN:
+  texte_affiche: Mauritanie
+  nom_page: Mauritanie
+COM-MA:
+  texte_affiche: Mayotte
+  nom_page: Mayotte
+ASS-ME:
+  texte_affiche: Meghalaya
+  nom_page: Meghalaya
+SCS:
+  texte_affiche: Mer de Chine méridionale
+  nom_page: Mer de Chine méridionale
+MXC-DF:
+  texte_affiche: Mexico
+  nom_page: Mexico
+'79':
+  texte_affiche: Mexique
+  nom_page: Mexique
+MIC:
+  texte_affiche: Michigan
+  nom_page: Michigan
+MXS-MI:
+  texte_affiche: Michoacán
+  nom_page: Michoacán
+MCS:
+  texte_affiche: Minamitori-shima
+  nom_page: Minamitori-shima
+BZL-MG:
+  texte_affiche: Minas Gerais
+  nom_page: Minas Gerais
+MIN:
+  texte_affiche: Minnesota
+  nom_page: Minnesota
+MSI:
+  texte_affiche: Mississippi
+  nom_page: Mississippi (État)
+MSO:
+  texte_affiche: Missouri
+  nom_page: Missouri (État)
+ASS-MI:
+  texte_affiche: Mizoram
+  nom_page: Mizoram
+UKR-MO:
+  texte_affiche: Moldavie
+  nom_page: Moldavie
+MOL:
+  texte_affiche: Moluques
+  nom_page: Moluques
+FRA-MO:
+  texte_affiche: Monaco
+  nom_page: Monaco
+MON:
+  texte_affiche: Mongolie
+  nom_page: Mongolie
+CHI:
+  texte_affiche: Mongolie-Intérieure
+  nom_page: Mongolie-Intérieure
+MNT:
+  texte_affiche: Montana
+  nom_page: Montana
+LEE-MO:
+  texte_affiche: Montserrat
+  nom_page: Montserrat (Antilles)
+YUG-MN:
+  texte_affiche: Monténégro
+  nom_page: Monténégro
+MXC-MO:
+  texte_affiche: Morelos
+  nom_page: Morelos
+MOZ:
+  texte_affiche: Mozambique
+  nom_page: Mozambique
+TVL-MP:
+  texte_affiche: Mpumalanga
+  nom_page: Mpumalanga
+ASS-NA:
+  texte_affiche: Nagaland
+  nom_page: Nagaland
+TCS-NA:
+  texte_affiche: Nakhitchevan
+  nom_page: Nakhitchevan
+NAM:
+  texte_affiche: Namibie
+  nom_page: Namibie
+NRU:
+  texte_affiche: Nauru
+  nom_page: Nauru
+MXS-NA:
+  texte_affiche: Nayarit
+  nom_page: Nayarit
+NEB:
+  texte_affiche: Nebraska
+  nom_page: Nebraska
+NEV:
+  texte_affiche: Nevada
+  nom_page: Nevada
+NWH:
+  texte_affiche: New Hampshire
+  nom_page: New Hampshire
+NWJ:
+  texte_affiche: New Jersey
+  nom_page: New Jersey
+NIC:
+  texte_affiche: Nicaragua
+  nom_page: Nicaragua
+SWC-NC:
+  lien: true
+  langue: en
+  trad: Nicaraguan Caribbean Islands
+NGR:
+  texte_affiche: Niger
+  nom_page: Niger
+NGA:
+  texte_affiche: Nigeria
+  nom_page: Nigeria
+CHI-NX:
+  texte_affiche: Ningxia
+  nom_page: Ningxia
+NUE:
+  texte_affiche: Niue
+  nom_page: Niue
+TVL-NW:
+  texte_affiche: Nord-Ouest
+  nom_page: Nord-Ouest (Afrique du Sud)
+TVL:
+  lien: true
+  langue: en
+  trad: Northern Provinces
+NOR:
+  texte_affiche: Norvège
+  nom_page: Norvège
+NBR:
+  texte_affiche: Nouveau-Brunswick
+  nom_page: Nouveau-Brunswick
+NWM:
+  texte_affiche: Nouveau-Mexique
+  nom_page: Nouveau-Mexique
+NWC:
+  texte_affiche: Nouvelle-Calédonie
+  nom_page: Nouvelle-Calédonie
+NSW:
+  texte_affiche: Nouvelle-Galles du Sud
+  nom_page: Nouvelle-Galles du Sud (Australie)
+NWG:
+  texte_affiche: Nouvelle-Guinée
+  nom_page: Nouvelle-Guinée
+NWG-IJ:
+  texte_affiche: Nouvelle-Guinée occidentale
+  nom_page: Nouvelle-Guinée occidentale
+'51':
+  texte_affiche: Nouvelle-Zélande
+  nom_page: Nouvelle-Zélande
+NSC:
+  texte_affiche: Nouvelle-Écosse
+  nom_page: Nouvelle-Écosse
+MXE-NL:
+  texte_affiche: Nuevo León
+  nom_page: Nuevo León
+NUN:
+  texte_affiche: Nunavut
+  nom_page: Nunavut
+NEP:
+  texte_affiche: Népal
+  nom_page: Népal
+MXS-OA:
+  texte_affiche: Oaxaca
+  nom_page: Oaxaca (État)
+IRK:
+  texte_affiche: Oblast d'Irkoutsk
+  nom_page: Oblast d'Irkoutsk
+MAG:
+  texte_affiche: Oblast de Magadan
+  nom_page: Oblast de Magadan
+CTA:
+  texte_affiche: Oblast de Tchita
+  nom_page: Oblast de Tchita
+AMU:
+  texte_affiche: Oblast de l'Amour
+  nom_page: Oblast de l'Amour
+'6':
+  texte_affiche: Océan Pacifique
+  nom_page: Océan Pacifique
+IND-OR:
+  texte_affiche: Odisha
+  nom_page: Odisha
+OHI:
+  texte_affiche: Ohio
+  nom_page: Ohio
+OKL:
+  texte_affiche: Oklahoma
+  nom_page: Oklahoma
+OMA:
+  texte_affiche: Oman
+  nom_page: Oman
+ONT:
+  texte_affiche: Ontario
+  nom_page: Ontario
+ORE:
+  texte_affiche: Oregon
+  nom_page: Oregon
+NCS-SO:
+  texte_affiche: Ossétie du Nord-Alanie
+  nom_page: Ossétie du Nord-Alanie
+'71':
+  texte_affiche: Ouest canadien
+  nom_page: Ouest canadien
+UGA:
+  texte_affiche: Ouganda
+  nom_page: Ouganda
+UZB:
+  texte_affiche: Ouzbékistan
+  nom_page: Ouzbékistan
+PAK:
+  texte_affiche: Pakistan
+  nom_page: Pakistan
+CRL-PA:
+  texte_affiche: Palaos
+  nom_page: Palaos
+PAL:
+  texte_affiche: Palestine
+  nom_page: Palestine (région)
+PAN:
+  texte_affiche: Panama
+  nom_page: Panama
+NWG-PN:
+  texte_affiche: Papouasie-Nouvelle-Guinée
+  nom_page: Papouasie-Nouvelle-Guinée
+'43':
+  lien: true
+  langue: en
+  trad: Papuasia
+  fr: Papuasie
+PAR:
+  texte_affiche: Paraguay
+  nom_page: Paraguay
+BZS-PR:
+  texte_affiche: Paraná
+  nom_page: Paraná (État)
+BZE-PB:
+  texte_affiche: Paraíba
+  nom_page: Paraíba
+BZN-PA:
+  texte_affiche: Pará
+  nom_page: Pará
+BLT:
+  texte_affiche: Pays baltes
+  nom_page: Pays baltes
+NET:
+  texte_affiche: Pays-Bas
+  nom_page: Pays-Bas (pays constitutif)
+IND-PU:
+  texte_affiche: Pendjab
+  nom_page: Pendjab
+PEN:
+  texte_affiche: Pennsylvanie
+  nom_page: Pennsylvanie
+BZE-PE:
+  texte_affiche: Pernambouc
+  nom_page: Pernambouc (État)
+LSI:
+  texte_affiche: Petites îles de la Sonde
+  nom_page: Petites îles de la Sonde
+PHI:
+  texte_affiche: Philippines
+  nom_page: Philippines
+BZE-PI:
+  texte_affiche: Piauí
+  nom_page: Piauí
+POL:
+  texte_affiche: Pologne
+  nom_page: Pologne
+PUE:
+  texte_affiche: Porto Rico
+  nom_page: Porto Rico
+POR:
+  texte_affiche: Portugal
+  nom_page: Portugal
+GGI-PR:
+  texte_affiche: Principe
+  nom_page: Principe (île)
+AGE-ER:
+  texte_affiche: Province d'Entre Ríos
+  nom_page: Province d'Entre Ríos
+AGE-BA:
+  texte_affiche: Province de Buenos Aires
+  nom_page: Province de Buenos Aires
+AGW-CA:
+  texte_affiche: Province de Catamarca
+  nom_page: Province de Catamarca
+AGS-CB:
+  texte_affiche: Province de Chubut
+  nom_page: Province de Chubut
+AGE-CN:
+  texte_affiche: Province de Corrientes
+  nom_page: Province de Corrientes
+AGE-CD:
+  texte_affiche: Province de Córdoba
+  nom_page: Province de Córdoba (Argentine)
+AGE-FO:
+  texte_affiche: Province de Formosa
+  nom_page: Province de Formosa
+AGW-JU:
+  texte_affiche: Province de Jujuy
+  nom_page: Province de Jujuy
+AGE-LP:
+  texte_affiche: Province de La Pampa
+  nom_page: Province de La Pampa
+AGW-LR:
+  texte_affiche: Province de La Rioja
+  nom_page: Province de La Rioja (Argentine)
+AGW-ME:
+  texte_affiche: Province de Mendoza
+  nom_page: Province de Mendoza
+AGE-MI:
+  texte_affiche: Province de Misiones
+  nom_page: Province de Misiones
+AGS-NE:
+  texte_affiche: Province de Neuquén
+  nom_page: Province de Neuquén
+AGS-RN:
+  texte_affiche: Province de Río Negro
+  nom_page: Province de Río Negro
+AGW-SA:
+  texte_affiche: Province de Salta
+  nom_page: Province de Salta
+AGW-SJ:
+  texte_affiche: Province de San Juan
+  nom_page: Province de San Juan
+AGW-SL:
+  texte_affiche: Province de San Luis
+  nom_page: Province de San Luis
+AGS-SC:
+  texte_affiche: Province de Santa Cruz
+  nom_page: Province de Santa Cruz
+AGE-SF:
+  texte_affiche: Province de Santa Fe
+  nom_page: Province de Santa Fe
+AGW-SE:
+  texte_affiche: Province de Santiago del Estero
+  nom_page: Province de Santiago del Estero
+AGS-TF:
+  texte_affiche: Province de Terre de Feu
+  nom_page: Province de Terre de Feu (Argentine)
+AGW-TU:
+  texte_affiche: Province de Tucumán
+  nom_page: Province de Tucumán
+AGE-CH:
+  texte_affiche: Province du Chaco
+  nom_page: Province du Chaco
+CPP:
+  lien: true
+  langue: en
+  trad: Cape Provinces
+  fr: Provinces du Cap
+MXC-PU:
+  texte_affiche: Puebla
+  nom_page: Puebla (État)
+CHN-BJ:
+  texte_affiche: Pékin
+  nom_page: Pékin
+PER:
+  texte_affiche: Pérou
+  nom_page: Pérou
+GST-QA:
+  texte_affiche: Qatar
+  nom_page: Qatar
+CHQ:
+  texte_affiche: Qinghai
+  nom_page: Qinghai
+QLD:
+  texte_affiche: Queensland
+  nom_page: Queensland
+MXE-QU:
+  texte_affiche: Querétaro
+  nom_page: Querétaro
+MXT-QR:
+  texte_affiche: Quintana Roo
+  nom_page: Quintana Roo
+QUE:
+  texte_affiche: Québec
+  nom_page: Québec
+IND-RA:
+  texte_affiche: Rajasthan
+  nom_page: Rajasthan
+RHO:
+  texte_affiche: Rhode Island
+  nom_page: Rhode Island
+BZE-RN:
+  texte_affiche: Rio Grande do Norte
+  nom_page: Rio Grande do Norte
+BZS-RS:
+  texte_affiche: Rio Grande do Sul
+  nom_page: Rio Grande do Sul
+MXI-RA:
+  lien: true
+  langue: en
+  trad: Rocas Alijos
+  fr: Rocas Alijos
+ROD:
+  texte_affiche: Rodrigues
+  nom_page: Rodrigues
+BZN-RO:
+  texte_affiche: Rondônia
+  nom_page: Rondônia
+BZN-RM:
+  texte_affiche: Roraima
+  nom_page: Roraima
+ROM:
+  texte_affiche: Roumanie
+  nom_page: Roumanie
+RWA:
+  texte_affiche: Rwanda
+  nom_page: Rwanda
+BZC:
+  texte_affiche: Région Centre-Ouest
+  nom_page: Région Centre-Ouest (Brésil)
+BZN:
+  texte_affiche: Région Nord
+  nom_page: Région Nord (Brésil)
+BZE:
+  texte_affiche: Région Nord-Est
+  nom_page: Région Nord-Est (Brésil)
+BZS:
+  texte_affiche: Région Sud
+  nom_page: Région Sud (Brésil)
+BZL:
+  texte_affiche: Région Sud-Est
+  nom_page: Région Sud-Est (Brésil)
+'9':
+  texte_affiche: Région antarctique
+  nom_page: Région antarctique
+CLN-AN:
+  texte_affiche: Région d'Antofagasta
+  nom_page: Région d'Antofagasta
+CLN-AT:
+  texte_affiche: Région d'Atacama
+  nom_page: Région d'Atacama
+CLS-AI:
+  texte_affiche: Région d'Aysén
+  nom_page: Région d'Aysén
+CLC-CO:
+  texte_affiche: Région de Coquimbo
+  nom_page: Région de Coquimbo
+CLS-MG:
+  texte_affiche: Région de Magallanes et de l'Antarctique chilien
+  nom_page: Région de Magallanes et de l'Antarctique chilien
+CLN-TA:
+  texte_affiche: Région de Tarapacá
+  nom_page: Région de Tarapacá
+CLC-VA:
+  texte_affiche: Région de Valparaíso
+  nom_page: Région de Valparaíso
+CLC-LA:
+  texte_affiche: Région de l'Araucanie
+  nom_page: Région de l'Araucanie
+CLS-LL:
+  texte_affiche: Région des Lacs
+  nom_page: Région des Lacs
+CLC-BI:
+  texte_affiche: Région du Biobío
+  nom_page: Région du Biobío
+CLC-OH:
+  texte_affiche: Région du Libertador General Bernardo O'Higgins
+  nom_page: Région du Libertador General Bernardo O'Higgins
+CLC-MA:
+  texte_affiche: Région du Maule
+  nom_page: Région du Maule
+CLC-SA:
+  texte_affiche: Région métropolitaine de Santiago
+  nom_page: Région métropolitaine de Santiago
+YEM-NY:
+  texte_affiche: République arabe du Yémen
+  nom_page: République arabe du Yémen
+CAF:
+  texte_affiche: République centrafricaine
+  nom_page: République centrafricaine
+TCS-AB:
+  texte_affiche: République d'Abkhazie
+  nom_page: République d'Abkhazie
+YAK:
+  texte_affiche: République de Sakha
+  nom_page: République de Sakha
+DOM:
+  texte_affiche: République dominicaine
+  nom_page: République dominicaine
+CON:
+  texte_affiche: République du Congo
+  nom_page: République du Congo
+ZAI:
+  texte_affiche: République démocratique du Congo
+  nom_page: République démocratique du Congo
+YEM-SY:
+  texte_affiche: République démocratique populaire du Yémen
+  nom_page: République démocratique populaire du Yémen
+BOR-SB:
+  texte_affiche: Sabah
+  nom_page: Sabah
+WSA:
+  texte_affiche: Sahara occidental
+  nom_page: Sahara occidental
+LEE-SK:
+  texte_affiche: Saint-Christophe-et-Niévès
+  nom_page: Saint-Christophe-et-Niévès
+ITA-SM:
+  texte_affiche: Saint-Marin
+  nom_page: Saint-Marin
+LEE-SM:
+  texte_affiche: Saint-Martin
+  nom_page: Saint-Martin (île)
+NFL-SP:
+  texte_affiche: Saint-Pierre-et-Miquelon
+  nom_page: Saint-Pierre-et-Miquelon
+WIN-SV:
+  texte_affiche: Saint-Vincent-et-les-Grenadines
+  nom_page: Saint-Vincent-et-les-Grenadines
+STH:
+  texte_affiche: Sainte-Hélène
+  nom_page: Sainte-Hélène (île)
+WIN-SL:
+  texte_affiche: Sainte-Lucie
+  nom_page: Sainte-Lucie
+SAK:
+  texte_affiche: Sakhaline
+  nom_page: Sakhaline
+ELS:
+  texte_affiche: Salvador
+  nom_page: Salvador
+SAM:
+  texte_affiche: Samoa
+  nom_page: Samoa
+SAM-AS:
+  texte_affiche: Samoa américaines
+  nom_page: Samoa américaines
+MXE-SL:
+  texte_affiche: San Luis Potosí
+  nom_page: San Luis Potosí (État)
+BZS-SC:
+  texte_affiche: Santa Catarina
+  nom_page: Santa Catarina
+BOR-SR:
+  texte_affiche: Sarawak
+  nom_page: Sarawak
+SAR:
+  texte_affiche: Sardaigne
+  nom_page: Sardaigne
+SAS:
+  texte_affiche: Saskatchewan
+  nom_page: Saskatchewan
+YUG-SE:
+  texte_affiche: Serbie
+  nom_page: Serbie
+BZE-SE:
+  texte_affiche: Sergipe
+  nom_page: Sergipe
+SEY:
+  texte_affiche: Seychelles
+  nom_page: Seychelles
+CHN-SA:
+  texte_affiche: Shaanxi
+  nom_page: Shaanxi
+CHN-SD:
+  texte_affiche: Shandong
+  nom_page: Shandong
+CHS-SH:
+  texte_affiche: Shanghai
+  nom_page: Shanghai
+CHN-SX:
+  texte_affiche: Shanxi
+  nom_page: Shanxi
+JAP-SH:
+  texte_affiche: Shikoku
+  nom_page: Shikoku
+'30':
+  texte_affiche: Sibérie
+  nom_page: Sibérie
+WSB:
+  lien: true
+  langue: en
+  trad: West Siberia
+  fr: Sibérie occidentale
+CHC-SC:
+  texte_affiche: Sichuan
+  nom_page: Sichuan
+SIC:
+  texte_affiche: Sicile
+  nom_page: Sicile
+SIE:
+  texte_affiche: Sierra Leone
+  nom_page: Sierra Leone
+EHM-SI:
+  texte_affiche: Sikkim
+  nom_page: Sikkim
+MXN-SI:
+  texte_affiche: Sinaloa
+  nom_page: Sinaloa
+SIN:
+  texte_affiche: Sinaï
+  nom_page: Sinaï
+MLY-SI:
+  texte_affiche: Singapour
+  nom_page: Singapour
+CZE-SL:
+  texte_affiche: Slovaquie
+  nom_page: Slovaquie
+YUG-SL:
+  texte_affiche: Slovénie
+  nom_page: Slovénie
+SOC:
+  texte_affiche: Socotra
+  nom_page: Socotra
+SOM:
+  texte_affiche: Somalie
+  nom_page: Somalie
+MXN-SO:
+  texte_affiche: Sonora
+  nom_page: Sonora
+SUD:
+  texte_affiche: Soudan
+  nom_page: Soudan
+'40':
+  texte_affiche: Sous-continent indien
+  nom_page: Sous-continent indien
+SRL:
+  texte_affiche: Sri Lanka
+  nom_page: Sri Lanka
+SWI:
+  texte_affiche: Suisse
+  nom_page: Suisse
+SUM:
+  texte_affiche: Sumatra
+  nom_page: Sumatra
+SUR:
+  texte_affiche: Suriname
+  nom_page: Suriname
+SWE:
+  texte_affiche: Suède
+  nom_page: Suède
+SVA:
+  texte_affiche: Svalbard
+  nom_page: Svalbard
+TOK-SW:
+  texte_affiche: Swains
+  nom_page: Swains
+LBS-SY:
+  texte_affiche: Syrie
+  nom_page: Syrie
+GGI-ST:
+  texte_affiche: São Tomé
+  nom_page: São Tomé (île)
+SEN:
+  texte_affiche: Sénégal
+  nom_page: Sénégal
+MXT-TB:
+  texte_affiche: Tabasco
+  nom_page: Tabasco (État)
+TZK:
+  texte_affiche: Tadjikistan
+  nom_page: Tadjikistan
+MXE-TA:
+  texte_affiche: Tamaulipas
+  nom_page: Tamaulipas
+IND-TN:
+  texte_affiche: Tamil Nadu
+  nom_page: Tamil Nadu
+TAN:
+  texte_affiche: Tanzanie
+  nom_page: Tanzanie
+TAS:
+  texte_affiche: Tasmanie
+  nom_page: Tasmanie
+TAI:
+  texte_affiche: Taïwan
+  nom_page: Taïwan
+CHA:
+  texte_affiche: Tchad
+  nom_page: Tchad
+CZE:
+  texte_affiche: Tchécoslovaquie
+  nom_page: Tchécoslovaquie
+CZE-CZ:
+  texte_affiche: Tchéquie
+  nom_page: Tchéquie
+NCS-CH:
+  texte_affiche: Tchétchénie
+  nom_page: Tchétchénie
+TEN:
+  texte_affiche: Tennessee
+  nom_page: Tennessee
+IND-PO:
+  texte_affiche: Territoire de Pondichéry
+  nom_page: Territoire de Pondichéry
+NSW-CT:
+  texte_affiche: Territoire de la capitale australienne
+  nom_page: Territoire de la capitale australienne
+NTA:
+  texte_affiche: Territoire du Nord
+  nom_page: Territoire du Nord
+NWT:
+  texte_affiche: Territoires du Nord-Ouest
+  nom_page: Territoires du Nord-Ouest
+TEX:
+  texte_affiche: Texas
+  nom_page: Texas
+THA:
+  texte_affiche: Thaïlande
+  nom_page: Thaïlande
+TUE:
+  texte_affiche: Thrace orientale
+  nom_page: Thrace orientale
+CHN-TJ:
+  texte_affiche: Tianjin
+  nom_page: Tianjin
+CHT:
+  texte_affiche: Tibet
+  nom_page: Tibet
+LSI-ET:
+  texte_affiche: Timor oriental
+  nom_page: Timor oriental
+MXC-TL:
+  texte_affiche: Tlaxcala
+  nom_page: Tlaxcala (État)
+BZN-TO:
+  texte_affiche: Tocantins
+  nom_page: Tocantins
+TOG:
+  texte_affiche: Togo
+  nom_page: Togo
+TOK:
+  texte_affiche: Tokelau
+  nom_page: Tokelau
+TOK-TO:
+  texte_affiche: Tokelau
+  nom_page: Tokelau
+TON:
+  texte_affiche: Tonga
+  nom_page: Tonga
+TVA:
+  texte_affiche: Touva
+  nom_page: Touva
+TCS:
+  texte_affiche: Transcaucasie
+  nom_page: Transcaucasie
+BZL-TR:
+  texte_affiche: Trindade et Martin Vaz
+  nom_page: Trindade et Martin Vaz
+TRT:
+  texte_affiche: Trinité-et-Tobago
+  nom_page: Trinité-et-Tobago
+ASS-TR:
+  texte_affiche: Tripura
+  nom_page: Tripura
+TUN:
+  texte_affiche: Tunisie
+  nom_page: Tunisie
+TKM:
+  texte_affiche: Turkménistan
+  nom_page: Turkménistan
+TUR:
+  texte_affiche: Turquie
+  nom_page: Turquie
+TUV:
+  texte_affiche: Tuvalu
+  nom_page: Tuvalu
+UKR:
+  texte_affiche: Ukraine
+  nom_page: Ukraine
+LIN-US:
+  lien: true
+  langue: en
+  trad: United States Line Islands
+URU:
+  texte_affiche: Uruguay
+  nom_page: Uruguay
+UTA:
+  texte_affiche: Utah
+  nom_page: Utah
+IND-UP:
+  texte_affiche: Uttar Pradesh
+  nom_page: Uttar Pradesh
+WHM-UT:
+  texte_affiche: Uttarakhand
+  nom_page: Uttarakhand
+VAN:
+  texte_affiche: Vanuatu
+  nom_page: Vanuatu
+ITA-VC:
+  texte_affiche: Vatican
+  nom_page: Vatican
+VEN:
+  texte_affiche: Venezuela
+  nom_page: Venezuela
+MXG-VC:
+  texte_affiche: Veracruz
+  nom_page: Veracruz (État)
+VER:
+  texte_affiche: Vermont
+  nom_page: Vermont
+VIC:
+  texte_affiche: Victoria
+  nom_page: Victoria (État)
+VIE:
+  texte_affiche: Vietnam
+  nom_page: Vietnam
+VRG:
+  texte_affiche: Virginie
+  nom_page: Virginie (États-Unis)
+WVA:
+  texte_affiche: Virginie-Occidentale
+  nom_page: Virginie-Occidentale
+WAK:
+  texte_affiche: Wake
+  nom_page: Wake (atoll)
+WAL:
+  texte_affiche: Wallis-et-Futuna
+  nom_page: Wallis-et-Futuna
+WAS:
+  texte_affiche: Washington
+  nom_page: Washington (État)
+WDC:
+  texte_affiche: Washington
+  nom_page: Washington (district de Columbia)
+WIN:
+  texte_affiche: Windward Islands
+  nom_page: Windward Islands
+WIS:
+  texte_affiche: Wisconsin
+  nom_page: Wisconsin
+WYO:
+  texte_affiche: Wyoming
+  nom_page: Wyoming
+CHX:
+  texte_affiche: Xinjiang
+  nom_page: Xinjiang
+IND-YA:
+  texte_affiche: Yanaon
+  nom_page: Yanaon
+YUG:
+  texte_affiche: Yougoslavie
+  nom_page: Yougoslavie
+MXT-YU:
+  texte_affiche: Yucatán
+  nom_page: Yucatán
+YUK:
+  texte_affiche: Yukon
+  nom_page: Yukon
+CHC-YN:
+  texte_affiche: Yunnan
+  nom_page: Yunnan
+YEM:
+  texte_affiche: Yémen
+  nom_page: Yémen
+MXE-ZA:
+  texte_affiche: Zacatecas
+  nom_page: Zacatecas (État)
+ZAM:
+  texte_affiche: Zambie
+  nom_page: Zambie
+CHS-ZJ:
+  texte_affiche: Zhejiang
+  nom_page: Zhejiang
+ZIM:
+  texte_affiche: Zimbabwe
+  nom_page: Zimbabwe
+EGY:
+  texte_affiche: Égypte
+  nom_page: Égypte
+GST-UA:
+  texte_affiche: Émirats arabes unis
+  nom_page: Émirats arabes unis
+ECU:
+  texte_affiche: Équateur
+  nom_page: Équateur (pays)
+ERI:
+  texte_affiche: Érythrée
+  nom_page: Érythrée
+MXC-ME:
+  texte_affiche: État de Mexico
+  nom_page: État de Mexico
+NWY:
+  texte_affiche: État de New York
+  nom_page: État de New York
+BZL-RJ:
+  texte_affiche: État de Rio de Janeiro
+  nom_page: État de Rio de Janeiro
+BZL-SP:
+  texte_affiche: État de São Paulo
+  nom_page: État de São Paulo
+OFS:
+  texte_affiche: État libre
+  nom_page: État libre (Afrique du Sud)
+CRL-MF:
+  texte_affiche: États fédérés de Micronésie
+  nom_page: États fédérés de Micronésie
+ETH:
+  texte_affiche: Éthiopie
+  nom_page: Éthiopie
+ASP:
+  texte_affiche: Île Amsterdam
+  nom_page: Île Amsterdam
+BOU:
+  texte_affiche: Île Bouvet
+  nom_page: Île Bouvet
+XMS:
+  texte_affiche: Île Christmas
+  nom_page: Île Christmas (Australie)
+CPI-CL:
+  texte_affiche: Île Clipperton
+  nom_page: Île Clipperton
+CPI-CO:
+  texte_affiche: Île Cocos
+  nom_page: Île Cocos
+MXI-GU:
+  texte_affiche: Île Guadalupe
+  nom_page: Île Guadalupe
+NFK-LH:
+  texte_affiche: Île Lord Howe
+  nom_page: Île Lord Howe
+MAQ:
+  texte_affiche: Île Macquarie
+  nom_page: Île Macquarie
+NFK:
+  texte_affiche: Île Norfolk
+  nom_page: Île Norfolk
+CPI-MA:
+  texte_affiche: Île de Malpelo
+  nom_page: Île de Malpelo
+EAS:
+  texte_affiche: Île de Pâques
+  nom_page: Île de Pâques
+ASC:
+  texte_affiche: Île de l'Ascension
+  nom_page: Île de l'Ascension
+HAI-NI:
+  texte_affiche: Île de la Navasse
+  nom_page: Île de la Navasse
+NZN:
+  texte_affiche: Île du Nord
+  nom_page: Île du Nord
+NZS:
+  texte_affiche: Île du Sud
+  nom_page: Île du Sud
+PEI:
+  texte_affiche: Île-du-Prince-Édouard
+  nom_page: Île-du-Prince-Édouard
+ALU:
+  texte_affiche: Îles Aléoutiennes
+  nom_page: Îles Aléoutiennes
+AND:
+  texte_affiche: Îles Andaman
+  nom_page: Îles Andaman
+FRA-CI:
+  texte_affiche: Îles Anglo-Normandes
+  nom_page: Îles Anglo-Normandes
+WAU-AC:
+  texte_affiche: Îles Ashmore-et-Cartier
+  nom_page: Îles Ashmore-et-Cartier
+TUB:
+  texte_affiche: Îles Australes
+  nom_page: Îles Australes
+BAL:
+  texte_affiche: Îles Baléares
+  nom_page: Îles Baléares
+OGA:
+  texte_affiche: Îles Bonin
+  nom_page: Îles Bonin
+CNY:
+  texte_affiche: Îles Canaries
+  nom_page: Îles Canaries
+CRL:
+  texte_affiche: Îles Carolines
+  nom_page: Îles Carolines
+CAY:
+  texte_affiche: Îles Caïmans
+  nom_page: Îles Caïmans
+CTM:
+  texte_affiche: Îles Chatham
+  nom_page: Îles Chatham
+AND-CO:
+  texte_affiche: Îles Coco
+  nom_page: Îles Coco
+CKI:
+  texte_affiche: Îles Cocos
+  nom_page: Îles Cocos
+COO:
+  texte_affiche: Îles Cook
+  nom_page: Îles Cook
+DSV:
+  texte_affiche: Îles Desventuradas
+  nom_page: Îles Desventuradas
+FOR:
+  texte_affiche: Îles Féroé
+  nom_page: Îles Féroé
+GAL:
+  texte_affiche: Îles Galápagos
+  nom_page: Îles Galápagos
+GIL:
+  texte_affiche: Îles Gilbert
+  nom_page: Îles Gilbert
+HMD:
+  texte_affiche: Îles Heard-et-MacDonald
+  nom_page: Îles Heard-et-MacDonald
+KEG:
+  texte_affiche: Îles Kerguelen
+  nom_page: Îles Kerguelen
+KER:
+  texte_affiche: Îles Kermadec
+  nom_page: Îles Kermadec
+KUR:
+  texte_affiche: Îles Kouriles
+  nom_page: Îles Kouriles
+LDV:
+  texte_affiche: Îles Laquedives
+  nom_page: Îles Laquedives
+FAL:
+  texte_affiche: Îles Malouines
+  nom_page: Îles Malouines
+MRN:
+  texte_affiche: Îles Mariannes
+  nom_page: Îles Mariannes
+MRN-NM:
+  texte_affiche: Îles Mariannes du Nord
+  nom_page: Îles Mariannes du Nord
+MRQ:
+  texte_affiche: Îles Marquises
+  nom_page: Îles Marquises
+MRS:
+  texte_affiche: Îles Marshall
+  nom_page: Îles Marshall
+CHS-MP:
+  texte_affiche: Îles Matsu
+  nom_page: Îles Matsu
+HAW-MI:
+  texte_affiche: Îles Midway
+  nom_page: Îles Midway
+NCB:
+  texte_affiche: Îles Nicobar
+  nom_page: Îles Nicobar
+SCS-PI:
+  texte_affiche: Îles Paracels
+  nom_page: Îles Paracels
+PHX:
+  texte_affiche: Îles Phœnix
+  nom_page: Îles Phœnix
+PIT:
+  texte_affiche: Îles Pitcairn
+  nom_page: Îles Pitcairn
+MXI-RG:
+  texte_affiche: Îles Revillagigedo
+  nom_page: Îles Revillagigedo
+LEE-NL:
+  texte_affiche: Îles SSS
+  nom_page: Îles SSS
+SOL:
+  texte_affiche: Îles Salomon
+  nom_page: Îles Salomon (archipel d'Océanie)
+SSA:
+  texte_affiche: Îles Sandwich du Sud
+  nom_page: Îles Sandwich du Sud
+SCZ:
+  texte_affiche: Îles Santa Cruz
+  nom_page: Îles Santa Cruz
+SEL:
+  texte_affiche: Îles Selvagens
+  nom_page: Îles Selvagens
+LEE:
+  lien: true
+  langue: en
+  trad: Leeward Islands
+  fr: Îles Sous-le-Vent
+SCS-SI:
+  texte_affiche: Îles Spratleys
+  nom_page: Îles Spratleys
+TUA:
+  texte_affiche: Îles Tuamotu
+  nom_page: Îles Tuamotu
+TCI:
+  texte_affiche: Îles Turques-et-Caïques
+  nom_page: Îles Turques-et-Caïques
+LEE-BV:
+  texte_affiche: Îles Vierges britanniques
+  nom_page: Îles Vierges britanniques
+LEE-VI:
+  texte_affiche: Îles Vierges des États-Unis
+  nom_page: Îles Vierges des États-Unis
+LIN:
+  texte_affiche: Îles de la Ligne
+  nom_page: Îles de la Ligne
+QLD-CS:
+  texte_affiche: Îles de la mer de Corail
+  nom_page: Îles de la mer de Corail
+ATP:
+  texte_affiche: Îles des Antipodes
+  nom_page: Îles des Antipodes
+MPE:
+  texte_affiche: Îles du Prince-Édouard
+  nom_page: Îles du Prince-Édouard
+MCI:
+  texte_affiche: Îles Éparses de l'océan Indien
+  nom_page: Îles Éparses de l'océan Indien

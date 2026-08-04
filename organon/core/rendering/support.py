@@ -183,3 +183,32 @@ def data_pays_code(code: str) -> str:
     if entry["texte_affiche"] == entry["nom_page"]:
         return f"[[{entry['nom_page']}]]"
     return f"[[{entry['nom_page']}|{entry['texte_affiche']}]]"
+
+
+@lru_cache(maxsize=1)
+def load_wgsrpd() -> dict[str, dict[str, str]]:
+    with (DATA_DIR / "wgsrpd.yaml").open(encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
+def data_wgsrpd_code(code: str) -> str:
+    """Renvoie un wikilien pour un code WGSRPD (niveau 3, ex. "FRA"), même principe que
+    `data_pays_code` mais sur le référentiel TDWG/WGSRPD plutôt qu'ISO 3166 (voir
+    `organon.modules.powo.module` pour l'origine de ces codes). Retourne le code tel quel
+    (non lié) si totalement inconnu. Pour les codes sans article Wikipédia en français
+    (`entry["lien"]`), utilise {{Lien}} vers l'article anglais plutôt qu'un wikilien direct
+    inexistant — avec une proposition de titre français (`fr`) seulement quand
+    scripts/build_wgsrpd_yaml.py a pu en établir une de façon fiable, sinon le paramètre `fr`
+    est simplement omis (convention {{Lien}})."""
+    wgsrpd = load_wgsrpd()
+    entry = wgsrpd.get(code)
+    if entry is None:
+        return code
+    if entry.get("lien"):
+        resu = f"{{{{Lien|langue={entry['langue']}|trad={entry['trad']}"
+        if entry.get("fr"):
+            resu += f"|fr={entry['fr']}"
+        return resu + "}}"
+    if entry["texte_affiche"] == entry["nom_page"]:
+        return f"[[{entry['nom_page']}]]"
+    return f"[[{entry['nom_page']}|{entry['texte_affiche']}]]"
