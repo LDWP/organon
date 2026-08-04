@@ -158,7 +158,7 @@ def merge_subtaxa(
         kind: GroupKind = "primary" if i == 0 else "alternative"
         # Liste complète telle que rapportée par la première source du groupe (toutes les
         # sources du groupe s'accordent par construction sur ce même ensemble de noms).
-        species_names = [sp.nom for sp in source_liste[ordered_sources[0]]]
+        species_names = sorted(sp.nom for sp in source_liste[ordered_sources[0]])
         groups.append(
             MergedGroup(
                 sources=ordered_sources,

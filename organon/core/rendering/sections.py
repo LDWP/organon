@@ -225,7 +225,7 @@ def render_inf(struct: Struct, options: GenerateOptions) -> str:
     ret = f"\n== Liste des {rang_txt} ==\nSelon {{{{Bioref|{module_source}|{cdate}}}}} :\n"
 
     ret0 = ""
-    for sous_taxon in sous_taxons.liste:
+    for sous_taxon in sorted(sous_taxons.liste, key=lambda s: s.nom):
         ret0 += render_subtaxon_line(sous_taxon, struct.regne, rang_defaut, struct.taxon.rang)
 
     if est_colonnes(len(sous_taxons.liste), options):
@@ -408,7 +408,7 @@ def render_originale(struct: Struct, options: GenerateOptions) -> str:
     pubs = struct.originale if isinstance(struct.originale, list) else [struct.originale]
     titre = "\n== Publications originales ==\n" if len(pubs) > 1 else "\n== Publication originale ==\n"
     resu = titre
-    for pub in pubs:
+    for pub in sorted(pubs):
         resu += f"* {pub}\n"
     return resu
 
