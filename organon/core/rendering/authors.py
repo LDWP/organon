@@ -162,22 +162,26 @@ def _resolve_procaryote(token: str) -> str | None:
     return f"[[{entry['cible']}|{token}]]"
 
 
-def _resolve_zoologiste(token: str, annee: int | None) -> str | None:
+def _resolve_zoologiste(token: str, annee: int | None) -> tuple[str | None, list[dict] | None]:
+    """Renvoie `(lien, homonymes)` — `homonymes` n'est peuplé que si plusieurs zoologistes
+    partagent ce nom de famille et que la fenêtre de dates n'a pas permis de trancher (voir
+    discussion Projet:Biologie/Organon #10 : dans ce cas on ne devine pas, on laisse
+    `{{auteur|[[Nom]]}}` et on avertit plutôt que de résoudre vers le mauvais article)."""
     candidats = _load_zoologistes().get(token)
     if not candidats:
-        return None
+        return None, None
     if len(candidats) == 1:
-        return f"[[{candidats[0]['cible']}|{token}]]"
+        return f"[[{candidats[0]['cible']}|{token}]]", None
     if annee is None:
-        return None
+        return None, candidats
     matches = []
     for c in candidats:
         fenetre = _dates_window(c.get("dates", ""))
         if fenetre is not None and fenetre[0] <= annee <= fenetre[1]:
             matches.append(c)
     if len(matches) == 1:
-        return f"[[{matches[0]['cible']}|{token}]]"
-    return None
+        return f"[[{matches[0]['cible']}|{token}]]", None
+    return None, candidats
 
 
 def resoudre_auteur_principal(struct: Struct) -> tuple[str, list[str]]:
@@ -226,7 +230,16 @@ def resoudre_auteur_principal(struct: Struct) -> tuple[str, list[str]]:
         elif regne in PROCARYOTE_REGNES:
             resolu = _resolve_procaryote(stripped)
         elif regne not in NO_RESOLUTION_REGNES:
-            resolu = _resolve_zoologiste(stripped, annee)
+            resolu, homonymes = _resolve_zoologiste(stripped, annee)
+            if homonymes is not None:
+                cibles = ", ".join(
+                    f"{c['cible']} ({c['dates']})" if c.get("dates") else c["cible"]
+                    for c in homonymes
+                )
+                avertissements.append(
+                    f"Auteur « {stripped} » : homonymie entre plusieurs zoologistes "
+                    f"({cibles}) — non résolu automatiquement, à trancher manuellement."
+                )
 
         if resolu is not None:
             resolus.append(("nom", resolu))
