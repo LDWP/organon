@@ -167,7 +167,7 @@ def _resolve_zoologiste(token: str, annee: int | None) -> str | None:
     if not candidats:
         return None
     if len(candidats) == 1:
-        return f"[[{candidats[0]['cible']}]]"
+        return f"[[{candidats[0]['cible']}|{token}]]"
     if annee is None:
         return None
     matches = []
@@ -176,7 +176,7 @@ def _resolve_zoologiste(token: str, annee: int | None) -> str | None:
         if fenetre is not None and fenetre[0] <= annee <= fenetre[1]:
             matches.append(c)
     if len(matches) == 1:
-        return f"[[{matches[0]['cible']}]]"
+        return f"[[{matches[0]['cible']}|{token}]]"
     return None
 
 
