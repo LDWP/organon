@@ -20,19 +20,26 @@ ITIS/GBIF : "on continue avec les données du synonyme").
 Distribution (`detail["distribution"]`) : un dict de catégories (`natives`, `introduced`,
 `absent`, vues en direct ; `extinct`/`doubtful` probables par le même schéma WCVP mais non
 observées) plutôt qu'une simple liste de codes — chaque entrée porte `tdwgCode` (code régional
-TDWG/WGSRPD, ex. "FRA_FR") et `establishment` (ex. "Native", "Introduced", "Absent"). Bug corrigé
-ici : une version précédente lisait `detail.get("distribution")` comme si c'était déjà une liste
-de codes — comme ce champ est toujours un dict (jamais None) quand `include=['distribution']` est
-demandé, la garde `isinstance(raw, list)` était toujours fausse et aucune distribution n'était
-jamais retenue. `_distribution_entries` ci-dessous consomme la structure réelle, classe "Absent"
-exclu (le taxon n'y est explicitement pas), "Native"/"Introduced" en présence certaine, tout le
-reste (ex. "Doubtful") en présence incertaine ; secours sur `locations` (liste plate de codes,
-sans distinction de statut) si `distribution` est absent.
+TDWG/WGSRPD, niveau 3, ex. "FRA" ; vérifié empiriquement sur de vraies réponses — `tdwgLevel`
+vaut systématiquement 3, y compris pour des pays comme la France dont le `locationTree` contient
+pourtant des sous-codes de niveau 4 comme "FRA_FR" : ce sont ces derniers qu'un commentaire
+précédent citait à tort comme exemple de `tdwgCode`) et `establishment` (ex. "Native",
+"Introduced", "Absent"). Bug corrigé ici : une version précédente lisait
+`detail.get("distribution")` comme si c'était déjà une liste de codes — comme ce champ est
+toujours un dict (jamais None) quand `include=['distribution']` est demandé, la garde
+`isinstance(raw, list)` était toujours fausse et aucune distribution n'était jamais retenue.
+`_distribution_entries` ci-dessous consomme la structure réelle, classe "Absent" exclu (le taxon
+n'y est explicitement pas), "Native"/"Introduced" en présence certaine, tout le reste (ex.
+"Doubtful") en présence incertaine ; secours sur `locations` (liste plate de codes, sans
+distinction de statut) si `distribution` est absent.
 
 Ces codes TDWG/WGSRPD ne sont pas des codes pays ISO 3166 : `organon.core.rendering.support`
-attend des codes ISO mais retombe sur le code brut non lié pour tout code inconnu (comportement
-documenté), donc aucun crash — seulement un rendu moins soigné pour ces codes tant qu'aucune
-table de correspondance TDWG->ISO n'existe dans `organon/core`.
+attend des codes ISO pour le texte de la section Répartition, et retombe sur le code brut non
+lié pour tout code inconnu (comportement documenté) — donc aucun crash, seulement un rendu moins
+soigné pour ce texte. Ces mêmes codes alimentent en revanche directement `{{WGSRPD}}` (carte de
+répartition sur fr.wikipedia.org, Module:WGSRPD + pages Data:WGSRPD/level3/*.map sur Commons),
+émis par `organon.core.rendering.sections.render_distribution` pour la seule source `"powo"`
+(voir ce module pour le détail).
 
 Sous-taxons (mode classification uniquement, comme GBIF/COL/ITIS) : `detail["childNameUsages"]`
 donne directement les enfants acceptés du taxon consulté, quel que soit son rang (genres d'une

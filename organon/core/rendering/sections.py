@@ -358,29 +358,48 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
     source = ""
     certain: list[str] = []
     uncertain: list[str] = []
+    # Codes bruts (WGSRPD niveau 3) pour {{WGSRPD}} — seul POWO peuple struct.distribution avec
+    # ce référentiel ; les autres sources potentielles (codes ISO) ne sont pas compatibles avec
+    # le module de carte, d'où le filtre sur ref == "powo" plutôt qu'une supposition sur le
+    # nombre de sources.
+    wgsrpd_certain: list[str] = []
+    wgsrpd_uncertain: list[str] = []
     for ref, entry in struct.distribution.items():
         source = ref
         certain.extend(data_pays_code(code) for code in entry.certain)
         uncertain.extend(data_pays_code(code) for code in entry.uncertain)
+        if ref == "powo":
+            wgsrpd_certain.extend(entry.certain)
+            wgsrpd_uncertain.extend(entry.uncertain)
 
     certain = sorted(dict.fromkeys(certain))
     uncertain = sorted(dict.fromkeys(uncertain))
+    wgsrpd_certain = sorted(dict.fromkeys(wgsrpd_certain))
+    wgsrpd_uncertain = sorted(dict.fromkeys(wgsrpd_uncertain))
 
     if len(struct.distribution) == 1:
+        if wgsrpd_certain or wgsrpd_uncertain:
+            resu += "{{WGSRPD"
+            if wgsrpd_certain:
+                resu += f"|codes={','.join(wgsrpd_certain)}"
+            if wgsrpd_uncertain:
+                resu += f"|incertain={','.join(wgsrpd_uncertain)}"
+            resu += f"|source=[[Plants of the World Online|POWO]]{{{{Bioref|{source}|{cdate}|ref}}}}"
+            resu += "}}\n"
         if certain:
             resu += (
-                f"Ce taxon se rencontre dans les pays suivants{{{{Bioref|{source}|{cdate}|ref}}}} : "
+                f"Ce taxon se rencontre dans les pays et régions suivants{{{{Bioref|{source}|{cdate}|ref}}}} : "
                 if len(certain) > 1
-                else f"Ce taxon se rencontre dans le pays suivant{{{{Bioref|{source}|{cdate}|ref}}}} : "
+                else f"Ce taxon se rencontre dans le pays ou la région suivant{{{{Bioref|{source}|{cdate}|ref}}}} : "
             )
             resu += ", ".join(certain) + ".\n"
         if uncertain:
             if certain:
                 resu += "\n"
             resu += (
-                f"La présence de ce taxon est incertaine dans les pays suivants{{{{Bioref|{source}|{cdate}|ref}}}} : "
+                f"La présence de ce taxon est incertaine dans les pays et régions suivants{{{{Bioref|{source}|{cdate}|ref}}}} : "
                 if len(uncertain) > 1
-                else f"La présence de ce taxon est incertaine dans le pays suivant{{{{Bioref|{source}|{cdate}|ref}}}} : "
+                else f"La présence de ce taxon est incertaine dans le pays ou la région suivant{{{{Bioref|{source}|{cdate}|ref}}}} : "
             )
             resu += ", ".join(uncertain) + ".\n"
     else:
