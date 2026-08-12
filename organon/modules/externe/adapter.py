@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import httpx
 
+from organon.modules.common import sparql_escape
+
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
 SPECIES_API_URL = "https://species.wikimedia.org/w/api.php"
@@ -32,7 +34,7 @@ class ExterneAdapter:
     async def wikidata_qid(self, taxon: str) -> str | None:
         """Cherche l'item Wikidata représentant un taxon (P31=taxon, P225=nom scientifique)."""
         query = (
-            'SELECT ?item WHERE { ?item wdt:P31 wd:Q16521 ; wdt:P225 "%s" . }' % taxon.replace('"', '\\"')
+            'SELECT ?item WHERE { ?item wdt:P31 wd:Q16521 ; wdt:P225 "%s" . }' % sparql_escape(taxon)
         )
         resp = await self._client.get(
             WIKIDATA_SPARQL_URL,

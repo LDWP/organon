@@ -21,6 +21,8 @@ from urllib.parse import unquote
 
 import httpx
 
+from organon.modules.common import sparql_escape
+
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
 USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
@@ -90,7 +92,7 @@ class CommonsImagesAdapter:
         """Nom de fichier Commons (propriété P18) déjà utilisé par l'item Wikidata de ce taxon,
         s'il existe — sert uniquement à repérer qu'une suggestion n'est pas une nouveauté (voir
         `organon.modules.commons_images.service`), jamais à la construire elle-même."""
-        escaped = taxon.replace('"', '\\"')
+        escaped = sparql_escape(taxon)
         query = (
             "SELECT ?image WHERE { "
             f'?item wdt:P31 wd:Q16521 ; wdt:P225 "{escaped}" ; wdt:P18 ?image . '

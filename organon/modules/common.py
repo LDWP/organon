@@ -121,6 +121,21 @@ def filter_ancestors_above_regne(
     return [chain[boundary], *reste] if garder_regne else reste
 
 
+def sparql_escape(value: str) -> str:
+    """Échappe une chaîne pour l'insérer dans un littéral SPARQL entre guillemets doubles
+    (`"..."`). Backslash d'abord : sinon le remplacement du guillemet ajouté à l'étape suivante
+    serait lui-même ré-échappé, laissant un backslash final non échappé capable de faire fusionner
+    le guillemet fermant du littéral avec le premier caractère de `value` (injection — un `taxon`
+    terminé par `\\` casse la chaîne). Saut de ligne/retour chariot ensuite : un littéral SPARQL
+    sur une ligne ne peut pas contenir de saut de ligne brut, qui le terminerait prématurément."""
+    return (
+        value.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+    )
+
+
 def simple_debug_link(struct: Struct, module_id: str, url_template: str, label: str) -> str | None:
     """Lien brut vers la fiche du taxon sur le site source, construit à partir de
     l'identifiant stocké dans `struct.liens[module_id]['id']`. `url_template` utilise `{id}`
