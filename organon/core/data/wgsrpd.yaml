@@ -149,6 +149,8 @@ EHM-AP:
 ASS-AS:
   texte_affiche: Assam
   nom_page: Assam
+ASS:
+  texte_affiche: Assam
 HAW-JI:
   texte_affiche: Atoll Johnston
   nom_page: Atoll Johnston
@@ -308,12 +310,20 @@ SCA:
 BZE-CE:
   texte_affiche: Ceará
   nom_page: Ceará
-RUC:
-  texte_affiche: Centre de la Russie d'Europe
 CPI:
   lien: true
   langue: en
   trad: Central American Pacific Islands
+RUC:
+  texte_affiche: Centre de la Russie d'Europe
+CLC:
+  texte_affiche: Centre du Chili
+MXC:
+  texte_affiche: Centre du Mexique
+CHN:
+  texte_affiche: Centre-Nord de la Chine
+CHC:
+  texte_affiche: Centre-Sud de la Chine
 IND-CH:
   texte_affiche: Chandigarh
   nom_page: Chandigarh
@@ -398,6 +408,8 @@ SUL:
 IVO:
   texte_affiche: Côte d'Ivoire
   nom_page: Côte d'Ivoire
+MXG:
+  texte_affiche: Côte du golfe du Mexique
 IND-DD:
   texte_affiche: Dadra et Nagar Haveli
   nom_page: Dadra et Nagar Haveli
@@ -619,6 +631,10 @@ MXE-HI:
 WHM-HP:
   texte_affiche: Himachal Pradesh
   nom_page: Himachal Pradesh
+WHM:
+  texte_affiche: Himalaya occidental
+EHM:
+  texte_affiche: Himalaya oriental
 JAP-HK:
   texte_affiche: Hokkaidō
   nom_page: Hokkaidō
@@ -650,6 +666,8 @@ IDA:
 ILL:
   texte_affiche: Illinois
   nom_page: Illinois
+IND:
+  texte_affiche: Inde
 INI:
   texte_affiche: Indiana
   nom_page: Indiana
@@ -816,6 +834,8 @@ CHM-LN:
 LBS-LB:
   texte_affiche: Liban
   nom_page: Liban
+LBS:
+  texte_affiche: Liban-Syrie
 LBR:
   texte_affiche: Liberia
   nom_page: Liberia
@@ -867,6 +887,8 @@ MAI:
 MLY-PM:
   texte_affiche: Malaisie péninsulaire
   nom_page: Malaisie péninsulaire
+MLY:
+  texte_affiche: Malaisie péninsulaire
 MLW:
   texte_affiche: Malawi
   nom_page: Malawi
@@ -1043,11 +1065,21 @@ NUE:
   nom_page: Niue
 RUN:
   texte_affiche: Nord de la Russie d'Europe
+CLN:
+  texte_affiche: Nord du Chili
+AGE:
+  texte_affiche: Nord-Est de l'Argentine
+MXE:
+  texte_affiche: Nord-Est du Mexique
 TVL-NW:
   texte_affiche: Nord-Ouest
   nom_page: Nord-Ouest (Afrique du Sud)
+AGW:
+  texte_affiche: Nord-Ouest de l'Argentine
 RUW:
   texte_affiche: Nord-Ouest de la Russie d'Europe
+MXN:
+  texte_affiche: Nord-Ouest du Mexique
 TVL:
   lien: true
   langue: en
@@ -1549,8 +1581,20 @@ SUD:
 SRL:
   texte_affiche: Sri Lanka
   nom_page: Sri Lanka
+AGS:
+  texte_affiche: Sud de l'Argentine
 RUS:
   texte_affiche: Sud de la Russie d'Europe
+CLS:
+  texte_affiche: Sud du Chili
+CHS:
+  texte_affiche: Sud-Est de la Chine
+MXT:
+  texte_affiche: Sud-Est du Mexique
+SWC:
+  texte_affiche: Sud-Ouest des Caraïbes
+MXS:
+  texte_affiche: Sud-Ouest du Mexique
 SWI:
   texte_affiche: Suisse
   nom_page: Suisse
@@ -1614,6 +1658,8 @@ NCS-CH:
 TEN:
   texte_affiche: Tennessee
   nom_page: Tennessee
+NFL:
+  texte_affiche: Terre-Neuve
 IND-PO:
   texte_affiche: Territoire de Pondichéry
   nom_page: Territoire de Pondichéry
@@ -1816,6 +1862,8 @@ BZL-SP:
 OFS:
   texte_affiche: État libre
   nom_page: État libre (Afrique du Sud)
+GST:
+  texte_affiche: États du Golfe (Amérique du Nord)
 CRL-MF:
   texte_affiche: États fédérés de Micronésie
   nom_page: États fédérés de Micronésie
@@ -2016,12 +2064,16 @@ LIN:
 QLD-CS:
   texte_affiche: Îles de la mer de Corail
   nom_page: Îles de la mer de Corail
+EAI:
+  texte_affiche: Îles de la mer Égée orientale
 ATP:
   texte_affiche: Îles des Antipodes
   nom_page: Îles des Antipodes
 MPE:
   texte_affiche: Îles du Prince-Édouard
   nom_page: Îles du Prince-Édouard
+MXI:
+  texte_affiche: Îles mexicaines du Pacifique
 MCI:
   texte_affiche: Îles Éparses de l'océan Indien
   nom_page: Îles Éparses de l'océan Indien
