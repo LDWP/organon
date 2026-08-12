@@ -11,7 +11,6 @@ from organon.core.models import Struct
 from organon.core.rendering.grammar import CATEGORIE_PAR_REGNE, EBAUCHE_PAR_REGNE
 from organon.core.selectors.engine import evaluate_ruleset
 
-# Portail par défaut selon le règne.
 _PORTAIL_PAR_REGNE: dict[str, str] = {
     "animal": "zoologie",
     "végétal": "botanique",
