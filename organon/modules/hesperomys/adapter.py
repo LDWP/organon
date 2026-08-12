@@ -27,6 +27,8 @@ import time
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 BASE_URL = "https://hesperomys.com/graphql"
 
 _MIN_INTERVAL = 0.2  # ~5 requêtes/s, prudence par défaut pour une API tierce non documentée
@@ -117,15 +119,7 @@ async def _throttle() -> None:
         _last_call = time.monotonic()
 
 
-class HesperomysAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class HesperomysAdapter(OwnedClientMixin):
     async def _query(self, query: str, variables: dict) -> dict | None:
         await _throttle()
         try:

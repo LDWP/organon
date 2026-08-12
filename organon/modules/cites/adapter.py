@@ -3,20 +3,12 @@ décodage JSON bruts uniquement."""
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin, fetch_json
 
 BASE_URL = "https://www.speciesplus.net/api/v1"
 
 
-class CitesAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class CitesAdapter(OwnedClientMixin):
     async def autocomplete(self, name: str) -> list[dict]:
         resp = await self._client.get(
             f"{BASE_URL}/auto_complete_taxon_concepts", params={"taxonomy": "cites", "taxon_concept_query": name}
@@ -25,8 +17,7 @@ class CitesAdapter:
         return resp.json().get("auto_complete_taxon_concepts") or []
 
     async def taxon_concept(self, concept_id: int) -> dict | None:
-        resp = await self._client.get(f"{BASE_URL}/taxon_concepts/{concept_id}")
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json().get("taxon_concept")
+        data = await fetch_json(
+            self._client, f"{BASE_URL}/taxon_concepts/{concept_id}", empty_value={}
+        )
+        return data.get("taxon_concept")

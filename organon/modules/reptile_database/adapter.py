@@ -15,6 +15,8 @@ from dataclasses import dataclass
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 BASE_URL = "https://reptile-database.reptarium.cz"
 
 _NOT_FOUND_RE = re.compile(r"<h1>Species <em>[^<]+</em> was not found!</h1>")
@@ -70,14 +72,9 @@ def _parse_higher_taxa(raw: str) -> tuple[str | None, str | None]:
     return famille, ordre
 
 
-class ReptileDatabaseAdapter:
+class ReptileDatabaseAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, follow_redirects=True)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, follow_redirects=True)
 
     async def get_species(self, genus: str, species: str) -> SpeciesHit | None:
         """Renvoie la fiche si elle existe, `None` sinon. `auteur` est le texte brut suivant le

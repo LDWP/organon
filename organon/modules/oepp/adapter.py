@@ -11,7 +11,7 @@ from __future__ import annotations
 import html
 import re
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://gd.eppo.int"
 
@@ -21,15 +21,7 @@ _FRENCH_ROW_RE = re.compile(
 )
 
 
-class OeppAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class OeppAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[dict]:
         resp = await self._client.get(
             f"{BASE_URL}/ajax/search", params={"k": name, "s": 1, "m": 1, "t": 0, "l": ""}

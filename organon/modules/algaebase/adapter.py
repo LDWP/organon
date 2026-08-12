@@ -11,7 +11,7 @@ donc appelé une fois par appel à `collect()`."""
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin, fetch_json
 
 SITE_URL = "https://www.algaebase.org/"
 AUTH_URL = "https://api2.algaebase.org/auth/"
@@ -28,15 +28,7 @@ _HEADERS = {
 }
 
 
-class AlgaeBaseAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class AlgaeBaseAdapter(OwnedClientMixin):
     async def fetch_key(self) -> str | None:
         """Porte alg_apikey() : amorce le cookie de session puis récupère la clé courte-durée."""
         resp = await self._client.get(SITE_URL)
@@ -50,11 +42,7 @@ class AlgaeBaseAdapter:
 
     async def _get(self, key: str, path: str, params: dict | None = None) -> dict | None:
         headers = {**_HEADERS, "abapikey": key}
-        resp = await self._client.get(f"{API_BASE}{path}", params=params, headers=headers)
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json()
+        return await fetch_json(self._client, f"{API_BASE}{path}", params=params, headers=headers)
 
     async def search_genus(self, key: str, genus: str) -> dict | None:
         return await self._get(key, "/genus", params={"genus": genus, "offset": 0, "order": "genus,false"})

@@ -9,23 +9,16 @@ avec ~17 500 checklists sources supplémentaires et sert de taxonomie par défau
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin, fetch_json
 
 API_BASE = "https://api.checklistbank.org"
 DATASET_ID = "3LXR"  # dernière release XR publiée (permanente, sans découverte)
 
 
-class ColXrAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class ColXrAdapter(OwnedClientMixin):
     async def search(self, taxon: str) -> list[dict]:
-        resp = await self._client.get(
+        data = await fetch_json(
+            self._client,
             f"{API_BASE}/dataset/{DATASET_ID}/nameusage/search",
             params={
                 "limit": 50,
@@ -35,11 +28,9 @@ class ColXrAdapter:
                 "status": "_NOT_NULL",
                 "type": "EXACT",
             },
+            empty_value={},
         )
-        if resp.status_code == 404:
-            return []
-        resp.raise_for_status()
-        return resp.json().get("result", [])
+        return data.get("result", [])
 
     async def children_page(self, taxon_id: str, offset: int = 0) -> dict:
         resp = await self._client.get(

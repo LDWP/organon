@@ -29,6 +29,7 @@ from __future__ import annotations
 import httpx
 
 from organon.core.auth_settings import get_auth_settings
+from organon.core.http import OwnedClientMixin
 
 TOKEN_URL = "https://sso.dsmz.de/auth/realms/dsmz/protocol/openid-connect/token"
 KEYCLOAK_CLIENT_ID = "api.lpsn.public"
@@ -39,24 +40,19 @@ class LpsnAuthError(RuntimeError):
     """Échec d'authentification LPSN (identifiants absents ou refusés par Keycloak)."""
 
 
-class LpsnAdapter:
+class LpsnAdapter(OwnedClientMixin):
     def __init__(
         self,
         client: httpx.AsyncClient | None = None,
         username: str | None = None,
         password: str | None = None,
     ) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
+        super().__init__(client)
         settings = get_auth_settings()
         self._username = username if username is not None else settings.lpsn_username
         self._password = password if password is not None else settings.lpsn_password
         self._access_token: str | None = None
         self._refresh_token: str | None = None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
 
     async def _authenticate(self) -> None:
         if not self._username or not self._password:

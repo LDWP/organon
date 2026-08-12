@@ -5,20 +5,12 @@ seule l'existence (200 vs 404) est exploitée ici."""
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://science.mnhn.fr/taxon"
 
 
-class MnhnAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class MnhnAdapter(OwnedClientMixin):
     async def exists(self, path: str) -> bool:
         resp = await self._client.get(f"{BASE_URL}/{path}")
         return resp.status_code == 200

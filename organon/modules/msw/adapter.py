@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import re
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://www.departments.bucknell.edu/biology/resources/msw3"
 
@@ -29,15 +29,7 @@ _RESULT_RE = re.compile(
 _AUTHOR_RE = re.compile(r"Author:</td>\s*<td[^>]*>([^<]*)</td>", re.IGNORECASE)
 
 
-class MswAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class MswAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[tuple[int, str]]:
         """Renvoie une liste de `(id, nom_affiché)` pour les résultats de rang espèce ou
         sous-espèce, pas encore filtrée au nom recherché (laissé à module.py). Les noms

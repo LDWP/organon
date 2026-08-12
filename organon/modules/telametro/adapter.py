@@ -6,7 +6,7 @@ JavaScript client du site), pas un secret."""
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 ALGOLIA_URL = "https://yotvbfebjc-dsn.algolia.net/1/indexes/*/queries"
 ALGOLIA_PARAMS = {
@@ -16,15 +16,7 @@ ALGOLIA_PARAMS = {
 }
 
 
-class TelametroAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class TelametroAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[dict]:
         params = (
             f"query={name}&hitsPerPage=20&maxValuesPerFacet=10&page=0"

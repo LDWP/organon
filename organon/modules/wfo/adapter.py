@@ -12,7 +12,7 @@ from __future__ import annotations
 import html
 import re
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://www.worldfloraonline.org"
 
@@ -28,15 +28,7 @@ _RESULT_RE = re.compile(
 )
 
 
-class WfoAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class WfoAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[dict]:
         """Renvoie une liste de `{id, nom, auteur, statut}`, déjà nettoyée (entités HTML
         décodées) mais pas encore filtrée au nom recherché (laissé à module.py)."""

@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import re
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "http://taxonomicon.taxonomy.nl"
 
@@ -41,15 +41,7 @@ _AUTHOR_CITATION_RE = re.compile(
 )
 
 
-class TaxonomiconAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class TaxonomiconAdapter(OwnedClientMixin):
     async def _search(self, subject: str, by: str, term: str) -> list[tuple[str, int, str]]:
         resp = await self._client.get(
             f"{BASE_URL}/TaxonList.aspx", params={"subject": subject, "by": by, "search": term}

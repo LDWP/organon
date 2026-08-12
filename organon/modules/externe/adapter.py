@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
 from organon.modules.common import sparql_escape
 
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
@@ -22,14 +23,9 @@ FRWIKTIONARY_API_URL = "https://fr.wiktionary.org/w/api.php"
 USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
 
 
-class ExterneAdapter:
+class ExterneAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, headers={"User-Agent": USER_AGENT})
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, headers={"User-Agent": USER_AGENT})
 
     async def wikidata_qid(self, taxon: str) -> str | None:
         """Cherche l'item Wikidata représentant un taxon (P31=taxon, P225=nom scientifique)."""

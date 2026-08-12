@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from xml.etree import ElementTree as ET
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://www.indexfungorum.org/ixfwebservice/fungus.asmx"
 
@@ -24,15 +24,7 @@ def _parse_records(xml_text: str) -> list[dict[str, str]]:
     return [{_decode_tag(field.tag): (field.text or "") for field in record} for record in root]
 
 
-class IndexFungorumAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class IndexFungorumAdapter(OwnedClientMixin):
     async def name_search(self, text: str, max_number: int = 50) -> list[dict[str, str]]:
         """`AnywhereInText=false` filtre par préfixe côté serveur, pas par égalité stricte
         (vérifié en direct : une recherche "Amanita" renvoie aussi "Amanita muscaria...") — le

@@ -25,6 +25,8 @@ import re
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 API_BASE = "https://taxref.mnhn.fr/taxref-web/api"
 WEB_BASE = "https://taxref.mnhn.fr/taxref-web"
 
@@ -47,14 +49,9 @@ _VERNACULAR_ENTRY_RE = re.compile(
 )
 
 
-class InpnAdapter:
+class InpnAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, headers=_BROWSER_HEADERS)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, headers=_BROWSER_HEADERS)
 
     async def search(self, nom_complet: str, nb_rows: int = 500) -> list[dict]:
         resp = await self._client.get(

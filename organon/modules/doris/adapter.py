@@ -20,6 +20,8 @@ import re
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 SEARCH_URL = "https://doris.ffessm.fr/content/action"
 LEGACY_FICHE_URL = "https://doris.ffessm.fr/fiche2.asp"
 
@@ -29,14 +31,9 @@ _RESULT_RE = re.compile(
 )
 
 
-class DorisAdapter:
+class DorisAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, follow_redirects=True)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, follow_redirects=True)
 
     async def search(self, nom: str) -> tuple[str, str] | None:
         """Renvoie `(id_fiche, nom_commun)` pour la première correspondance dont le nom

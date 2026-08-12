@@ -6,28 +6,20 @@ rang en plus de la table de traduction vers le français."""
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin, fetch_json
 
 API_BASE = "https://paleobiodb.org/data1.2"
 
 
-class TpdbAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class TpdbAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[dict]:
-        resp = await self._client.get(
-            f"{API_BASE}/combined/auto.json", params={"name": name, "type": "cls", "vocab": "pbdb"}
+        data = await fetch_json(
+            self._client,
+            f"{API_BASE}/combined/auto.json",
+            params={"name": name, "type": "cls", "vocab": "pbdb"},
+            empty_value={},
         )
-        if resp.status_code == 404:
-            return []
-        resp.raise_for_status()
-        return resp.json().get("records", [])
+        return data.get("records", [])
 
     async def taxon_by_name(self, name: str) -> dict | None:
         """Note : volontairement une recherche par *nom* et non par `id=txn:{orig_no}` — testé
@@ -35,12 +27,11 @@ class TpdbAdapter:
         (ex. `id=txn:451494` renvoie "Ptelea modesta" même si 451494 est l'identifiant du
         combinaison originale "Cytisus modestus") plutôt que la combinaison précise recherchée,
         ce qui empêcherait de récupérer l'auteur propre à l'orthographe/combinaison demandée."""
-        resp = await self._client.get(
+        data = await fetch_json(
+            self._client,
             f"{API_BASE}/taxa/single.json",
             params={"name": name, "vocab": "pbdb", "show": "attr"},
+            empty_value={},
         )
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        records = resp.json().get("records", [])
+        records = data.get("records", [])
         return records[0] if records else None

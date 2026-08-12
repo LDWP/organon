@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "http://www.efloras.org"
 
@@ -18,15 +18,7 @@ VALID_FLORA_IDS = {1, 2, 5}
 _RESULT_RE = re.compile(r"florataxon\.aspx\?flora_id=(\d+)&taxon_id=(\d+)'[^>]*>\s*<b>([^<]+)</b>")
 
 
-class EfloraAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class EfloraAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[tuple[int, int, str]]:
         """Renvoie une liste de `(flora_id, taxon_id, nom_affiché)`, déjà filtrée aux flores
         valides mais pas encore au nom recherché (laissé à module.py)."""

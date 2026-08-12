@@ -12,68 +12,64 @@ pour l'extraction elle-même (partagée avec WoRMS, même plateforme)."""
 
 from __future__ import annotations
 
-import httpx
-
+from organon.core.http import OwnedClientMixin, fetch_json
 from organon.modules.common import extract_aphia_original_description
 
 BASE_URL = "https://www.irmng.org/rest"
 TAXDETAILS_URL = "https://www.irmng.org/aphia.php"
 
 
-class IrmngAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class IrmngAdapter(OwnedClientMixin):
     async def records_by_name(self, name: str) -> list[dict]:
-        resp = await self._client.get(f"{BASE_URL}/AphiaRecordsByName/{name}", params={"like": "false"})
-        if resp.status_code == 204:
-            return []
-        resp.raise_for_status()
-        return resp.json() or []
+        data = await fetch_json(
+            self._client,
+            f"{BASE_URL}/AphiaRecordsByName/{name}",
+            params={"like": "false"},
+            empty_statuses=(204,),
+            empty_value=[],
+        )
+        return data or []
 
     async def record_by_id(self, irmng_id: int) -> dict | None:
-        resp = await self._client.get(f"{BASE_URL}/AphiaRecordByIRMNG_ID/{irmng_id}")
-        if resp.status_code == 204:
-            return None
-        resp.raise_for_status()
-        return resp.json()
+        return await fetch_json(
+            self._client, f"{BASE_URL}/AphiaRecordByIRMNG_ID/{irmng_id}", empty_statuses=(204,)
+        )
 
     async def classification_by_id(self, irmng_id: int) -> dict | None:
-        resp = await self._client.get(f"{BASE_URL}/AphiaClassificationByIRMNG_ID/{irmng_id}")
-        if resp.status_code == 204:
-            return None
-        resp.raise_for_status()
-        return resp.json()
+        return await fetch_json(
+            self._client,
+            f"{BASE_URL}/AphiaClassificationByIRMNG_ID/{irmng_id}",
+            empty_statuses=(204,),
+        )
 
     async def children_by_id(self, irmng_id: int, offset: int = 1) -> list[dict]:
-        resp = await self._client.get(
-            f"{BASE_URL}/AphiaChildrenByIRMNG_ID/{irmng_id}", params={"offset": offset}
+        data = await fetch_json(
+            self._client,
+            f"{BASE_URL}/AphiaChildrenByIRMNG_ID/{irmng_id}",
+            params={"offset": offset},
+            empty_statuses=(204,),
+            empty_value=[],
         )
-        if resp.status_code == 204:
-            return []
-        resp.raise_for_status()
-        return resp.json() or []
+        return data or []
 
     async def synonyms_by_id(self, irmng_id: int, offset: int = 1) -> list[dict]:
-        resp = await self._client.get(
-            f"{BASE_URL}/AphiaSynonymsByIRMNG_ID/{irmng_id}", params={"offset": offset}
+        data = await fetch_json(
+            self._client,
+            f"{BASE_URL}/AphiaSynonymsByIRMNG_ID/{irmng_id}",
+            params={"offset": offset},
+            empty_statuses=(204,),
+            empty_value=[],
         )
-        if resp.status_code == 204:
-            return []
-        resp.raise_for_status()
-        return resp.json() or []
+        return data or []
 
     async def vernaculars_by_id(self, irmng_id: int) -> list[dict]:
-        resp = await self._client.get(f"{BASE_URL}/AphiaVernacularsByIRMNG_ID/{irmng_id}")
-        if resp.status_code == 204:
-            return []
-        resp.raise_for_status()
-        return resp.json() or []
+        data = await fetch_json(
+            self._client,
+            f"{BASE_URL}/AphiaVernacularsByIRMNG_ID/{irmng_id}",
+            empty_statuses=(204,),
+            empty_value=[],
+        )
+        return data or []
 
     async def original_description(self, irmng_id: int) -> str | None:
         resp = await self._client.get(TAXDETAILS_URL, params={"p": "taxdetails", "id": irmng_id})

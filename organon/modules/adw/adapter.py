@@ -31,6 +31,8 @@ from dataclasses import dataclass, field
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 BASE_URL = "https://animaldiversity.org"
 
 _NOT_FOUND_RE = re.compile(r"<h1>\s*Page not found\s*</h1>")
@@ -98,14 +100,9 @@ def _parse_citation(html_page: str) -> AdwCitation:
     )
 
 
-class AdwAdapter:
+class AdwAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, follow_redirects=True)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, follow_redirects=True)
 
     async def fetch(self, slug: str) -> AdwCitation | None:
         """Renvoie la citation du taxon `slug` (espaces déjà remplacés par des underscores), ou

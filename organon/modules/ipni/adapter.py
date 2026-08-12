@@ -6,20 +6,12 @@ de nom portent un champ `name` (voir module.py pour le filtrage par correspondan
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://www.ipni.org/api/1"
 
 
-class IpniAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class IpniAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[dict]:
         resp = await self._client.get(f"{BASE_URL}/search", params={"q": name, "perPage": 50})
         resp.raise_for_status()

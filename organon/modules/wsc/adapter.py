@@ -21,22 +21,19 @@ from datetime import datetime, timedelta, timezone
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 BASE_URL = "https://wsc.nmbe.ch/resources/species_export_{date}.csv"
 _DATE_ATTEMPTS = 2  # jour courant (UTC), puis veille si pas encore republié
 
 
-class WscAdapter:
+class WscAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
+        super().__init__(client)
         self._by_name: dict[str, dict] | None = None
         self._by_id: dict[str, dict] | None = None
         self._cached_date: str | None = None
         self._lock = asyncio.Lock()
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
 
     async def _ensure_loaded(self) -> None:
         today = datetime.now(timezone.utc).strftime("%Y%m%d")

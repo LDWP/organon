@@ -10,23 +10,16 @@ sur catalogueoflife.org/data/taxon/{id} (résolus contre la dernière release, p
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin, fetch_json
 
 API_BASE = "https://api.checklistbank.org"
 DATASET_ID = "3LR"  # dernière release publiée du projet "COL" (permanent, sans découverte)
 
 
-class ColAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class ColAdapter(OwnedClientMixin):
     async def search(self, taxon: str) -> dict | None:
-        resp = await self._client.get(
+        return await fetch_json(
+            self._client,
             f"{API_BASE}/dataset/{DATASET_ID}/nameusage/search",
             params={
                 "limit": 50,
@@ -37,7 +30,3 @@ class ColAdapter:
                 "type": "EXACT",
             },
         )
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json()

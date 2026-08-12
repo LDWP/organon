@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from xml.etree import ElementTree as ET
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://www.itis.gov/ITISWebService/services/ITISService"
 
@@ -31,15 +31,7 @@ def _text(elem: ET.Element | None) -> str | None:
     return text or None
 
 
-class ItisAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class ItisAdapter(OwnedClientMixin):
     async def _get_xml(self, endpoint: str, tsn: int | str | None = None, **params) -> ET.Element:
         if tsn is not None:
             params["tsn"] = tsn

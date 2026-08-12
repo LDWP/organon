@@ -10,22 +10,19 @@ from __future__ import annotations
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 BASE_URL = "https://www.tropicos.org/api"
 _TOKEN = "RjRGNDA4RDgtOEY2NS00NzVGLUI3NDktRjk4MjE2Q0NCRTQ1"
 
 
-class TropicosAdapter:
+class TropicosAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         headers = {
             "Authorization": f"Bearer {_TOKEN}",
             "Referer": "https://www.tropicos.org/name/Search",
         }
-        self._client = client or httpx.AsyncClient(timeout=10.0, headers=headers)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, headers=headers)
 
     async def search(self, name: str) -> list[dict]:
         resp = await self._client.get(

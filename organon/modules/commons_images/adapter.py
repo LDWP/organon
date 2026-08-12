@@ -21,6 +21,7 @@ from urllib.parse import unquote
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
 from organon.modules.common import sparql_escape
 
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
@@ -33,14 +34,9 @@ USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot
 _IMAGEINFO_BATCH_SIZE = 50
 
 
-class CommonsImagesAdapter:
+class CommonsImagesAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, headers={"User-Agent": USER_AGENT})
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, headers={"User-Agent": USER_AGENT})
 
     async def category_files(self, category_title: str, *, limit: int = 500) -> list[str]:
         """Titres des fichiers membres d'une catégorie Commons (ex. `Category:Gadus morhua`),

@@ -17,6 +17,8 @@ from typing import Any
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php"
 USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
 
@@ -63,14 +65,9 @@ def _first_snak_value(claims: dict[str, Any], prop: str) -> Any | None:
         return None
 
 
-class WikidataAdapter:
+class WikidataAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0, headers={"User-Agent": USER_AGENT})
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
+        super().__init__(client, headers={"User-Agent": USER_AGENT})
 
     async def get_entity(self, qid: str) -> dict[str, Any] | None:
         """Récupère claims + label français de l'item, ou None si le QID n'existe pas."""

@@ -4,21 +4,13 @@ logique métier (voir module.py).
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin, fetch_json
 
 BASE_URL = "https://api.gbif.org/v1"
 DATASET_KEY = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"  # Backbone Taxonomy GBIF (legacy, ids entiers)
 
 
-class GbifAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class GbifAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[dict]:
         resp = await self._client.get(
             f"{BASE_URL}/species", params={"datasetKey": DATASET_KEY, "name": name}
@@ -39,11 +31,7 @@ class GbifAdapter:
         return resp.json().get("results", [])
 
     async def name_info(self, key: int) -> dict | None:
-        resp = await self._client.get(f"{BASE_URL}/species/{key}/name")
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json()
+        return await fetch_json(self._client, f"{BASE_URL}/species/{key}/name")
 
     async def species_profiles(self, key: int) -> list[dict]:
         resp = await self._client.get(f"{BASE_URL}/species/{key}/speciesProfiles")
@@ -51,18 +39,10 @@ class GbifAdapter:
         return resp.json().get("results", [])
 
     async def species_record(self, key: int) -> dict | None:
-        resp = await self._client.get(f"{BASE_URL}/species/{key}")
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json()
+        return await fetch_json(self._client, f"{BASE_URL}/species/{key}")
 
     async def iucn_red_list_category(self, key: int) -> dict | None:
-        resp = await self._client.get(f"{BASE_URL}/species/{key}/iucnRedListCategory")
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json()
+        return await fetch_json(self._client, f"{BASE_URL}/species/{key}/iucnRedListCategory")
 
     async def children_page(self, key: int, offset: int = 0) -> dict:
         resp = await self._client.get(f"{BASE_URL}/species/{key}/children", params={"offset": offset})

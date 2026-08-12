@@ -4,20 +4,12 @@ HTTP et décodage JSON bruts uniquement. Public, sans clé — NCBI recommande u
 
 from __future__ import annotations
 
-import httpx
+from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
 
-class NcbiAdapter:
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        self._client = client or httpx.AsyncClient(timeout=10.0)
-        self._owns_client = client is None
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
+class NcbiAdapter(OwnedClientMixin):
     async def search_taxid(self, name: str) -> str | None:
         resp = await self._client.get(
             f"{BASE_URL}/esearch.fcgi",
