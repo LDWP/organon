@@ -362,9 +362,14 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
     # Codes bruts (WGSRPD niveau 3) pour {{WGSRPD}} — seul POWO peuple struct.distribution avec
     # ce référentiel ; les autres sources potentielles (codes ISO) ne sont pas compatibles avec
     # le module de carte, d'où le filtre sur ref == "powo" plutôt qu'une supposition sur le
-    # nombre de sources.
+    # nombre de sources. `introduced`/`extinct` sont retirés de certain/uncertain pour la carte
+    # (mais pas pour le texte, qui reste inchangé) afin d'obtenir une couleur dédiée
+    # (introduit=violet, eteint=rouge) plutôt que le vert/jaune par défaut — voir docstring de
+    # `DistributionEntry`.
     wgsrpd_certain: list[str] = []
     wgsrpd_uncertain: list[str] = []
+    wgsrpd_introduit: list[str] = []
+    wgsrpd_eteint: list[str] = []
     for ref, entry in struct.distribution.items():
         source = ref
         # POWO peuple ce champ avec des codes WGSRPD (pas ISO) : table de traduction dédiée
@@ -373,21 +378,29 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
         certain.extend(traduit_code(code) for code in entry.certain)
         uncertain.extend(traduit_code(code) for code in entry.uncertain)
         if ref == "powo":
-            wgsrpd_certain.extend(entry.certain)
-            wgsrpd_uncertain.extend(entry.uncertain)
+            wgsrpd_certain.extend(code for code in entry.certain if code not in entry.introduced)
+            wgsrpd_uncertain.extend(code for code in entry.uncertain if code not in entry.extinct)
+            wgsrpd_introduit.extend(entry.introduced)
+            wgsrpd_eteint.extend(entry.extinct)
 
     certain = sorted(dict.fromkeys(certain))
     uncertain = sorted(dict.fromkeys(uncertain))
     wgsrpd_certain = sorted(dict.fromkeys(wgsrpd_certain))
     wgsrpd_uncertain = sorted(dict.fromkeys(wgsrpd_uncertain))
+    wgsrpd_introduit = sorted(dict.fromkeys(wgsrpd_introduit))
+    wgsrpd_eteint = sorted(dict.fromkeys(wgsrpd_eteint))
 
     if len(struct.distribution) == 1:
-        if wgsrpd_certain or wgsrpd_uncertain:
+        if wgsrpd_certain or wgsrpd_uncertain or wgsrpd_introduit or wgsrpd_eteint:
             resu += "{{WGSRPD"
             if wgsrpd_certain:
-                resu += f"|codes={','.join(wgsrpd_certain)}"
+                resu += f"|certain={','.join(wgsrpd_certain)}"
             if wgsrpd_uncertain:
                 resu += f"|incertain={','.join(wgsrpd_uncertain)}"
+            if wgsrpd_introduit:
+                resu += f"|introduit={','.join(wgsrpd_introduit)}"
+            if wgsrpd_eteint:
+                resu += f"|eteint={','.join(wgsrpd_eteint)}"
             resu += f"|source=[[Plants of the World Online|POWO]]{{{{Bioref|{source}|{cdate}|ref}}}}"
             resu += "}}\n"
         if certain:

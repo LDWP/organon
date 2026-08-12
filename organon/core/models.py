@@ -94,10 +94,17 @@ class Etymology(BaseModel):
 class DistributionEntry(BaseModel):
     """Un élément de struct['distribution'][module_id]. Les valeurs sont des codes pays ; le
     dict conserve le code comme clé ET valeur (ex. `{"MG": "MG"}`), ce qui permet de tester
-    l'appartenance d'un code par simple présence de clé sans construire un `set` séparé."""
+    l'appartenance d'un code par simple présence de clé sans construire un `set` séparé.
+
+    `introduced`/`extinct` sont des sous-ensembles de `certain`/`uncertain` respectivement (pas
+    des codes en plus) : ils isolent, parmi les codes déjà classés présence certaine/incertaine,
+    ceux qu'un statut POWO plus précis ("Introduced"/"Extinct") permet de colorer différemment
+    sur la carte {{WGSRPD}} (voir `organon.core.rendering.sections.render_distribution`)."""
 
     certain: dict[str, str] = Field(default_factory=dict)
     uncertain: dict[str, str] = Field(default_factory=dict)
+    introduced: dict[str, str] = Field(default_factory=dict)
+    extinct: dict[str, str] = Field(default_factory=dict)
 
 
 class RegneIncoherence(BaseModel):

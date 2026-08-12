@@ -30,8 +30,11 @@ toujours un dict (jamais None) quand `include=['distribution']` est demandé, la
 `isinstance(raw, list)` était toujours fausse et aucune distribution n'était jamais retenue.
 `_distribution_entries` ci-dessous consomme la structure réelle, classe "Absent" exclu (le taxon
 n'y est explicitement pas), "Native"/"Introduced" en présence certaine, tout le reste (ex.
-"Doubtful") en présence incertaine ; secours sur `locations` (liste plate de codes, sans
-distinction de statut) si `distribution` est absent.
+"Doubtful"/"Extinct") en présence incertaine ; secours sur `locations` (liste plate de codes,
+sans distinction de statut) si `distribution` est absent. "Introduced" et "Extinct" sont en plus
+isolés dans deux sous-ensembles dédiés (`introduced`/`extinct` de `DistributionEntry`) pour
+permettre une couleur distincte (violet/rouge) sur {{WGSRPD}}, sans changer le classement
+certain/incertain utilisé par le texte de la section Répartition.
 
 Ces codes TDWG/WGSRPD ne sont pas des codes pays ISO 3166 : `organon.core.rendering.support`
 attend des codes ISO pour le texte de la section Répartition, et retombe sur le code brut non
@@ -67,12 +70,23 @@ from organon.modules.powo.adapter import PowoAdapter
 from organon.modules.powo.ranks import powo_cherche_rang, powo_cherche_regne
 
 _ABSENT = "absent"
-_INCERTAIN = {"doubtful", "extinct"}
+_EXTINCT = "extinct"
+_INTRODUCED = "introduced"
+_INCERTAIN = {"doubtful", _EXTINCT}
 
 
-def _distribution_entries(detail: dict) -> tuple[dict[str, str], dict[str, str]]:
+def _distribution_entries(
+    detail: dict,
+) -> tuple[dict[str, str], dict[str, str], dict[str, str], dict[str, str]]:
+    """Renvoie (certain, uncertain, introduced, extinct). `introduced`/`extinct` sont des
+    sous-ensembles de `certain`/`uncertain` (voir docstring de `DistributionEntry`) : ils isolent
+    les codes dont le statut POWO est explicitement "Introduced"/"Extinct" pour leur permettre
+    une couleur dédiée sur {{WGSRPD}} (violet/rouge) sans perdre le classement certain/incertain
+    déjà utilisé par le texte de la section Répartition."""
     certain: dict[str, str] = {}
     uncertain: dict[str, str] = {}
+    introduced: dict[str, str] = {}
+    extinct: dict[str, str] = {}
 
     dist = detail.get("distribution")
     if isinstance(dist, dict):
@@ -86,13 +100,20 @@ def _distribution_entries(detail: dict) -> tuple[dict[str, str], dict[str, str]]
                 statut = (e.get("establishment") or "").lower()
                 if statut == _ABSENT:
                     continue
-                (uncertain if statut in _INCERTAIN else certain)[code] = code
-        return certain, uncertain
+                if statut in _INCERTAIN:
+                    uncertain[code] = code
+                    if statut == _EXTINCT:
+                        extinct[code] = code
+                else:
+                    certain[code] = code
+                    if statut == _INTRODUCED:
+                        introduced[code] = code
+        return certain, uncertain, introduced, extinct
 
     locations = detail.get("locations")
     if isinstance(locations, list):
         certain = {code: code for code in locations if isinstance(code, str)}
-    return certain, uncertain
+    return certain, uncertain, introduced, extinct
 
 
 class PowoModule(TaxonomyModule):
@@ -156,9 +177,11 @@ class PowoModule(TaxonomyModule):
         if synonymes_liste:
             struct.synonymes = SynonymList(liste=synonymes_liste, source="POWO", coupe=coupe)
 
-        certain, uncertain = _distribution_entries(detail)
+        certain, uncertain, introduced, extinct = _distribution_entries(detail)
         if certain or uncertain:
-            struct.distribution["powo"] = DistributionEntry(certain=certain, uncertain=uncertain)
+            struct.distribution["powo"] = DistributionEntry(
+                certain=certain, uncertain=uncertain, introduced=introduced, extinct=extinct
+            )
 
         if est_synonyme:
             if not is_classification:
