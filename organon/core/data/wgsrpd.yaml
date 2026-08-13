@@ -141,6 +141,11 @@ EHM-AP:
 '34':
   texte_affiche: Asie de l'Ouest
   nom_page: Asie de l'Ouest
+'3':
+  lien: true
+  langue: en
+  trad: temperate Asia
+  fr: Asie tempérée
 '4':
   lien: true
   langue: en

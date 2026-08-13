@@ -58,7 +58,7 @@ def render(struct: Struct, options: GenerateOptions, ext_only: bool = False) -> 
     ret += sections.render_voir_aussi(struct, options)
 
     if not ext_only:
-        ret += sections.render_fin(struct)
+        ret += sections.render_fin(struct, notes='group="note"' in ret)
 
     while "\n\n\n" in ret:
         ret = ret.replace("\n\n\n", "\n\n")

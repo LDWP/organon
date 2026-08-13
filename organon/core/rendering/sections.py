@@ -29,6 +29,7 @@ from organon.core.rendering.support import (
     cherche_homonyme,
     colonnes_contenu,
     conditionne_noms,
+    continents_codes_wgsrpd,
     data_pays_code,
     data_wgsrpd_code,
     dates_recupere,
@@ -357,15 +358,13 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
         return ""
 
     source = ""
+    # `introduced`/`extinct` sont des sous-ensembles de `certain`/`uncertain` (docstring de
+    # `DistributionEntry`) : retirés de leur bucket parent pour une clause dédiée par statut,
+    # comme déjà fait pour {{WGSRPD}}.
     certain: list[str] = []
     uncertain: list[str] = []
-    # Codes bruts (WGSRPD niveau 3) pour {{WGSRPD}} — seul POWO peuple struct.distribution avec
-    # ce référentiel ; les autres sources potentielles (codes ISO) ne sont pas compatibles avec
-    # le module de carte, d'où le filtre sur ref == "powo" plutôt qu'une supposition sur le
-    # nombre de sources. `introduced`/`extinct` sont retirés de certain/uncertain pour la carte
-    # (mais pas pour le texte, qui reste inchangé) afin d'obtenir une couleur dédiée
-    # (introduit=violet, eteint=rouge) plutôt que le vert/jaune par défaut — voir docstring de
-    # `DistributionEntry`.
+    introduit: list[str] = []
+    eteint: list[str] = []
     wgsrpd_certain: list[str] = []
     wgsrpd_uncertain: list[str] = []
     wgsrpd_introduit: list[str] = []
@@ -375,8 +374,14 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
         # POWO peuple ce champ avec des codes WGSRPD (pas ISO) : table de traduction dédiée
         # (voir data_wgsrpd_code) plutôt que data_pays_code, qui ne les connaît pas.
         traduit_code = data_wgsrpd_code if ref == "powo" else data_pays_code
-        certain.extend(traduit_code(code) for code in entry.certain)
-        uncertain.extend(traduit_code(code) for code in entry.uncertain)
+        certain.extend(
+            traduit_code(code) for code in entry.certain if code not in entry.introduced
+        )
+        uncertain.extend(
+            traduit_code(code) for code in entry.uncertain if code not in entry.extinct
+        )
+        introduit.extend(traduit_code(code) for code in entry.introduced)
+        eteint.extend(traduit_code(code) for code in entry.extinct)
         if ref == "powo":
             wgsrpd_certain.extend(code for code in entry.certain if code not in entry.introduced)
             wgsrpd_uncertain.extend(code for code in entry.uncertain if code not in entry.extinct)
@@ -385,6 +390,8 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
 
     certain = sorted(dict.fromkeys(certain))
     uncertain = sorted(dict.fromkeys(uncertain))
+    introduit = sorted(dict.fromkeys(introduit))
+    eteint = sorted(dict.fromkeys(eteint))
     wgsrpd_certain = sorted(dict.fromkeys(wgsrpd_certain))
     wgsrpd_uncertain = sorted(dict.fromkeys(wgsrpd_uncertain))
     wgsrpd_introduit = sorted(dict.fromkeys(wgsrpd_introduit))
@@ -403,24 +410,191 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
                 resu += f"|eteint={','.join(wgsrpd_eteint)}"
             resu += f"|source=[[Plants of the World Online|POWO]]{{{{Bioref|{source}|{cdate}|ref}}}}"
             resu += "}}\n"
-        if certain:
-            resu += (
-                f"Ce taxon se rencontre dans les pays et régions suivants{{{{Bioref|{source}|{cdate}|ref}}}} : "
-                if len(certain) > 1
-                else f"Ce taxon se rencontre dans le pays ou la région suivant{{{{Bioref|{source}|{cdate}|ref}}}} : "
+        total = len(certain) + len(uncertain) + len(introduit) + len(eteint)
+        if total > SEUIL_TABLEAU_DISTRIBUTION:
+            resu += _resume_et_tableau_distribution(
+                certain, uncertain, introduit, eteint, wgsrpd_certain, source, cdate
             )
-            resu += ", ".join(certain) + ".\n"
-        if uncertain:
-            if certain:
-                resu += "\n"
-            resu += (
-                f"La présence de ce taxon est incertaine dans les pays et régions suivants{{{{Bioref|{source}|{cdate}|ref}}}} : "
-                if len(uncertain) > 1
-                else f"La présence de ce taxon est incertaine dans le pays ou la région suivant{{{{Bioref|{source}|{cdate}|ref}}}} : "
-            )
-            resu += ", ".join(uncertain) + ".\n"
+        else:
+            resu += _phrase_distribution(certain, uncertain, introduit, eteint, source, cdate)
     else:
         resu += "''Une distribution issue de plusieurs sources existe. Non implémenté pour le moment''\n"
+    return resu
+
+
+def _phrase_distribution(
+    certain: list[str],
+    uncertain: list[str],
+    introduit: list[str],
+    eteint: list[str],
+    source: str,
+    cdate: str,
+) -> str:
+    """Une clause par statut plutôt que noyés ensemble ; `certain` reste sans qualificatif
+    (indigène/endémique ne se déduisent pas d'un simple compte de codes WGSRPD). Un statut seul
+    a sa propre formulation, plutôt que le "est présent" générique trompeur par omission —
+    symétrique aux titres dédiés de {{WGSRPD}} sur le wiki."""
+    if not (certain or uncertain or introduit or eteint):
+        return ""
+    ref = f"{{{{Bioref|{source}|{cdate}|ref}}}}"
+
+    if eteint and not (certain or uncertain or introduit):
+        return f"Ce taxon est éteint dans {_lieu(eteint)}{ref} : {', '.join(eteint)}.\n"
+    if introduit and not (certain or uncertain or eteint):
+        return f"Ce taxon est introduit dans {_lieu(introduit)}{ref} : {', '.join(introduit)}.\n"
+    if uncertain and not (certain or introduit or eteint):
+        return (
+            f"La présence de ce taxon est incertaine dans {_lieu(uncertain)}{ref} : "
+            f"{', '.join(uncertain)}.\n"
+        )
+
+    clauses = []
+    if certain:
+        clauses.append(", ".join(certain))
+    if introduit:
+        clauses.append(f"introduit en {', '.join(introduit)}")
+    if uncertain:
+        clauses.append(f"de présence incertaine en {', '.join(uncertain)}")
+    if eteint:
+        clauses.append(f"éteint en {', '.join(eteint)}")
+
+    if certain:
+        entete = f"Ce taxon est présent dans {_lieu(certain)}"
+    else:
+        entete = "Statut de ce taxon par pays et région"
+    return f"{entete}{ref} : {'; '.join(clauses)}.\n"
+
+
+def _lieu(items: list[str]) -> str:
+    return "le pays ou la région suivant" if len(items) == 1 else "les pays et régions suivants"
+
+
+SEUIL_TABLEAU_DISTRIBUTION = 10
+"""Au-delà de ce total d'entrées (tous statuts confondus), la phrase inline devient illisible
+(ex. Quercus robur, ~60 entrées) : bascule sur un résumé chiffré + tableau triable."""
+
+
+def _lien_continents(n: int) -> str:
+    """"Continent(s)" lié vers WGSRPD plutôt que vers un article de continent classique : les
+    régions L1 (ex. Pacifique, Antarctique) ne correspondent pas toutes à un vrai continent."""
+    texte = "continent" if n == 1 else "continents"
+    return (
+        "{{Lien|trad=World Geographical Scheme for Recording Plant Distributions|langue=en|"
+        "fr=Système géographique mondial d'enregistrement de la répartition des plantes|"
+        f"texte={texte}}}}}"
+    )
+
+
+_NOMBRES_LETTRES = {
+    0: "zéro", 1: "un", 2: "deux", 3: "trois", 4: "quatre", 5: "cinq", 6: "six",
+    7: "sept", 8: "huit", 9: "neuf", 10: "dix", 11: "onze", 12: "douze", 13: "treize",
+    14: "quatorze", 15: "quinze", 16: "seize",
+}
+
+
+def _en_lettres(n: int) -> str:
+    """Nombre en toutes lettres (convention typographique Wikipédia) pour les petits nombres ;
+    au-delà de 16, aucune convention simple n'existe (accord seize/dix-sept variable selon le
+    contexte) — retombe sur le chiffre."""
+    return _NOMBRES_LETTRES.get(n, str(n))
+
+
+def _liste_fr(items: list[str]) -> str:
+    """Liste à la française : "A", "A et B", "A, B et C"."""
+    if len(items) == 1:
+        return items[0]
+    return ", ".join(items[:-1]) + " et " + items[-1]
+
+
+_NOTE_WGSRPD_DWC = "wgsrpd-dwc"
+
+
+def _note_dwc(cdate: str) -> str:
+    citation = (
+        "{{Lien web|langue=en|titre=Darwin Core Event Vocabulary|"
+        "url=https://dwc.tdwg.org/em/|site=Biodiversity Information Standards (TDWG)|"
+        f"consulté le={cdate}}}}}"
+    )
+    return (
+        f"La terminologie utilisée correspond à celle établie par [[Darwin Core]] ({citation}) :\n"
+        "* '''Natif''' : taxon présent au sein de son « aire de répartition naturelle » : "
+        "[[indigène (écologie)|indigène]], [[endémisme|endémique]] ou, lorsqu'il avait disparu "
+        "localement, réintroduit dans une région où il était historiquement natif.\n"
+        "* '''Introduit''' : taxon introduit et établi, volontairement ou accidentellement par "
+        "l'humain, dans une région située en dehors de son aire de répartition naturelle.\n"
+        "* '''Présence incertaine''' : l'origine de la présence du taxon dans la région est "
+        "« obscure » : les données disponibles (fossiles et historiques) ne permettent pas de "
+        "déterminer s'il est indigène ou introduit.\n"
+        "* '''Éteint''' : taxon ayant [[espèce éteinte|disparu]] d'une région, sans que cela "
+        "implique nécessairement sa [[Extinction des espèces|disparition totale]] à l'échelle "
+        "mondiale. Ce statut est utilisé par [[World Checklist of Vascular Plants]], mais ne "
+        "fait pas partie du Darwin Core."
+    )
+
+
+def _resume_et_tableau_distribution(
+    certain: list[str],
+    uncertain: list[str],
+    introduit: list[str],
+    eteint: list[str],
+    wgsrpd_certain: list[str],
+    source: str,
+    cdate: str,
+) -> str:
+    """Résumé chiffré (continents via `continents_codes_wgsrpd`, une note de terminologie DWC
+    partagée) + tableau triable, remplace `_phrase_distribution` au-delà de
+    `SEUIL_TABLEAU_DISTRIBUTION`."""
+    ref = f"{{{{Bioref|{source}|{cdate}|ref}}}}"
+    note_emise = False
+
+    def note() -> str:
+        nonlocal note_emise
+        if note_emise:
+            return f'<ref group="note" name="{_NOTE_WGSRPD_DWC}"/>'
+        note_emise = True
+        return f'<ref group="note" name="{_NOTE_WGSRPD_DWC}">{_note_dwc(cdate)}</ref>'
+
+    resu = ""
+    ref_utilisee = False
+    continents = continents_codes_wgsrpd(wgsrpd_certain) if certain else []
+    if continents:
+        continents_txt = _liste_fr([f"en {data_wgsrpd_code(c)}" for c in continents])
+        resu += (
+            f"Ce taxon est présent sur {_en_lettres(len(continents))} "
+            f"{_lien_continents(len(continents))}{ref} : {continents_txt}. "
+        )
+        ref_utilisee = True
+
+    clauses = []
+    if certain:
+        suffixe = "pays ou région" if len(certain) == 1 else "pays et régions"
+        clauses.append(f"nativement présent{note()} dans {len(certain)} {suffixe}")
+    if introduit:
+        suffixe = "autre" if len(introduit) == 1 else "autres"
+        clauses.append(f"introduit{note()} dans {len(introduit)} {suffixe}")
+    if uncertain:
+        suffixe = "autre" if len(uncertain) == 1 else "autres"
+        clauses.append(f"de présence incertaine{note()} dans {len(uncertain)} {suffixe}")
+    if eteint:
+        suffixe = "pays ou région" if len(eteint) == 1 else "pays et régions"
+        clauses.append(f"éteint{note()} dans {len(eteint)} {suffixe}")
+
+    resu += f"Il est {_liste_fr(clauses)}"
+    if not ref_utilisee:
+        resu += ref
+    resu += ".\n\n"
+
+    entrees = (
+        [(nom, "Présent") for nom in certain]
+        + [(nom, "Incertain") for nom in uncertain]
+        + [(nom, "Introduit") for nom in introduit]
+        + [(nom, "Éteint") for nom in eteint]
+    )
+    entrees.sort(key=lambda e: e[0])
+    resu += '{| class="wikitable sortable"\n! Pays / région !! Statut\n'
+    for nom, statut in entrees:
+        resu += f"|-\n| {nom} || {statut}\n"
+    resu += "|}\n"
     return resu
 
 
@@ -533,8 +707,15 @@ def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
     return "\n" + resu
 
 
-def render_fin(struct: Struct) -> str:
-    ret = "\n== Notes et références ==\n{{références}}\n"
+def render_fin(struct: Struct, notes: bool = False) -> str:
+    if notes:
+        ret = (
+            "\n== Notes et références ==\n"
+            "=== Notes ===\n{{Références|groupe=note}}\n"
+            "=== Références ===\n{{références}}\n"
+        )
+    else:
+        ret = "\n== Notes et références ==\n{{références}}\n"
     fin = struct.liens.get("fin", {})
     portails = fin.get("portails") or []
     categories = fin.get("categories") or []

@@ -216,3 +216,18 @@ def data_wgsrpd_code(code: str) -> str:
     if entry["texte_affiche"] == entry["nom_page"]:
         return f"[[{entry['nom_page']}]]"
     return f"[[{entry['nom_page']}|{entry['texte_affiche']}]]"
+
+
+@lru_cache(maxsize=1)
+def load_wgsrpd_continents() -> dict[str, str]:
+    with (DATA_DIR / "wgsrpd_continents.yaml").open(encoding="utf-8") as fh:
+        return yaml.safe_load(fh)
+
+
+def continents_codes_wgsrpd(codes: list[str]) -> list[str]:
+    """Codes continentaux WGSRPD niveau 1 (ex. "1" = Europe) couverts par une liste de codes
+    niveau 3, triés par nom traduit (`data_wgsrpd_code`, ces codes L1 y figurent aussi). Ignore
+    les codes L3 inconnus de `wgsrpd_continents.yaml` plutôt que planter."""
+    mapping = load_wgsrpd_continents()
+    continents = {mapping[code] for code in codes if code in mapping}
+    return sorted(continents, key=data_wgsrpd_code)
