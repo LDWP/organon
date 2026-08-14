@@ -115,6 +115,31 @@
   - Roses et rosiers
 - when:
     field: rangs.famille
+    eq: Fabaceae
+  return:
+  - Fabaceae
+- when:
+    field: rangs.famille
+    eq: Poaceae
+  return:
+  - Poaceae
+- when:
+    field: rangs.famille
+    eq: Solanaceae
+  return:
+  - Solanaceae
+- when:
+    field: rangs.famille
+    eq: Convolvulaceae
+  return:
+  - Convolvulaceae
+- when:
+    field: rangs.famille
+    eq: Orchidaceae
+  return:
+  - Orchidaceae
+- when:
+    field: rangs.famille
     eq: Ursidae
   return:
   - Mammifères
