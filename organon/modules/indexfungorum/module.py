@@ -113,8 +113,15 @@ class IndexFungorumModule(TaxonomyModule):
         struct.taxon.rang = ixf_rang(full.get("INFRASPECIFIC_RANK"))
         struct.taxon.auteur = format_auteur(full.get("AUTHORS"))
 
-        struct.classification = "Index Fungorum"
-        struct.classification_taxobox = "Index Fungorum"
+        # IF et SF partagent le même backend/RecordID mais pas le même rôle : IF est un simple
+        # répertoire de noms publiés (sans avis taxonomique, voir render_bioref/debug_link plus
+        # bas, laissés sur "Index Fungorum" pour les liens de fiches de noms individuels), tandis
+        # que SF est l'autorité qui tranche nom correct vs synonyme — d'où "Species Fungorum" ici
+        # pour la classification/taxobox. "speciesfungorum" (sans espace) est la clé Bioref
+        # proposée côté wiki ; Modèle:Bioref/switch n'a aujourd'hui aucune entrée "fungorum" avec
+        # espace ni "speciesfungorum" — création du modèle wiki nécessaire côté MediaWiki.
+        struct.classification = "speciesfungorum"
+        struct.classification_taxobox = "Species Fungorum"
 
         rangs: list[RankName] = []
         for field, rang_fr in CLASSIFICATION_LADDER:
