@@ -52,7 +52,7 @@ class ReptileDatabaseModule(TaxonomyModule):
         struct.taxon.rang = "espèce"
         struct.taxon.auteur = auteur
         struct.regne = "animal"
-        struct.classification = "Reptile Database"
+        struct.classification = "reptiledb"
         struct.classification_taxobox = "Reptile Database"
 
         rangs = [RankName(nom=genre, rang="genre"), RankName(nom=hit.famille, rang="famille")]
