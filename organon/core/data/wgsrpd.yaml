@@ -155,7 +155,10 @@ ASS-AS:
   texte_affiche: Assam
   nom_page: Assam
 ASS:
-  texte_affiche: Assam
+  lien: true
+  langue: en
+  trad: Assam Province
+  fr: Province d'Assam
 HAW-JI:
   texte_affiche: Atoll Johnston
   nom_page: Atoll Johnston
@@ -1868,7 +1871,7 @@ OFS:
   texte_affiche: État libre
   nom_page: État libre (Afrique du Sud)
 GST:
-  texte_affiche: États du Golfe (Amérique du Nord)
+  texte_affiche: États du Golfe (golfe Persique)
 CRL-MF:
   texte_affiche: États fédérés de Micronésie
   nom_page: États fédérés de Micronésie
