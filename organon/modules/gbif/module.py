@@ -190,6 +190,16 @@ class GbifModule(TaxonomyModule):
             # réponse), en secours le temps que taxref.mnhn.fr soit de nouveau joignable.
             struct.vernaculaire["INPN"] = taxref_noms
 
+        # Même contournement que ci-dessus, pour l'identifiant plutôt que les noms : TAXREF est
+        # aussi publiée comme checklist à part sur GBIF (`TAXREF_DATASET_KEY`), distincte du
+        # Backbone. `related` retrouve l'enregistrement TAXREF du même concept taxonomique que
+        # `key`, dont `taxonID` est le CD_NOM (identifiant INPN) — indépendant de la présence
+        # d'un nom vernaculaire français (contrairement à `taxref_noms` ci-dessus).
+        taxref_records = await adapter.taxref_related(key)
+        cd_nom = next((r["taxonID"] for r in taxref_records if r.get("taxonID")), None)
+        if cd_nom:
+            struct.liens["gbif"]["inpn_id"] = cd_nom
+
         accepted_key = cur.get("acceptedKey")
         is_synonym = accepted_key is not None and accepted_key != key
         if is_synonym:
@@ -316,7 +326,17 @@ class GbifModule(TaxonomyModule):
         if not data or "id" not in data:
             return None
         path = "species" if isinstance(data["id"], int) else "taxon"
-        return simple_debug_link(struct, "gbif", f"https://www.gbif.org/{path}/{{id}}", "GBIF")
+        link = simple_debug_link(struct, "gbif", f"https://www.gbif.org/{path}/{{id}}", "GBIF")
+        if link and data.get("inpn_id"):
+            # Même page que le module `inpn` afficherait pour ce même identifiant (voir
+            # `organon.modules.inpn.module.InpnModule.debug_link`) — le lien reste utilisable
+            # même quand le module `inpn` lui-même échoue (403 côté serveur, voir `taxref_related`
+            # dans `_collect` ci-dessus), un navigateur normal n'étant pas concerné par ce blocage.
+            link += (
+                f" <a href='https://taxref.mnhn.fr/taxref-web/taxa/{data['inpn_id']}' "
+                f"target='_blank' rel='noopener noreferrer'>INPN</a>"
+            )
+        return link
 
 
 register_module(GbifModule)

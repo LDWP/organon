@@ -8,6 +8,7 @@ from organon.core.http import OwnedClientMixin, fetch_json
 
 BASE_URL = "https://api.gbif.org/v1"
 DATASET_KEY = "d7dddbf4-2cf0-4f39-9b2a-bb099caae36c"  # Backbone Taxonomy GBIF (legacy, ids entiers)
+TAXREF_DATASET_KEY = "0e61f8fe-7d25-4f81-ada7-d970bbb2c6d6"  # TAXREF (MNHN), checklist GBIF
 
 
 class GbifAdapter(OwnedClientMixin):
@@ -60,3 +61,13 @@ class GbifAdapter(OwnedClientMixin):
         resp = await self._client.get(f"{BASE_URL}/species/{key}/synonyms", params={"offset": offset})
         resp.raise_for_status()
         return resp.json()
+
+    async def taxref_related(self, key: int) -> list[dict]:
+        """Enregistrement(s) de la checklist TAXREF correspondant au même concept taxonomique
+        que `key` (Backbone). Distinct de `vernacular_names_page` : ne dépend pas de l'existence
+        d'un nom vernaculaire français pour ce taxon."""
+        resp = await self._client.get(
+            f"{BASE_URL}/species/{key}/related", params={"datasetKey": TAXREF_DATASET_KEY}
+        )
+        resp.raise_for_status()
+        return resp.json().get("results", [])
