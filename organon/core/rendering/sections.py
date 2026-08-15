@@ -411,8 +411,8 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
             resu += f"|source=[[Plants of the World Online|POWO]]{{{{Bioref|{source}|{cdate}|ref}}}}"
             resu += "}}\n"
         total = len(certain) + len(uncertain) + len(introduit) + len(eteint)
-        if total > SEUIL_TABLEAU_DISTRIBUTION:
-            resu += _resume_et_tableau_distribution(
+        if total > SEUIL_LISTE_DISTRIBUTION:
+            resu += _resume_et_liste_distribution(
                 certain, uncertain, introduit, eteint, wgsrpd_certain, source, cdate
             )
         else:
@@ -469,9 +469,15 @@ def _lieu(items: list[str]) -> str:
     return "le pays ou la région suivant" if len(items) == 1 else "les pays et régions suivants"
 
 
-SEUIL_TABLEAU_DISTRIBUTION = 10
+SEUIL_LISTE_DISTRIBUTION = 10
 """Au-delà de ce total d'entrées (tous statuts confondus), la phrase inline devient illisible
-(ex. Quercus robur, ~60 entrées) : bascule sur un résumé chiffré + tableau triable."""
+(ex. Quercus robur, ~60 entrées) : bascule sur un résumé chiffré + liste groupée par statut."""
+
+SEUIL_COLONNES_STATUT = 15
+"""Au-delà de ce nombre d'entrées pour un même statut, la liste horizontale à virgules devient
+elle-même trop longue à lire d'un bloc (ex. Quercus robur, ~60 pays natifs) : bascule sur
+{{Début de colonnes}}/{{Fin de colonnes}} (une entrée par ligne, réparties en colonnes par le
+navigateur — voir la documentation du modèle sur Wikipédia)."""
 
 
 def _lien_continents(n: int) -> str:
@@ -506,7 +512,7 @@ def _liste_fr(items: list[str]) -> str:
     return ", ".join(items[:-1]) + " et " + items[-1]
 
 
-def _resume_et_tableau_distribution(
+def _resume_et_liste_distribution(
     certain: list[str],
     uncertain: list[str],
     introduit: list[str],
@@ -515,8 +521,9 @@ def _resume_et_tableau_distribution(
     source: str,
     cdate: str,
 ) -> str:
-    """Résumé chiffré (continents via `continents_codes_wgsrpd`) + tableau triable, remplace
-    `_phrase_distribution` au-delà de `SEUIL_TABLEAU_DISTRIBUTION`."""
+    """Résumé chiffré (continents via `continents_codes_wgsrpd`) + liste horizontale groupée par
+    statut (un tableau une-ligne-par-pays était illisible pour ~60 entrées, cf. discussion #27),
+    remplace `_phrase_distribution` au-delà de `SEUIL_LISTE_DISTRIBUTION`."""
     ref = f"{{{{Bioref|{source}|{cdate}|ref}}}}"
 
     resu = ""
@@ -549,18 +556,25 @@ def _resume_et_tableau_distribution(
         resu += ref
     resu += ".\n\n"
 
-    entrees = (
-        [(nom, "Présent") for nom in certain]
-        + [(nom, "Incertain") for nom in uncertain]
-        + [(nom, "Introduit") for nom in introduit]
-        + [(nom, "Éteint") for nom in eteint]
-    )
-    entrees.sort(key=lambda e: e[0])
-    resu += '{| class="wikitable sortable"\n! Pays / région !! Statut\n'
-    for nom, statut in entrees:
-        resu += f"|-\n| {nom} || {statut}\n"
-    resu += "|}\n"
+    if certain:
+        resu += _bloc_statut("Natif", certain)
+    if introduit:
+        resu += _bloc_statut("Introduit", introduit)
+    if uncertain:
+        resu += _bloc_statut("Présence incertaine", uncertain)
+    if eteint:
+        resu += _bloc_statut("Éteint", eteint)
     return resu
+
+
+def _bloc_statut(label: str, items: list[str]) -> str:
+    """Un statut de `_resume_et_liste_distribution` : liste horizontale à virgules en-dessous de
+    `SEUIL_COLONNES_STATUT`, sinon une entrée par ligne réparties en colonnes via
+    {{Début de colonnes}} (voir `SEUIL_COLONNES_STATUT`)."""
+    if len(items) <= SEUIL_COLONNES_STATUT:
+        return f"* '''{label}''' : {_liste_fr(items)}.\n"
+    lignes = "\n".join(f"* {item}" for item in items)
+    return f"'''{label}''' :\n{{{{Début de colonnes|taille=12}}}}\n{lignes}\n{{{{Fin de colonnes}}}}\n"
 
 
 def render_etymologie(struct: Struct, options: GenerateOptions) -> str:
