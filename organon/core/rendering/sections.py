@@ -506,32 +506,6 @@ def _liste_fr(items: list[str]) -> str:
     return ", ".join(items[:-1]) + " et " + items[-1]
 
 
-_NOTE_WGSRPD_DWC = "wgsrpd-dwc"
-
-
-def _note_dwc(cdate: str) -> str:
-    citation = (
-        "{{Lien web|langue=en|titre=Darwin Core Event Vocabulary|"
-        "url=https://dwc.tdwg.org/em/|site=Biodiversity Information Standards (TDWG)|"
-        f"consulté le={cdate}}}}}"
-    )
-    return (
-        f"La terminologie utilisée correspond à celle établie par [[Darwin Core]] ({citation}) :\n"
-        "* '''Natif''' : taxon présent au sein de son « aire de répartition naturelle » : "
-        "[[indigène (écologie)|indigène]], [[endémisme|endémique]] ou, lorsqu'il avait disparu "
-        "localement, réintroduit dans une région où il était historiquement natif.\n"
-        "* '''Introduit''' : taxon introduit et établi, volontairement ou accidentellement par "
-        "l'humain, dans une région située en dehors de son aire de répartition naturelle.\n"
-        "* '''Présence incertaine''' : l'origine de la présence du taxon dans la région est "
-        "« obscure » : les données disponibles (fossiles et historiques) ne permettent pas de "
-        "déterminer s'il est indigène ou introduit.\n"
-        "* '''Éteint''' : taxon ayant [[espèce éteinte|disparu]] d'une région, sans que cela "
-        "implique nécessairement sa [[Extinction des espèces|disparition totale]] à l'échelle "
-        "mondiale. Ce statut est utilisé par [[World Checklist of Vascular Plants]], mais ne "
-        "fait pas partie du Darwin Core."
-    )
-
-
 def _resume_et_tableau_distribution(
     certain: list[str],
     uncertain: list[str],
@@ -541,18 +515,9 @@ def _resume_et_tableau_distribution(
     source: str,
     cdate: str,
 ) -> str:
-    """Résumé chiffré (continents via `continents_codes_wgsrpd`, une note de terminologie DWC
-    partagée) + tableau triable, remplace `_phrase_distribution` au-delà de
-    `SEUIL_TABLEAU_DISTRIBUTION`."""
+    """Résumé chiffré (continents via `continents_codes_wgsrpd`) + tableau triable, remplace
+    `_phrase_distribution` au-delà de `SEUIL_TABLEAU_DISTRIBUTION`."""
     ref = f"{{{{Bioref|{source}|{cdate}|ref}}}}"
-    note_emise = False
-
-    def note() -> str:
-        nonlocal note_emise
-        if note_emise:
-            return f'<ref group="note" name="{_NOTE_WGSRPD_DWC}"/>'
-        note_emise = True
-        return f'<ref group="note" name="{_NOTE_WGSRPD_DWC}">{_note_dwc(cdate)}</ref>'
 
     resu = ""
     ref_utilisee = False
@@ -568,16 +533,16 @@ def _resume_et_tableau_distribution(
     clauses = []
     if certain:
         suffixe = "pays ou région" if len(certain) == 1 else "pays et régions"
-        clauses.append(f"nativement présent{note()} dans {len(certain)} {suffixe}")
+        clauses.append(f"nativement présent dans {len(certain)} {suffixe}")
     if introduit:
         suffixe = "autre" if len(introduit) == 1 else "autres"
-        clauses.append(f"introduit{note()} dans {len(introduit)} {suffixe}")
+        clauses.append(f"introduit dans {len(introduit)} {suffixe}")
     if uncertain:
         suffixe = "autre" if len(uncertain) == 1 else "autres"
-        clauses.append(f"de présence incertaine{note()} dans {len(uncertain)} {suffixe}")
+        clauses.append(f"de présence incertaine dans {len(uncertain)} {suffixe}")
     if eteint:
         suffixe = "pays ou région" if len(eteint) == 1 else "pays et régions"
-        clauses.append(f"éteint{note()} dans {len(eteint)} {suffixe}")
+        clauses.append(f"éteint dans {len(eteint)} {suffixe}")
 
     resu += f"Il est {_liste_fr(clauses)}"
     if not ref_utilisee:
