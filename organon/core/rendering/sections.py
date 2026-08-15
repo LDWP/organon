@@ -475,9 +475,9 @@ SEUIL_LISTE_DISTRIBUTION = 10
 
 SEUIL_COLONNES_STATUT = 15
 """Au-delà de ce nombre d'entrées pour un même statut, la liste horizontale à virgules devient
-elle-même trop longue à lire d'un bloc (ex. Quercus robur, ~60 pays natifs) : bascule sur
-{{Début de colonnes}}/{{Fin de colonnes}} (une entrée par ligne, réparties en colonnes par le
-navigateur — voir la documentation du modèle sur Wikipédia)."""
+elle-même trop longue à lire d'un bloc (ex. Quercus robur, ~60 pays natifs) : bascule sur une
+{{Liste déroulante}} centrée et repliée par défaut, contenant la liste en colonnes ({{colonnes}})
+plutôt qu'un bloc {{Début de colonnes}} nu qui restait affiché en entier dans l'article."""
 
 
 def _lien_continents(n: int) -> str:
@@ -525,6 +525,9 @@ def _resume_et_liste_distribution(
     statut (un tableau une-ligne-par-pays était illisible pour ~60 entrées, cf. discussion #27),
     remplace `_phrase_distribution` au-delà de `SEUIL_LISTE_DISTRIBUTION`."""
     ref = f"{{{{Bioref|{source}|{cdate}|ref}}}}"
+    # Pas de |ref (pas de balise <ref>) dans la liste déroulante : {{Bioref}} y sert de simple
+    # lien de citation en ligne, la note de bas de page numérotée est déjà posée par `ref` ci-dessus.
+    citation = f"{{{{Bioref|{source}|{cdate}}}}}"
 
     resu = ""
     ref_utilisee = False
@@ -557,24 +560,39 @@ def _resume_et_liste_distribution(
     resu += ".\n\n"
 
     if certain:
-        resu += _bloc_statut("Natif", certain)
+        resu += _bloc_statut("Natif", "nativement présent", certain, citation)
     if introduit:
-        resu += _bloc_statut("Introduit", introduit)
+        resu += _bloc_statut("Introduit", "introduit", introduit, citation)
     if uncertain:
-        resu += _bloc_statut("Présence incertaine", uncertain)
+        resu += _bloc_statut("Présence incertaine", "de présence incertaine", uncertain, citation)
     if eteint:
-        resu += _bloc_statut("Éteint", eteint)
+        resu += _bloc_statut("Éteint", "éteint", eteint, citation)
     return resu
 
 
-def _bloc_statut(label: str, items: list[str]) -> str:
+def _bloc_statut(label: str, qualificatif: str, items: list[str], citation: str) -> str:
     """Un statut de `_resume_et_liste_distribution` : liste horizontale à virgules en-dessous de
-    `SEUIL_COLONNES_STATUT`, sinon une entrée par ligne réparties en colonnes via
-    {{Début de colonnes}} (voir `SEUIL_COLONNES_STATUT`)."""
+    `SEUIL_COLONNES_STATUT`, sinon une {{Liste déroulante}} centrée et repliée par défaut, avec la
+    source et la liste en colonnes ({{colonnes}}) dans son contenu (voir `SEUIL_COLONNES_STATUT`).
+    `qualificatif` est l'adjectif accordé au statut (ex. "introduit") utilisé dans le titre de la
+    liste déroulante, distinct de `label` qui reste le nom du statut au format court."""
     if len(items) <= SEUIL_COLONNES_STATUT:
         return f"* '''{label}''' : {_liste_fr(items)}.\n"
     lignes = "\n".join(f"* {item}" for item in items)
-    return f"'''{label}''' :\n{{{{Début de colonnes|taille=12}}}}\n{lignes}\n{{{{Fin de colonnes}}}}\n"
+    titre = f"Liste des régions et pays dans lesquels ce taxon est {qualificatif}"
+    return (
+        "<center>\n"
+        "{{Liste déroulante\n"
+        " | width   = 55%\n"
+        f" | titre   = {titre}\n"
+        " | contenu =\n"
+        f" Données : {citation}.\n"
+        " {{colonnes|taille=18|1=\n"
+        f"{lignes}\n"
+        "}}\n"
+        "}}\n"
+        "</center>\n"
+    )
 
 
 def render_etymologie(struct: Struct, options: GenerateOptions) -> str:
