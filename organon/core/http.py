@@ -42,10 +42,14 @@ async def fetch_json(
     empty_value: Any = None,
 ) -> Any:
     """GET + décodage JSON, avec repli sur `empty_value` pour les statuts listés dans
-    `empty_statuses` (ex. 404/204 = ressource absente, pas une erreur) avant
-    `raise_for_status()`."""
+    `empty_statuses` (ex. 404 = ressource absente, pas une erreur) avant `raise_for_status()`,
+    et pour tout corps de réponse vide quel que soit le statut (ex. GBIF renvoie 204 sans corps
+    sur `/iucnRedListCategory` pour un taxon que l'UICN n'évalue pas à ce rang — un corps vide
+    n'est jamais un JSON valide, `resp.json()` lèverait sinon un JSONDecodeError)."""
     resp = await client.get(url, params=params, headers=headers)
     if resp.status_code in empty_statuses:
         return empty_value
     resp.raise_for_status()
+    if not resp.content:
+        return empty_value
     return resp.json()
