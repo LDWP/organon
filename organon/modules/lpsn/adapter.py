@@ -20,9 +20,12 @@ les synonymes ou sous-taxons d'un identifiant donné : `module.py` ne peut donc 
 oubli).
 
 Noms de champs JSON (voir `module.py`) tirés de la documentation publique
-(https://lpsn.dsmz.de/text/lpsn-api) faute de compte de test disponible pour vérifier contre une
-réponse réelle au moment de l'écriture (voir `docs/md/db-inventory.md` : LPSN classé
-"contact_requis") — à valider dès qu'un compte est enregistré."""
+(https://lpsn.dsmz.de/text/lpsn-api), vérifiés depuis contre l'API réelle. Un écart notable :
+`lpsn_address` ne contient pas l'URL conviviale du site (ex. "https://lpsn.dsmz.de/genus/
+dichelobacter") contrairement à ce que dit la doc, mais le lien DOI permanent de la fiche (ex.
+"https://doi.org/10.83108/rn.515525") — `module.py` reconstruit donc l'identifiant du modèle
+Wikipédia {{LPSN}} depuis `monomial`/`species_epithet`/`subspecies_epithet` plutôt que depuis ce
+champ (voir `_slug_from_record`)."""
 
 from __future__ import annotations
 

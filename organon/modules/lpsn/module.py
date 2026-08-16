@@ -40,14 +40,22 @@ from organon.modules.common import MAX_SYNONYM_HOPS, format_auteur
 from organon.modules.lpsn.adapter import LpsnAdapter
 from organon.modules.lpsn.ranks import lpsn_cherche_rang, lpsn_cherche_regne
 
+LPSN_WEBSITE_BASE = "https://lpsn.dsmz.de"
 
-def _slug_from_address(address: str | None) -> str | None:
-    """Extrait le segment final de `lpsn_address` (URL de la fiche sur lpsn.dsmz.de), seul
-    identifiant accepté par le paramètre "ID" du modèle Wikipédia {{LPSN}} (ex.
-    "hyphomonas-rosenbergii", pas l'identifiant numérique interne)."""
-    if not address:
+
+def _slug_from_record(cur: dict) -> str | None:
+    """Identifiant du modèle Wikipédia {{LPSN}} (ex. "dichelobacter", "hyphomonas-rosenbergii") :
+    `lpsn_address` ne convient pas, ce champ contient le DOI permanent de la fiche, pas l'URL
+    conviviale du site (voir docstring de tête de `adapter.py`)."""
+    monomial = cur.get("monomial")
+    if not monomial:
         return None
-    return address.rstrip("/").rsplit("/", 1)[-1] or None
+    epithets = [monomial]
+    for key in ("species_epithet", "subspecies_epithet"):
+        epithet = cur.get(key)
+        if epithet:
+            epithets.append(epithet)
+    return "-".join(epithets).lower()
 
 
 class LpsnModule(TaxonomyModule):
@@ -86,10 +94,11 @@ class LpsnModule(TaxonomyModule):
         rang = lpsn_cherche_rang(cur.get("category"))
 
         entry: dict = {"nom": cur.get("full_name") or struct.taxon.nom, "rang": rang}
-        slug = _slug_from_address(cur.get("lpsn_address"))
-        if slug:
+        category = cur.get("category")
+        slug = _slug_from_record(cur)
+        if slug and category:
             entry["id"] = slug
-            entry["url"] = cur["lpsn_address"]
+            entry["url"] = f"{LPSN_WEBSITE_BASE}/{category}/{slug}"
         if cur.get("authority"):
             entry["auteur"] = format_auteur(cur["authority"])
         struct.liens["lpsn"] = entry
