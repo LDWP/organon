@@ -56,6 +56,15 @@ def _relevance(match: SearchMatch, query: str) -> int:
     return 2
 
 
+def _doubtful_rank(status: str) -> int:
+    """Départage une égalité de `_relevance` entre deux fiches GBIF du même nom : un statut
+    `DOUBTFUL` (ex. variant orthographique non lié par `acceptedKey` à l'entrée acceptée, voir
+    Acroteriobatus annulatus — Projet:Biologie/Organon #43) ne doit pas primer sur `ACCEPTED`
+    juste parce que `species/search` l'a renvoyé en premier : le tri de Python étant stable, un
+    ordre brut défavorable se propageait tel quel jusqu'au `gbif_key` retenu par défaut."""
+    return 1 if status == "DOUBTFUL" else 0
+
+
 def _rank_label(rank_raw: str) -> str:
     """Traduit le rang GBIF (ex. "GENUS") vers le libellé français utilisé partout ailleurs
     dans l'app (table `organon/core/data/ranks.yaml`), plutôt qu'un second vocabulaire de
@@ -87,16 +96,17 @@ async def search(q: str) -> SearchResponse:
     # "Acanthocephala" désigne à la fois un phylum de vers et un genre d'insectes, tous deux
     # Animalia — dédupliquer sur (nom, règne) les aurait silencieusement fusionnés en un seul
     # résultat, masquant l'homonymie qu'on cherche justement à révéler).
-    seen: dict[int | str, SearchMatch] = {}
+    DedupKey = int | tuple[str, str, str]
+    seen: dict[DedupKey, tuple[SearchMatch, int]] = {}
     for entry in raw_results:
         nom = entry.get("canonicalName") or entry.get("scientificName")
         if not nom:
             continue
         kingdom_raw = entry.get("kingdom", "")
-        dedup_key = entry.get("key") or (nom, kingdom_raw, entry.get("authorship", ""))
+        dedup_key: DedupKey = entry.get("key") or (nom, kingdom_raw, entry.get("authorship", ""))
         if dedup_key in seen:
             continue
-        seen[dedup_key] = SearchMatch(
+        match = SearchMatch(
             scientific_name=nom,
             author=entry.get("authorship", "").strip(),
             extinct=bool(entry.get("extinct", False)),
@@ -106,11 +116,13 @@ async def search(q: str) -> SearchResponse:
             gbif_key=entry.get("key"),
             parent_key=entry.get("parentKey"),
         )
+        seen[dedup_key] = (match, _doubtful_rank(entry.get("taxonomicStatus", "")))
 
     # Dédoublonné sur l'ensemble des résultats bruts avant de trier par pertinence puis de
     # couper à MAX_MATCHES — trier avant de couper, pas l'inverse, sinon la correspondance
     # exacte pourrait être perdue si elle arrive après la position MAX_MATCHES côté GBIF.
-    matches = sorted(seen.values(), key=lambda m: _relevance(m, query))[:MAX_MATCHES]
+    ordered = sorted(seen.values(), key=lambda pair: (_relevance(pair[0], query), pair[1]))
+    matches = [match for match, _ in ordered][:MAX_MATCHES]
     return SearchResponse(query=q, matches=matches)
 
 
