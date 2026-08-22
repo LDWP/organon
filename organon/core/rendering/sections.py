@@ -40,6 +40,12 @@ from organon.core.rendering.support import (
 # Règnes utilisant "nom correct" plutôt que "nom valide" (convention bota/mycolo/bactério).
 _REGNES_NOM_CORRECT = {"végétal", "champignon", "algue", "bactérie", "archaea"}
 
+RANGS_CATEGORIE_HOMONYME = {"embranchement", "classe", "ordre", "famille"}
+"""Rangs pour lesquels l'article est la page principale de sa propre catégorie homonyme (ex.
+[[Catégorie:Bovidae|*]] + {{catégorie principale}} sur l'article "Bovidae") — voir
+`organon.core.selectors.categorization.compute_fin_liens` (catégorie) et `render_voir_aussi`
+ci-dessous ({{catégorie principale}})."""
+
 # Table $cas de rendu_vide() : section -> (rendu si plan=false, rendu si plan=true).
 _RENDU_VIDE_CAS: dict[str, tuple[bool, bool]] = {
     "repartition": (True, True),
@@ -697,6 +703,8 @@ def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
         for a in sorted(autres):
             resu += f"| {a}\n"
         resu += "}}\n"
+        if struct.taxon.rang in RANGS_CATEGORIE_HOMONYME:
+            resu += "{{catégorie principale}}\n"
     if ext:
         for e in sorted(ext):
             resu += f"* {e}\n"

@@ -9,6 +9,7 @@ from __future__ import annotations
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.rendering.grammar import CATEGORIE_PAR_REGNE, EBAUCHE_PAR_REGNE
+from organon.core.rendering.sections import RANGS_CATEGORIE_HOMONYME
 from organon.core.selectors.engine import evaluate_ruleset
 
 _PORTAIL_PAR_REGNE: dict[str, str] = {
@@ -66,5 +67,9 @@ def compute_fin_liens(struct: Struct, options: GenerateOptions) -> dict[str, lis
 
     categories = [r.nom for r in struct.rangs if r.rang == "famille"]
     categories.extend(lien_pour_categorie(struct, options) or [])
+
+    if struct.taxon.rang in RANGS_CATEGORIE_HOMONYME:
+        categories.append(f"{struct.taxon.nom}|{options.cle_categorie_homonyme}")
+    categories.sort()
 
     return {"portails": portails, "categories": categories}

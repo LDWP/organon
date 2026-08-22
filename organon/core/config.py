@@ -106,3 +106,12 @@ class GenerateOptions(BaseModel):
             "silencieusement sans possibilité de le désactiver."
         ),
     )
+
+    cle_categorie_homonyme: str = Field(
+        default="*",
+        description=(
+            "Clé de tri de la catégorie homonyme ajoutée pour les taxons de rang embranchement/"
+            "classe/ordre/famille (ex. [[Catégorie:Bovidae|*]]) — voir "
+            "organon.core.selectors.categorization.compute_fin_liens."
+        ),
+    )
