@@ -5,6 +5,7 @@ Ne fait aucun appel HTTP directement, voir adapter.py.
 from __future__ import annotations
 
 import html as _html
+import re
 
 from organon.core.config import GenerateOptions
 from organon.core.models import (
@@ -17,6 +18,7 @@ from organon.core.models import (
     TaxonInfo,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
+from organon.core.rendering.authors import BOTANIST_REGNES
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.col_xr.adapter import ColXrAdapter
@@ -30,6 +32,28 @@ from organon.modules.common import (
 )
 from organon.modules.gbif.adapter import GbifAdapter
 from organon.modules.gbif.ranks import GBIF_WP, gbif_cherche_rang, gbif_cherche_regne
+
+_ANNEE_PUBLICATION_RE = re.compile(r"\b(1[3-9]\d\d|20\d\d)\b")
+
+
+def _annee_probable(published_in: str | None, regne: str | None) -> int | None:
+    """Extrait un candidat d'année de publication depuis `publishedIn` (citation bibliographique
+    en texte libre — GBIF n'expose aucun champ année structuré comme `namePublishedInYear` chez
+    POWO ou `YEAR_OF_PUBLICATION` chez Index Fungorum). Limité aux règnes ICN
+    (`BOTANIST_REGNES` : botanique/champignons), où l'année n'est jamais incluse dans la
+    citation d'auteur elle-même par convention, contrairement à l'ICZN zoologique (ex.
+    "Linnaeus, 1758" pour la zoologie contre "L." pour la botanique) — inutile d'en extraire une
+    pour un règne où GBIF la porte déjà nativement dans `authorship`.
+
+    Prend le dernier nombre à 4 chiffres plausible (l'année termine généralement la citation,
+    ex. "Sp. Pl.: 996 (1753)") : une extraction imparfaite reste sans danger, ce candidat n'est
+    utilisé que s'il est recoupé avec un autre module (voir
+    `organon.core.selectors.coherence.gbif_annee_probable_validee`), jamais présenté seul à
+    l'utilisateur."""
+    if not published_in or regne not in BOTANIST_REGNES:
+        return None
+    matches = _ANNEE_PUBLICATION_RE.findall(published_in)
+    return int(matches[-1]) if matches else None
 
 
 async def _taxon_info(adapter: GbifAdapter, key: int) -> dict | None:
@@ -146,12 +170,22 @@ class GbifModule(TaxonomyModule):
             **({"rang": info["rang"]} if "rang" in info else {}),
             **({"eteint": info["eteint"]} if "eteint" in info else {}),
         }
-        if not is_classification and cur.get("kingdom"):
+        if cur.get("publishedIn"):
+            # Citation bibliographique déjà présente dans la réponse de recherche utilisée
+            # ci-dessus (aucun appel réseau supplémentaire) — même usage que
+            # `dcterms:bibliographicCitation`/`originalPublicationRef` côté AlgaeBase
+            # (`algaebase/module.py::_apply_bibliographic_citation`/`_apply_detail_page`), pas de
+            # champ année structuré séparé contrairement à POWO/IPNI/Index Fungorum.
+            struct.originale = cur["publishedIn"]
+
+        regne_detecte = gbif_cherche_regne(cur["kingdom"]) if cur.get("kingdom") else None
+        annee_probable = _annee_probable(cur.get("publishedIn"), regne_detecte)
+        if annee_probable is not None:
+            struct.liens["gbif"]["annee_probable"] = annee_probable
+        if not is_classification and regne_detecte:
             # Signal de règne détecté sans appel réseau supplémentaire : le champ "kingdom" est
             # déjà présent dans la réponse de recherche utilisée ci-dessus. Voir RegneIncoherence.
-            regne_detecte = gbif_cherche_regne(cur["kingdom"])
-            if regne_detecte:
-                struct.liens["gbif"]["regne_detecte"] = regne_detecte
+            struct.liens["gbif"]["regne_detecte"] = regne_detecte
 
         # Placé ici (avant le `if not is_classification` plus bas) plutôt que dans la branche
         # classification uniquement : GBIF tourne aussi en enrichissement quand une autre source

@@ -11,6 +11,7 @@ partir de `Struct` déjà résolu — donc il vit ici plutôt que dans `organon.
 
 from __future__ import annotations
 
+import re
 from collections import Counter
 
 from organon.core.domains import build_module_domain_tree, rec_strict_domaine
@@ -21,6 +22,34 @@ _REGNE_INCONNU = "neutre"
 """Valeur sentinelle utilisée par les tables kingdom->règne (GBIF/ITIS/WoRMS) quand le libellé
 de règne renvoyé par la source n'est reconnu dans aucune charte — pas un vrai signal de règne,
 donc exclue pour éviter un faux positif à chaque libellé non mappé."""
+
+_YEAR_TOKEN_RE = re.compile(r"\b(1[3-9]\d\d|20\d\d)\b")
+"""Mêmes bornes que `organon.core.rendering.authors._YEAR_RE` (1300-2099), mais en recherche
+libre (`search`/`findall`) plutôt qu'en correspondance stricte d'un token déjà découpé : sert ici
+à repérer une année dans une chaîne d'auteur complète plutôt que dans un seul token isolé."""
+
+
+def gbif_annee_probable_validee(struct: Struct, auteur_retenu: str | None) -> int | None:
+    """Confirme un candidat d'année GBIF (`struct.liens['gbif']['annee_probable']`, extrait par
+    regex d'une citation bibliographique en texte libre — GBIF n'expose aucun champ année
+    structuré comme POWO/IPNI/Index Fungorum, voir `organon.modules.gbif.module._annee_probable`)
+    — non fiable isolément (parsing de texte libre, sans champ dédié), mais utilisable une fois
+    recoupée : ne renvoie l'année que si un AUTRE module rapporte la même dans son propre auteur
+    (`struct.liens[<module>]['auteur']`). `auteur_retenu` est l'auteur déjà choisi par le vote
+    majoritaire (`generate.py::_auteur_majoritaire`) : si celui-ci porte déjà une année, rien à
+    ajouter — évite un doublon (ex. "L., 1753, 1753")."""
+    if auteur_retenu and _YEAR_TOKEN_RE.search(auteur_retenu):
+        return None
+    annee = struct.liens.get("gbif", {}).get("annee_probable")
+    if annee is None:
+        return None
+    cible = str(annee)
+    for module_id, data in struct.liens.items():
+        if module_id == "gbif" or not isinstance(data, dict):
+            continue
+        if cible in _YEAR_TOKEN_RE.findall(data.get("auteur") or ""):
+            return annee
+    return None
 
 
 def detect_regne_incoherences(struct: Struct, classification_id: str) -> list[RegneIncoherence]:

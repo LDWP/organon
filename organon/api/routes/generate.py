@@ -69,6 +69,7 @@ from organon.core.selectors.categorization import compute_fin_liens
 from organon.core.selectors.coherence import (
     classification_regne_coherents,
     detect_regne_incoherences,
+    gbif_annee_probable_validee,
     reference_module_coherente,
 )
 from organon.modules.bootstrap import ensure_modules_registered
@@ -613,6 +614,12 @@ def _assemble_response(
         struct.taxon.auteur = auteur_candidats[options.auteur_source]
     else:
         struct.taxon.auteur = _auteur_majoritaire(struct, classification_id)
+    # Année GBIF (parsing de `publishedIn`, texte libre — voir gbif/module.py::_annee_probable) :
+    # ajoutée seulement si un autre module rapporte la même année dans son propre auteur (voir
+    # gbif_annee_probable_validee), jamais présentée à l'utilisateur sur la seule foi du parsing.
+    annee_gbif_validee = gbif_annee_probable_validee(struct, struct.taxon.auteur)
+    if annee_gbif_validee is not None:
+        struct.taxon.auteur = f"{struct.taxon.auteur}, {annee_gbif_validee}"
     struct.taxon.auteur_resolu, auteur_warnings = resoudre_auteur_principal(struct)
     warnings = warnings + auteur_warnings
 
