@@ -41,7 +41,10 @@ class ItisModule(TaxonomyModule):
         # searchByScientificName fait une recherche floue (ex. "Boletus" retourne des espèces
         # dont l'épithète est "boletus" dans d'autres genres, toutes règnes confondus) : sans ce
         # filtre, `results[0]` peut être un taxon homonyme sans rapport avec un règne erroné.
-        match = next((sn for sn in results if sn.get("combinedName") == taxon), None)
+        candidates = [sn for sn in results if sn.get("combinedName") == taxon]
+        if not candidates:
+            return None
+        match, accepted_prefetched = await self._resolve_homonym(candidates, adapter)
         if match is None or not match.get("tsn"):
             return None
         tsn = match["tsn"]
@@ -59,7 +62,10 @@ class ItisModule(TaxonomyModule):
             if regne_detecte:
                 struct.liens["itis"]["regne_detecte"] = regne_detecte
 
-        accepted = await adapter.accepted_names(tsn)
+        if accepted_prefetched is not None:
+            accepted = accepted_prefetched
+        else:
+            accepted = await adapter.accepted_names(tsn)
         accepted_entry = next((a for a in accepted if a.get("acceptedName")), None)
         if accepted_entry is not None:
             if not is_classification:
@@ -134,6 +140,31 @@ class ItisModule(TaxonomyModule):
             struct.vernaculaire["ITIS"] = vernaculaire
 
         return struct
+
+    @staticmethod
+    async def _resolve_homonym(
+        candidates: list[dict], adapter: ItisAdapter
+    ) -> tuple[dict, list[dict] | None]:
+        """ITIS peut renvoyer plusieurs entrées avec le même `combinedName` (ex. "Aegilops
+        tauschii" existe à la fois comme nom valide et comme nom rejeté/mal appliqué sous des
+        auteurs différents). Sans arbitrage, un homonyme invalide arrivé en premier dans les
+        résultats de recherche serait pris pour le taxon, entraînant classification ou
+        redirection de synonyme vers une autre espèce. On préfère le premier homonyme qui est
+        lui-même le nom accepté (pas de redirection via getAcceptedNamesFromTSN) ; si tous sont
+        des synonymes, on retombe sur le premier résultat comme avant ce correctif."""
+        if len(candidates) == 1:
+            return candidates[0], None
+        first_accepted: list[dict] | None = None
+        for index, candidate in enumerate(candidates):
+            tsn = candidate.get("tsn")
+            if not tsn:
+                continue
+            accepted = await adapter.accepted_names(tsn)
+            if index == 0:
+                first_accepted = accepted
+            if not any(a.get("acceptedName") for a in accepted):
+                return candidate, accepted
+        return candidates[0], first_accepted
 
     def render_bioref(self, struct: Struct) -> str | None:
         data = struct.liens.get("itis")
