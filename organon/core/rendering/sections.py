@@ -16,6 +16,7 @@ from organon.core.rendering.grammar import (
     lien_pour_auteur,
     lien_pour_basionyme,
     lien_pour_synonyme,
+    wp_est_infraspecifique,
     wp_est_italique,
     wp_eteint_rang,
     wp_inf_rang,
@@ -209,10 +210,14 @@ def render_subtaxon_line(sous_taxon: RankName, regne: str, rang_defaut: str, tax
     mono-source et le rendu fusionné multi-sources). Le wikilien est ajouté dès que le rang du
     sous-taxon est plus spécifique que celui du taxon de l'article (`taxon_rang`) — et non plus
     seulement au-dessus du niveau espèce : une liste de sous-taxons ne contient par construction
-    que des rangs inférieurs à celui du taxon, donc essentiellement toujours un lien."""
+    que des rangs inférieurs à celui du taxon, donc essentiellement toujours un lien — sauf pour
+    les rangs infra-spécifiques (sous-espèce, variété, forme...), qui n'ont presque jamais
+    d'article dédié sur Wikipédia (voir `wp_est_infraspecifique`)."""
     rang_affiche = sous_taxon.rang or rang_defaut
     auteur = " " + format_auteur(sous_taxon.auteur) if sous_taxon.auteur else ""
-    wikilien = wp_rang_plus_specifique(rang_affiche, taxon_rang)
+    wikilien = wp_rang_plus_specifique(rang_affiche, taxon_rang) and not wp_est_infraspecifique(
+        rang_affiche
+    )
     cible = wp_met_italiques(sous_taxon.nom, rang_affiche, regne, lien=wikilien)
     if sous_taxon.eteint:
         cible = "† " + cible

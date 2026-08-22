@@ -174,6 +174,19 @@ def wp_rang_plus_specifique(rang: str, reference: str, table: RankTable | None =
     return ordre.index(rang) < ordre.index(reference)
 
 
+def wp_est_infraspecifique(rang: str, table: RankTable | None = None) -> bool:
+    """Indique si `rang` est un rang infra-spécifique (sous-espèce, variété, forme, etc. —
+    strictement plus spécifique qu'espèce dans l'ordre de `ranks.yaml`). Ces taxons n'ont
+    presque jamais d'article dédié sur Wikipédia, d'où l'exclusion du wikilien dans
+    `sections.render_subtaxon_line` même quand le rang est plus spécifique que celui de
+    l'article courant. Ne pas confondre avec `rang_inferieur_espece` (utilisé par
+    `wp_est_italique`), qui couvre aussi le genre et en dessous."""
+    table = table or load_rank_table()
+    if not wp_rang_valide(rang, table):
+        return False
+    return rang != "espèce" and wp_rang_plus_specifique(rang, "espèce", table)
+
+
 def wp_accorde_adjectif(
     nom_adjectif: str, genre: Literal["masculin", "féminin"], plur: bool = False,
     table: RankTable | None = None,
