@@ -128,7 +128,7 @@ class ColXrModule(TaxonomyModule):
         if "extinct" in usage:
             struct.taxon.eteint = usage["extinct"]
         struct.taxon.nom = name["scientificName"].strip()
-        struct.classification = "COL XR"
+        struct.classification = "CatalogueofLife"
         struct.classification_taxobox = "COL XR"
 
         classification = cur.get("classification", [])
@@ -172,7 +172,7 @@ class ColXrModule(TaxonomyModule):
 
         liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
         if liste:
-            struct.sous_taxons = SubTaxonList(liste=liste, source="COL XR", coupe=coupe)
+            struct.sous_taxons = SubTaxonList(liste=liste, source="CatalogueofLife", coupe=coupe)
 
         vernaculaire = [
             _html.unescape(v["name"])
@@ -180,7 +180,7 @@ class ColXrModule(TaxonomyModule):
             if v.get("language") == "fra"
         ]
         if vernaculaire:
-            struct.vernaculaire["COL XR"] = vernaculaire
+            struct.vernaculaire["CatalogueofLife"] = vernaculaire
 
         syn = await adapter.synonyms(taxon_id)
         synonymes = []
@@ -196,7 +196,7 @@ class ColXrModule(TaxonomyModule):
                 )
             )
         if synonymes:
-            struct.synonymes = SynonymList(liste=synonymes, source="COL XR", coupe=False)
+            struct.synonymes = SynonymList(liste=synonymes, source="CatalogueofLife", coupe=False)
 
         return struct
 
