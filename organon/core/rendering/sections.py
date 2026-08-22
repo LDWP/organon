@@ -554,7 +554,7 @@ def _resume_et_liste_distribution(
     clauses = []
     if certain:
         suffixe = "pays ou région" if len(certain) == 1 else "pays et régions"
-        clauses.append(f"nativement présent dans {len(certain)} {suffixe}")
+        clauses.append(f"[[indigène (écologie)|indigène]] dans {len(certain)} {suffixe}")
     if introduit:
         suffixe = "autre" if len(introduit) == 1 else "autres"
         clauses.append(f"introduit dans {len(introduit)} {suffixe}")
@@ -571,7 +571,7 @@ def _resume_et_liste_distribution(
     resu += ".\n\n"
 
     if certain:
-        resu += _bloc_statut("Natif", "nativement présent", certain, citation)
+        resu += _bloc_statut("Natif", "indigène", certain, citation)
     if introduit:
         resu += _bloc_statut("Introduit", "introduit", introduit, citation)
     if uncertain:
@@ -588,7 +588,7 @@ def _bloc_statut(label: str, qualificatif: str, items: list[str], citation: str)
     `qualificatif` est l'adjectif accordé au statut (ex. "introduit") utilisé dans le titre de la
     liste déroulante, distinct de `label` qui reste le nom du statut au format court."""
     if len(items) <= SEUIL_COLONNES_STATUT:
-        return f"* '''{label}''' : {_liste_fr(items)}.\n"
+        return f"* {label} : {_liste_fr(items)}.\n"
     lignes = "\n".join(f"* {item}" for item in items)
     titre = f"Liste des régions et pays dans lesquels ce taxon est {qualificatif}"
     return (
