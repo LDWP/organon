@@ -16,10 +16,21 @@ groupes sont ordonnés par taille décroissante (le plus d'espèces d'abord), à
 d'apparition des sources dans `sources` — le premier groupe sert de "primary" (coché par défaut,
 phrase d'ouverture nommant le taxon), les suivants "alternative" (décochés par défaut, phrase
 reprenant le pronom anaphorique).
+
+`reconcile_synonym_groups` (voir plus bas) est une seconde phase optionnelle, asynchrone, qui
+départage les cas où deux sources rapportent le même NOMBRE d'espèces mais divergent sur un ou
+plusieurs noms à cause d'une synonymie (ex. Discussion Projet:Biologie/Organon #30 : GBIF et POWO
+rapportent chacun 22 espèces pour *Anthoshorea*, une seule diffère de graphie entre les deux).
+Cette phase résout les noms orphelins via un identifiant tiers (COL XR, voir
+`organon.modules.col_xr.lookup.resolve_col_xr_concept_id`, injecté par l'appelant) et ne fusionne
+que si la correspondance est une bijection complète et vérifiée — jamais par ressemblance de nom
+seule.
 """
 
 from __future__ import annotations
 
+import asyncio
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Literal
 
@@ -167,7 +178,9 @@ def merge_subtaxa(
                 species=[
                     MergedSpecies(
                         nom=nom,
-                        line=render_subtaxon_line(name_to_species[nom], regne, rang_defaut, taxon_rang),
+                        line=render_subtaxon_line(
+                            name_to_species[nom], regne, rang_defaut, taxon_rang
+                        ),
                         default_checked=(kind == "primary"),
                     )
                     for nom in species_names
@@ -182,3 +195,130 @@ def merge_subtaxa(
         taxon_phrase=_taxon_phrase(taxon_rang, taxon_nom, regne),
         groups=groups,
     )
+
+
+def _merge_pair(
+    primary: MergedGroup, secondary: MergedGroup, source_order: list[str], pairing: dict[str, str]
+) -> MergedGroup:
+    """Fusionne deux groupes de même taille dont chaque nom orphelin de `primary` a été apparié à
+    l'unique nom homologue de `secondary` (bijection déjà vérifiée par l'appelant, voir
+    `reconcile_synonym_groups`). `pairing` : nom (dans `primary`) -> nom homologue (dans
+    `secondary`). `kind`/`intro` sont des valeurs provisoires, recalculées par l'appelant une fois
+    l'ordre final des groupes connu."""
+    primary_by_nom = {s.nom: s for s in primary.species}
+    secondary_by_nom = {s.nom: s for s in secondary.species}
+    species = [s for nom, s in primary_by_nom.items() if nom in secondary_by_nom]
+    species += [primary_by_nom[nom] for nom in pairing]
+    return MergedGroup(
+        sources=sorted(primary.sources + secondary.sources, key=source_order.index),
+        kind="alternative",
+        intro="",
+        species=sorted(species, key=lambda s: s.nom),
+    )
+
+
+def _resolved_ids(names: set[str], ids: list[str | None]) -> dict[str, str] | None:
+    """None dès qu'un nom ne s'est pas résolu — un identifiant absent invalide toute la
+    correspondance pour cette paire de groupes (voir `reconcile_synonym_groups`)."""
+    result: dict[str, str] = {}
+    for nom, cid in zip(names, ids, strict=True):
+        if cid is None:
+            return None
+        result[nom] = cid
+    return result
+
+
+async def reconcile_synonym_groups(
+    groups: list[MergedGroup],
+    source_order: list[str],
+    resolve: Callable[[str], Awaitable[str | None]],
+) -> list[MergedGroup]:
+    """Départage par synonymie vérifiée les groupes que `merge_subtaxa` a laissés séparés faute
+    d'accord exact sur les noms, quand deux groupes rapportent le même NOMBRE d'espèces (voir
+    Discussion Projet:Biologie/Organon #30 : GBIF et POWO rapportent chacun 22 espèces pour
+    *Anthoshorea*, une seule diffère de graphie entre les deux, empêchant sinon la phrase unifiée).
+
+    `resolve(nom)` doit renvoyer un identifiant externe stable (ex. COL XR, voir
+    `organon.modules.col_xr.lookup.resolve_col_xr_concept_id`) ou `None` si non résolu — injecté
+    pour ne pas coupler ce module, autrement pur, à un module réseau précis (voir l'appelant,
+    `organon.api.routes.subtaxa_merge`). Ne fusionne QUE si chaque nom orphelin d'un côté a un et
+    un seul homologue de l'autre côté avec le même identifiant résolu (bijection complète, aucun
+    `None`, aucune ambiguïté) — jamais par ressemblance de nom seule, même logique de prudence que
+    `merge_subtaxa` (voir docstring de module).
+    """
+    if len(groups) < 2:
+        return list(groups)
+
+    working = list(groups)
+    cache: dict[str, str | None] = {}
+
+    async def resolved(nom: str) -> str | None:
+        if nom not in cache:
+            cache[nom] = await resolve(nom)
+        return cache[nom]
+
+    merged_once = True
+    while merged_once:
+        merged_once = False
+        for i in range(len(working)):
+            for j in range(i + 1, len(working)):
+                ga, gb = working[i], working[j]
+                if len(ga.species) != len(gb.species) or not ga.species:
+                    continue
+                a_first = source_order.index(ga.sources[0])
+                b_first = source_order.index(gb.sources[0])
+                primary, secondary = (ga, gb) if a_first <= b_first else (gb, ga)
+
+                primary_names = {s.nom for s in primary.species}
+                secondary_names = {s.nom for s in secondary.species}
+                only_primary = primary_names - secondary_names
+                only_secondary = secondary_names - primary_names
+                if not only_primary:
+                    continue  # groupes déjà identiques : ne devrait pas arriver (garde-fou)
+
+                ids_primary, ids_secondary = await asyncio.gather(
+                    asyncio.gather(*(resolved(n) for n in only_primary)),
+                    asyncio.gather(*(resolved(n) for n in only_secondary)),
+                )
+                id_of_primary = _resolved_ids(only_primary, ids_primary)
+                id_of_secondary = _resolved_ids(only_secondary, ids_secondary)
+                if id_of_primary is None or id_of_secondary is None:
+                    continue
+
+                name_of_id_secondary: dict[str, str] = {}
+                ambiguous = False
+                for nom, cid in id_of_secondary.items():
+                    if cid in name_of_id_secondary:
+                        ambiguous = True
+                        break
+                    name_of_id_secondary[cid] = nom
+                if ambiguous or any(
+                    cid not in name_of_id_secondary for cid in id_of_primary.values()
+                ):
+                    continue
+
+                pairing = {nom: name_of_id_secondary[cid] for nom, cid in id_of_primary.items()}
+                if len(set(pairing.values())) != len(pairing):
+                    continue  # bijection stricte : pas deux orphelins vers le même homologue
+
+                working[i] = _merge_pair(primary, secondary, source_order, pairing)
+                del working[j]
+                merged_once = True
+                break
+            if merged_once:
+                break
+
+    cdate = dates_recupere()
+    working.sort(key=lambda g: (-len(g.species), source_order.index(g.sources[0])))
+    return [
+        MergedGroup(
+            sources=g.sources,
+            kind="primary" if i == 0 else "alternative",
+            intro=_intro(g.sources, cdate),
+            species=[
+                MergedSpecies(nom=s.nom, line=s.line, default_checked=(i == 0))
+                for s in g.species
+            ],
+        )
+        for i, g in enumerate(working)
+    ]

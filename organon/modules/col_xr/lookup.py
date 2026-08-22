@@ -19,6 +19,26 @@ def _kingdom_index(classification: list[dict]) -> int | None:
     return next((i for i, c in enumerate(classification) if c.get("rank") == "kingdom"), None)
 
 
+def _regne_correspond(r: dict, domaine: str) -> bool:
+    if domaine in ("*", ""):
+        return True
+    idx = _kingdom_index(r.get("classification", []))
+    kingdom = r["classification"][idx]["name"] if idx is not None else ""
+    return KINGDOM_MAP.get(kingdom, "") == domaine
+
+
+def _exact_matches(results: list[dict], nom: str) -> list[dict]:
+    # Même filtre client strict que l'ancien module de classification : `type=EXACT` côté
+    # ChecklistBank ne suffit pas à exclure tous les à-peu-près.
+    exact = [r for r in results if r["usage"]["name"]["scientificName"] == nom]
+    return exact or results
+
+
+def _pick(candidats: list[dict], domaine: str) -> dict | None:
+    cur = next((r for r in candidats if _regne_correspond(r, domaine)), None)
+    return cur if cur is not None else (candidats[0] if candidats else None)
+
+
 async def find_col_xr_id(adapter: ColXrAdapter, nom: str, domaine: str) -> str | None:
     """None si aucune entrée COL XR acceptée ne correspond au nom (et au règne, si `domaine` est
     renseigné) — un simple défaut d'absence, pas une erreur : GBIF garde alors son identifiant
@@ -28,23 +48,32 @@ async def find_col_xr_id(adapter: ColXrAdapter, nom: str, domaine: str) -> str |
     results = await adapter.search(nom)
     if not results:
         return None
+    candidats = _exact_matches(results, nom)
+    accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
+    cur = _pick(accepted, domaine)
+    return cur["id"] if cur is not None else None
 
-    # Même filtre client strict que `ColXrModule` : `type=EXACT` côté ChecklistBank ne suffit
-    # pas à exclure tous les à-peu-près.
-    exact = [r for r in results if r["usage"]["name"]["scientificName"] == nom]
-    candidats = exact or results
-
-    def _regne_correspond(r: dict) -> bool:
-        if domaine in ("*", ""):
-            return True
-        idx = _kingdom_index(r.get("classification", []))
-        kingdom = r["classification"][idx]["name"] if idx is not None else ""
-        return KINGDOM_MAP.get(kingdom, "") == domaine
+async def resolve_col_xr_concept_id(adapter: ColXrAdapter, nom: str, domaine: str) -> str | None:
+    """Identifiant ChecklistBank du concept taxonomique ACCEPTÉ désigné par `nom`, que `nom` soit
+    lui-même le nom accepté ou un synonyme que COL XR redirige explicitement vers lui
+    (`usage.accepted.id`) — contrairement à `find_col_xr_id`, qui ignore les synonymes pour ne
+    jamais faire pointer un lien externe vers un statut différent du sien. Utilisé par
+    `organon.core.rendering.subtaxa_merge.reconcile_synonym_groups` pour reconnaître comme un seul
+    taxon deux noms orthographiés différemment par deux sources (ex. Discussion Projet:Biologie/
+    Organon #30) quand COL XR les relie explicitement — jamais par ressemblance de nom seule.
+    None si `nom` n'a aucune entrée COL XR (accepté ou synonyme redirigé) correspondante."""
+    results = await adapter.search(nom)
+    if not results:
+        return None
+    candidats = _exact_matches(results, nom)
 
     accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
-    cur = next((r for r in accepted if _regne_correspond(r)), None)
-    if cur is None:
-        cur = accepted[0] if accepted else None
-    if cur is None:
-        return None
-    return cur["id"]
+    cur = _pick(accepted, domaine)
+    if cur is not None:
+        return cur["id"]
+
+    synonymes = [
+        r for r in candidats if r["usage"]["status"] == "synonym" and r["usage"].get("accepted")
+    ]
+    cur = _pick(synonymes, domaine)
+    return cur["usage"]["accepted"]["id"] if cur is not None else None
