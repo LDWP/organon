@@ -3,13 +3,14 @@
 que d'en dériver un depuis EOL (pas de champ de rang structuré exploité ici).
 
 L'auteur est extrait de `scientificName` (qui inclut le nom scientifique complet suivi de
-l'auteur, ex. "Gadus morhua Linnaeus, 1758") en retranchant le nom déjà connu. Les noms
-vernaculaires français passent par `html.unescape()` : l'API renvoie des entités HTML brutes
-dans les chaînes (ex. `Morue de l&#39;Atlantique`)."""
+l'auteur, ex. "Gadus morhua Linnaeus, 1758") en retranchant le nom déjà connu.
+
+EOL ne contribue pas aux noms vernaculaires français : EOL les recopie de Wikidata (miroir),
+ce qui crée des boucles de propagation d'erreurs Wikidata -> EOL -> Wikispecies/Wikipédia FR
+(voir ticket #39 sur le wiki Biologie/Organon, cas "Épilobe-mollet" pour Epilobium
+parviflorum)."""
 
 from __future__ import annotations
-
-import html
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
@@ -47,14 +48,6 @@ class EolModule(TaxonomyModule):
                 auteur = scientific_name[len(taxon) :].strip()
                 if auteur:
                     blob["auteur"] = format_auteur(auteur)
-
-            vernaculaire = [
-                html.unescape(v["vernacularName"])
-                for v in page.get("vernacularNames") or []
-                if v.get("language") == "fr" and v.get("vernacularName")
-            ]
-            if vernaculaire:
-                struct.vernaculaire["EOL"] = vernaculaire
 
         struct.liens["eol"] = blob
         return struct
