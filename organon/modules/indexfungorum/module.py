@@ -34,7 +34,13 @@ from organon.core.config import GenerateOptions
 from organon.core.models import Basionym, RankName, Redirection, Struct, SynonymList, TaxonInfo
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, format_auteur, simple_debug_link
+from organon.modules.common import (
+    MAX_SYNONYM_HOPS,
+    as_limit,
+    format_auteur,
+    format_auteur_annee,
+    simple_debug_link,
+)
 from organon.modules.indexfungorum.adapter import IndexFungorumAdapter
 from organon.modules.indexfungorum.ranks import CLASSIFICATION_LADDER, UNRESOLVED_PLACEHOLDER, ixf_rang, ixf_regne
 
@@ -85,11 +91,15 @@ class IndexFungorumModule(TaxonomyModule):
 
         is_redirect = full["NAME_OF_FUNGUS"] != struct.taxon.nom
 
+        # `AUTHORS` seul ne porte pas l'année de publication (convention ICN, comme POWO/IPNI/
+        # AlgaeBase) : `YEAR_OF_PUBLICATION` (uniquement présent sur `NameByKey`, absent de
+        # `NameSearch` — vérifié en direct) la fournit à part.
+        auteur_annee = format_auteur_annee(full.get("AUTHORS"), full.get("YEAR_OF_PUBLICATION"))
         ixf_link: dict = {
             "id": full["RECORD_NUMBER"],
             "nom": full["NAME_OF_FUNGUS"],
             "rang": ixf_rang(full.get("INFRASPECIFIC_RANK")),
-            "auteur": format_auteur(full.get("AUTHORS")),
+            "auteur": format_auteur(auteur_annee),
         }
         if is_redirect:
             ixf_link["synonyme"] = True
@@ -111,7 +121,7 @@ class IndexFungorumModule(TaxonomyModule):
 
         struct.regne = ixf_regne(full.get("Kingdom_name"))
         struct.taxon.rang = ixf_rang(full.get("INFRASPECIFIC_RANK"))
-        struct.taxon.auteur = format_auteur(full.get("AUTHORS"))
+        struct.taxon.auteur = format_auteur(auteur_annee)
 
         # IF et SF partagent le même backend/RecordID mais pas le même rôle : IF est un simple
         # répertoire de noms publiés (sans avis taxonomique, voir render_bioref/debug_link plus

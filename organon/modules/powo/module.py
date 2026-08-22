@@ -65,7 +65,13 @@ from organon.core.models import (
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, format_auteur, simple_debug_link
+from organon.modules.common import (
+    MAX_SYNONYM_HOPS,
+    as_limit,
+    format_auteur,
+    format_auteur_annee,
+    simple_debug_link,
+)
 from organon.modules.powo.adapter import PowoAdapter
 from organon.modules.powo.ranks import powo_cherche_rang, powo_cherche_regne
 
@@ -148,10 +154,11 @@ class PowoModule(TaxonomyModule):
 
         numero = taxon_id.rsplit(":", 1)[-1]
         rang = powo_cherche_rang(detail.get("rank"))
+        auteur_annee = format_auteur_annee(detail.get("authors"), detail.get("namePublishedInYear"))
         entry: dict = {
             "id": numero,
             "nom": detail.get("name") or match["name"],
-            "auteur": format_auteur(detail.get("authors")),
+            "auteur": format_auteur(auteur_annee),
         }
         if rang:
             entry["rang"] = rang
@@ -205,7 +212,7 @@ class PowoModule(TaxonomyModule):
             return None
 
         struct.taxon.rang = rang
-        struct.taxon.auteur = format_auteur(detail.get("authors"))
+        struct.taxon.auteur = format_auteur(auteur_annee)
         struct.regne = regne
         struct.classification = "POWO"
         struct.classification_taxobox = "POWO"

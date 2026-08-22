@@ -21,17 +21,15 @@ from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.algaebase.adapter import AlgaeBaseAdapter
 from organon.modules.algaebase.ranks import algaebase_charte, algaebase_cherche_rang
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.modules.common import format_auteur, format_auteur_annee, simple_debug_link
 
 PAGE_SIZE = 50
 
 
 def _format_auteur_year(found: dict) -> str:
-    auteur = found.get("dwc:scientificNameAuthorship") or ""
-    year = found.get("dwc:namePublishedInYear")
-    if year:
-        auteur = f"{auteur}, {year}" if auteur else str(year)
-    return auteur
+    return format_auteur_annee(
+        found.get("dwc:scientificNameAuthorship"), found.get("dwc:namePublishedInYear")
+    ) or ""
 
 
 def _base_blob(found: dict, taxon_name: str, id_field: str) -> dict:

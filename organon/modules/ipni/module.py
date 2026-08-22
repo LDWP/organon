@@ -23,7 +23,7 @@ from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.modules.common import format_auteur, format_auteur_annee, simple_debug_link
 from organon.modules.ipni.adapter import IpniAdapter
 
 
@@ -47,10 +47,11 @@ class IpniModule(TaxonomyModule):
         if not ipni_id:
             return None
 
+        auteur_brut = match.get("authors") or match.get("publishingAuthor")
         struct.liens["ipni"] = {
             "id": ipni_id,
             "nom": match["name"],
-            "auteur": format_auteur(match.get("authors") or match.get("publishingAuthor")),
+            "auteur": format_auteur(format_auteur_annee(auteur_brut, match.get("publicationYear"))),
         }
         return struct
 

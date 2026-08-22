@@ -65,6 +65,22 @@ def format_auteur(auteur: str | None) -> str | None:
     return rempl_et_al(auteur)
 
 
+def format_auteur_annee(authors: str | None, year: str | int | None) -> str | None:
+    """Concatène auteur + année en `"Auteur, Année"`, pour les sources dont l'API expose
+    l'année de publication dans un champ séparé de la citation d'auteur — le cas des codes de
+    nomenclature qui ne l'incluent pas par convention (ICN botanique/champignons ; à distinguer
+    de l'ICZN zoologique et de l'ICNP bactérien, qui l'incluent déjà nativement dans la chaîne
+    d'auteur). `resoudre_auteur_principal` (`core/rendering/authors.py`) sait déjà extraire un
+    token année terminal quel que soit le règne — seule l'absence de ce suffixe empêchait la
+    date d'apparaître dans la taxobox botanique (discussion Projet:Biologie/Organon #33).
+    N'applique aucun remplacement `et al.` : passer le résultat à `format_auteur` comme pour
+    tout autre auteur brut."""
+    authors = authors or ""
+    if year:
+        authors = f"{authors}, {year}" if authors else str(year)
+    return authors or None
+
+
 _ORIGINAL_DESCRIPTION_FIELD_RE = re.compile(
     r'id="OriginalDescription"[^>]*>(?P<block>.*?)for="', re.DOTALL
 )
