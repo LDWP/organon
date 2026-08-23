@@ -1,5 +1,7 @@
 """Couche d'accès réseau pour la Catalogue of Life Extended Release (ChecklistBank) : appels
-HTTP et décodage JSON bruts uniquement, aucune logique métier (voir module.py).
+HTTP et décodage JSON bruts uniquement, aucune logique métier — utilisée par
+`organon.modules.col.module` (classification complète) et `organon.modules.col_xr.lookup`
+(résolution d'identifiant pour GBIF/subtaxa_merge).
 
 `3LXR` est l'alias ChecklistBank pour la dernière release XR publiée (comme `3LR` pour la COL
 classique côté `organon/modules/col/adapter.py`, même infrastructure) — la XR fusionne la COL

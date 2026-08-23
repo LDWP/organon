@@ -471,9 +471,9 @@ def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
     """Auteur brut rapporté par chaque module ayant contribué à ce taxon, avant vote majoritaire
     — exposé via `GenerateResponse.auteur_candidats` pour permettre à l'utilisateur d'imposer une
     source via `GenerateOptions.auteur_source` plutôt que de subir le vote automatique de
-    `_auteur_majoritaire`. Même périmètre que ce vote (mêmes exclusions, ex. CoL sous
-    `liens['col']['bundles']`), mais un candidat par module plutôt qu'un multi-ensemble : ici
-    seule la liste des sources disponibles compte, pas leur poids dans un vote."""
+    `_auteur_majoritaire`. Même périmètre que ce vote, mais un candidat par module plutôt qu'un
+    multi-ensemble : ici seule la liste des sources disponibles compte, pas leur poids dans un
+    vote."""
     candidats: dict[str, str] = {}
     classification_auteur = (struct.taxon.auteur or "").strip()
     if classification_auteur:
@@ -492,10 +492,7 @@ def _auteur_majoritaire(struct: Struct, classification_id: str) -> str:
     l'auteur, alors que GBIF tourné en enrichissement l'a trouvé) ou le premier rencontré dans
     un ordre arbitraire. Aucune priorité de module : à effectif égal, l'auteur du module de
     classification l'emporte (c'est lui qui pilote cette génération), à défaut le premier
-    rencontré. Les modules qui ne rapportent l'auteur que pour une fiche secondaire (ex. CoL,
-    dont l'auteur vit sous `liens['col']['bundles']` en cas d'homonymie non résolue plutôt qu'au
-    premier niveau) ne participent pas au vote, faute de porter l'auteur du taxon principal au
-    même endroit que les autres modules."""
+    rencontré."""
     classification_auteur = (struct.taxon.auteur or "").strip()
     candidats = [classification_auteur] if classification_auteur else []
     for module_id, data in struct.liens.items():
@@ -556,12 +553,10 @@ def _compute_data_found(struct: Struct, classification_id: str) -> dict[str, lis
 
 def _compute_external_ids(struct: Struct, ran_modules: list[str]) -> dict[str, str]:
     """Identifiant du taxon par module ayant contribué à cette génération — convention
-    `struct.liens[module_id]['id']` suivie par la quasi-totalité des modules (voir
-    `organon.modules.common.simple_debug_link`). Seule exception : `col`, qui porte son
-    identifiant sous `liens['col']['bundles'][0]['id']` (une entrée par homonyme non résolu,
-    voir `col/module.py:104`) — on retient le premier, comme le fait déjà `debug_link` pour
-    l'affichage. Un module dont l'entrée ne porte ni l'un ni l'autre (ex. `externe`, qui ne
-    référence aucune base externe propre) est simplement absent du résultat."""
+    `struct.liens[module_id]['id']` suivie par tous les modules (voir
+    `organon.modules.common.simple_debug_link`). Un module dont l'entrée ne porte pas cette clé
+    (ex. `externe`, qui ne référence aucune base externe propre) est simplement absent du
+    résultat."""
     ids: dict[str, str] = {}
     for module_id in ran_modules:
         data = struct.liens.get(module_id)
@@ -569,8 +564,6 @@ def _compute_external_ids(struct: Struct, ran_modules: list[str]) -> dict[str, s
             continue
         if data.get("id"):
             ids[module_id] = str(data["id"])
-        elif data.get("bundles"):
-            ids[module_id] = str(data["bundles"][0]["id"])
     return ids
 
 

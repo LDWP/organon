@@ -1,4 +1,6 @@
-"""Table de rangs pour CoL (Catalogue of Life)."""
+"""Table de rangs pour CoL (Catalogue of Life), dataset `3LR`. Non utilisée par
+`organon.modules.col.module` (qui interroge `3LXR`, voir `col/adapter.py`) — conservée par
+précaution avec `adapter.py`."""
 
 from __future__ import annotations
 
