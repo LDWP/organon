@@ -31,7 +31,7 @@ from organon.modules.common import (
     simple_debug_link,
 )
 from organon.modules.gbif.adapter import GbifAdapter
-from organon.modules.gbif.ranks import GBIF_WP, gbif_cherche_rang, gbif_cherche_regne
+from organon.modules.gbif.ranks import GBIF_MARKERS, GBIF_WP, gbif_cherche_rang, gbif_cherche_regne
 
 _ANNEE_PUBLICATION_RE = re.compile(r"\b(1[3-9]\d\d|20\d\d)\b")
 
@@ -54,6 +54,33 @@ def _annee_probable(published_in: str | None, regne: str | None) -> int | None:
         return None
     matches = _ANNEE_PUBLICATION_RE.findall(published_in)
     return int(matches[-1]) if matches else None
+
+
+def _extrait_marqueur_rang(nom: str) -> tuple[str | None, str]:
+    """Repère un marqueur de rang infraspécifique explicite dans un nom recherché (ex. "subsp."
+    dans "Mentha spicata subsp. spicata") et renvoie (rang GBIF correspondant, nom débarrassé de
+    ce marqueur). `/species?name=` (recherche exacte GBIF, voir `_collect`) indexe ces taxons
+    sans leur marqueur (vérifié en direct : la requête avec marqueur ne matche rien du tout ;
+    sans lui, elle matche mais devient ambiguë avec toute autre variation infraspécifique de
+    mêmes épithètes, ex. la variété homonyme d'une sous-espèce) — nécessaire à la fois pour
+    retenter la recherche sans le marqueur et pour départager les candidats obtenus ainsi."""
+    mots = nom.split()
+    for i, mot in enumerate(mots):
+        rang = GBIF_MARKERS.get(mot)
+        if rang:
+            return rang, " ".join(mots[:i] + mots[i + 1 :])
+    return None, nom
+
+
+def _filtre_rang_marqueur(rang_attendu: str | None, candidats: list[dict]) -> list[dict]:
+    """Ne garde, parmi plusieurs candidats homonymes, que ceux dont le rang GBIF correspond au
+    marqueur explicite du nom recherché (`_extrait_marqueur_rang`) — sans quoi le premier
+    candidat de la liste l'emportait au hasard, un rang différent de celui demandé,
+    silencieusement (pas d'erreur : juste le mauvais taxon généré)."""
+    if rang_attendu is None or len(candidats) < 2:
+        return candidats
+    filtres = [r for r in candidats if r.get("rank") == rang_attendu]
+    return filtres or candidats
 
 
 async def _taxon_info(adapter: GbifAdapter, key: int) -> dict | None:
@@ -130,7 +157,13 @@ class GbifModule(TaxonomyModule):
             cur = await adapter.species_record(options.gbif_key)
 
         if cur is None:
+            rang_marqueur, nom_sans_marqueur = _extrait_marqueur_rang(struct.taxon.nom)
             results = await adapter.search(struct.taxon.nom)
+            if not results and rang_marqueur is not None:
+                # `/species?name=` ne matche rien avec le marqueur de rang infraspécifique
+                # botanique (ex. "subsp.") : on retente sans, voir `_extrait_marqueur_rang`. Le
+                # rang extrait sert plus bas à départager les candidats ainsi trouvés.
+                results = await adapter.search(nom_sans_marqueur)
             if not results:
                 return None
 
@@ -143,13 +176,14 @@ class GbifModule(TaxonomyModule):
             # Un même nom peut désigner des taxons distincts selon le règne (ex. "Morus", mûrier
             # chez les végétaux et fou de Bassan chez les animaux) : si un filtre de domaine est
             # posé, on préfère l'entrée dont le règne correspond plutôt que la première trouvée.
-            cur = next((r for r in accepted if _regne_correspond(r)), None)
-            if cur is None:
-                cur = accepted[0] if accepted else None
+            candidats = [r for r in accepted if _regne_correspond(r)] or accepted
+            candidats = _filtre_rang_marqueur(rang_marqueur, candidats)
+            cur = candidats[0] if candidats else None
             if cur is None:
                 if not options.suivre_synonymes:
                     return None
-                cur = next((r for r in results if _regne_correspond(r)), results[0])
+                repli = [r for r in results if _regne_correspond(r)] or results
+                cur = _filtre_rang_marqueur(rang_marqueur, repli)[0]
 
         key = cur["key"]
         info = await _taxon_info(adapter, key)
