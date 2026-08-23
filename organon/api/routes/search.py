@@ -56,6 +56,22 @@ def _relevance(match: SearchMatch, query: str) -> int:
     return 2
 
 
+def _clean_name(entry: dict) -> str | None:
+    """`canonicalName` omet le marqueur de rang ("subsp."/"var."/"f.") pour les taxons
+    infraspécifiques botaniques (vérifié en direct sur l'API GBIF : "Mentha spicata subsp.
+    spicata" y devient "Mentha spicata spicata", indiscernable d'une variété de mêmes épithètes)
+    — d'où la préférence pour `scientificName`, qui le conserve, en lui retirant le suffixe
+    `authorship` pour retrouver un nom sans auteur. Pas de risque de sur-découpage : `authorship`
+    est toujours un suffixe littéral de `scientificName` côté GBIF."""
+    nom = entry.get("scientificName") or entry.get("canonicalName")
+    if not nom:
+        return None
+    auteur = entry.get("authorship") or ""
+    if auteur and nom.endswith(auteur):
+        nom = nom[: -len(auteur)].rstrip()
+    return nom or None
+
+
 def _doubtful_rank(status: str) -> int:
     """Départage une égalité de `_relevance` entre deux fiches GBIF du même nom : un statut
     `DOUBTFUL` (ex. variant orthographique non lié par `acceptedKey` à l'entrée acceptée, voir
@@ -99,7 +115,7 @@ async def search(q: str) -> SearchResponse:
     DedupKey = int | tuple[str, str, str]
     seen: dict[DedupKey, tuple[SearchMatch, int]] = {}
     for entry in raw_results:
-        nom = entry.get("canonicalName") or entry.get("scientificName")
+        nom = _clean_name(entry)
         if not nom:
             continue
         kingdom_raw = entry.get("kingdom", "")
