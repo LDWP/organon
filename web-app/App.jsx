@@ -1098,6 +1098,29 @@ export default function App() {
     return `comprend ${n} ${n === 1 ? rangTxtSingulier : rangTxt}`;
   }
 
+  // Recalcule (rangTxt, rangTxtSingulier) à partir des rangs réellement présents dans
+  // `speciesList` plutôt que d'utiliser tel quel `rang_txt`/`rang_txt_singulier` (figés côté
+  // serveur sur l'ensemble complet, toutes sources confondues) : sinon la phrase continuerait de
+  // citer un rang (ex. "variétés") entièrement décoché par l'utilisateur. `rangNames` (fourni par
+  // le serveur, voir MergedSubtaxaResponse.rang_names) associe chaque clé de rang à son
+  // (pluriel, singulier) — la jonction "virgule + et" reste la seule logique faite ici, même
+  // convention que `join_et` côté serveur.
+  function rangTxtFor(speciesList, rangNames) {
+    const seen = [];
+    for (const sp of speciesList) {
+      if (rangNames[sp.rang] && !seen.includes(sp.rang)) seen.push(sp.rang);
+    }
+    if (seen.length === 0) {
+      return { rangTxt: "taxons de rang inférieur", rangTxtSingulier: "taxon de rang inférieur" };
+    }
+    const join = (items) =>
+      items.length <= 1 ? items[0] || "" : `${items.slice(0, -1).join(", ")} et ${items[items.length - 1]}`;
+    return {
+      rangTxt: join(seen.map((r) => rangNames[r][0])),
+      rangTxtSingulier: join(seen.map((r) => rangNames[r][1])),
+    };
+  }
+
   // Compose le bloc "sous-taxons" en mode fusionné : une phrase par groupe non vide (un groupe
   // entièrement décoché disparaît du rendu), suivie des lignes déjà rendues des espèces cochées.
   // La toute première phrase effectivement rendue nomme le taxon ("le genre X comprend...") ;
@@ -1107,20 +1130,23 @@ export default function App() {
   // rendu final.
   function renderSubtaxaMergeWikitext() {
     if (!effectiveSubtaxaMerge) return "";
-    const { rang_txt: rangTxt, rang_txt_singulier: rangTxtSingulier, pronoun, taxon_phrase: taxonPhrase } =
-      effectiveSubtaxaMerge;
+    const { pronoun, taxon_phrase: taxonPhrase, rang_names: rangNames } = effectiveSubtaxaMerge;
     const parts = [];
+    const allChecked = [];
     effectiveSubtaxaMerge.groups.forEach((group, gi) => {
       const checked = group.species.filter(
         (s) => subtaxaChecked[subtaxaCheckKey(gi, s.nom)] ?? s.default_checked
       );
       if (checked.length === 0) return;
+      allChecked.push(...checked);
       const sujet = parts.length === 0 ? taxonPhrase : pronoun;
+      const { rangTxt, rangTxtSingulier } = rangTxtFor(checked, rangNames);
       const middle = subtaxaMergeMiddle(checked.length, rangTxt, rangTxtSingulier);
       parts.push(`${group.intro}, ${sujet} ${middle} :\n${checked.map((s) => s.line).join("")}`);
     });
     if (parts.length === 0) return "";
-    return `\n== Liste des ${rangTxt} ==\n${parts.join("\n")}`;
+    const { rangTxt: headerRangTxt } = rangTxtFor(allChecked, rangNames);
+    return `\n== Liste des ${headerRangTxt} ==\n${parts.join("\n")}`;
   }
 
   const subtaxaMergeWikitext = subtaxaFusionEnabled ? renderSubtaxaMergeWikitext() : "";
@@ -1874,7 +1900,10 @@ export default function App() {
                                     (sp) => subtaxaChecked[subtaxaCheckKey(gi, sp.nom)] ?? sp.default_checked
                                   ).length;
                                   const groupAllChecked = groupCheckedCount === group.species.length;
-                                  const { rang_txt: rangTxt, rang_txt_singulier: rangTxtSingulier } = effectiveSubtaxaMerge;
+                                  const { rangTxt, rangTxtSingulier } = rangTxtFor(
+                                    group.species,
+                                    effectiveSubtaxaMerge.rang_names
+                                  );
                                   return (
                                   <div key={gi} className="subtaxa-merge-group">
                                     <p className="subtaxa-merge-group-head">

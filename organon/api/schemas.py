@@ -293,6 +293,7 @@ class MergedSpeciesOut(BaseModel):
     """Un sous-taxon fusionné (voir `organon.core.rendering.subtaxa_merge.MergedSpecies`)."""
 
     nom: str
+    rang: str
     line: str
     default_checked: bool
 
@@ -315,6 +316,10 @@ class MergedSubtaxaResponse(BaseModel):
     rang_txt_singulier: str
     pronoun: Literal["il", "elle"]
     taxon_phrase: str
+    rang_names: dict[str, tuple[str, str]]
+    """Nom de rang (pluriel, singulier) par clé technique de rang, pour que le frontend recalcule
+    `rang_txt`/`rang_txt_singulier` au fil des cases (dé)cochées (voir
+    `organon.core.rendering.subtaxa_merge.MergedSubtaxa.rang_names`)."""
     groups: list[MergedGroupOut]
 
 

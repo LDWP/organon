@@ -41,7 +41,12 @@ from organon.core.rendering.grammar import (
     wp_met_italiques,
     wp_nom_rang,
 )
-from organon.core.rendering.sections import compute_rang_txt, render_subtaxon_line
+from organon.core.rendering.sections import (
+    compute_rang_names,
+    compute_rang_txt,
+    join_et,
+    render_subtaxon_line,
+)
 from organon.core.rendering.support import dates_recupere
 
 GroupKind = Literal["primary", "alternative"]
@@ -50,6 +55,10 @@ GroupKind = Literal["primary", "alternative"]
 @dataclass
 class MergedSpecies:
     nom: str
+    rang: str
+    """Clé technique du rang (ex. "sous-espèce") — permet au frontend de recalculer
+    `MergedSubtaxa.rang_txt`/`rang_txt_singulier` au fil des cases cochées via `rang_names`,
+    plutôt que de figer un texte qui ne refléterait que l'ensemble complet des sources."""
     line: str
     """Ligne wikitexte déjà mise en forme (voir `sections.render_subtaxon_line`)."""
     default_checked: bool
@@ -90,6 +99,12 @@ class MergedSubtaxa:
     phrase du premier groupe ("Selon SourceA et SourceB, le genre X comprend N espèces") ; les
     groupes suivants reprennent l'anaphore `pronoun` ("Pour SourceC, il comprend...") plutôt que
     de renommer le taxon à chaque phrase."""
+    rang_names: dict[str, tuple[str, str]]
+    """Nom de rang (pluriel, singulier) par clé technique de rang, pour l'ensemble des espèces
+    toutes sources confondues (voir `sections.compute_rang_names`). `rang_txt`/`rang_txt_singulier`
+    ci-dessus figent le texte pour l'ensemble complet ; cette table permet au frontend de
+    recalculer ce texte au fil des cases (dé)cochées — sinon la phrase citerait un rang (ex.
+    "variétés") qui a été intégralement décoché par l'utilisateur."""
     groups: list[MergedGroup]
 
 
@@ -109,24 +124,11 @@ def _taxon_phrase(taxon_rang: str, taxon_nom: str, regne: str) -> str:
     return f"{article}{rang_nom} {cible}"
 
 
-def _join_et(items: list[str]) -> str:
-    """Même convention de jonction que `sections.compute_rang_txt` : virgules, "et" avant le
-    dernier élément."""
-    if not items:
-        return ""
-    if len(items) == 1:
-        return items[0]
-    txt = items[0]
-    for i in range(1, len(items)):
-        txt += " et " + items[i] if i == len(items) - 1 else ", " + items[i]
-    return txt
-
-
 def _intro(sources_list: list[str], cdate: str) -> str:
     citations = [f"{{{{Bioref|{s}|{cdate}}}}}" for s in sources_list]
     if len(citations) == 1:
         return f"Pour {citations[0]}"
-    return "Selon " + _join_et(citations)
+    return "Selon " + join_et(citations)
 
 
 def merge_subtaxa(
@@ -147,6 +149,7 @@ def merge_subtaxa(
 
     all_species = [name_to_species[n] for n in name_to_species]
     rang_txt, rang_txt_singulier, rang_defaut = compute_rang_txt(all_species)
+    rang_names = compute_rang_names(all_species)
 
     # Regroupe les sources qui rapportent EXACTEMENT le même ensemble d'espèces (par nom).
     group_order: list[frozenset[str]] = []
@@ -178,6 +181,7 @@ def merge_subtaxa(
                 species=[
                     MergedSpecies(
                         nom=nom,
+                        rang=name_to_species[nom].rang or rang_defaut,
                         line=render_subtaxon_line(
                             name_to_species[nom], regne, rang_defaut, taxon_rang
                         ),
@@ -193,6 +197,7 @@ def merge_subtaxa(
         rang_txt_singulier=rang_txt_singulier,
         pronoun=_pronoun(taxon_rang),
         taxon_phrase=_taxon_phrase(taxon_rang, taxon_nom, regne),
+        rang_names=rang_names,
         groups=groups,
     )
 
@@ -316,7 +321,7 @@ async def reconcile_synonym_groups(
             kind="primary" if i == 0 else "alternative",
             intro=_intro(g.sources, cdate),
             species=[
-                MergedSpecies(nom=s.nom, line=s.line, default_checked=(i == 0))
+                MergedSpecies(nom=s.nom, rang=s.rang, line=s.line, default_checked=(i == 0))
                 for s in g.species
             ],
         )

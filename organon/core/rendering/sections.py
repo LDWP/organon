@@ -178,6 +178,38 @@ def render_taxobox(struct: Struct, options: GenerateOptions, ebauche: list[str])
     return resu
 
 
+def join_et(items: list[str]) -> str:
+    """Joint une liste avec des virgules et "et" avant le dernier élément (ex. ["a", "b", "c"] ->
+    "a, b et c"). Partagé entre `compute_rang_txt` et `organon.core.rendering.subtaxa_merge`
+    (citations Bioref) pour ne pas dupliquer cette convention de jonction."""
+    if not items:
+        return ""
+    if len(items) == 1:
+        return items[0]
+    txt = items[0]
+    for i in range(1, len(items)):
+        txt += " et " + items[i] if i == len(items) - 1 else ", " + items[i]
+    return txt
+
+
+def compute_rang_names(liste: list[RankName]) -> dict[str, tuple[str, str]]:
+    """Nom de rang (pluriel, singulier) pour chaque rang distinct de `liste`, dans l'ordre de
+    première rencontre, indexé par la clé technique du rang (ex. "sous-espèce") plutôt que son
+    nom affiché — pour permettre à `organon.core.rendering.subtaxa_merge` d'exposer cette table au
+    frontend et d'y recalculer `rang_txt`/`rang_txt_singulier` au fil des cases cochées, sans
+    deviner la pluralisation en JS."""
+    rang_names: dict[str, tuple[str, str]] = {}
+    for sous_taxon in liste:
+        if sous_taxon.rang is None or sous_taxon.rang in rang_names:
+            continue
+        plur = wp_nom_rang(sous_taxon.rang, lien=False, maj=False, plur=True)
+        if plur == "NOTFOUND":
+            continue
+        sing = wp_nom_rang(sous_taxon.rang, lien=False, maj=False, plur=False)
+        rang_names[sous_taxon.rang] = (plur, sing)
+    return rang_names
+
+
 def compute_rang_txt(liste: list[RankName]) -> tuple[str, str, str]:
     """Calcule `(rang_txt, rang_txt_singulier, rang_defaut)` pour une liste de sous-taxons :
     `rang_txt`/`rang_txt_singulier` sont le(s) nom(s) de rang rencontrés dans `liste` au pluriel
@@ -191,31 +223,13 @@ def compute_rang_txt(liste: list[RankName]) -> tuple[str, str, str]:
     actuels). Extrait de `render_inf` pour être partagé avec
     `organon.core.rendering.subtaxa_merge` (rendu fusionné multi-sources, où `rang_txt_singulier`
     sert à l'accord grammatical du compte d'espèces) sans dupliquer cette logique."""
-    rang_keys: list[str] = []
-    rang_names: dict[str, str] = {}
-    for sous_taxon in liste:
-        nom_rang = wp_nom_rang(sous_taxon.rang, lien=False, maj=False, plur=True)
-        if nom_rang == "NOTFOUND":
-            continue
-        if nom_rang not in rang_names:
-            rang_names[nom_rang] = nom_rang
-            rang_keys.append(sous_taxon.rang)
-    noms_rang = list(rang_names.values())
+    rang_names = compute_rang_names(liste)
+    if not rang_names:
+        return "taxons de rang inférieur", "taxon de rang inférieur", "espèce"
 
-    if not noms_rang:
-        rang_txt = "taxons de rang inférieur"
-        rang_txt_singulier = "taxon de rang inférieur"
-    else:
-        noms_singulier = [wp_nom_rang(k, lien=False, maj=False, plur=False) for k in rang_keys]
-        rang_txt = noms_rang[0]
-        rang_txt_singulier = noms_singulier[0]
-        for i in range(1, len(noms_rang)):
-            rang_txt += " et " + noms_rang[i] if i == len(noms_rang) - 1 else ", " + noms_rang[i]
-            rang_txt_singulier += (
-                " et " + noms_singulier[i] if i == len(noms_rang) - 1 else ", " + noms_singulier[i]
-            )
-
-    rang_defaut = noms_rang[0] if noms_rang else "espèce"
+    rang_txt = join_et([plur for plur, _ in rang_names.values()])
+    rang_txt_singulier = join_et([sing for _, sing in rang_names.values()])
+    rang_defaut = next(iter(rang_names.values()))[0]
     return rang_txt, rang_txt_singulier, rang_defaut
 
 

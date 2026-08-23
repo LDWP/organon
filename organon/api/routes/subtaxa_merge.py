@@ -51,13 +51,16 @@ async def subtaxa_merge(req: SubtaxaMergeRequest) -> MergedSubtaxaResponse:
         rang_txt_singulier=result.rang_txt_singulier,
         pronoun=result.pronoun,
         taxon_phrase=result.taxon_phrase,
+        rang_names=result.rang_names,
         groups=[
             MergedGroupOut(
                 sources=g.sources,
                 kind=g.kind,
                 intro=g.intro,
                 species=[
-                    MergedSpeciesOut(nom=s.nom, line=s.line, default_checked=s.default_checked)
+                    MergedSpeciesOut(
+                        nom=s.nom, rang=s.rang, line=s.line, default_checked=s.default_checked
+                    )
                     for s in g.species
                 ],
             )
