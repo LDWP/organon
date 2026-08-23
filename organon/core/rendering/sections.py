@@ -47,6 +47,19 @@ RANGS_CATEGORIE_HOMONYME = {"embranchement", "classe", "ordre", "famille"}
 `organon.core.selectors.categorization.compute_fin_liens` (catégorie) et `render_voir_aussi`
 ci-dessous ({{catégorie principale}})."""
 
+_RANG_PARENT_CITE: dict[str, str] = {
+    "famille": "ordre",
+    "ordre": "classe",
+    "classe": "embranchement",
+}
+"""Rang cité comme taxon supérieur dans le RI (`render_intro`), ex. « famille de l'ordre des
+Artiodactyla » pour un taxon de rang famille (tâche #37). Par défaut (rang absent de ce
+mapping — genre, espèce, tribu...) on cite la famille, comme avant l'ajout de ce mapping. Ordre
+de `core/data/ranks.yaml` : chaque valeur est le rang canonique immédiatement supérieur, en
+ignorant les rangs intermédiaires (sous-ordre, infra-classe...) qui n'ont pas de page Wikipédia
+dédiée. `embranchement` n'a pas d'entrée : le rang supérieur (règne/domaine) sort du périmètre
+de la tâche."""
+
 # Table $cas de rendu_vide() : section -> (rendu si plan=false, rendu si plan=true).
 _RENDU_VIDE_CAS: dict[str, tuple[bool, bool]] = {
     "repartition": (True, True),
@@ -66,10 +79,13 @@ def rendu_vide(section: str, options: GenerateOptions) -> bool:
 
 
 def render_intro(struct: Struct) -> str:
-    fam = None
+    rang_cite = _RANG_PARENT_CITE.get(struct.taxon.rang, "famille")
+    parent = None
     for rang in struct.rangs:
-        if rang.rang == "famille":
-            fam = wp_met_italiques(rang.nom, "famille", struct.regne, lien=True)
+        if rang.rang == rang_cite:
+            nom_cite = wp_nom_rang(rang_cite, lien=True, maj=False, plur=False)
+            taxon_cite = wp_met_italiques(rang.nom, rang_cite, struct.regne, lien=True)
+            parent = wp_le_rang(rang_cite) + nom_cite + " des " + taxon_cite
             break
 
     lien = wp_un_rang(struct.taxon.rang)
@@ -84,8 +100,8 @@ def render_intro(struct: Struct) -> str:
     if struct.taxon.eteint:
         phrase += wp_eteint_rang(struct.taxon.rang) + " "
 
-    if fam:
-        phrase += "de la [[Famille (biologie)|famille]] des " + fam + ".\n"
+    if parent:
+        phrase += "de " + parent + ".\n"
     else:
         phrase += ".\n"
     return phrase
