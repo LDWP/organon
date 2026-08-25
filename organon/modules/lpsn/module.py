@@ -17,10 +17,15 @@ Type nomenclatural (`nomenclatural_type_id`, ex. l'espèce-type d'un genre) alim
 `struct.type_taxon` : le seul module actuellement capable de remplir ce champ (côté PHP historique,
 seul `mod_lpsn.php` le faisait — voir `docs/md/comparaison-php-python.md`).
 
-Hors périmètre (limitation de l'API LPSN, pas un oubli) : `struct.synonymes` et
-`struct.sous_taxons`, l'API n'exposant aucune route pour lister les synonymes/sous-taxons d'un
-identifiant donné (seulement recherche par critères + fiche par identifiant, voir
-`adapter.py`)."""
+Sous-taxons (`struct.sous_taxons`) : pas de route dédiée à la hiérarchie descendante, mais
+`flexible_search({"lpsn_parent_id": id})` (voir `adapter.py`) retrouve les enfants directs d'un
+taxon, les fiches sont ensuite récupérées par lots via `fetch`. Les synonymes parmi les enfants
+sont exclus (même test que `is_synonym` ci-dessous) : un sous-taxon liste des noms acceptés, pas
+leurs synonymes.
+
+Hors périmètre (limitation de l'API LPSN, pas un oubli) : `struct.synonymes`, l'API n'exposant
+aucune route pour lister les synonymes d'un identifiant donné (seul le sens inverse,
+`lpsn_correct_name_id`, est exploitable — voir `adapter.py`)."""
 
 from __future__ import annotations
 
@@ -30,17 +35,21 @@ from organon.core.models import (
     RankName,
     Redirection,
     Struct,
+    SubTaxonList,
     TaxonInfo,
     TypeTaxon,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, format_auteur
+from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, collect_pages, format_auteur
 from organon.modules.lpsn.adapter import LpsnAdapter
 from organon.modules.lpsn.ranks import lpsn_cherche_rang, lpsn_cherche_regne
 
 LPSN_WEBSITE_BASE = "https://lpsn.dsmz.de"
+CHILDREN_PAGE_SIZE = 50
+"""Taille des lots `fetch` lors de la pagination des enfants directs (voir `_process`) : assez
+petit pour rester sous les limites de longueur d'URL de `fetch/id1;id2;...`."""
 
 
 def _slug_from_record(cur: dict) -> str | None:
@@ -171,6 +180,32 @@ class LpsnModule(TaxonomyModule):
                     auteur=format_auteur(type_rec.get("authority")),
                     source="LPSN",
                 )
+
+        child_ids = await adapter.flexible_search({"lpsn_parent_id": lpsn_id})
+        if child_ids:
+
+            async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
+                page_ids = child_ids[offset : offset + CHILDREN_PAGE_SIZE]
+                records = await adapter.fetch(page_ids)
+                items = [
+                    RankName(
+                        nom=r["full_name"],
+                        rang=lpsn_cherche_rang(r.get("category")),
+                        auteur=format_auteur(r.get("authority")),
+                    )
+                    for r in records
+                    # même test d'acceptation que `is_synonym` ci-dessus : un sous-taxon liste
+                    # des noms acceptés, pas leurs synonymes.
+                    if r.get("full_name") and r.get("lpsn_correct_name_id") in (None, r.get("id"))
+                ]
+                done = offset + CHILDREN_PAGE_SIZE >= len(child_ids)
+                return items, len(page_ids), done
+
+            sous_taxons, coupe = await collect_pages(
+                fetch_children, limit=as_limit(options.limite_listes)
+            )
+            if sous_taxons:
+                struct.sous_taxons = SubTaxonList(liste=sous_taxons, source="LPSN", coupe=coupe)
 
         return struct
 

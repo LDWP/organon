@@ -13,11 +13,15 @@ d'accès est valide ~15 minutes d'après ce client de référence ; renouvelé v
 rafraîchissement sur un 401, ou ré-authentifié depuis zéro si le rafraîchissement échoue aussi.
 
 L'API LPSN n'expose que trois routes (voir https://api.lpsn.dsmz.de/) : `advanced_search`
-(recherche -> liste d'identifiants, paginée par `next`), `fetch` (fiches complètes pour une liste
-d'identifiants séparés par `;`) et `flexible_search` (non utilisée ici). Pas de route pour lister
-les synonymes ou sous-taxons d'un identifiant donné : `module.py` ne peut donc pas remplir
-`struct.synonymes`/`struct.sous_taxons`, contrairement à WoRMS/POWO (limitation de l'API, pas un
-oubli).
+(recherche par critères nommés -> liste d'identifiants, paginée par `next`), `fetch` (fiches
+complètes pour une liste d'identifiants séparés par `;`) et `flexible_search` (recherche par
+requête JSON arbitraire sur n'importe quel champ de fiche, même pagination par `next`). Pas de
+route dédiée à la hiérarchie (pas d'équivalent à `AphiaChildrenByAphiaID` de WoRMS), mais chaque
+fiche porte son `lpsn_parent_id` (voir `module.py`), et celui-ci est un champ de fiche comme un
+autre : `flexible_search({"lpsn_parent_id": id})` retrouve donc les enfants directs d'un taxon
+sans route dédiée. Toujours pas de route pour les synonymes d'un identifiant donné (seul le sens
+inverse, `lpsn_correct_name_id` porté par chaque synonyme, est exploité) : `struct.synonymes`
+reste hors périmètre de ce module.
 
 Noms de champs JSON (voir `module.py`) tirés de la documentation publique
 (https://lpsn.dsmz.de/text/lpsn-api), vérifiés depuis contre l'API réelle. Un écart notable :
@@ -28,6 +32,8 @@ Wikipédia {{LPSN}} depuis `monomial`/`species_epithet`/`subspecies_epithet` plu
 champ (voir `_slug_from_record`)."""
 
 from __future__ import annotations
+
+import json
 
 import httpx
 
@@ -117,6 +123,21 @@ class LpsnAdapter(OwnedClientMixin):
         client de référence."""
         query: dict[str, str] | None = {k.replace("_", "-"): v for k, v in params.items()}
         url: str | None = f"{BASE_URL}/advanced_search"
+        ids: list[int] = []
+        while url:
+            data = await self._get(url, params=query)
+            ids.extend(data.get("results") or [])
+            url = data.get("next")
+            query = None  # `next` est déjà une URL complète avec sa propre query string
+
+        return ids
+
+    async def flexible_search(self, search: dict[str, object]) -> list[int]:
+        """Recherche par requête JSON arbitraire sur les champs d'une fiche (voir
+        https://lpsn.dsmz.de/text/lpsn-api) -> liste d'identifiants LPSN, agrégée sur toutes les
+        pages (`next`), même forme de réponse que `advanced_search`."""
+        url: str | None = f"{BASE_URL}/flexible_search"
+        query: dict[str, str] | None = {"search": json.dumps(search)}
         ids: list[int] = []
         while url:
             data = await self._get(url, params=query)
