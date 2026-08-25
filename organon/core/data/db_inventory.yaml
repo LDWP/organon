@@ -363,7 +363,7 @@ categories:
         acces: {type: api_rest, detail: "API REST/JSON (ipni.org/api/1)"}
         derniere_maj: null
       - id: telametro
-        nom: "Tela Botanica (BDTFX)"
+        nom: "TelaMétro (Tela Botanica, BDTFX)"
         url: "https://www.tela-botanica.org"
         statut: disponible
         classification: {possible: false, estime: false}

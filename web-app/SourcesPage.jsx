@@ -38,6 +38,11 @@ const STATUT_BADGE_CLASS = {
   hors_perimetre: "source-badge-neutral",
 };
 
+function formatDateFr(iso) {
+  const [y, m, d] = iso.split("-");
+  return `${d}-${m}-${y}`;
+}
+
 function SourceName({ source }) {
   const label = source.is_default ? `${source.nom} (défaut)` : source.nom;
   if (!source.url) return <span>{label}</span>;
@@ -121,7 +126,7 @@ export default function SourcesPage({ onBack }) {
         {disponibles.length} source{disponibles.length > 1 ? "s" : ""} disponible
         {disponibles.length > 1 ? "s" : ""} sur {sources.length} bases considérées
       </h1>
-      <p className="sources-updated">Liste mise à jour le {data.derniere_maj}</p>
+      <p className="sources-updated">Liste mise à jour le {formatDateFr(data.derniere_maj)}</p>
 
       <section className="sources-section">
         <h2>Disponibles ({disponibles.length})</h2>
