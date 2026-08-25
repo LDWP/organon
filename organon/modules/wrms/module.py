@@ -156,19 +156,19 @@ class WrmsModule(TaxonomyModule):
                     source="WRMS",
                 )
 
-        async def fetch_synonyms(offset: int) -> tuple[list[RankName], bool]:
+        async def fetch_synonyms(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.synonyms_by_id(aphia_id, offset=offset)
             items = [
                 RankName(nom=s["scientificname"], auteur=format_auteur(s.get("authority")), rang=wrms_rang(s["rank"]))
                 for s in page
             ]
-            return items, len(page) < PAGE_SIZE
+            return items, len(page), len(page) < PAGE_SIZE
 
         synonyms, _ = await collect_pages(fetch_synonyms, start_offset=1, limit=as_limit(options.limite_listes))
         if synonyms:
             struct.synonymes = SynonymList(liste=synonyms, source="WRMS")
 
-        async def fetch_children(offset: int) -> tuple[list[RankName], bool]:
+        async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.children_by_id(aphia_id, marine_only=options.marine_only, offset=offset)
             items = [
                 RankName(
@@ -180,7 +180,7 @@ class WrmsModule(TaxonomyModule):
                 for c in page
                 if c.get("status") == "accepted"  # synonymes/incertain/nomen dubium exclus — filtre REST explicite
             ]
-            return items, len(page) < PAGE_SIZE
+            return items, len(page), len(page) < PAGE_SIZE
 
         sous_taxons, _ = await collect_pages(fetch_children, start_offset=1, limit=as_limit(options.limite_listes))
         if sous_taxons:

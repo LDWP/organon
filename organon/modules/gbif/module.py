@@ -252,14 +252,15 @@ class GbifModule(TaxonomyModule):
         # derrière une autre source gagnante).
         taxref_noms: list[str] = []
 
-        async def fetch_vernacular(offset: int) -> tuple[list[str], bool]:
+        async def fetch_vernacular(offset: int) -> tuple[list[str], int, bool]:
             page = await adapter.vernacular_names_page(key, offset)
-            results = [c for c in page.get("results", []) if c.get("language") == "fra"]
+            raw = page.get("results", [])
+            results = [c for c in raw if c.get("language") == "fra"]
             taxref_noms.extend(
                 _html.unescape(c["vernacularName"]) for c in results if c.get("source") == "TAXREF"
             )
             names = [_html.unescape(c["vernacularName"]) for c in results]
-            return names, page.get("endOfRecords", True)
+            return names, len(raw), page.get("endOfRecords", True)
 
         vernaculaire, _ = await collect_pages(fetch_vernacular)
         if vernaculaire:
@@ -351,31 +352,33 @@ class GbifModule(TaxonomyModule):
 
         if cur.get("numDescendants", 0) > 0:
 
-            async def fetch_children(offset: int) -> tuple[list[RankName], bool]:
+            async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
                 page = await adapter.children_page(key, offset)
+                raw = page.get("results", [])
                 out = []
-                for c in page.get("results", []):
+                for c in raw:
                     if c.get("rank") == "UNRANKED" or "canonicalName" not in c:
                         continue
                     child_info = await _taxon_info(adapter, c["key"])
                     if child_info is not None:
                         out.append(RankName.model_validate(child_info))
-                return out, page.get("endOfRecords", True)
+                return out, len(raw), page.get("endOfRecords", True)
 
             liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
             if liste:
                 struct.sous_taxons = SubTaxonList(liste=liste, source="GBIF", coupe=coupe)
 
-        async def fetch_synonyms(offset: int) -> tuple[list[RankName], bool]:
+        async def fetch_synonyms(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.synonyms_page(key, offset)
+            raw = page.get("results", [])
             out = []
-            for c in page.get("results", []):
+            for c in raw:
                 blob = await _taxon_info(adapter, c["key"])
                 if blob is not None:
                     out.append(
                         RankName(nom=blob["nom"], auteur=format_auteur(blob["auteur"]), rang=blob.get("rang"))
                     )
-            return out, page.get("endOfRecords", True)
+            return out, len(raw), page.get("endOfRecords", True)
 
         synonymes, coupe = await collect_pages(fetch_synonyms, limit=as_limit(options.limite_listes))
         if synonymes:

@@ -20,14 +20,19 @@ chaque `collect()`)."""
 
 
 async def collect_pages(
-    fetch_page: Callable[[int], Awaitable[tuple[list, bool]]],
+    fetch_page: Callable[[int], Awaitable[tuple[list, int, bool]]],
     start_offset: int = 0,
     limit: int | None = None,
 ) -> tuple[list, bool]:
     """Agrège toutes les pages d'un endpoint paginé. `fetch_page(offset)` doit renvoyer
-    `(éléments de cette page, est-ce la dernière page ?)`. `start_offset` s'adapte aux deux
-    conventions rencontrées : 0 (GBIF, index du premier élément) ou 1 (WoRMS, numéro du
-    premier enregistrement) ; le pas suivant est déduit du nombre d'éléments reçus.
+    `(éléments retenus de cette page, taille brute de la page lue côté source, est-ce la
+    dernière page ?)`. La taille brute est distincte du nombre d'éléments retenus dès qu'un
+    appelant filtre certains enregistrements avant de les renvoyer (ex. rang non pertinent,
+    statut non accepté) : avancer l'offset sur le compte filtré ferait rechevaucher la page
+    suivante avec la fin de celle-ci côté source, dupliquant les enregistrements de la zone de
+    chevauchement. `start_offset` s'adapte aux deux conventions rencontrées : 0 (GBIF, index du
+    premier élément) ou 1 (WoRMS, numéro du premier enregistrement) ; le pas suivant est déduit
+    de la taille brute reçue.
 
     `limit` porte l'option `limite-listes` : si fourni, la pagination s'arrête dès que ce
     nombre est dépassé plutôt que de récupérer des pages inutiles pour une liste tronquée de
@@ -38,10 +43,10 @@ async def collect_pages(
     while True:
         if limit is not None and len(items) > limit:
             return items[:limit], True
-        page_items, done = await fetch_page(offset)
+        page_items, raw_count, done = await fetch_page(offset)
         items.extend(page_items)
-        offset += len(page_items)
-        if done or not page_items:
+        offset += raw_count
+        if done or not raw_count:
             break
     return items, False
 

@@ -169,10 +169,11 @@ class ColModule(TaxonomyModule):
             if c.get("id") != taxon_id
         ]
 
-        async def fetch_children(offset: int) -> tuple[list[RankName], bool]:
+        async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.children_page(taxon_id, offset)
+            raw = page.get("result", [])
             out = []
-            for c in page.get("result", []):
+            for c in raw:
                 if c.get("rank") == "unranked" or c.get("status") != "accepted":
                     continue
                 out.append(
@@ -185,7 +186,7 @@ class ColModule(TaxonomyModule):
                         eteint=c.get("labelHtml", "").startswith("†") or None,
                     )
                 )
-            return out, page.get("last", True)
+            return out, len(raw), page.get("last", True)
 
         liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
         if liste:
