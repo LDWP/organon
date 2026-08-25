@@ -215,6 +215,7 @@ const LICENSE_URL = "https://www.gnu.org/licenses/gpl-3.0.html";
 const BUG_REPORT_URL = "https://fr.wikipedia.org/wiki/Discussion_Projet:Biologie/Organon";
 const REPO_URL = "https://github.com/LDWP/organon";
 const DOCS_URL = "https://github.com/LDWP/organon/blob/master/README.md";
+const API_DOCS_URL = "https://organon.toolforge.org/docs";
 
 function getInitialTheme() {
   if (getStorageConsent() === "accepted") {
@@ -2263,7 +2264,9 @@ export default function App() {
       <footer>
         <div className="wrap">
           <p>
-            Organon · api/v1 ·{" "}
+            Organon ·{" "}
+            <a href={API_DOCS_URL} target="_blank" rel="noreferrer">api/v1</a>{" "}
+            ·{" "}
             <button type="button" className="footer-link" onClick={() => setShowSources(true)}>
               sources
             </button>
