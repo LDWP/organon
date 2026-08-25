@@ -753,6 +753,11 @@ def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
             resu += f"| {a}\n"
         resu += "}}\n"
         if struct.taxon.rang in RANGS_CATEGORIE_HOMONYME:
+            # TODO: passer le mot-clé {{Catégorie principale|Titre}} quand le titre de la page
+            # diffère du nom du taxon (homonymie, ex. "Elmidae (famille)") — nécessite de
+            # connaître le titre réel de la page cible, indisponible ici. À rebrancher quand
+            # l'intégration OAuth (voir organon/api/routes/auth.py) permettra de suggérer/lire
+            # ce titre.
             resu += "{{catégorie principale}}\n"
     if ext:
         for e in sorted(ext):
