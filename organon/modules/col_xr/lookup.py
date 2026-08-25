@@ -11,8 +11,28 @@ Ne fait aucun appel HTTP directement, voir adapter.py."""
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from organon.core.domains import KINGDOM_MAP
 from organon.modules.col_xr.adapter import ColXrAdapter
+from organon.modules.col_xr.ranks import col_xr_cherche_rang
+from organon.modules.common import format_auteur
+
+
+@dataclass
+class ColXrLinkInfo:
+    """Nom/auteur/rang tels que COL XR les rapporte pour la fiche `id` — mêmes champs que ceux
+    que `ColModule` calcule pour `struct.liens["col"]` (voir col/module.py), pour que le lien
+    {{CatalogueofLife}} construit par GbifModule à partir de cette fiche cite le même auteur que
+    ColModule citerait pour la même fiche, plutôt que l'auteur GBIF (backbone), qui peut différer
+    ou manquer — sans quoi les deux lignes ne sont pas des doublons textuellement identiques et le
+    dédoublonnage par ligne de `_compute_ext_liens_items` (sections.py) ne les fusionne pas."""
+
+    id: str
+    nom: str
+    auteur: str | None
+    rang: str | None
+    eteint: bool | None
 
 
 def _kingdom_index(classification: list[dict]) -> int | None:
@@ -39,19 +59,38 @@ def _pick(candidats: list[dict], domaine: str) -> dict | None:
     return cur if cur is not None else (candidats[0] if candidats else None)
 
 
-async def find_col_xr_id(adapter: ColXrAdapter, nom: str, domaine: str) -> str | None:
-    """None si aucune entrée COL XR acceptée ne correspond au nom (et au règne, si `domaine` est
-    renseigné) — un simple défaut d'absence, pas une erreur : GBIF garde alors son identifiant
-    numérique habituel. Ignore délibérément les synonymes (contrairement à `ColXrModule`) : un
-    lien de référence doit pointer vers la même fiche acceptée que celle déjà résolue par GBIF,
-    jamais vers un statut différent."""
+def _to_link_info(cur: dict) -> ColXrLinkInfo:
+    usage = cur["usage"]
+    name = usage["name"]
+    return ColXrLinkInfo(
+        id=cur["id"],
+        nom=name["scientificName"],
+        auteur=format_auteur(name.get("authorship")),
+        rang=col_xr_cherche_rang(name["rank"]) if "rank" in name else None,
+        eteint=usage.get("extinct"),
+    )
+
+
+async def find_col_xr_link(adapter: ColXrAdapter, nom: str, domaine: str) -> ColXrLinkInfo | None:
+    """Comme `find_col_xr_id`, mais renvoie la fiche complète (nom/auteur/rang) plutôt que le seul
+    identifiant — voir `ColXrLinkInfo`. None si aucune entrée COL XR acceptée ne correspond au nom
+    (et au règne, si `domaine` est renseigné) — un simple défaut d'absence, pas une erreur : GBIF
+    garde alors son identifiant numérique habituel. Ignore délibérément les synonymes (contrairement
+    à `ColXrModule`) : un lien de référence doit pointer vers la même fiche acceptée que celle déjà
+    résolue par GBIF, jamais vers un statut différent."""
     results = await adapter.search(nom)
     if not results:
         return None
     candidats = _exact_matches(results, nom)
     accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
     cur = _pick(accepted, domaine)
-    return cur["id"] if cur is not None else None
+    return _to_link_info(cur) if cur is not None else None
+
+
+async def find_col_xr_id(adapter: ColXrAdapter, nom: str, domaine: str) -> str | None:
+    """Identifiant seul — voir `find_col_xr_link` pour la fiche complète."""
+    info = await find_col_xr_link(adapter, nom, domaine)
+    return info.id if info is not None else None
 
 async def resolve_col_xr_concept_id(adapter: ColXrAdapter, nom: str, domaine: str) -> str | None:
     """Identifiant ChecklistBank du concept taxonomique ACCEPTÉ désigné par `nom`, que `nom` soit

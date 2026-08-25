@@ -22,7 +22,7 @@ from organon.core.rendering.authors import BOTANIST_REGNES
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.col_xr.adapter import ColXrAdapter
-from organon.modules.col_xr.lookup import find_col_xr_id
+from organon.modules.col_xr.lookup import find_col_xr_link
 from organon.modules.common import (
     MAX_SYNONYM_HOPS,
     as_limit,
@@ -195,15 +195,28 @@ class GbifModule(TaxonomyModule):
         # numérique GBIF pour le rendu (Modèle:GBIF réformé pour accepter les deux formats,
         # voir render_bioref) — la clé numérique `key` continue de piloter tous les appels GBIF
         # ci-dessous, seul l'identifiant stocké pour l'affichage change.
-        col_xr_id = await find_col_xr_id(self._col_xr_adapter, info["nom"], struct.domaine)
+        col_xr = await find_col_xr_link(self._col_xr_adapter, info["nom"], struct.domaine)
 
         struct.liens["gbif"] = {
-            "id": col_xr_id or key,
+            "id": col_xr.id if col_xr is not None else key,
             "auteur": format_auteur(info["auteur"]),
             "nom": info["nom"],
             **({"rang": info["rang"]} if "rang" in info else {}),
             **({"eteint": info["eteint"]} if "eteint" in info else {}),
         }
+        if col_xr is not None:
+            # Fiche COL XR propre à l'identifiant ci-dessus : sert uniquement au second lien
+            # {{CatalogueofLife}} de `render_bioref`, pas au lien {{GBIF}} — sans ça, ce lien citait
+            # l'auteur du backbone GBIF au lieu de celui de la fiche COL XR réellement liée, ce qui
+            # produisait deux lignes {{CatalogueofLife}} au contenu différent (donc non fusionnées
+            # par le dédoublonnage de `_compute_ext_liens_items`) quand `ColModule` résolvait la
+            # même fiche indépendamment.
+            struct.liens["gbif"]["col_xr"] = {
+                "nom": col_xr.nom,
+                "auteur": col_xr.auteur,
+                "rang": col_xr.rang,
+                "eteint": col_xr.eteint,
+            }
         if cur.get("publishedIn"):
             # Citation bibliographique déjà présente dans la réponse de recherche utilisée
             # ci-dessus (aucun appel réseau supplémentaire) — même usage que
@@ -383,9 +396,22 @@ class GbifModule(TaxonomyModule):
         out = [f"{{{{GBIF | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"]
         if isinstance(data["id"], str):
             # Identifiant ChecklistBank (COL XR) plutôt que la clé numérique GBIF legacy : la
-            # même fiche existe aussi sur catalogueoflife.org, d'où ce second lien.
+            # même fiche existe aussi sur catalogueoflife.org, d'où ce second lien. Cité avec le
+            # nom/auteur propres à cette fiche COL XR (`col_xr`), pas ceux du backbone GBIF
+            # ci-dessus : les deux peuvent diverger (ex. auteur absent côté GBIF), et un lien
+            # {{CatalogueofLife}} doit citer la même chose que `ColModule` citerait pour la même
+            # fiche, sans quoi le dédoublonnage par ligne de `_compute_ext_liens_items` ne les
+            # reconnaît pas comme la même référence.
+            col_xr = data["col_xr"]
+            cible_col = wp_met_italiques(
+                col_xr["nom"], col_xr.get("rang") or struct.taxon.rang, struct.regne
+            )
+            if col_xr.get("auteur"):
+                cible_col += " " + col_xr["auteur"]
+            sup_col = " | éteint=oui" if col_xr.get("eteint") else ""
             out.append(
-                f"{{{{CatalogueofLife | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"
+                f"{{{{CatalogueofLife | {data['id']} | {cible_col}{sup_col}{nv} | "
+                f"consulté le={cdate} }}}}"
             )
         return out
 
