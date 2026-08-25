@@ -68,6 +68,11 @@ class GenerateResponse(BaseModel):
     """Code de statut de conservation UICN (LC/NT/VU/EN/CR/EW/EX/DD/NE...), rapporté par GBIF
     via `/species/{key}/iucnRedListCategory` (voir `organon.modules.gbif`) ; vide si absent."""
     vernacular_names: list[str] = []
+    autres_noms: dict[str, list[str]] = {}
+    """`struct.autres_noms`, fondu toutes sources confondues par statut (ex. « Recommandé ou
+    typique » -> [...]) — pendant de `vernacular_names` pour les noms qu'une source qualifie
+    elle-même d'un statut explicite (voir `organon.core.models.Struct.autres_noms`), affichés à
+    part dans l'onglet Noms & synonymes plutôt que fondus dans `vernacular_names`."""
     wikitext: str
     taxobox_wikitext: str
     """Le bloc `{{ébauche}}` → `{{Taxobox fin}}` isolé du reste de `wikitext` — permet de

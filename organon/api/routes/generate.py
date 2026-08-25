@@ -362,10 +362,10 @@ class EnrichmentRunner:
         l'ordre d'arrivée réseau. Sans ça, deux modules qui écrivent le même champ mono-valeur de
         `Struct` (`sous_taxons`, `synonymes`, `basionyme`...) donneraient un résultat dépendant de
         la latence de chacun plutôt que de la priorité déclarée. Les champs déjà namespacés par
-        module (`liens`, `vernaculaire`, `distribution`) n'ont pas ce problème — chaque copie ne
-        porte que la clé de son propre module, donc un simple `update()` les fusionne sans
-        conflit ; seuls les champs mono-valeur de `_MONOVALUE_FIELDS` nécessitent un choix par
-        priorité, tranché en comparant chaque copie à `self._baseline`."""
+        module (`liens`, `vernaculaire`, `autres_noms`, `distribution`) n'ont pas ce problème —
+        chaque copie ne porte que la clé de son propre module, donc un simple `update()` les
+        fusionne sans conflit ; seuls les champs mono-valeur de `_MONOVALUE_FIELDS` nécessitent
+        un choix par priorité, tranché en comparant chaque copie à `self._baseline`."""
         started: dict[str, float] = {module_id: time.monotonic() for module_id in self._enrichment_ids}
         tasks = [
             asyncio.create_task(self.collect_one_module(module_id), name=module_id)
@@ -400,6 +400,7 @@ class EnrichmentRunner:
             copy = results[module_id]
             self.struct.liens.update(copy.liens)
             self.struct.vernaculaire.update(copy.vernaculaire)
+            self.struct.autres_noms.update(copy.autres_noms)
             self.struct.distribution.update(copy.distribution)
             for field in _MONOVALUE_FIELDS:
                 value = getattr(copy, field)
@@ -655,6 +656,14 @@ def _assemble_response(
         for nom in noms:
             ajoute_si_besoin(vernacular_merged, nom, src)
 
+    autres_noms_merged: dict[str, dict[str, list[str]]] = {}
+    for src, statuts in struct.autres_noms.items():
+        for statut, noms in statuts.items():
+            bucket = autres_noms_merged.setdefault(statut, {})
+            for nom in noms:
+                ajoute_si_besoin(bucket, nom, src)
+    autres_noms_response = {statut: list(noms) for statut, noms in autres_noms_merged.items()}
+
     # Anciennement un unique `completeness_score` (rangs + sous-taxons + synonymes + noms
     # vernaculaires additionnés) : scindé en deux mesures indépendantes, une par facette du
     # "zoom" classification (taxobox / sous-taxons), pour que le frontend puisse recommander une
@@ -684,6 +693,7 @@ def _assemble_response(
         eteint=bool(struct.taxon.eteint),
         uicn_statut=struct.liens.get("uicn", {}).get("risque", ""),
         vernacular_names=list(vernacular_merged)[:6],
+        autres_noms=autres_noms_response,
         wikitext=wikitext,
         taxobox_wikitext=taxobox_wikitext,
         subtaxa_wikitext=subtaxa_wikitext,

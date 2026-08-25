@@ -421,6 +421,13 @@ h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: 
 .noms-card > .data-table-wrap { padding: 10px 12px 12px; }
 .noms-card-body { margin: 0; padding: 10px 12px 12px; }
 
+.autres-noms-groupe { border-top: 1px solid var(--line); }
+.autres-noms-groupe:first-child { border-top: none; }
+.autres-noms-statut {
+  margin: 0; padding: 8px 12px 0; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.05em;
+  text-transform: uppercase; color: var(--ink-soft); font-weight: 600;
+}
+
 /* ---------- galerie d'images Commons (sous-onglet Image) ---------- */
 .image-gallery { padding: 16px; }
 .image-gallery-empty { display: flex; flex-direction: column; align-items: center; gap: 14px; }

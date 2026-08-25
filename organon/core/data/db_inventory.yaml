@@ -368,7 +368,7 @@ categories:
         statut: disponible
         classification: {possible: false, estime: false}
         elements_recoltes: ["noms vernaculaires", identifiant]
-        acces: {type: api_rest, detail: "API JSON (index Algolia, clé « search-only » publique)"}
+        acces: {type: scraping, detail: "recherche via API JSON (index Algolia, clé « search-only » publique) ; noms vernaculaires typés par scraping HTML de l'onglet Ethnobotanique (aucune API pour ce statut)"}
         derniere_maj: null
       - id: vascan
         nom: "Base de données des plantes vasculaires du Canada (VASCAN)"

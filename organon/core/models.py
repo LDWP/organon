@@ -154,6 +154,13 @@ class Struct(BaseModel):
     vernaculaire: dict[str, list[str]] = Field(default_factory=dict)
     """struct['vernaculaire'][nom-technique-module] -> liste de noms vernaculaires."""
 
+    autres_noms: dict[str, dict[str, list[str]]] = Field(default_factory=dict)
+    """struct['autres_noms'][nom-technique-module][statut] -> liste de noms. Distinct de
+    `vernaculaire` : des noms qu'une source qualifie elle-même d'un statut explicite (ex. la
+    BDTFX de TelaMétro distingue « Recommandé ou typique » de « Secondaire ou régional »),
+    rendus séparément (voir `organon.core.rendering.sections.render_supp`) plutôt que fondus
+    dans la liste `vernaculaire` qui ne porte aucune notion de statut."""
+
     etymologie: Etymology | None = None
     originale: str | list[str] | None = None
     synonymes: SynonymList | None = None

@@ -2064,6 +2064,22 @@ export default function App() {
                           )}
                         </div>
 
+                        {Object.entries(activeData.autres_noms || {}).some(([, noms]) => noms.length > 0) && (
+                          <div className="noms-card">
+                            <div className="noms-card-head">
+                              <span className="noms-card-title">Autres noms</span>
+                            </div>
+                            {Object.entries(activeData.autres_noms).map(([statut, noms]) => (
+                              noms.length > 0 && (
+                                <div key={statut} className="autres-noms-groupe">
+                                  <p className="autres-noms-statut">{statut}</p>
+                                  <p className="noms-card-body">{noms.join(", ")}</p>
+                                </div>
+                              )
+                            ))}
+                          </div>
+                        )}
+
                         <div className="noms-card">
                           <div className="noms-card-head">
                             <span className="noms-card-title">

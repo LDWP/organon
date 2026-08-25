@@ -3,8 +3,12 @@ métropolitaine). Module d'enrichissement uniquement (`can_classify=False`), lim
 végétal. Réutilise nom/rang déjà connus de la classification principale (BDTFX n'expose pas de
 rang traduisible directement vers le vocabulaire Wikipédia dans cette recherche).
 
-`common_name` est une liste JSON (parfois avec une entrée vide `['']` quand aucun nom
-vernaculaire n'est renseigné) — filtrée ici avant d'alimenter `struct.vernaculaire`."""
+Les noms vernaculaires viennent d'un second appel (`noms_communs_fr`, scraping de l'onglet
+Ethnobotanique) plutôt que du `common_name` renvoyé par la recherche Algolia — voir
+`TelametroAdapter` pour pourquoi ce dernier est insuffisant. Alimentent `struct.autres_noms`
+(groupés par statut BDTFX), pas `struct.vernaculaire` : contrairement aux autres sources de
+noms vernaculaires, la BDTFX qualifie elle-même chaque nom d'un statut explicite, information
+qu'on ne veut pas perdre en la fondant dans la liste plate `vernaculaire`."""
 
 from __future__ import annotations
 
@@ -55,9 +59,9 @@ class TelametroModule(TaxonomyModule):
             blob["auteur"] = format_auteur(auteur)
         struct.liens["telametro"] = blob
 
-        vernaculaire = [n for n in (match.get("common_name") or []) if n]
-        if vernaculaire:
-            struct.vernaculaire["Tela-métro"] = vernaculaire
+        autres_noms = await self._adapter.noms_communs_fr(match["nomenclatural_number"])
+        if autres_noms:
+            struct.autres_noms["Tela-métro"] = autres_noms
 
         return struct
 

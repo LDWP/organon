@@ -344,7 +344,21 @@ def render_supp(struct: Struct, options: GenerateOptions) -> str:
             if cnt > 1
             else "le [[nom vernaculaire]] ou [[nom normalisé|normalisé]] suivant"
         )
-        ret += f"Ce taxon porte en français {pl} : {txt}.\n\n"
+        ret += f"Ce taxon porte en français {pl} : {txt}."
+
+        if struct.autres_noms:
+            # Fondu en dict[source, noms] (statuts confondus) pour réutiliser conditionne_noms :
+            # une seconde phrase, jamais seule (voir la garde `if struct.vernaculaire` ci-dessus)
+            # — "également" n'a de sens qu'à la suite de la phrase précédente.
+            autres_par_source = {
+                source: [nom for noms in statuts.values() for nom in noms]
+                for source, statuts in struct.autres_noms.items()
+            }
+            txt_autres, _ = conditionne_noms(autres_par_source, cdate)
+            if txt_autres:
+                ret += f" Ce taxon est également nommé {txt_autres}."
+
+        ret += "\n\n"
 
     if struct.synonymes is not None and struct.synonymes.liste:
         target = lien_pour_synonyme(struct.regne)
