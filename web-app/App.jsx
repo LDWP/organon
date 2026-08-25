@@ -1276,7 +1276,7 @@ export default function App() {
   const checkedReferenceLines = referenceItems.filter(
     (item) => referenceCheckedOverrides[referenceItemKey(item)] ?? item.default_checked
   );
-  const autresProjetsMatch = baseData?.wikitext?.match(/\{\{Autres projets\n(?:\|[^\n]*\n)*\}\}\n/);
+  const autresProjetsMatch = baseData?.wikitext?.match(/\{\{Autres projets\n(?:\|[^\n]*\n)*\}\}\n(?:\{\{catégorie principale\}\}\n)?/);
   const autresProjetsBlock = autresProjetsMatch ? autresProjetsMatch[0] : "";
   const checkedReferencesLinesText = checkedReferenceLines.map((item) => `* ${item.wikitext}`).join("\n");
   const checkedReferencesWikitext =
