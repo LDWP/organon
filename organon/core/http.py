@@ -8,6 +8,8 @@ from typing import Any
 
 import httpx
 
+USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Organon)"
+
 
 class OwnedClientMixin:
     """Gère un `httpx.AsyncClient` optionnellement injecté (tests, partage entre adaptateurs)

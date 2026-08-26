@@ -21,12 +21,11 @@ from urllib.parse import unquote
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import USER_AGENT, OwnedClientMixin
 from organon.modules.common import sparql_escape
 
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
-USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
 
 # Limite de titres par appel `prop=imageinfo` côté anonyme (voir
 # https://www.mediawiki.org/wiki/API:Query#Multiple_values, "500" pour les comptes autorisés,

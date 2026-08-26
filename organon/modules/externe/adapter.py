@@ -13,14 +13,13 @@ from __future__ import annotations
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import USER_AGENT, OwnedClientMixin
 from organon.modules.common import sparql_escape
 
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
 SPECIES_API_URL = "https://species.wikimedia.org/w/api.php"
 FRWIKTIONARY_API_URL = "https://fr.wiktionary.org/w/api.php"
-USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
 
 
 class ExterneAdapter(OwnedClientMixin):

@@ -17,10 +17,9 @@ from typing import Any
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import USER_AGENT, OwnedClientMixin
 
 WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php"
-USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
 
 TAXON_NAME_PROPERTY = "P225"
 AUTHOR_PROPERTY = "P405"

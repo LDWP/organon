@@ -40,7 +40,7 @@ class AuthSettings(BaseSettings):
     bot_username: str = ""
     bot_password: str = ""
     wiki_api_url: str = "https://fr.wikipedia.org/w/api.php"
-    user_agent: str = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Taxobot)"
+    user_agent: str = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Organon)"
 
     # Page de permission — lecture fail-closed, cache TTL court. Le nom `.../Taxobot/user.json`
     # n'est pas un identifiant interne oublié : c'est un chemin de page wiki réel (sous l'espace
