@@ -77,6 +77,12 @@ class AuthSettings(BaseSettings):
     lpsn_username: str = "" #envvars ORGANON_LPSN_USERNAME
     lpsn_password: str = "" #envvars ORGANON_LPSN_PASSWORD
 
+    # BHL (organon.modules.wrms, enrichissement de la publication originale via l'API v3) exige
+    # une clé individuelle gratuite (https://www.biodiversitylibrary.org/getapikey.aspx). Vide
+    # par défaut -> l'enrichissement BHL est simplement sauté (repli sur le texte brut), pas
+    # d'échec du module WoRMS pour autant.
+    bhl_api_key: str = "" #envvars ORGANON_BHL_API_KEY
+
 
 _settings: AuthSettings | None = None
 

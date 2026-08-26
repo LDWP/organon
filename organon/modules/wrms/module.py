@@ -9,12 +9,23 @@ La « publication originale » (struct.originale) n'a aucun champ REST structur�
 seul champ disponible est scrapé depuis la page HTML de détail
 (`WrmsAdapter.original_description`, voir `organon.modules.common.
 extract_aphia_original_description`) — la seule exception à "REST uniquement" dans ce module.
+`organon.modules.wrms.citations.build_citation` tente ensuite de remplacer ce texte brut par une
+citation structurée ({{Bibliographie}}/{{Article}}/{{Ouvrage}}) quand un DOI ou un lien BHL y
+est repérable, avec repli silencieux sur le texte brut en cas d'échec.
 """
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Basionym, RankName, Redirection, Struct, SubTaxonList, SynonymList, TaxonInfo
+from organon.core.models import (
+    Basionym,
+    RankName,
+    Redirection,
+    Struct,
+    SubTaxonList,
+    SynonymList,
+    TaxonInfo,
+)
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
@@ -27,8 +38,8 @@ from organon.modules.common import (
     simple_debug_link,
 )
 from organon.modules.wrms.adapter import WrmsAdapter
+from organon.modules.wrms.citations import build_citation
 from organon.modules.wrms.ranks import CHARTES_GARDENT_REGNE, wrms_charte, wrms_rang
-
 
 PAGE_SIZE = 50
 """Taille de page de l'API REST WoRMS (constante documentée par le service, pas configurable)."""
@@ -144,7 +155,8 @@ class WrmsModule(TaxonomyModule):
         if vernaculaire:
             struct.vernaculaire["WRMS"] = vernaculaire
 
-        struct.originale = await adapter.original_description(aphia_id)
+        raw_originale = await adapter.original_description(aphia_id)
+        struct.originale = await build_citation(adapter, raw_originale)
 
         original_id = cur.get("originalNameUsageID")
         if original_id and original_id != aphia_id:
