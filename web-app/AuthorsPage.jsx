@@ -77,6 +77,30 @@ export default function AuthorsPage({ onBack }) {
           Wikipédia (ou ailleurs).
         </p>
       </section>
+
+      <section className="authors-entry">
+        <h2>Favicon</h2>
+
+        <p>
+          Le favicon reprend le fichier{" "}
+          <a
+            href="https://commons.wikimedia.org/wiki/File:Greek_uc_omicron.svg"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Greek_uc_omicron.svg
+          </a>{" "}
+          de{" "}
+          <a
+            href="https://commons.wikimedia.org/wiki/User:Mrmw"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Mrmw
+          </a>
+          , domaine public, via Wikimedia Commons.
+        </p>
+      </section>
     </div>
   );
 }

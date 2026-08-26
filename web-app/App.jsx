@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   fetchAuthStatus,
   fetchCommonsImages,
@@ -486,6 +486,26 @@ export default function App() {
       /* rien à faire si le stockage est déjà indisponible */
     }
   }
+
+  // Regroupe les domaines par parent (ex. les enfants d'"animal" comme "arachnide") en
+  // s'appuyant sur le champ `parent` déjà renvoyé par /api/v1/domains, plutôt que de
+  // recoder l'arbre de organon/core/domains.py côté frontend.
+  const domainGroups = useMemo(() => {
+    const children = new Map();
+    const top = [];
+    for (const d of domains) {
+      if (d.id === "*") continue;
+      if (d.parent) {
+        if (!children.has(d.parent)) children.set(d.parent, []);
+        children.get(d.parent).push(d.id);
+      } else {
+        top.push(d.id);
+      }
+    }
+    top.sort((a, b) => a.localeCompare(b, "fr"));
+    for (const list of children.values()) list.sort((a, b) => a.localeCompare(b, "fr"));
+    return { top, children };
+  }, [domains]);
 
   useEffect(() => {
     fetchDomains()
@@ -1560,14 +1580,18 @@ export default function App() {
                 Filtre
               </label>
               <select id="domaine-select" value={domaine} onChange={(e) => setDomaine(e.target.value)}>
-                <option value="*">Aucun</option>
-                {domains
-                  .filter((d) => d.id !== "*")
-                  .map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.id}
-                    </option>
-                  ))}
+                <option value="*">aucun</option>
+                {domainGroups.top.map((id) => (
+                  <Fragment key={id}>
+                    <option value={id}>{id}</option>
+                    {(domainGroups.children.get(id) || []).map((childId) => (
+                      <option key={childId} value={childId}>
+                        {"    "}
+                        {childId}
+                      </option>
+                    ))}
+                  </Fragment>
+                ))}
               </select>
             </div>
             <button className="run" type="submit" disabled={initialLoading}>
