@@ -51,7 +51,7 @@ class AuthSettings(BaseSettings):
     permission_cache_ttl_seconds: float = 300.0
 
     # Verrou explicite : reste à False tant que (a) le statut du bot n'a pas été tranché par la
-    # communauté (question posée sur Discussion Projet:Biologie/Taxobot) et (b) la page de
+    # communauté (question posée sur Discussion Projet:Biologie/Organon) et (b) la page de
     # permission n'est pas protégée en écriture par un administrateur frwiki. La partie
     # identification (OAuth seul, sans édition) fonctionne indépendamment de ce flag.
     bot_edit_enabled: bool = False

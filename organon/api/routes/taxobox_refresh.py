@@ -7,7 +7,7 @@ d'un article existant — cette logique de repérage/fusion reste à spécifier 
 implémentée, pour éviter d'inventer un comportement non validé.
 
 **Désactivé par défaut** (`AuthSettings.bot_edit_enabled=False`) tant que (a) le statut du bot
-n'a pas été tranché par la communauté sur `Discussion Projet:Biologie/Taxobot` et (b) la page de
+n'a pas été tranché par la communauté sur `Discussion Projet:Biologie/Organon` et (b) la page de
 permission n'est pas protégée en écriture par un administrateur frwiki. Basculer ce flag est une
 décision de mise en service, pas de code.
 """
@@ -51,7 +51,7 @@ async def refresh_taxobox(
             503,
             detail=(
                 "Édition par le bot désactivée : en attente de la clarification communautaire du "
-                "statut du bot (voir Discussion Projet:Biologie/Taxobot) et de la protection en "
+                "statut du bot (voir Discussion Projet:Biologie/Organon) et de la protection en "
                 "écriture de la page de permission."
             ),
         )
