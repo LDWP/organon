@@ -11,7 +11,11 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 
+from organon.api.rate_limit import limiter
 from organon.api.routes import (
     auth,
     commons_images,
@@ -42,6 +46,12 @@ def create_app() -> FastAPI:
         version=VERSION,
         description="Génération de squelettes d'articles Wikipédia pour les taxons.",
     )
+
+    app.state.limiter = limiter
+    # Signature slowapi spécifique à RateLimitExceeded, plus stricte que le
+    # Callable[[Request, Exception], ...] générique attendu par Starlette.
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
+    app.add_middleware(SlowAPIMiddleware)
 
     # CORS uniquement en dev, quand le frontend Vite (port 5173) et l'API (port 8000) tournent
     # sur des origines différentes. En prod le frontend buildé est servi par ce même process

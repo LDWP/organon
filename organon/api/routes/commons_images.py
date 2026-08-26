@@ -9,8 +9,9 @@ sa possession côté frontend."""
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Request
 
+from organon.api.rate_limit import limiter
 from organon.api.schemas import CommonsImagesResponse, CommonsImageSuggestion
 from organon.modules.commons_images.adapter import CommonsImagesAdapter
 from organon.modules.commons_images.service import find_images
@@ -19,7 +20,10 @@ router = APIRouter()
 
 
 @router.get("/commons-images", response_model=CommonsImagesResponse)
-async def commons_images(taxon: str = Query(..., min_length=1)) -> CommonsImagesResponse:
+@limiter.limit("30/minute")
+async def commons_images(
+    request: Request, taxon: str = Query(..., min_length=1)
+) -> CommonsImagesResponse:
     adapter = CommonsImagesAdapter()
     try:
         result = await find_images(taxon, adapter)

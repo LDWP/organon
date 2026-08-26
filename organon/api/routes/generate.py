@@ -29,12 +29,12 @@ import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
-
 from pydantic import BaseModel
 
 from organon.api.deps import require_username
+from organon.api.rate_limit import limiter
 from organon.api.schemas import (
     ExternalLink,
     FatalErrorEvent,
@@ -76,6 +76,11 @@ from organon.core.selectors.coherence import (
 from organon.modules.bootstrap import ensure_modules_registered
 
 router = APIRouter()
+
+# Limite partagée entre POST /generate, GET /generate et POST /generate/stream : ce sont trois
+# façons de déclencher la même opération coûteuse (~20 appels externes, 10-20s), le quota doit
+# donc être commun plutôt que triplé.
+_GENERATE_RATE_LIMIT = "10/minute"
 logger = logging.getLogger(__name__)
 
 _MONOVALUE_FIELDS = (
@@ -410,8 +415,7 @@ class EnrichmentRunner:
             self.ran_modules.append(module_id)
 
 
-@router.post("/generate", response_model=GenerateResponse)
-async def generate(req: GenerateRequest, username: str = Depends(require_username)) -> GenerateResponse:
+async def _generate_core(req: GenerateRequest) -> GenerateResponse:
     ensure_modules_registered()
     started = time.monotonic()
     logs: list[str] = []
@@ -459,18 +463,25 @@ async def generate(req: GenerateRequest, username: str = Depends(require_usernam
     )
 
 
+@router.post("/generate", response_model=GenerateResponse)
+@limiter.shared_limit(_GENERATE_RATE_LIMIT, scope="generate")
+async def generate(
+    request: Request, req: GenerateRequest, username: str = Depends(require_username)
+) -> GenerateResponse:
+    return await _generate_core(req)
+
+
 @router.get("/generate", response_model=GenerateResponse)
-async def generate_via_get(taxon: str, username: str = Depends(require_username)) -> GenerateResponse:
+@limiter.shared_limit(_GENERATE_RATE_LIMIT, scope="generate")
+async def generate_via_get(
+    request: Request, taxon: str, username: str = Depends(require_username)
+) -> GenerateResponse:
     """Alias GET de `POST /generate`, avec uniquement `taxon` en paramètre de requête (toutes
     les autres options à leur valeur par défaut) — pour pouvoir déclencher une génération
     depuis un simple lien ou la barre d'adresse d'un navigateur, sans construire de corps JSON.
     Le frontend continue d'utiliser `POST /generate`/`POST /generate/stream`, qui exposent
-    l'intégralité de `GenerateOptions`.
-
-    `username` résolu ici puis passé explicitement à `generate()` : appelée directement comme une
-    coroutine Python plutôt que via une requête HTTP, cette dernière ne repasserait jamais par la
-    résolution FastAPI de son propre `Depends(require_username)`."""
-    return await generate(GenerateRequest(taxon=taxon), username=username)
+    l'intégralité de `GenerateOptions`."""
+    return await _generate_core(GenerateRequest(taxon=taxon))
 
 
 def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
@@ -742,7 +753,10 @@ def _sse(event: BaseModel) -> str:
 
 
 @router.post("/generate/stream")
-async def generate_stream(req: GenerateRequest, username: str = Depends(require_username)) -> StreamingResponse:
+@limiter.shared_limit(_GENERATE_RATE_LIMIT, scope="generate")
+async def generate_stream(
+    request: Request, req: GenerateRequest, username: str = Depends(require_username)
+) -> StreamingResponse:
     """Variante de `/generate` en Server-Sent Events : un `module_status` par module de
     classification/enrichissement (voir `ModuleStatusEvent`), un `plan` juste après la
     classification, puis un `result` final portant la même donnée que `POST /generate`. En cas

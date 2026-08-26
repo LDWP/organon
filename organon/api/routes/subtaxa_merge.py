@@ -15,8 +15,9 @@ sources s'accordent déjà exactement, ou si leurs listes divergentes ont des ta
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
+from organon.api.rate_limit import limiter
 from organon.api.schemas import (
     MergedGroupOut,
     MergedSpeciesOut,
@@ -31,7 +32,8 @@ router = APIRouter()
 
 
 @router.post("/subtaxa-merge", response_model=MergedSubtaxaResponse)
-async def subtaxa_merge(req: SubtaxaMergeRequest) -> MergedSubtaxaResponse:
+@limiter.limit("30/minute")
+async def subtaxa_merge(request: Request, req: SubtaxaMergeRequest) -> MergedSubtaxaResponse:
     result = merge_subtaxa(
         req.taxon_rang, req.taxon_nom, req.regne, [(s.module_id, s.liste) for s in req.sources]
     )
