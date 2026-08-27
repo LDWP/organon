@@ -330,13 +330,33 @@ function trimBlockForDisplay(text) {
   return text.replace(/^\n+/, "").replace(/\n+$/, "");
 }
 
+function ConnectGate() {
+  return (
+    <div className="console connect-gate">
+      <p className="connect-gate-desc">
+        Organon interroge automatiquement une vingtaine de bases taxonomiques (GBIF, ITIS,
+        AlgaeBase, WoRMS…) pour générer l'ébauche sourcée d'un article Wikipédia sur un taxon.
+      </p>
+      <p className="connect-gate-desc">
+        La génération est réservée aux comptes connectés, pour rattacher chaque génération à son
+        auteur plutôt que de rester anonyme.
+      </p>
+      <a className="run connect-gate-cta" href={LOGIN_URL}>
+        Se connecter avec Wikimedia ▸
+      </a>
+    </div>
+  );
+}
+
 export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const [domains, setDomains] = useState([]);
   const [modules, setModules] = useState([]);
   const [showSources, setShowSources] = useState(false);
   const [showAuthors, setShowAuthors] = useState(false);
-  const [username, setUsername] = useState(null);
+  // undefined = statut pas encore vérifié (évite un flash de l'écran "non connecté" le temps que
+  // fetchAuthStatus() réponde), null = non connecté confirmé, string = username connecté.
+  const [username, setUsername] = useState(undefined);
   const [storageConsent, setStorageConsentState] = useState(getStorageConsent);
   const [showStorageBanner, setShowStorageBanner] = useState(() => getStorageConsent() === null);
 
@@ -1471,6 +1491,14 @@ export default function App() {
               setShowSources(true);
             }}
           />
+        ) : username === undefined ? null : username === null ? (
+          <>
+            <span className="eyebrow">Organon</span>
+            <h1>
+              Interrogez AlgaeBase, ITIS… — <em>en une requête</em>
+            </h1>
+            <ConnectGate />
+          </>
         ) : (
           <>
         <span className="eyebrow">Organon</span>

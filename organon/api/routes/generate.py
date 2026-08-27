@@ -29,11 +29,12 @@ import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from pydantic import BaseModel
 
+from organon.api.deps import require_username
 from organon.api.schemas import (
     ExternalLink,
     FatalErrorEvent,
@@ -410,7 +411,7 @@ class EnrichmentRunner:
 
 
 @router.post("/generate", response_model=GenerateResponse)
-async def generate(req: GenerateRequest) -> GenerateResponse:
+async def generate(req: GenerateRequest, username: str = Depends(require_username)) -> GenerateResponse:
     ensure_modules_registered()
     started = time.monotonic()
     logs: list[str] = []
@@ -459,13 +460,17 @@ async def generate(req: GenerateRequest) -> GenerateResponse:
 
 
 @router.get("/generate", response_model=GenerateResponse)
-async def generate_via_get(taxon: str) -> GenerateResponse:
+async def generate_via_get(taxon: str, username: str = Depends(require_username)) -> GenerateResponse:
     """Alias GET de `POST /generate`, avec uniquement `taxon` en paramètre de requête (toutes
     les autres options à leur valeur par défaut) — pour pouvoir déclencher une génération
     depuis un simple lien ou la barre d'adresse d'un navigateur, sans construire de corps JSON.
     Le frontend continue d'utiliser `POST /generate`/`POST /generate/stream`, qui exposent
-    l'intégralité de `GenerateOptions`."""
-    return await generate(GenerateRequest(taxon=taxon))
+    l'intégralité de `GenerateOptions`.
+
+    `username` résolu ici puis passé explicitement à `generate()` : appelée directement comme une
+    coroutine Python plutôt que via une requête HTTP, cette dernière ne repasserait jamais par la
+    résolution FastAPI de son propre `Depends(require_username)`."""
+    return await generate(GenerateRequest(taxon=taxon), username=username)
 
 
 def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
@@ -737,7 +742,7 @@ def _sse(event: BaseModel) -> str:
 
 
 @router.post("/generate/stream")
-async def generate_stream(req: GenerateRequest) -> StreamingResponse:
+async def generate_stream(req: GenerateRequest, username: str = Depends(require_username)) -> StreamingResponse:
     """Variante de `/generate` en Server-Sent Events : un `module_status` par module de
     classification/enrichissement (voir `ModuleStatusEvent`), un `plan` juste après la
     classification, puis un `result` final portant la même donnée que `POST /generate`. En cas

@@ -18,8 +18,9 @@ from __future__ import annotations
 
 import re
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from organon.api.deps import require_username
 from organon.api.schemas import SearchMatch, SearchResponse
 from organon.core.domains import KINGDOM_MAP
 from organon.core.rendering.grammar import wp_nom_rang
@@ -93,7 +94,7 @@ def _rank_label(rank_raw: str) -> str:
 
 
 @router.get("/search", response_model=SearchResponse)
-async def search(q: str) -> SearchResponse:
+async def search(q: str, username: str = Depends(require_username)) -> SearchResponse:
     query = q.strip()
     if not query:
         return SearchResponse(query=q, matches=[])
