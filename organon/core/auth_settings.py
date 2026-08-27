@@ -15,13 +15,16 @@ class AuthSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="ORGANON_", extra="ignore")
 
     # OAuth 2.0 utilisateur (identification seule) — consumer public enregistré sur
-    # meta.wikimedia.org, revue communautaire requise avant activation.
+    # meta.wikimedia.org, revue communautaire requise avant activation. Le consumer approuvé est
+    # restreint à frwiki (« limited project » côté admin) : les endpoints doivent donc pointer sur
+    # fr.wikipedia.org, pas meta.wikimedia.org, sous peine de 403 sur resource/profile (le jeton
+    # n'est valide que pour le wiki auquel le consumer est restreint).
     oauth_client_id: str = ""
     oauth_client_secret: str = ""
     oauth_redirect_uri: str = ""
-    oauth_authorize_url: str = "https://meta.wikimedia.org/w/rest.php/oauth2/authorize"
-    oauth_token_url: str = "https://meta.wikimedia.org/w/rest.php/oauth2/access_token"
-    oauth_profile_url: str = "https://meta.wikimedia.org/w/rest.php/oauth2/resource/profile"
+    oauth_authorize_url: str = "https://fr.wikipedia.org/w/rest.php/oauth2/authorize"
+    oauth_token_url: str = "https://fr.wikipedia.org/w/rest.php/oauth2/access_token"
+    oauth_profile_url: str = "https://fr.wikipedia.org/w/rest.php/oauth2/resource/profile"
 
     # Cookies signés (identifiants du flux + session utilisateur).
     session_secret_key: str = ""
