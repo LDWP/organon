@@ -338,8 +338,8 @@ function ConnectGate() {
         AlgaeBase, WoRMS…) pour générer l'ébauche sourcée d'un article Wikipédia sur un taxon.
       </p>
       <p className="connect-gate-desc">
-        La génération est réservée aux comptes connectés, pour rattacher chaque génération à son
-        auteur plutôt que de rester anonyme.
+        La génération est réservée aux comptes wikimédiens connectés. Il sera ultérieurement
+        possible de publier ou de mettre à jour un article directement depuis cet outil.
       </p>
       <a className="run connect-gate-cta" href={LOGIN_URL}>
         Se connecter avec Wikimedia ▸
