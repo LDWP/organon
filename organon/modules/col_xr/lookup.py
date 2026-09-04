@@ -11,6 +11,7 @@ Ne fait aucun appel HTTP directement, voir adapter.py."""
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 from organon.core.domains import KINGDOM_MAP
@@ -47,10 +48,87 @@ def _regne_correspond(r: dict, domaine: str) -> bool:
     return KINGDOM_MAP.get(kingdom, "") == domaine
 
 
-def _exact_matches(results: list[dict], nom: str) -> list[dict]:
-    # Même filtre client strict que l'ancien module de classification : `type=EXACT` côté
-    # ChecklistBank ne suffit pas à exclure tous les à-peu-près.
+_SUBGENUS_RE = re.compile(r"\s*\([^)]*\)")
+_LATIN_GENDER_ENDINGS = ("us", "a", "um")
+
+
+def _strip_subgenus(nom: str) -> str:
+    """Retire le sous-genre entre parenthèses ("Mus (Mus) musculus" -> "Mus musculus"), pour
+    comparer un nom binomial à la notation trinomiale que ChecklistBank utilise pour certaines
+    fiches (rongeurs, moustiques, Drosophila, Plasmodium...) sans que `type=EXACT` ne les
+    reconnaisse comme correspondant au binôme demandé."""
+    return _SUBGENUS_RE.sub("", nom).strip()
+
+
+def _latin_gender_variants(nom: str) -> list[str]:
+    """Variantes d'accord de genre latin (-us/-a/-um) sur le dernier mot de `nom`, pour
+    retrouver un binôme dont l'épithète a été corrigée entre deux sources qui ne republient pas
+    en même temps (ex. Macrovipera lebetina, encore utilisée par GBIF, vs lebetinus, la forme
+    adoptée par COL XR après correction nomenclaturale). Repli de dernier recours seulement
+    (voir `resolve_col_xr_matches`) : ne couvre qu'un désaccord de terminaison sur le tout
+    dernier mot, pas une recherche floue générale."""
+    base, sep, dernier = nom.rpartition(" ")
+    if not sep:
+        return []
+    for terminaison in _LATIN_GENDER_ENDINGS:
+        if dernier.endswith(terminaison):
+            racine = dernier[: -len(terminaison)]
+            return [
+                f"{base} {racine}{autre}" for autre in _LATIN_GENDER_ENDINGS if autre != terminaison
+            ]
+    return []
+
+
+async def _canonical_search(adapter: ColXrAdapter, nom: str) -> list[dict]:
+    """Recherche `nom` sans `type=EXACT`, puis ne garde que les candidats dont le nom
+    scientifique, une fois le sous-genre retiré, correspond exactement à `nom` sans sous-genre —
+    assez strict pour ignorer le bruit d'une recherche non filtrée par type, assez souple pour
+    retrouver une fiche notée avec sous-genre."""
+    cible = _strip_subgenus(nom)
+    resultats = await adapter.search(nom, exact=False)
+    return [r for r in resultats if _strip_subgenus(r["usage"]["name"]["scientificName"]) == cible]
+
+
+def _merge_unique(*groupes: list[dict]) -> list[dict]:
+    vus: set[str] = set()
+    fusion: list[dict] = []
+    for groupe in groupes:
+        for r in groupe:
+            if r["id"] not in vus:
+                vus.add(r["id"])
+                fusion.append(r)
+    return fusion
+
+
+async def resolve_col_xr_matches(adapter: ColXrAdapter, nom: str) -> list[dict]:
+    """Résout `nom` dans COL XR avec repli progressif, partagé par `ColModule` (classification)
+    et `find_col_xr_link`/`resolve_col_xr_concept_id` (lien secondaire GBIF) pour ne pas dupliquer
+    la logique. Couvre deux désaccords de forme observés lors de l'audit GBIF/COL XR : la notation
+    de sous-genre ("Mus (Mus) musculus" côté COL XR pour la requête "Mus musculus", y compris
+    quand seule la forme sans sous-genre existe comme synonyme littéral — ex. Drosophila
+    melanogaster, accepté sous "Drosophila (Sophophora) melanogaster") et un changement d'accord
+    de genre latin sur l'épithète (ex. Macrovipera lebetina/lebetinus). `type=EXACT` côté
+    ChecklistBank ne reconnaît aucune des deux variantes.
+
+    Renvoie la recherche exacte fusionnée avec les candidats trouvés au premier repli qui
+    aboutit (sous-genre retiré, puis, seulement si ça échoue, variantes de genre latin) — la
+    recherche exacte reste toujours en tête même quand un repli aboutit, pour ne pas perdre un
+    synonyme littéral déjà trouvé (ex. Drosophila melanogaster, dont la redirection vers
+    l'accepté sert encore aux appelants qui suivent les synonymes)."""
+    results = await adapter.search(nom)
     exact = [r for r in results if r["usage"]["name"]["scientificName"] == nom]
+    if exact and any(r["usage"]["status"] == "accepted" for r in exact):
+        return exact
+
+    candidats = await _canonical_search(adapter, nom)
+    if candidats:
+        return _merge_unique(exact, candidats)
+
+    for variante in _latin_gender_variants(nom):
+        candidats = await _canonical_search(adapter, variante)
+        if candidats:
+            return _merge_unique(exact, candidats)
+
     return exact or results
 
 
@@ -78,10 +156,7 @@ async def find_col_xr_link(adapter: ColXrAdapter, nom: str, domaine: str) -> Col
     garde alors son identifiant numérique habituel. Ignore délibérément les synonymes (contrairement
     à `ColXrModule`) : un lien de référence doit pointer vers la même fiche acceptée que celle déjà
     résolue par GBIF, jamais vers un statut différent."""
-    results = await adapter.search(nom)
-    if not results:
-        return None
-    candidats = _exact_matches(results, nom)
+    candidats = await resolve_col_xr_matches(adapter, nom)
     accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
     cur = _pick(accepted, domaine)
     return _to_link_info(cur) if cur is not None else None
@@ -101,10 +176,7 @@ async def resolve_col_xr_concept_id(adapter: ColXrAdapter, nom: str, domaine: st
     taxon deux noms orthographiés différemment par deux sources (ex. Discussion Projet:Biologie/
     Organon #30) quand COL XR les relie explicitement — jamais par ressemblance de nom seule.
     None si `nom` n'a aucune entrée COL XR (accepté ou synonyme redirigé) correspondante."""
-    results = await adapter.search(nom)
-    if not results:
-        return None
-    candidats = _exact_matches(results, nom)
+    candidats = await resolve_col_xr_matches(adapter, nom)
 
     accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
     cur = _pick(accepted, domaine)

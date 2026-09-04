@@ -18,18 +18,33 @@ DATASET_ID = "3LXR"  # dernière release XR publiée (permanente, sans découver
 
 
 class ColXrAdapter(OwnedClientMixin):
-    async def search(self, taxon: str) -> list[dict]:
+    async def search(self, taxon: str, *, exact: bool = True) -> list[dict]:
+        params: dict[str, str | int] = {
+            "limit": 50,
+            "offset": 0,
+            "q": taxon,
+            "status": "_NOT_NULL",
+        }
+        if exact:
+            params["type"] = "EXACT"
+            params["sortBy"] = "taxonomic"
+        else:
+            # `type=EXACT` ne matche jamais un nom noté avec sous-genre côté ChecklistBank
+            # ("Mus musculus" ne trouve pas "Mus (Mus) musculus") ni un binôme dont
+            # l'épithète a été corrigée depuis (accord de genre latin) : voir le repli
+            # `organon.modules.col_xr.lookup.resolve_col_xr_matches`, seul appelant de
+            # `exact=False`. Sans `type=EXACT`, une recherche non filtrée sur un binôme courant
+            # peut renvoyer plusieurs milliers de résultats sans rapport direct (vérifié en
+            # direct : total=5043 pour "Drosophila melanogaster" trié par taxonomie) — la bonne
+            # fiche resterait hors de portée de `limit`. Restreindre la recherche au champ nom
+            # scientifique et trier par pertinence la fait remonter dans les tout premiers
+            # résultats à la place.
+            params["sortBy"] = "RELEVANCE"
+            params["content"] = "SCIENTIFIC_NAME"
         data = await fetch_json(
             self._client,
             f"{API_BASE}/dataset/{DATASET_ID}/nameusage/search",
-            params={
-                "limit": 50,
-                "offset": 0,
-                "q": taxon,
-                "sortBy": "taxonomic",
-                "status": "_NOT_NULL",
-                "type": "EXACT",
-            },
+            params=params,
             empty_value={},
         )
         return data.get("result", [])

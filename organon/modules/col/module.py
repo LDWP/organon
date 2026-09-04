@@ -43,6 +43,7 @@ from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.col_xr.adapter import ColXrAdapter
+from organon.modules.col_xr.lookup import resolve_col_xr_matches
 from organon.modules.col_xr.ranks import col_xr_cherche_rang
 from organon.modules.common import (
     MAX_SYNONYM_HOPS,
@@ -79,15 +80,9 @@ class ColModule(TaxonomyModule):
     ) -> Struct | None:
         adapter = self._adapter
 
-        results = await adapter.search(struct.taxon.nom)
-        if not results:
+        candidats = await resolve_col_xr_matches(adapter, struct.taxon.nom)
+        if not candidats:
             return None
-
-        # `type=EXACT` côté ChecklistBank ne suffit pas à exclure tous les à-peu-près (plusieurs
-        # centaines de résultats observés en pratique pour un binôme exact) : filtre client
-        # strict sur le nom.
-        exact = [r for r in results if r["usage"]["name"]["scientificName"] == struct.taxon.nom]
-        candidats = exact or results
 
         def _regne_correspond(r: dict) -> bool:
             if struct.domaine in ("*", ""):
