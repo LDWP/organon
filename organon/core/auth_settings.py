@@ -86,6 +86,11 @@ class AuthSettings(BaseSettings):
     # d'échec du module WoRMS pour autant.
     bhl_api_key: str = "" #envvars ORGANON_BHL_API_KEY
 
+    # IUCN Red List (organon.modules.iucn, statut de conservation) exige un jeton individuel
+    # gratuit (https://api.iucnredlist.org/users/sign_up, usage non commercial uniquement). Vide
+    # par défaut -> même principe que bhl_api_key ci-dessus, le module est simplement sauté.
+    iucn_api_token: str = "" #envvars ORGANON_IUCN_API_TOKEN
+
 
 _settings: AuthSettings | None = None
 

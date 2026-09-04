@@ -234,22 +234,11 @@ class GbifModule(TaxonomyModule):
             # déjà présent dans la réponse de recherche utilisée ci-dessus. Voir RegneIncoherence.
             struct.liens["gbif"]["regne_detecte"] = regne_detecte
 
-        # Placé ici (avant le `if not is_classification` plus bas) plutôt que dans la branche
-        # classification uniquement : GBIF tourne aussi en enrichissement quand une autre source
-        # pilote la classification (domaine "all"), et c'est le seul endroit où `key` est connu
-        # dans les deux cas — un module `iucn` séparé ne verrait pas cette clé en enrichissement
-        # (les modules d'enrichissement tournent en parallèle sur des copies indépendantes du
-        # struct pré-enrichissement, voir `EnrichmentRunner`).
-        iucn = await adapter.iucn_red_list_category(key)
-        if iucn and iucn.get("code"):
-            struct.liens["uicn"] = {"risque": iucn["code"]}
-
-        # Même raison que le bloc IUCN ci-dessus : les noms vernaculaires (`struct.vernaculaire`,
-        # namespacé par module, fusionné sans conflit avec les autres sources — voir
-        # `EnrichmentRunner.run`) ne doivent pas dépendre de savoir si GBIF pilote ou non la
-        # classification, sous peine de dépendre arbitrairement du module qui a gagné la
-        # classification (constaté en direct : absents dès que GBIF tourne en enrichissement
-        # derrière une autre source gagnante).
+        # Les noms vernaculaires (`struct.vernaculaire`, namespacé par module, fusionné sans
+        # conflit avec les autres sources — voir `EnrichmentRunner.run`) ne doivent pas dépendre
+        # de savoir si GBIF pilote ou non la classification, sous peine de dépendre
+        # arbitrairement du module qui a gagné la classification (constaté en direct : absents
+        # dès que GBIF tourne en enrichissement derrière une autre source gagnante).
         taxref_noms: list[str] = []
 
         async def fetch_vernacular(offset: int) -> tuple[list[str], int, bool]:

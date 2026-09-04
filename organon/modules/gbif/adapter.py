@@ -42,9 +42,6 @@ class GbifAdapter(OwnedClientMixin):
     async def species_record(self, key: int) -> dict | None:
         return await fetch_json(self._client, f"{BASE_URL}/species/{key}")
 
-    async def iucn_red_list_category(self, key: int) -> dict | None:
-        return await fetch_json(self._client, f"{BASE_URL}/species/{key}/iucnRedListCategory")
-
     async def children_page(self, key: int, offset: int = 0) -> dict:
         resp = await self._client.get(f"{BASE_URL}/species/{key}/children", params={"offset": offset})
         resp.raise_for_status()

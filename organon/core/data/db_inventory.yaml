@@ -164,14 +164,14 @@ categories:
         elements_recoltes: []
         acces: {type: inconnu, detail: "/isc/api renvoie 404 ; probablement un service par abonnement institutionnel, non confirmé"}
         derniere_maj: null
-      - id: uicn
+      - id: iucn
         nom: "Liste rouge de l'UICN"
-        url: null
-        statut: bloque
+        url: "https://www.iucnredlist.org"
+        statut: disponible
         classification: {possible: false, estime: false, detail: "statut de conservation, pas une classification"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "API v3 derrière Cloudflare ; v4 nécessite un jeton enregistré"}
-        derniere_maj: null
+        elements_recoltes: [statut de conservation, critères d'évaluation]
+        acces: {type: api_rest, detail: "API v4 REST/JSON (api.iucnredlist.org), jeton individuel gratuit requis"}
+        derniere_maj: "2026-09-04"
       - id: sealifebase
         nom: SeaLifeBase
         url: null
