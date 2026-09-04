@@ -117,7 +117,22 @@ class ColModule(TaxonomyModule):
             **({"eteint": usage["extinct"]} if "extinct" in usage else {}),
         }
 
+        if not is_classification:
+            # Même principe que gbif/module.py : la chaîne "classification" est déjà présente dans
+            # la réponse de recherche utilisée ci-dessus, aucun appel réseau de plus. Voir
+            # RangIncoherence — non peuplé en mode classification, où `struct.rangs` couvre déjà
+            # ces rangs pour le module gagnant.
+            for ancetre in cur.get("classification", []):
+                rang_ancetre = col_xr_cherche_rang(ancetre.get("rank", ""))
+                if rang_ancetre == "famille" and ancetre.get("name"):
+                    struct.liens["col"]["famille_detectee"] = ancetre["name"]
+                elif rang_ancetre == "ordre" and ancetre.get("name"):
+                    struct.liens["col"]["ordre_detecte"] = ancetre["name"]
+
         is_synonym = usage["status"] == "synonym"
+        # Statut nomenclatural pour cette fiche précise (voir RangIncoherence) — posé avant la
+        # redirection ci-dessous, même raisonnement que gbif/module.py.
+        struct.liens["col"]["statut_detecte"] = "synonyme" if is_synonym else "accepté"
         if is_synonym:
             if not is_classification:
                 struct.liens["col"]["synonyme"] = True

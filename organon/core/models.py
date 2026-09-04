@@ -123,6 +123,28 @@ class RegneIncoherence(BaseModel):
     regne_retenu: str
 
 
+class RangIncoherence(BaseModel):
+    """Signale qu'un module de classification concurrent (actif dans le run mais pas retenu comme
+    gagnant — ex. CoL XR quand GBIF gagne, ou l'inverse) rapporte, pour le même taxon, une valeur
+    différente de celle retenue pour la famille, l'ordre ou le statut nomenclatural (accepté/
+    synonyme). Contrairement à un simple trou de données (une source qui n'a rien à dire), c'est
+    un VRAI désaccord : les deux sources ont chacune une valeur, mais différente (ex. Anolis
+    carolinensis : famille Dactyloidae chez GBIF, Anolidae chez CoL XR — placement débattu en
+    herpétologie). Un choix éditorial qui appartient au contributeur Wikipédia, jamais tranché
+    automatiquement ici — voir `organon.core.selectors.coherence.detect_rang_incoherences`.
+
+    Détecté uniquement quand le module expose déjà ce signal sans appel réseau supplémentaire
+    (même principe que `RegneIncoherence` : la donnée est déjà présente dans la réponse utilisée
+    pour la classification/recherche) — pas une détection exhaustive, seulement honnête sur ce
+    qu'elle couvre."""
+
+    module: str
+    rang: str
+    """Le rang comparé : "famille", "ordre" ou "statut"."""
+    valeur_suggeree: str
+    valeur_retenue: str
+
+
 class Struct(BaseModel):
     """Objet mutable unique passé par référence tout au long du pipeline (résolution de la
     classification -> enrichissement par les modules -> rendu) — un choix pragmatique adapté

@@ -233,6 +233,15 @@ class GbifModule(TaxonomyModule):
             # Signal de règne détecté sans appel réseau supplémentaire : le champ "kingdom" est
             # déjà présent dans la réponse de recherche utilisée ci-dessus. Voir RegneIncoherence.
             struct.liens["gbif"]["regne_detecte"] = regne_detecte
+        if not is_classification:
+            # Même principe que regne_detecte ci-dessus, pour la famille/l'ordre : "family"/"order"
+            # sont déjà des champs plats de la réponse de recherche (comme "kingdom"), aucun appel
+            # réseau de plus. Voir RangIncoherence — non peuplé en mode classification, où
+            # `struct.rangs` couvre déjà ces rangs pour le module gagnant.
+            if cur.get("family"):
+                struct.liens["gbif"]["famille_detectee"] = cur["family"]
+            if cur.get("order"):
+                struct.liens["gbif"]["ordre_detecte"] = cur["order"]
 
         # Les noms vernaculaires (`struct.vernaculaire`, namespacé par module, fusionné sans
         # conflit avec les autres sources — voir `EnrichmentRunner.run`) ne doivent pas dépendre
@@ -273,6 +282,11 @@ class GbifModule(TaxonomyModule):
 
         accepted_key = cur.get("acceptedKey")
         is_synonym = accepted_key is not None and accepted_key != key
+        # Statut nomenclatural pour cet enregistrement précis (voir RangIncoherence) — posé avant
+        # la redirection ci-dessous : un hop redirigé reconstruit "gbif" à neuf pour la cible
+        # acceptée, dont le statut sera "accepté" à son propre tour de boucle, donc aucun statut
+        # obsolète ne subsiste après redirection.
+        struct.liens["gbif"]["statut_detecte"] = "synonyme" if is_synonym else "accepté"
         if is_synonym:
             if not is_classification:
                 struct.liens["gbif"]["synonyme"] = True

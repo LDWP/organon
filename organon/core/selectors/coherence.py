@@ -15,8 +15,20 @@ import re
 from collections import Counter
 
 from organon.core.domains import build_module_domain_tree, rec_strict_domaine
-from organon.core.models import RegneIncoherence, Struct
+from organon.core.models import RangIncoherence, RegneIncoherence, Struct
 from organon.core.registry import get_module
+
+_STATUT_RETENU_DEFAUT = "accepté"
+"""Statut nomenclatural implicite du taxon retenu par la classification gagnante : par
+construction du pipeline, un synonyme est soit re-résolu vers sa cible acceptée avant de gagner
+la classification (`suivre_synonymes`, cas par défaut), soit — désactivé — porte lui-même son
+propre `statut_detecte` sous `struct.liens[classification_id]` (voir gbif/col `module.py`), qui
+prend alors le pas sur ce défaut. N'est utilisé que si le module de classification n'a pas
+explicité son propre statut."""
+
+_RANG_DETECTE_KEYS: dict[str, str] = {"famille": "famille_detectee", "ordre": "ordre_detecte"}
+"""Association rang comparé -> clé `struct.liens[<module>][<clé>]` où ce rang est exposé par un
+module d'enrichissement (voir gbif/col `module.py`) — même principe que `regne_detecte`."""
 
 _REGNE_INCONNU = "neutre"
 """Valeur sentinelle utilisée par les tables kingdom->règne (GBIF/ITIS/WoRMS) quand le libellé
@@ -65,6 +77,50 @@ def detect_regne_incoherences(struct: Struct, classification_id: str) -> list[Re
         if regne_detecte and regne_detecte != _REGNE_INCONNU and regne_detecte != struct.regne:
             incoherences.append(
                 RegneIncoherence(module=module_id, regne_suggere=regne_detecte, regne_retenu=struct.regne)
+            )
+    return incoherences
+
+
+def detect_rang_incoherences(struct: Struct, classification_id: str) -> list[RangIncoherence]:
+    """Pendant de `detect_regne_incoherences` pour la famille, l'ordre et le statut nomenclatural
+    (accepté/synonyme) : parcourt `struct.liens` à la recherche de modules d'enrichissement dont
+    la famille/ordre/statut détecté diffère de celui retenu — un VRAI désaccord entre deux sources
+    ayant chacune une valeur, jamais un trou de données (une source qui n'a rien à dire sur ce
+    rang n'apparaît jamais ici, voir la garde `valeur_suggeree and valeur_retenue` ci-dessous ;
+    combler les rangs manquants est une préoccupation distincte, traitée ailleurs).
+
+    Détection partielle et honnête, comme `detect_regne_incoherences` : seuls les modules qui
+    exposent déjà famille/ordre/statut sans appel réseau supplémentaire (actuellement GBIF et CoL
+    XR, voir leurs `module.py`) peuvent déclencher une incohérence ici."""
+    incoherences: list[RangIncoherence] = []
+    valeurs_retenues = {r.rang: r.nom for r in struct.rangs if r.rang in _RANG_DETECTE_KEYS}
+    classification_data = struct.liens.get(classification_id) or {}
+    statut_retenu = classification_data.get("statut_detecte") or _STATUT_RETENU_DEFAUT
+
+    for module_id, data in struct.liens.items():
+        if module_id == classification_id or not isinstance(data, dict):
+            continue
+        for rang, cle in _RANG_DETECTE_KEYS.items():
+            valeur_retenue = valeurs_retenues.get(rang)
+            valeur_suggeree = data.get(cle)
+            if valeur_retenue and valeur_suggeree and valeur_suggeree != valeur_retenue:
+                incoherences.append(
+                    RangIncoherence(
+                        module=module_id,
+                        rang=rang,
+                        valeur_suggeree=valeur_suggeree,
+                        valeur_retenue=valeur_retenue,
+                    )
+                )
+        statut_suggere = data.get("statut_detecte")
+        if statut_suggere and statut_suggere != statut_retenu:
+            incoherences.append(
+                RangIncoherence(
+                    module=module_id,
+                    rang="statut",
+                    valeur_suggeree=statut_suggere,
+                    valeur_retenue=statut_retenu,
+                )
             )
     return incoherences
 

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 
 from organon.core.config import GenerateOptions
 from organon.core.db_inventory import DbInventory
-from organon.core.models import Basionym, RankName, RegneIncoherence
+from organon.core.models import Basionym, RangIncoherence, RankName, RegneIncoherence
 
 
 class GenerateRequest(GenerateOptions):
@@ -154,6 +154,11 @@ class GenerateResponse(BaseModel):
     classification — signe possible d'homonymie inter-règnes (voir RegneIncoherence).
     Détection partielle : seuls quelques modules (GBIF/ITIS/WoRMS) exposent ce signal sans coût
     réseau supplémentaire ; son absence ne garantit donc pas la cohérence."""
+    rang_incoherences: list[RangIncoherence] = []
+    """Modules de classification concurrents (GBIF/CoL XR) dont la famille, l'ordre ou le statut
+    (accepté/synonyme) détecté diffère de celui retenu — vrai désaccord taxonomique entre deux
+    sources ayant chacune une valeur, jamais un trou de données (voir RangIncoherence). Détection
+    partielle, comme `regne_incoherences` : son absence ne garantit pas la cohérence."""
     milieu: str = ""
     """`Struct.milieu` ('marin'/'terrestre'), copié tel quel depuis la source qui l'a détecté
     (ex. WoRMS via isMarine/isTerrestrial) ; vide si aucune source ne l'a renseigné."""

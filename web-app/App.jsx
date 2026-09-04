@@ -1729,6 +1729,23 @@ export default function App() {
                 </p>
               </div>
             )}
+            {activeData?.rang_incoherences?.length > 0 && (
+              <div className="regne-alert">
+                <p className="regne-alert-title">
+                  ⚠ Désaccord taxonomique entre sources : {activeData.rang_incoherences.length === 1 ? "une source" : "des sources"} donne{activeData.rang_incoherences.length === 1 ? "" : "nt"} une valeur différente.
+                </p>
+                <ul>
+                  {activeData.rang_incoherences.map((inc, i) => (
+                    <li key={i}>
+                      <strong>{inc.module.toUpperCase()}</strong> donne « {inc.valeur_suggeree} » pour {inc.rang}, valeur retenue : « {inc.valeur_retenue} »
+                    </li>
+                  ))}
+                </ul>
+                <p className="regne-alert-hint">
+                  Divergence taxonomique réelle entre sources (pas un trou de données) — à trancher éditorialement, pas automatiquement.
+                </p>
+              </div>
+            )}
 
             <div className="result-shell">
               <nav className="result-nav" role="tablist" aria-label="Vue du résultat">

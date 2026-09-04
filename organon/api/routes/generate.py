@@ -69,6 +69,7 @@ from organon.core.rendering.support import ajoute_si_besoin, data_pays_code
 from organon.core.selectors.categorization import compute_fin_liens
 from organon.core.selectors.coherence import (
     classification_regne_coherents,
+    detect_rang_incoherences,
     detect_regne_incoherences,
     gbif_annee_probable_validee,
     reference_module_coherente,
@@ -616,6 +617,7 @@ def _assemble_response(
     sans considération de streaming."""
     _repli_eteint(struct)
     regne_incoherences = detect_regne_incoherences(struct, classification_id)
+    rang_incoherences = detect_rang_incoherences(struct, classification_id)
 
     struct.liens["fin"] = compute_fin_liens(struct, options)
 
@@ -732,6 +734,7 @@ def _assemble_response(
         elapsed_seconds=round(time.monotonic() - started, 3),
         truncated=truncated,
         regne_incoherences=regne_incoherences,
+        rang_incoherences=rang_incoherences,
         milieu=struct.milieu or "",
         distribution=distribution_merged,
         external_ids=_compute_external_ids(struct, ran_modules),
