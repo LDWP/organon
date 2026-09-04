@@ -8,28 +8,24 @@ originale » n'a aucun champ REST équivalent (vérifié) et reste scrapée depu
 détail (`aphia.php?p=taxdetails`), voir `organon.modules.common.extract_aphia_original_description`
 pour l'extraction elle-même (partagée avec IRMNG, même plateforme).
 
-Les méthodes `wikidata_qid_for_doi`/`crossref_work`/`bhl_*_metadata` sont de simples appels
-réseau supplémentaires (mêmes principes que ci-dessus) utilisés par
-`organon.modules.wrms.citations` pour enrichir cette citation brute quand un DOI ou un lien BHL
-y est repérable — la logique de décision (quel modèle produire, quand renoncer) vit dans ce
-module-là, pas ici."""
+`resolve_doi_citation`/`wikidata_is_edition`/`bhl_*_metadata` sont de simples appels réseau
+supplémentaires (mêmes principes que ci-dessus, `resolve_doi_citation` déléguant à
+`organon.modules.bibliography`, partagée avec LPSN) utilisés par `organon.modules.wrms.citations`
+pour enrichir cette citation brute quand un DOI ou un lien BHL y est repérable — la logique de
+décision (quel modèle produire, quand renoncer) vit dans ce module-là, pas ici."""
 
 from __future__ import annotations
 
 import httpx
 
 from organon.core.auth_settings import get_auth_settings
-from organon.core.http import OwnedClientMixin, fetch_json
-from organon.modules.common import extract_aphia_original_description, sparql_escape
+from organon.core.http import USER_AGENT, OwnedClientMixin, fetch_json
+from organon.modules.bibliography import WIKIDATA_SPARQL_URL, resolve_doi_citation
+from organon.modules.common import extract_aphia_original_description
 
 BASE_URL = "https://www.marinespecies.org/rest"
 TAXDETAILS_URL = "https://www.marinespecies.org/aphia.php"
-WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
-CROSSREF_URL = "https://api.crossref.org/works"
 BHL_API_URL = "https://www.biodiversitylibrary.org/api3"
-# Politique de User-Agent de WDQS (voir organon.modules.externe.adapter) : une requête sans
-# en-tête descriptif est rejetée en 403.
-USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Organon)"
 
 
 class WrmsAdapter(OwnedClientMixin):
@@ -97,24 +93,8 @@ class WrmsAdapter(OwnedClientMixin):
             return None
         return extract_aphia_original_description(resp.text)
 
-    async def wikidata_qid_for_doi(self, doi: str) -> str | None:
-        """Cherche l'item Wikidata portant ce DOI (P356). Comparaison insensible à la casse via
-        `UCASE` plutôt qu'une égalité stricte : Wikidata normalise les valeurs P356 en
-        majuscules par convention, mais ce n'est pas garanti pour toutes les entrées."""
-        query = (
-            'SELECT ?item WHERE { ?item wdt:P356 ?doi . FILTER(UCASE(STR(?doi)) = UCASE("%s")) }'
-            % sparql_escape(doi)
-        )
-        resp = await self._client.get(
-            WIKIDATA_SPARQL_URL,
-            params={"query": query},
-            headers={"Accept": "application/sparql-results+json", "User-Agent": USER_AGENT},
-        )
-        resp.raise_for_status()
-        bindings = resp.json().get("results", {}).get("bindings", [])
-        if not bindings:
-            return None
-        return bindings[0]["item"]["value"].rsplit("/", 1)[-1]
+    async def resolve_doi_citation(self, doi: str) -> str | None:
+        return await resolve_doi_citation(self._client, doi)
 
     async def wikidata_is_edition(self, qid: str) -> bool:
         """Vérifie qu'un item Wikidata est bien une édition (P31=Q3331189) avant de s'en servir
@@ -130,13 +110,6 @@ class WrmsAdapter(OwnedClientMixin):
         )
         resp.raise_for_status()
         return bool(resp.json().get("boolean"))
-
-    async def crossref_work(self, doi: str) -> dict | None:
-        resp = await self._client.get(f"{CROSSREF_URL}/{doi}")
-        if resp.status_code == 404:
-            return None
-        resp.raise_for_status()
-        return resp.json().get("message")
 
     async def _bhl_get(self, op: str, id_param: str, id_value: str) -> dict | None:
         if not self._bhl_api_key:

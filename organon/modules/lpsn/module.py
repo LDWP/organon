@@ -25,7 +25,10 @@ leurs synonymes.
 
 Hors périmètre (limitation de l'API LPSN, pas un oubli) : `struct.synonymes`, l'API n'exposant
 aucune route pour lister les synonymes d'un identifiant donné (seul le sens inverse,
-`lpsn_correct_name_id`, est exploitable — voir `adapter.py`)."""
+`lpsn_correct_name_id`, est exploitable — voir `adapter.py`).
+
+Publication originale (`struct.originale`) : contrairement à WoRMS, LPSN expose un DOI structuré
+(`publication_doi`) directement dans la fiche, sans scraping — voir `citations.build_citation`."""
 
 from __future__ import annotations
 
@@ -43,6 +46,7 @@ from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, collect_pages, format_auteur
+from organon.modules.lpsn import citations
 from organon.modules.lpsn.adapter import LpsnAdapter
 from organon.modules.lpsn.ranks import lpsn_cherche_rang, lpsn_cherche_regne
 
@@ -159,6 +163,8 @@ class LpsnModule(TaxonomyModule):
             for n in chain
             if n.get("full_name")
         ]
+
+        struct.originale = await citations.build_citation(adapter, cur)
 
         basonym_id = cur.get("basonym_id")
         if basonym_id and basonym_id != lpsn_id:

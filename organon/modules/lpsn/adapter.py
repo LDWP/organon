@@ -39,6 +39,7 @@ import httpx
 
 from organon.core.auth_settings import get_auth_settings
 from organon.core.http import OwnedClientMixin
+from organon.modules.bibliography import resolve_doi_citation
 
 TOKEN_URL = "https://sso.dsmz.de/auth/realms/dsmz/protocol/openid-connect/token"
 KEYCLOAK_CLIENT_ID = "api.lpsn.public"
@@ -164,3 +165,10 @@ class LpsnAdapter(OwnedClientMixin):
     async def fetch_one(self, taxon_id: int) -> dict | None:
         records = await self.fetch([taxon_id])
         return records[0] if records else None
+
+    async def resolve_doi_citation(self, doi: str) -> str | None:
+        """Résolution DOI -> citation wikitexte partagée avec WoRMS (voir
+        `organon.modules.bibliography`) : n'interroge ni `api.lpsn.dsmz.de` ni Keycloak, donc pas
+        besoin du token porteur — `self._client` nu convient (`_auth_header` n'est ajouté
+        qu'explicitement par `_get`, jamais par défaut sur le client)."""
+        return await resolve_doi_citation(self._client, doi)

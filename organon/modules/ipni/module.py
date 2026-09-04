@@ -15,7 +15,15 @@ n'ayant plus cours : vérifié en direct que "Quercus robur" a trois enregistrem
 (Linnaeus 1753, Asso 1779, Pallas 1789) partageant la même chaîne de caractères. Le champ
 `inPowo` (`true` uniquement sur l'enregistrement de 1753 dans ce cas) sert de signal fiable
 pour préférer la combinaison actuellement reconnue par Plants of the World Online plutôt que de
-prendre la première réponse de l'API dans un ordre non garanti."""
+prendre la première réponse de l'API dans un ordre non garanti.
+
+Publication originale (`struct.originale`) : voir `citations.build_citation`. Écrit
+inconditionnellement (IPNI ne classifie jamais, `is_classification` est toujours `False` ici) —
+comme tout champ mono-valeur (`organon.api.routes.generate._MONOVALUE_FIELDS`), la valeur
+retenue en cas d'écriture concurrente par un autre module d'enrichissement dépend de
+`ModuleMeta.priority` (IPNI reste au défaut 0, comme tous les modules `can_classify=False` du
+projet) — limitation pré-existante à cette fonctionnalité, pas introduite par elle (déjà vraie
+ex. entre GBIF et AlgaeBase)."""
 
 from __future__ import annotations
 
@@ -24,6 +32,7 @@ from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.support import dates_recupere
 from organon.modules.common import format_auteur, format_auteur_annee, simple_debug_link
+from organon.modules.ipni import citations
 from organon.modules.ipni.adapter import IpniAdapter
 
 
@@ -53,6 +62,7 @@ class IpniModule(TaxonomyModule):
             "nom": match["name"],
             "auteur": format_auteur(format_auteur_annee(auteur_brut, match.get("publicationYear"))),
         }
+        struct.originale = await citations.build_citation(self._adapter, match)
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
