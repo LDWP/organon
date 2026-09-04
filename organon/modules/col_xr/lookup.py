@@ -34,6 +34,11 @@ class ColXrLinkInfo:
     auteur: str | None
     rang: str | None
     eteint: bool | None
+    classification: dict[str, str]
+    """Rang WP (`col_xr_cherche_rang`) -> nom, pour chaque ancêtre de la fiche `id` — sert à
+    `organon.modules.gbif.module` à combler un rang absent de sa propre réponse (ex. `order`,
+    souvent manquant chez GBIF pour les reptiles non-aviens) sans appel réseau supplémentaire,
+    cette classification étant déjà incluse dans la réponse de recherche ChecklistBank ci-dessus."""
 
 
 def _kingdom_index(classification: list[dict]) -> int | None:
@@ -137,6 +142,15 @@ def _pick(candidats: list[dict], domaine: str) -> dict | None:
     return cur if cur is not None else (candidats[0] if candidats else None)
 
 
+def _classification_par_rang(classification: list[dict]) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for c in classification:
+        rang, nom = c.get("rank"), c.get("name")
+        if rang and nom:
+            out[col_xr_cherche_rang(rang)] = nom
+    return out
+
+
 def _to_link_info(cur: dict) -> ColXrLinkInfo:
     usage = cur["usage"]
     name = usage["name"]
@@ -146,6 +160,7 @@ def _to_link_info(cur: dict) -> ColXrLinkInfo:
         auteur=format_auteur(name.get("authorship")),
         rang=col_xr_cherche_rang(name["rank"]) if "rank" in name else None,
         eteint=usage.get("extinct"),
+        classification=_classification_par_rang(cur.get("classification", [])),
     )
 
 

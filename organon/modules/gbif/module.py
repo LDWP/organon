@@ -317,27 +317,46 @@ class GbifModule(TaxonomyModule):
         struct.classification = "GBIF"
         struct.classification_taxobox = "GBIF"
 
+        # Valeurs déjà portées par GBIF lui-même, tous rangs confondus (pas seulement ceux
+        # antérieurs dans GBIF_WP) : sert ci-dessous à ne jamais faire apparaître un même nom à
+        # deux rangs différents dans la taxobox — cas réel du backbone GBIF pour les reptiles non-
+        # aviens, qui n'a pas de classe "Reptilia" et élève directement l'ordre traditionnel
+        # (ex. "Testudines", "Squamata") au rang CLASS. Combler `order` avec ce même nom depuis
+        # COL XR (qui l'y place bien à ce rang) produirait "Classe : Testudines" ET
+        # "Ordre : Testudines" simultanément — un doublon contradictoire, pas un trou comblé.
+        noms_gbif = {cur[m.lower()] for m in GBIF_WP if m != "KINGDOM" and m.lower() in cur}
+
         rangs: list[RankName] = []
         for marker in GBIF_WP:
             field = marker.lower()
-            if field not in cur:
-                continue
-            value = cur[field]
             if marker == "KINGDOM":
-                struct.regne = gbif_cherche_regne(value)
+                if field in cur:
+                    struct.regne = gbif_cherche_regne(cur[field])
                 continue
             buf = gbif_cherche_rang(marker)
             if buf == struct.taxon.rang:
                 continue
-            entry: dict = {"nom": value, "rang": buf}
-            key_field = f"{field}Key"
-            if key_field in cur:
-                profiles = await adapter.species_profiles(cur[key_field])
-                for p in profiles:
-                    if "extinct" in p:
-                        entry["eteint"] = p["extinct"]
-                        break
-            rangs.append(RankName.model_validate(entry))
+            if field in cur:
+                value = cur[field]
+                entry: dict = {"nom": value, "rang": buf}
+                key_field = f"{field}Key"
+                if key_field in cur:
+                    profiles = await adapter.species_profiles(cur[key_field])
+                    for p in profiles:
+                        if "extinct" in p:
+                            entry["eteint"] = p["extinct"]
+                            break
+                rangs.append(RankName.model_validate(entry))
+                continue
+            if col_xr is not None:
+                # Rang absent de la réponse GBIF (ex. `order` chez les reptiles non-aviens,
+                # `class` chez certains poissons) : comblé depuis la fiche COL XR déjà résolue
+                # ci-dessus pour ce même taxon, sans appel réseau supplémentaire — jamais pour
+                # remplacer une valeur GBIF déjà présente (voir `noms_gbif` ci-dessus).
+                valeur = col_xr.classification.get(buf)
+                if valeur and valeur not in noms_gbif:
+                    rangs.append(RankName(nom=valeur, rang=buf))
+                    noms_gbif.add(valeur)
         struct.rangs = rangs
 
         if not struct.regne:
