@@ -47,6 +47,47 @@ def _regne_correspond(r: dict, domaine: str) -> bool:
     return regne_depuis_classification(r.get("classification", [])) == domaine
 
 
+def _rank_name(classification: list[dict], rank: str) -> str:
+    return next((c.get("name", "") for c in classification if c.get("rank") == rank), "")
+
+
+_CODES_EUCARYOTES_SEULEMENT = {
+    # ICNafp (botanique, couvre aussi algues/champignons) et ICZN (zoologique, couvre aussi une
+    # bonne part des protistes historiquement traités comme des "animaux") ne s'appliquent à
+    # aucun procaryote : un enregistrement de ce code sur le domaine Bacteria/Archaea est une
+    # incohérence interne, jamais un simple désaccord de classification.
+    "botanical",
+    "zoological",
+}
+_REGNES_INCOMPATIBLES_BOTANICAL = {"Animalia"}
+_REGNES_INCOMPATIBLES_ZOOLOGICAL = {"Plantae", "Viridiplantae", "Fungi"}
+_DOMAINES_PROCARYOTES = {"Bacteria", "Archaea"}
+
+
+def _code_incoherent(r: dict) -> bool:
+    """Un enregistrement ChecklistBank dont le code nomenclatural (`usage.name.code` :
+    botanical/zoological/bacterial/...) contredit son propre règne ou domaine déclaré est un
+    signe fiable de fiche mal fusionnée dans 3LXR — typiquement un traitement Plazi (extraction
+    automatique de texte scientifique) issu d'un article sans rapport, absorbé comme fiche
+    "acceptée" d'un taxon homonyme lors de la fusion des ~17 500 checklists sources — plutôt
+    qu'un vrai désaccord taxonomique entre deux checklists sérieuses. Repéré lors de l'audit
+    Escherichia coli (VB8KH : botanical sur un règne autrement cohérent Plantae, donc non détecté
+    ici — exclu par `_regne_correspond` quand le règne cible est connu ; NT3L7 : botanical sur
+    domaine Bacteria, détecté ici) et Toxoplasma gondii (VBKRN : botanical sur règne Animalia,
+    détecté ici)."""
+    code = r["usage"]["name"].get("code")
+    if code not in _CODES_EUCARYOTES_SEULEMENT and code != "bacterial":
+        return False
+    classification = r.get("classification", [])
+    kingdom = _rank_name(classification, "kingdom")
+    domain = _rank_name(classification, "domain")
+    if code == "botanical":
+        return kingdom in _REGNES_INCOMPATIBLES_BOTANICAL or domain in _DOMAINES_PROCARYOTES
+    if code == "zoological":
+        return kingdom in _REGNES_INCOMPATIBLES_ZOOLOGICAL or domain in _DOMAINES_PROCARYOTES
+    return domain == "Eukaryota"  # code == "bacterial" sur un eucaryote
+
+
 _SUBGENUS_RE = re.compile(r"\s*\([^)]*\)")
 _LATIN_GENDER_ENDINGS = ("us", "a", "um")
 
@@ -131,9 +172,35 @@ async def resolve_col_xr_matches(adapter: ColXrAdapter, nom: str) -> list[dict]:
     return exact or results
 
 
-def _pick(candidats: list[dict], domaine: str) -> dict | None:
-    cur = next((r for r in candidats if _regne_correspond(r, domaine)), None)
-    return cur if cur is not None else (candidats[0] if candidats else None)
+def select_col_xr_candidate(candidats: list[dict], domaine: str) -> dict | None:
+    """Départage une liste de candidats ChecklistBank (fiches "accepted" ou synonymes) déjà
+    filtrée par statut — partagé par `ColModule` et les fonctions `find_col_xr_*`/
+    `resolve_col_xr_concept_id` ci-dessous pour ne pas dupliquer la logique.
+
+    1. Restreint au règne `domaine` s'il est connu et qu'au moins un candidat correspond (sinon
+       tous les candidats restent en lice — `domaine` peut être inconnu, ex. "*").
+    2. Si plusieurs subsistent, préfère ceux dont `usage.merged` est faux : `merged=true` signale
+       une fiche assemblée automatiquement par l'algorithme de fusion inter-checklists de 3LXR
+       (souvent un traitement Plazi d'un article sans rapport) plutôt qu'une entrée nativement
+       curatée d'une checklist source — observé sur ~50 espèces bien documentées, `merged=false`
+       est la norme absolue pour une fiche correcte (voir l'audit CS33N vs VB8KH/NT3L7 pour
+       Escherichia coli, seul cas où ce signal à lui seul suffit à trancher).
+    3. Si plusieurs subsistent encore, écarte ceux dont le code nomenclatural contredit leur
+       propre règne/domaine (`_code_incoherent`, ex. Toxoplasma gondii VBKRN vs TFKPV, où
+       `merged=true` pour les deux candidats ne permet pas de trancher).
+    4. Sans autre signal fiable, conserve l'ordre déjà renvoyé par ChecklistBank (premier
+       candidat) plutôt que de refuser de répondre : les cas à ce stade sont restés rares lors de
+       l'audit (aucun trouvé au-delà d'Escherichia coli/Toxoplasma gondii sur ~75 taxons testés)."""
+    if not candidats:
+        return None
+    matching = [r for r in candidats if _regne_correspond(r, domaine)] or candidats
+    if len(matching) > 1:
+        non_fusionnes = [r for r in matching if not r["usage"].get("merged")]
+        matching = non_fusionnes or matching
+    if len(matching) > 1:
+        coherents = [r for r in matching if not _code_incoherent(r)]
+        matching = coherents or matching
+    return matching[0]
 
 
 def _classification_par_rang(classification: list[dict]) -> dict[str, str]:
@@ -167,7 +234,7 @@ async def find_col_xr_link(adapter: ColXrAdapter, nom: str, domaine: str) -> Col
     résolue par GBIF, jamais vers un statut différent."""
     candidats = await resolve_col_xr_matches(adapter, nom)
     accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
-    cur = _pick(accepted, domaine)
+    cur = select_col_xr_candidate(accepted, domaine)
     return _to_link_info(cur) if cur is not None else None
 
 
@@ -188,12 +255,12 @@ async def resolve_col_xr_concept_id(adapter: ColXrAdapter, nom: str, domaine: st
     candidats = await resolve_col_xr_matches(adapter, nom)
 
     accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
-    cur = _pick(accepted, domaine)
+    cur = select_col_xr_candidate(accepted, domaine)
     if cur is not None:
         return cur["id"]
 
     synonymes = [
         r for r in candidats if r["usage"]["status"] == "synonym" and r["usage"].get("accepted")
     ]
-    cur = _pick(synonymes, domaine)
+    cur = select_col_xr_candidate(synonymes, domaine)
     return cur["usage"]["accepted"]["id"] if cur is not None else None

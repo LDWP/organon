@@ -13,11 +13,16 @@ provenance d'un id avant de construire {{CatalogueofLife}}.
 Risque accepté en fusionnant : contrairement à l'ancien module CoL (voir historique de ce
 fichier), celui-ci ne construit plus une liste de fiches en cas d'homonymie non résolue (ex.
 *Morus* L. (Plantae) / *Morus* Vieillot, 1816 (Animalia), tous deux "accepted" dans 3LXR) — il
-retient une seule fiche, désambiguïsée par règne quand `struct.domaine` est connu, sinon la
-première rencontrée. Jugé rare en pratique (aucun cas de désaccord entre 3LR et 3LXR trouvé lors
-de l'audit ayant motivé cette fusion) et déjà le comportement de facto de l'ancien module CoL dès
-qu'un nom était directement "accepted" (sa désambiguïsation multi-fiches ne couvrait que le cas
-où toutes les entrées étaient des synonymes pointant vers des cibles distinctes).
+retient une seule fiche, désambiguïsée par règne quand `struct.domaine` est connu, puis par
+qualité de fiche (voir `select_col_xr_candidate`) quand plusieurs candidats restent malgré tout à
+égalité — cas observé sur de vraies homonymies inter-règnes non résolues par 3LXR (ex. Toxoplasma
+gondii, résolu vers le protiste Chromista plutôt qu'un homonyme Animalia issu d'une liste
+hôte-parasite mal absorbée) et sur des doublons non dédupliqués au sein d'un même règne (ex.
+Escherichia coli, deux fiches "accepted" concurrentes chez les bactéries). Jugé rare en pratique
+au-delà de ces cas (aucun autre trouvé sur ~75 taxons bien documentés lors de l'audit) et déjà le
+comportement de facto de l'ancien module CoL dès qu'un nom était directement "accepted" (sa
+désambiguïsation multi-fiches ne couvrait que le cas où toutes les entrées étaient des synonymes
+pointant vers des cibles distinctes).
 
 `organon/modules/col/adapter.py` et `organon/modules/col/ranks.py` (dataset `3LR`) restent dans
 le dépôt sans être importés ici — conservés par précaution en cas de retour en arrière, pas du
@@ -43,7 +48,7 @@ from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.col_xr.adapter import ColXrAdapter
-from organon.modules.col_xr.lookup import resolve_col_xr_matches
+from organon.modules.col_xr.lookup import resolve_col_xr_matches, select_col_xr_candidate
 from organon.modules.col_xr.ranks import col_xr_cherche_rang
 from organon.modules.common import (
     MAX_SYNONYM_HOPS,
@@ -84,19 +89,14 @@ class ColModule(TaxonomyModule):
         if not candidats:
             return None
 
-        def _regne_correspond(r: dict) -> bool:
-            if struct.domaine in ("*", ""):
-                return True
-            return regne_depuis_classification(r.get("classification", [])) == struct.domaine
-
         accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
-        cur = next((r for r in accepted if _regne_correspond(r)), None)
-        if cur is None:
-            cur = accepted[0] if accepted else None
+        cur = select_col_xr_candidate(accepted, struct.domaine)
         if cur is None:
             if not options.suivre_synonymes:
                 return None
-            cur = next((r for r in candidats if _regne_correspond(r)), candidats[0])
+            cur = select_col_xr_candidate(candidats, struct.domaine)
+            if cur is None:  # candidats non vide (garde ci-dessus) : jamais atteint en pratique
+                return None
 
         usage = cur["usage"]
         name = usage["name"]
