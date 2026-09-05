@@ -25,7 +25,11 @@ leurs synonymes.
 
 Hors périmètre (limitation de l'API LPSN, pas un oubli) : `struct.synonymes`, l'API n'exposant
 aucune route pour lister les synonymes d'un identifiant donné (seul le sens inverse,
-`lpsn_correct_name_id`, est exploitable — voir `adapter.py`).
+`lpsn_correct_name_id`, est exploitable — voir `adapter.py`). Idem pour un nom historique jamais
+enregistré sous ce genre dans LPSN (ex. "Treponema vincentii", jamais tracé ni par LPSN ni par
+CoL XR, seul le backbone GBIF le liste — à tort, en désaccord avec les deux premiers) : pas de
+correction inter-source (voir `organon.modules.gbif.module`), et `flexible_search` sur la seule
+épithète renvoie des homonymes d'autres genres sans lien exploitable pour désambiguïser.
 
 Publication originale (`struct.originale`) : contrairement à WoRMS, LPSN expose un DOI structuré
 (`publication_doi`) directement dans la fiche, sans scraping — voir `citations.build_citation`."""
