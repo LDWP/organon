@@ -41,6 +41,14 @@ class TaxonomyModule(ABC):
 
     meta: ClassVar[ModuleMeta]
 
+    def is_configured(self) -> bool:
+        """True si le module dispose de tout ce qu'il faut pour fonctionner (compte/clé tiers).
+        Par défaut True : la plupart des modules n'ont aucune dépendance externe à une
+        configuration. À surcharger pour un module dont l'absence de configuration provoque un
+        échec total plutôt qu'un enrichissement simplement sauté (voir
+        organon.modules.lpsn.module, qui échoue entièrement sans compte DSMZ)."""
+        return True
+
     @abstractmethod
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions

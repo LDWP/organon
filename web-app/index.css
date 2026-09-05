@@ -652,6 +652,8 @@ footer .footer-meta span[title] { cursor: help; border-bottom: 1px dotted var(--
 .considered-list [title] { cursor: help; }
 .considered-list .sep { color: var(--ink-soft); }
 
+.sources-archived { font-size: 13px; color: var(--ink-soft); line-height: 1.7; margin: 10px 0 0; }
+
 .source-muted { color: var(--ink-soft); }
 
 .source-badge {

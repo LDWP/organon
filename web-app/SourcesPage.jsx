@@ -80,6 +80,7 @@ function splitElements(list) {
 }
 
 const STATUT_LABELS = {
+  en_attente: "module prêt, en attente de configuration (clé/compte)",
   non_sonde: "non sondée / à revérifier",
   bloque_temporaire: "bloquée temporairement",
   bloque: "bloquée",
@@ -212,6 +213,11 @@ export default function SourcesPage({ onBack }) {
       .filter((s) => s.statut !== "disponible")
       .sort((a, b) => a.nom.localeCompare(b.nom, "fr"));
   }, [data]);
+
+  // "retire" = intégrée un temps puis débranchée volontairement (voir la sémantique du statut
+  // dans db_inventory.yaml) : mise en avant séparément du reste des indisponibles, le lecteur
+  // qui voit "considérées" veut souvent aussi savoir "et qu'est-ce qui a déjà tourné avant ?".
+  const archivees = useMemo(() => considerees.filter((s) => s.statut === "retire"), [considerees]);
 
   if (error) {
     return (
@@ -371,6 +377,12 @@ export default function SourcesPage({ onBack }) {
             </span>
           ))}
         </p>
+        {archivees.length > 0 && (
+          <p className="sources-archived">
+            {archivees.length} source{archivees.length > 1 ? "s" : ""} archivée
+            {archivees.length > 1 ? "s" : ""} : {archivees.map((s) => s.nom).join(", ")}
+          </p>
+        )}
       </section>
     </SourcesHeader>
   );

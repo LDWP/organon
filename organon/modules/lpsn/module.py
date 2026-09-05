@@ -36,6 +36,7 @@ Publication originale (`struct.originale`) : contrairement à WoRMS, LPSN expose
 
 from __future__ import annotations
 
+from organon.core.auth_settings import get_auth_settings
 from organon.core.config import GenerateOptions
 from organon.core.models import (
     Basionym,
@@ -85,6 +86,10 @@ class LpsnModule(TaxonomyModule):
 
     def __init__(self, adapter: LpsnAdapter | None = None) -> None:
         self._adapter = adapter or LpsnAdapter()
+
+    def is_configured(self) -> bool:
+        settings = get_auth_settings()
+        return bool(settings.lpsn_username and settings.lpsn_password)
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions

@@ -43,11 +43,16 @@ Statut = Literal[
     "ecarte",
     "hors_perimetre",
     "retire",
+    "en_attente",
 ]
 """`ecarte` désigne une base jamais intégrée (candidate rejetée avant tout portage) ; `retire`
 désigne une base qui a été intégrée puis débranchée après coup pour un motif éditorial (le module
 existait et fonctionnait, mais son maintien ne convenait plus) — ne pas confondre les deux, le
-second implique un travail d'intégration déjà fait et volontairement retiré."""
+second implique un travail d'intégration déjà fait et volontairement retiré. `en_attente` est un
+troisième cas distinct : le module est écrit et enregistré, mais reste non fonctionnel tant qu'une
+configuration tierce (compte/clé) n'est pas renseignée (voir `TaxonomyModule.is_configured` et
+`lpsn`, qui échoue entièrement sans compte DSMZ) — recalculé comme `disponible` dès que cette
+configuration est fournie, sans toucher au yaml."""
 
 
 class ClassificationInfo(BaseModel):
@@ -137,9 +142,10 @@ def build_sources_overview(inventory: DbInventory | None = None) -> DbInventory:
 def _reconcile(entry: SourceEntry, module, default_id: str | None) -> SourceEntry:
     if module is None:
         return entry
+    statut = "disponible" if module.is_configured() else "en_attente"
     return entry.model_copy(
         update={
-            "statut": "disponible",
+            "statut": statut,
             "classification": ClassificationInfo(
                 possible=module.meta.can_classify,
                 estime=False,

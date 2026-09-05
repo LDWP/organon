@@ -4,12 +4,16 @@
 #
 # Chaque source :
 #   - statut : disponible | non_sonde | bloque | bloque_temporaire | mort | contact_requis |
-#     ecarte | hors_perimetre | retire. Pour les sources "disponible", ce champ est de toute
-#     façon recalculé depuis le registre de modules à la lecture (voir build_sources_overview) :
-#     un module réellement enregistré est toujours affiché disponible même si cette valeur figée
-#     dit encore autre chose (cas de tropicos ci-dessous, intégré après cet inventaire). "retire"
-#     est réservé à une source qui a eu un module fonctionnel puis débranché volontairement (voir
-#     otl ci-dessous) — à ne pas confondre avec "ecarte", jamais intégrée.
+#     ecarte | hors_perimetre | retire | en_attente. Pour toute source dont l'id correspond à un
+#     module réellement enregistré, ce champ est de toute façon recalculé à la lecture (voir
+#     build_sources_overview) : "disponible" si le module est fonctionnel (TaxonomyModule.
+#     is_configured() renvoie True — vrai par défaut), "en_attente" sinon (module écrit et
+#     enregistré, mais qui échoue tant qu'une configuration tierce, ex. compte/clé, n'est pas
+#     renseignée — cas de lpsn ci-dessous, qui échoue entièrement sans compte DSMZ) ; la valeur
+#     figée ici peut donc dater d'avant une intégration récente (cas de tropicos ci-dessous,
+#     intégré après cet inventaire). "retire" est réservé à une source qui a eu un module
+#     fonctionnel puis débranché volontairement (voir otl ci-dessous) — à ne pas confondre avec
+#     "ecarte", jamais intégrée.
 #   - classification.estime : false si vérifié dans du code (module Python d'Organon ou
 #     déclaration `declare_module()` de l'ancien PHP), true si c'est une supposition sur la
 #     nature de la base, jamais portée.
@@ -132,6 +136,24 @@ categories:
         acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire)"}
         derniere_maj: null
         notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique."
+      - id: bhl
+        nom: "Biodiversity Heritage Library (BHL)"
+        url: "https://www.biodiversitylibrary.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "enrichissement bibliographique uniquement (citation de la publication originale), jamais une classification"}
+        elements_recoltes: ["citation structurée de la publication originale (auteur, titre, éditeur, année) quand un lien biodiversitylibrary.org est repéré dans le texte de la fiche WoRMS"]
+        acces: {type: api_rest, detail: "API v3 REST/JSON (biodiversitylibrary.org/api3), clé individuelle gratuite requise (biodiversitylibrary.org/getapikey.aspx, ORGANON_BHL_API_KEY) ; absence de clé = enrichissement simplement sauté (repli sur le texte brut), jamais un échec du module appelant"}
+        derniere_maj: "2026-09-05"
+        notes: "Pas un TaxonomyModule à part entière (aucun id dans le registre) : appelé en interne uniquement par organon/modules/wrms/citations.py::_via_bhl pour enrichir la publication originale de WoRMS — comme \"externe\" ci-dessus, un enrichissement transversal plutôt qu'une base taxonomique. Ajouté suite à une remarque : absent de toutes les versions précédentes de cet inventaire par omission."
+      - id: crossref
+        nom: Crossref
+        url: "https://www.crossref.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "enrichissement bibliographique uniquement (résolution de DOI vers une citation), jamais une classification"}
+        elements_recoltes: ["citation structurée (auteur, titre, périodique/éditeur, date) résolue depuis un DOI déjà repéré dans la fiche source, utilisée en repli quand la résolution primaire n'aboutit pas"]
+        acces: {type: api_rest, detail: "API REST/JSON publique, sans clé (api.crossref.org/works/{doi}) — voir organon/modules/bibliography.py::resolve_doi_citation (repli après une recherche Wikidata P356 infructueuse), partagé par WoRMS et LPSN"}
+        derniere_maj: "2026-09-05"
+        notes: "Même cas que BHL ci-dessus : pas de TaxonomyModule dédié, repéré en cherchant d'autres sites accédés en interne sans figurer comme sources."
       - id: biolib
         nom: BioLib
         url: null
@@ -192,11 +214,12 @@ categories:
       - id: taxref
         nom: TAXREF
         url: "https://taxref.mnhn.fr"
-        statut: bloque_temporaire
-        classification: {possible: false, estime: false, detail: "même service que INPN côté PHP"}
+        statut: ecarte
+        classification: {possible: false, estime: false, detail: "même service que INPN — jamais eu son propre module"}
         elements_recoltes: []
-        acces: {type: bloque, detail: "même blocage que INPN, resondé le 2026-07-23 (voir détail INPN)"}
-        derniere_maj: "2026-07-23"
+        acces: {type: inconnu, detail: "doublon exact d'INPN (même site taxref.mnhn.fr), désormais couvert par le module organon/modules/inpn — aucune raison d'en porter un second"}
+        derniere_maj: "2026-09-05"
+        notes: "Écarté suite au sondage 2026-09-05 : contrairement à INPN, cette entrée n'a jamais eu de module dédié ; maintenant qu'INPN dispose d'un module fonctionnel pour ce même service, TAXREF est redondant."
       - id: taxonomicon
         nom: "The Taxonomicon"
         url: "http://taxonomicon.taxonomy.nl"
@@ -400,11 +423,12 @@ categories:
       - id: wcsp
         nom: "World Checklist of Selected Plant Families (WCSP)"
         url: null
-        statut: non_sonde
+        statut: ecarte
         classification: {possible: true, estime: true}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "fusionné dans WCVP aujourd'hui, même blocage Cloudflare probable mais non testé séparément"}
-        derniere_maj: null
+        acces: {type: inconnu, detail: "fusionné dans WCVP, dont les données sont déjà servies par l'entrée powo ci-dessous (wcvp.science.kew.org redirige vers powo.science.kew.org, même constat que celui documenté sur powo pour l'ancienne entrée WCVP) — doublon exact, pas seulement non sondé"}
+        derniere_maj: "2026-09-05"
+        notes: "Reclassé depuis non_sonde : la fusion dans WCVP/POWO (déjà disponible) rend un sondage séparé inutile, même raisonnement que l'ancienne entrée WCVP retirée sur powo."
       - id: powo
         nom: "Plants of the World Online (POWO)"
         url: "https://powo.science.kew.org"
@@ -489,11 +513,12 @@ categories:
       - id: plantnet
         nom: "Pl@ntNet"
         url: null
-        statut: contact_requis
+        statut: hors_perimetre
         classification: {possible: false, estime: false, detail: "outil d'identification par image, pas une hiérarchie interrogeable par nom"}
         elements_recoltes: []
-        acces: {type: contact_requis, detail: "vraie API confirmée mais clé sur inscription requise"}
-        derniere_maj: null
+        acces: {type: inconnu, detail: "vraie API confirmée mais l'obstacle n'est pas l'inscription : Pl@ntNet identifie une plante à partir d'une photo, ce n'est pas un référentiel interrogeable par nom de taxon comme les autres sources de cette liste"}
+        derniere_maj: "2026-09-05"
+        notes: "Reclassé depuis contact_requis : la clé sur inscription n'est pas le vrai obstacle ici, la nature de l'outil (image -> identification) l'est, indépendamment de toute clé."
 
   - id: procaryotes
     nom: Procaryotes
@@ -501,11 +526,12 @@ categories:
       - id: lpsn
         nom: "List of Prokaryotic Names with Standing in Nomenclature (LPSN)"
         url: "https://api.lpsn.dsmz.de"
-        statut: contact_requis
-        classification: {possible: true, estime: false, detail: "organon.modules.lpsn — bloqué en pratique tant qu'un compte DSMZ n'est pas configuré (voir acces)"}
+        statut: en_attente
+        classification: {possible: true, estime: false, detail: "organon.modules.lpsn, module complet et enregistré — échoue entièrement tant qu'un compte DSMZ n'est pas configuré (voir acces)"}
         elements_recoltes: [auteur, rang, règne, "chaîne de classification", basionyme, "taxon-type", identifiant]
         acces: {type: contact_requis, detail: "API REST réelle (api.lpsn.dsmz.de, auth Keycloak) ; compte DSMZ requis (ORGANON_LPSN_USERNAME/ORGANON_LPSN_PASSWORD, inscription gratuite sur register.lpsn.dsmz.de)"}
-        derniere_maj: "2026-08-02"
+        derniere_maj: "2026-09-05"
+        notes: "\"en_attente\" plutôt que \"contact_requis\" : le module est déjà écrit et enregistré (TaxonomyModule.is_configured() bascule automatiquement vers \"disponible\" dès que les identifiants sont renseignés), contrairement à MycoBank/Pl@ntNet où l'intégration elle-même reste à faire."
       - id: gtdb
         nom: "Genome Taxonomy Database (GTDB)"
         url: null
@@ -566,11 +592,12 @@ categories:
       - id: ion
         nom: "Index to Organism Names (ION)"
         url: null
-        statut: contact_requis
+        statut: ecarte
         classification: {possible: false, estime: true, detail: "index nomenclatural, comme IPNI"}
         elements_recoltes: []
-        acces: {type: contact_requis, detail: "page atteignable, service historiquement fermé au public (accès payant institutionnel CAS)"}
-        derniere_maj: null
+        acces: {type: bloque, detail: "page atteignable, mais service historiquement fermé au public (accès payant institutionnel CAS) — pas une simple inscription gratuite comme MycoBank"}
+        derniere_maj: "2026-09-05"
+        notes: "Reclassé depuis contact_requis : l'accès est payant et réservé aux institutions abonnées (CAS), pas une inscription individuelle gratuite comme les autres sources \"contact_requis\" de cet inventaire."
       - id: sfs
         nom: "Species File Software (SFS)"
         url: "https://orthoptera.speciesfile.org"
