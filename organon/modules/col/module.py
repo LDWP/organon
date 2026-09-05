@@ -30,7 +30,7 @@ from __future__ import annotations
 import html as _html
 
 from organon.core.config import GenerateOptions
-from organon.core.domains import KINGDOM_MAP
+from organon.core.domains import regne_depuis_classification
 from organon.core.models import (
     RankName,
     Redirection,
@@ -87,9 +87,7 @@ class ColModule(TaxonomyModule):
         def _regne_correspond(r: dict) -> bool:
             if struct.domaine in ("*", ""):
                 return True
-            idx = _kingdom_index(r.get("classification", []))
-            kingdom = r["classification"][idx]["name"] if idx is not None else ""
-            return KINGDOM_MAP.get(kingdom, "") == struct.domaine
+            return regne_depuis_classification(r.get("classification", [])) == struct.domaine
 
         accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
         cur = next((r for r in accepted if _regne_correspond(r)), None)
@@ -159,7 +157,7 @@ class ColModule(TaxonomyModule):
         idx = _kingdom_index(classification)
         if idx is None:
             return None
-        struct.regne = KINGDOM_MAP.get(classification[idx]["name"], "")
+        struct.regne = regne_depuis_classification(classification)
         if not struct.regne:
             return None
 

@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from organon.core.domains import KINGDOM_MAP
+from organon.core.domains import regne_depuis_classification
 from organon.modules.col_xr.adapter import ColXrAdapter
 from organon.modules.col_xr.ranks import col_xr_cherche_rang
 from organon.modules.common import format_auteur
@@ -41,16 +41,10 @@ class ColXrLinkInfo:
     cette classification étant déjà incluse dans la réponse de recherche ChecklistBank ci-dessus."""
 
 
-def _kingdom_index(classification: list[dict]) -> int | None:
-    return next((i for i, c in enumerate(classification) if c.get("rank") == "kingdom"), None)
-
-
 def _regne_correspond(r: dict, domaine: str) -> bool:
     if domaine in ("*", ""):
         return True
-    idx = _kingdom_index(r.get("classification", []))
-    kingdom = r["classification"][idx]["name"] if idx is not None else ""
-    return KINGDOM_MAP.get(kingdom, "") == domaine
+    return regne_depuis_classification(r.get("classification", [])) == domaine
 
 
 _SUBGENUS_RE = re.compile(r"\s*\([^)]*\)")

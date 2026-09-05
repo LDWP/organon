@@ -253,3 +253,25 @@ KINGDOM_MAP: dict[str, str] = {
     "Archaebacteria": "archaea",
     "Viruses": "virus",
 }
+
+# Rang `domain` (tel qu'exposé par ChecklistBank/CoL XR) -> domaine Organon. Contrairement au
+# rang `kingdom`, resté stable pour les eucaryotes mais remplacé par des clades GTDB renommés et
+# multiples chez les procaryotes ("Bacillati", "Pseudomonadati", "Thermoproteati"... au lieu de
+# "Bacteria"/"Archaea" selon la source du checklist), `domain` reste unique et non affecté par ces
+# renommages. Voir `regne_depuis_classification`.
+DOMAIN_MAP: dict[str, str] = {
+    "Bacteria": "bactérie",
+    "Archaea": "archaea",
+}
+
+
+def regne_depuis_classification(classification: list[dict]) -> str:
+    """Résout le domaine Organon (règne) à partir d'une chaîne `classification` ChecklistBank
+    (CoL XR) : rang `domain` d'abord pour les procaryotes (stable), repli sur `kingdom` pour tout
+    le reste (Animalia/Plantae/Fungi/Chromista/Protozoa, où il reste fiable). Chaîne vide si ni
+    l'un ni l'autre n'est reconnu."""
+    domain_name = next((c.get("name") for c in classification if c.get("rank") == "domain"), None)
+    if domain_name in DOMAIN_MAP:
+        return DOMAIN_MAP[domain_name]
+    kingdom_name = next((c.get("name") for c in classification if c.get("rank") == "kingdom"), None)
+    return KINGDOM_MAP.get(kingdom_name, "") if kingdom_name else ""
