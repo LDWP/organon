@@ -643,6 +643,10 @@ export default function App() {
     await Promise.all(
       classificationModules
         .filter((m) => m.id !== excludeId)
+        // Un module dont la liste explicite de domaines ne couvre pas domaineValue ne peut de
+        // toute façon jamais aboutir pour ce taxon (voir organon/core/domains.py) : l'interroger
+        // quand même gaspillait une bonne partie du quota partagé de /generate* pour rien.
+        .filter((m) => m.domains === "all" || (Array.isArray(m.domains) && m.domains.includes(domaineValue)))
         .map((m) => {
           if (searchGeneration.current !== generation) return null; // recherche plus récente entretemps
           return fetchSource(taxonName, domaineValue, m.id);

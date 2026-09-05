@@ -81,7 +81,12 @@ router = APIRouter()
 # Limite partagée entre POST /generate, GET /generate et POST /generate/stream : ce sont trois
 # façons de déclencher la même opération coûteuse (~20 appels externes, 10-20s), le quota doit
 # donc être commun plutôt que triplé.
-_GENERATE_RATE_LIMIT = "10/minute"
+#
+# Une seule recherche déclenche déjà jusqu'à ~8 de ces requêtes (App.jsx,
+# prefetchOtherClassifications : une par module de classification applicable au domaine,
+# lancées en parallèle en arrière-plan) — 10/minute laissait moins d'une recherche de marge
+# avant 429, sans lien avec l'authentification malgré les apparences.
+_GENERATE_RATE_LIMIT = "40/minute"
 logger = logging.getLogger(__name__)
 
 _MONOVALUE_FIELDS = (
