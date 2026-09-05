@@ -220,14 +220,6 @@ categories:
         elements_recoltes: []
         acces: {type: mort, detail: "domaine injoignable — service historiquement fermé"}
         derniere_maj: null
-      - id: wikispecies
-        nom: Wikispecies
-        url: "https://species.wikimedia.org"
-        statut: ecarte
-        classification: {possible: true, estime: true, detail: "wiki taxonomique structuré par pages"}
-        elements_recoltes: []
-        acces: {type: api_rest, detail: "vraie API MediaWiki confirmée, mais contenu en wikitexte communautaire à parser — complexité proche du scraping malgré une API réelle"}
-        derniere_maj: null
       - id: zobodat
         nom: ZOBODAT
         url: null
