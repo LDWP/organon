@@ -33,7 +33,7 @@ categories:
         url: "https://www.gbif.org"
         statut: disponible
         classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale", "identifiant INPN secondaire"]
         acces: {type: api_rest, detail: "API REST/JSON (api.gbif.org)"}
         derniere_maj: null
       - id: itis
@@ -41,7 +41,7 @@ categories:
         url: "https://www.itis.gov"
         statut: disponible
         classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", éteint, identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", identifiant]
         acces: {type: api_rest, detail: "API REST (ITISWebService, réponses XML)"}
         derniere_maj: null
       - id: wrms
@@ -49,7 +49,7 @@ categories:
         url: "https://www.marinespecies.org"
         statut: disponible
         classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale", "milieu (marin/terrestre)"]
         acces: {type: api_rest, detail: "API REST/JSON (marinespecies.org/rest)"}
         derniere_maj: null
       - id: col
@@ -65,7 +65,7 @@ categories:
         url: "https://www.irmng.org"
         statut: disponible
         classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale"]
         acces: {type: api_rest, detail: "API REST/JSON (irmng.org/rest)"}
         derniere_maj: null
       - id: otl
@@ -91,7 +91,7 @@ categories:
         url: "https://www.speciesplus.net"
         statut: disponible
         classification: {possible: false, estime: false}
-        elements_recoltes: ["noms vernaculaires (« CITES espèce »)", identifiant]
+        elements_recoltes: [auteur, "annexe CITES", "date d'entrée en vigueur", "noms vernaculaires (« CITES espèce »)", identifiant]
         acces: {type: api_rest, detail: "API REST/JSON (speciesplus.net)"}
         derniere_maj: null
       - id: ncbi
@@ -123,7 +123,7 @@ categories:
         url: "https://eol.org"
         statut: disponible
         classification: {possible: false, estime: false, detail: "enrichissement uniquement, réutilise le rang déjà connu"}
-        elements_recoltes: [auteur, "noms vernaculaires français", identifiant]
+        elements_recoltes: [auteur, identifiant]
         acces: {type: api_rest, detail: "API REST/JSON publique, sans clé (eol.org/api/search/1.0, /api/pages/1.0)"}
         derniere_maj: null
         notes: "Absent de la version précédente par omission ; vérifié dans le code (organon/modules/eol)."
@@ -326,7 +326,7 @@ categories:
         url: "https://www.algaebase.org"
         statut: disponible
         classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "sous-taxons", éteint, identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "sous-taxons", éteint, identifiant, étymologie, "citation de la publication originale", "description (habitat, texte descriptif)"]
         acces: {type: api_rest, detail: "API REST/JSON (api2.algaebase.org, clé de session)"}
         derniere_maj: null
         notes: "Synonymes/basionyme non implémentés (TODO hérité du PHP d'origine)."
@@ -375,7 +375,7 @@ categories:
         url: "https://www.ipni.org"
         statut: disponible
         classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, "identifiant (rang réutilisé de la classification principale)"]
+        elements_recoltes: [auteur, "identifiant (rang réutilisé de la classification principale)", "citation de la publication originale"]
         acces: {type: api_rest, detail: "API REST/JSON (ipni.org/api/1)"}
         derniere_maj: null
       - id: telametro
@@ -383,7 +383,7 @@ categories:
         url: "https://www.tela-botanica.org"
         statut: disponible
         classification: {possible: false, estime: false}
-        elements_recoltes: ["noms vernaculaires", identifiant]
+        elements_recoltes: [auteur, "noms vernaculaires", identifiant]
         acces: {type: scraping, detail: "recherche via API JSON (index Algolia, clé « search-only » publique) ; noms vernaculaires typés par scraping HTML de l'onglet Ethnobotanique (aucune API pour ce statut)"}
         derniere_maj: null
       - id: vascan
@@ -417,7 +417,7 @@ categories:
         url: "https://www.worldfloraonline.org"
         statut: disponible
         classification: {possible: false, estime: false, detail: "confirmé en sondage direct : la fiche détail affiche une hiérarchie (Angiosperms > ordre > famille > genre > ...) mais elle ne descend pas jusqu'au règne/embranchement et mélange des nœuds génériques sans auteur (ex. « Angiosperms ») avec des rangs réels — jugée insuffisamment fiable, comme déjà tranché côté ancien PHP"}
-        elements_recoltes: [identifiant, auteur, "statut taxonomique (nom accepté/synonyme/non vérifié)"]
+        elements_recoltes: [identifiant, auteur]
         acces: {type: scraping, detail: "scraping HTML de /search par expression régulière ciblée, aucune API trouvée"}
         derniere_maj: "2026-07-23"
       - id: wcsp
@@ -434,7 +434,7 @@ categories:
         url: "https://powo.science.kew.org"
         statut: disponible
         classification: {possible: true, estime: false, detail: "classification Kew officielle (WCVP)"}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", synonymes, distribution, identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", synonymes, distribution, "sous-taxons", identifiant]
         acces: {type: api_rest, detail: "via la bibliothèque pykew (API JSON powo.science.kew.org/api/2) ; l'accès direct par requests nu reste bloqué (403 WAF sans en-tête User-Agent de navigateur, voir organon/modules/powo/adapter.py)"}
         derniere_maj: "2026-07-13"
         notes: "WCVP (listée séparément avant) est retirée ici : wcvp.science.kew.org redirige vers powo.science.kew.org, même données — entrée redondante."
@@ -528,7 +528,7 @@ categories:
         url: "https://api.lpsn.dsmz.de"
         statut: en_attente
         classification: {possible: true, estime: false, detail: "organon.modules.lpsn, module complet et enregistré — échoue entièrement tant qu'un compte DSMZ n'est pas configuré (voir acces)"}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", basionyme, "taxon-type", identifiant]
+        elements_recoltes: [auteur, rang, règne, "chaîne de classification", basionyme, "taxon-type", identifiant, "citation de la publication originale (DOI)", "sous-taxons"]
         acces: {type: contact_requis, detail: "API REST réelle (api.lpsn.dsmz.de, auth Keycloak) ; compte DSMZ requis (ORGANON_LPSN_USERNAME/ORGANON_LPSN_PASSWORD, inscription gratuite sur register.lpsn.dsmz.de)"}
         derniere_maj: "2026-09-05"
         notes: "\"en_attente\" plutôt que \"contact_requis\" : le module est déjà écrit et enregistré (TaxonomyModule.is_configured() bascule automatiquement vers \"disponible\" dès que les identifiants sont renseignés), contrairement à MycoBank/Pl@ntNet où l'intégration elle-même reste à faire."
