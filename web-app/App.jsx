@@ -4,6 +4,7 @@ import {
   fetchCommonsImages,
   fetchDomains,
   fetchModules,
+  fetchSources,
   generateTaxonStream,
   LOGIN_URL,
   logout,
@@ -352,6 +353,7 @@ export default function App() {
   const [theme, setTheme] = useState(getInitialTheme);
   const [domains, setDomains] = useState([]);
   const [modules, setModules] = useState([]);
+  const [nbSourcesDisponibles, setNbSourcesDisponibles] = useState(null);
   const [showSources, setShowSources] = useState(false);
   const [showAuthors, setShowAuthors] = useState(false);
   // undefined = statut pas encore vérifié (évite un flash de l'écran "non connecté" le temps que
@@ -534,6 +536,15 @@ export default function App() {
     fetchModules()
       .then((data) => setModules(data))
       .catch(() => setModules([]));
+    // Même calcul que le total affiché sur SourcesPage.jsx : nombre d'entrées db_inventory.yaml
+    // au statut "disponible", pas modules.length — certaines sources disponibles (bhl, crossref)
+    // ne sont pas des TaxonomyModule enregistrés, appelées en interne par d'autres modules.
+    fetchSources()
+      .then((data) => {
+        const n = data.categories.reduce((acc, c) => acc + c.sources.filter((s) => s.statut === "disponible").length, 0);
+        setNbSourcesDisponibles(n);
+      })
+      .catch(() => setNbSourcesDisponibles(null));
     fetchAuthStatus()
       .then((data) => setUsername(data.authenticated ? data.username : null))
       .catch(() => setUsername(null));
@@ -1464,8 +1475,8 @@ export default function App() {
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <button type="button" className="status" onClick={() => setShowSources(true)}>
               <span className="live">
-                {modules.length || "—"} source{modules.length > 1 ? "s" : ""} disponible
-                {modules.length > 1 ? "s" : ""}
+                {nbSourcesDisponibles ?? "—"} source{nbSourcesDisponibles > 1 ? "s" : ""} disponible
+                {nbSourcesDisponibles > 1 ? "s" : ""}
               </span>
             </button>
             <button

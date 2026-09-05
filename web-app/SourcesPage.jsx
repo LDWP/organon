@@ -241,7 +241,14 @@ export default function SourcesPage({ onBack }) {
     );
   }
 
-  const totalDisponibles = grouped.reduce((n, c) => n + c.sources.length, 0);
+  // Nombre d'entrées yaml "disponible" avant l'éclatement Wikimédia (voir `grouped` ci-dessus) —
+  // sinon le titre grimperait de +3 dès qu'un module d'agrégation liens externes est affiché en
+  // plusieurs lignes, sans rapport avec le nombre réel de sources distinctes. Même calcul que le
+  // badge de l'en-tête (App.jsx), pour que les deux nombres restent toujours identiques.
+  const totalDisponibles = data.categories.reduce(
+    (n, c) => n + c.sources.filter((s) => s.statut === "disponible").length,
+    0
+  );
   const cmp = sortComparator(sort.key, sort.dir);
 
   function handleSort(key) {
