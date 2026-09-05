@@ -21,7 +21,7 @@ from organon.core.models import Struct
 class ModuleMeta:
     """Métadonnées déclaratives d'un module : id, s'il peut servir de source de
     classification, s'il peut produire un lien externe/Bioref, les domaines applicables, sa
-    priorité (départage les égalités entre modules de classification concurrents — ex. GBIF
+    priorité (départage les égalités entre modules de classification concurrents — ex. COL
     999, ITIS 998, WoRMS 996), et s'il est la classification par défaut."""
 
     id: str

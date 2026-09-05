@@ -69,7 +69,12 @@ class ColModule(TaxonomyModule):
         can_classify=True,
         can_render_external_link=True,
         domains="all",
-        priority=200,
+        # Classification par défaut face à GBIF (priority=200 auparavant) : GBIF ne classe
+        # qu'avec les champs bruts de son dataset "Backbone Taxonomy" legacy, jamais corrigés
+        # par CoL XR au-delà d'un rang manquant (voir gbif/module.py) — quand les deux
+        # réussissent et se contredisent, la fiche CoL XR est la plus à jour (audit #50).
+        priority=999,
+        is_default_classification=True,
     )
 
     def __init__(self, adapter: ColXrAdapter | None = None) -> None:

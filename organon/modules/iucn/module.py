@@ -55,7 +55,7 @@ class IucnModule(TaxonomyModule):
         can_classify=False,
         can_render_external_link=True,
         domains="all",
-        # Priorité la plus haute du dépôt (au-dessus de GBIF, 999) : `EnrichmentRunner.run`
+        # Priorité la plus haute du dépôt (au-dessus de COL, 999) : `EnrichmentRunner.run`
         # fusionne `struct.liens` module par module dans l'ordre croissant de priorité, dernier
         # appliqué gagnant sur une clé partagée (voir organon/api/routes/generate.py). Personne
         # d'autre n'écrit `liens["uicn"]` aujourd'hui, mais GBIF le faisait avant ce module (voir

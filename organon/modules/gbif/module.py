@@ -126,8 +126,11 @@ class GbifModule(TaxonomyModule):
         can_classify=True,
         can_render_external_link=True,
         domains="all",
-        priority=999,
-        is_default_classification=True,
+        # Priorité abaissée derrière COL (voir col/module.py) : ne classe qu'avec les champs
+        # bruts du Backbone Taxonomy legacy (gbif/adapter.py::DATASET_KEY), jamais corrigés par
+        # CoL XR au-delà d'un rang manquant (audit #50). Reste le seul classeur pour un taxon
+        # absent de CoL XR (repli déjà géré par `successes` côté generate.py).
+        priority=200,
     )
 
     def __init__(
