@@ -8,6 +8,12 @@ figure. Le catalogue entier ne couvrant que l'ordre Araneae (classe Arachnida, e
 Arthropoda), cette chaîne fixe est injectée directement — même principe que
 `organon.modules.powo.ranks.POWO_KINGDOM_MAP`, à une seule entrée car WCVP ne couvre que Plantae.
 
+Aucune résolution de synonymes : la page https://wsc.nmbe.ch/dataresources documente l'export
+quotidien comme couvrant "all currently valid species" — un nom synonyme n'y apparaît donc
+jamais, ni sous sa propre ligne ni via un identifiant vers l'espèce acceptée. Seule l'API REST
+(écartée ci-dessus) expose ce lien (`validTaxon`/`status`) ; s'en passer signifie qu'une recherche
+sur un nom synonyme échoue simplement (`search` renvoie `None`, comme pour un nom inconnu).
+
 `can_render_external_link=False` (aucun {{Bioref}} publié) : la licence CC BY-NC-SA 4.0 de
 l'export est nonCommercial, ce module n'expose donc la source qu'en classification interne, pas
 en lien de citation public — voir organon/core/data/db_inventory.yaml (id: wsc).
@@ -20,9 +26,9 @@ produirait des codes inventés plutôt que dérivés d'une source fiable."""
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import RankName, Redirection, Struct, TaxonInfo
+from organon.core.models import RankName, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.modules.common import MAX_SYNONYM_HOPS, format_auteur, simple_debug_link
+from organon.modules.common import format_auteur, simple_debug_link
 from organon.modules.wsc.adapter import WscAdapter
 
 _CHAINE_FIXE = (
@@ -59,37 +65,11 @@ class WscModule(TaxonomyModule):
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        return await self._collect(struct, is_classification, options, hop=0)
-
-    async def _collect(
-        self, struct: Struct, is_classification: bool, options: GenerateOptions, hop: int
-    ) -> Struct | None:
         row = await self._adapter.search(struct.taxon.nom)
         if row is None:
             return None
 
         struct.liens["wsc"] = {"id": row["speciesId"], "nom": struct.taxon.nom}
-
-        est_synonyme = row.get("taxonStatus") not in (None, "VALID")
-        if est_synonyme:
-            accepted = await self._adapter.by_id(row.get("validSpeciesId") or "")
-            if accepted is None:
-                return None
-            nom_accepte = f"{accepted['genus']} {accepted['species']}"
-            if not is_classification:
-                struct.liens["wsc"]["synonyme"] = True
-                struct.liens["wsc"]["nom-synonyme"] = nom_accepte
-                struct.liens["wsc"]["id-synonyme"] = accepted["speciesId"]
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=nom_accepte)
-                return await self._collect(struct, is_classification, options, hop=hop + 1)
-            # suivre_synonymes désactivé : on continue avec les données du synonyme tel quel,
-            # comme ITIS/GBIF/POWO
-            row = accepted
 
         if not is_classification:
             return struct

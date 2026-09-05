@@ -31,7 +31,6 @@ class WscAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         super().__init__(client)
         self._by_name: dict[str, dict] | None = None
-        self._by_id: dict[str, dict] | None = None
         self._cached_date: str | None = None
         self._lock = asyncio.Lock()
 
@@ -46,12 +45,9 @@ class WscAdapter(OwnedClientMixin):
             if rows is None:
                 return  # échec de téléchargement : garde l'index précédent (même périmé) plutôt que de tout perdre
             by_name: dict[str, dict] = {}
-            by_id: dict[str, dict] = {}
             for row in rows:
-                species_id = row.get("speciesId")
-                if not species_id:
+                if not row.get("speciesId"):
                     continue
-                by_id[species_id] = row
                 genus, species = row.get("genus"), row.get("species")
                 if not genus or not species:
                     continue
@@ -65,7 +61,6 @@ class WscAdapter(OwnedClientMixin):
                 else:
                     by_name[f"{genus} {species}"] = row
             self._by_name = by_name
-            self._by_id = by_id
             self._cached_date = today
 
     async def _download(self, today: str) -> list[dict] | None:
@@ -84,9 +79,3 @@ class WscAdapter(OwnedClientMixin):
         if self._by_name is None:
             return None
         return self._by_name.get(name)
-
-    async def by_id(self, species_id: str) -> dict | None:
-        await self._ensure_loaded()
-        if self._by_id is None:
-            return None
-        return self._by_id.get(species_id)
