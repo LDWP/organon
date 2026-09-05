@@ -112,6 +112,12 @@ class LpsnModule(TaxonomyModule):
         if slug and category:
             entry["id"] = slug
             entry["url"] = f"{LPSN_WEBSITE_BASE}/{category}/{slug}"
+        else:
+            # Repli sur le record number LPSN (toujours présent) quand la fiche ne fournit pas de
+            # quoi reconstruire le slug conviviale (monomial absent) ou de catégorie pour l'URL :
+            # `/taxon/{id}` ne dépend pas du rang, contrairement à `/{category}/{slug}`.
+            entry["id"] = lpsn_id
+            entry["url"] = f"{LPSN_WEBSITE_BASE}/taxon/{lpsn_id}"
         if cur.get("authority"):
             entry["auteur"] = format_auteur(cur["authority"])
         struct.liens["lpsn"] = entry
@@ -239,6 +245,9 @@ class LpsnModule(TaxonomyModule):
         nom = wp_met_italiques(data["nom"], data["rang"], struct.regne)
         if data.get("auteur"):
             nom = f"{nom} {data['auteur']}"
+        # Le rang reste toujours passé en paramètre 1, identifiant numérique ou alphabétique :
+        # c'est {{{2}}} seul (voir modèle wikitexte révisé) qui distingue les deux formes pour
+        # construire l'URL (/{rang-anglais}/{slug} vs /taxon/{id}).
         return f"{{{{LPSN | {data['rang']} | {data['id']} | {nom} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
