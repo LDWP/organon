@@ -1484,7 +1484,7 @@ export default function App() {
 
       {showStorageBanner && <PreferencesBanner onAccept={handleAcceptStorage} onRefuse={handleRefuseStorage} />}
 
-      <main className="wrap">
+      <main className={showSources ? "wrap wrap-wide" : "wrap"}>
         {showSources ? (
           <SourcesPage modules={modules} onBack={() => setShowSources(false)} />
         ) : showAuthors ? (
