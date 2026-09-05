@@ -2,9 +2,11 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { fetchSources } from "./apiClient.js";
 
 // Tags qui reviennent dans la plupart des sources ("courants") vs mentions propres à une seule
-// source ("spécifiques") — évite qu'une phrase entière (ex. "identifiant Wikidata (QID)") ne
-// s'affiche à côté d'un simple "auteur". Chaque tag courant a sa propre couleur (voir index.css,
-// palette inspirée de Wikimedia Codex) pour rester scannable même avec plusieurs tags par ligne.
+// source ("spécifiques"). `startsWith` couvre les variantes qualifiées (ex. "identifiant Wikidata
+// (QID)", "chaîne de classification (genre → embranchement)") : la nuance entre parenthèses est
+// perdue, mais la source doit rester taguée comme fournissant bien cet élément. Chaque tag courant
+// a sa propre couleur (voir index.css, palette inspirée de Wikimedia Codex) pour rester scannable
+// même avec plusieurs tags par ligne.
 const FREQUENT_ELEMENTS = [
   { label: "Auteur", css: "chip-auteur", test: (s) => s.toLowerCase() === "auteur" },
   { label: "Rang", css: "chip-rang", test: (s) => s.toLowerCase() === "rang" },
@@ -15,7 +17,7 @@ const FREQUENT_ELEMENTS = [
   { label: "Sous-taxons", css: "chip-sst", test: (s) => s.toLowerCase() === "sous-taxons" },
   { label: "Basionyme", css: "chip-basio", test: (s) => s.toLowerCase() === "basionyme" },
   { label: "Éteint", css: "chip-eteint", test: (s) => s.toLowerCase() === "éteint" },
-  { label: "Identifiant", css: "chip-ident", test: (s) => s.toLowerCase() === "identifiant" },
+  { label: "Identifiant", css: "chip-ident", test: (s) => s.toLowerCase().startsWith("identifiant") },
 ];
 
 // Regroupement de "Méthode d'accès" pour le rendre triable — suit acces.type, une énumération
