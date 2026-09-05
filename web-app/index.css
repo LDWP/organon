@@ -645,14 +645,16 @@ footer .footer-meta span[title] { cursor: help; border-bottom: 1px dotted var(--
 
 .considered-list {
   background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px;
-  font-size: 14.5px; line-height: 1.9; margin: 0;
+  font-size: 14.5px; line-height: 1.9;
 }
+.considered-list p { margin: 0; }
+.considered-list p + p { margin-top: 12px; }
 .considered-list a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--line); }
 .considered-list a:hover { border-bottom-color: var(--accent); }
 .considered-list [title] { cursor: help; }
 .considered-list .sep { color: var(--ink-soft); }
 
-.sources-archived { font-size: 13px; color: var(--ink-soft); line-height: 1.7; margin: 10px 0 0; }
+.sources-archived { font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
 
 .source-muted { color: var(--ink-soft); }
 

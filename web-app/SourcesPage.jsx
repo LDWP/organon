@@ -37,12 +37,14 @@ function accessGroupLabel(source) {
   return (ACCESS_GROUPS.find((g) => g.test(source)) ?? { label: "Autre" }).label;
 }
 
-// Le module "Liens transversaux Wikimédia" est une entrée unique côté backend, mais couvre
-// plusieurs sites indépendants (Wikidata, Commons, Wikispecies, Wiktionnaire...) — on l'éclate ici
-// en une ligne par site, réunies dans leur propre groupe "Wikimédia" plutôt que noyées dans
-// "Données généralistes". Hypothèse : tous les éléments d'une telle source appartiennent à
-// l'écosystème Wikimédia (vrai pour l'entrée actuelle) ; un futur mélange avec des éléments
-// génériques serait silencieusement ignoré ici.
+// Le module "Liens transversaux Wikimédia" (id `externe` dans db_inventory.yaml) est une entrée
+// unique côté backend, mais couvre plusieurs sites indépendants (Wikidata, Commons, Wikispecies,
+// Wiktionnaire...) — on l'éclate ici en une ligne par site, réunies dans leur propre groupe
+// "Wikimédia" plutôt que noyées dans "Données généralistes". Repérée par id, pas par un texte
+// contenant "wikidata"/"commons"/etc. : une autre source peut légitimement mentionner ces mots
+// (ex. "résolution DOI en repli après une recherche Wikidata infructueuse" pour crossref) sans
+// être elle-même un agrégateur Wikimédia à éclater.
+const WIKI_AGGREGATOR_ID = "externe";
 const WIKI_PROPERTIES = [
   { test: /wikidata/i, nom: "Wikidata", url: "https://www.wikidata.org" },
   { test: /commons/i, nom: "Wikimedia Commons", url: "https://commons.wikimedia.org" },
@@ -52,7 +54,7 @@ const WIKI_PROPERTIES = [
 ];
 
 function isWikimediaAggregator(source) {
-  return source.elements_recoltes.some((raw) => WIKI_PROPERTIES.some((p) => p.test.test(raw)));
+  return source.id === WIKI_AGGREGATOR_ID;
 }
 
 function splitWikimediaSource(source) {
@@ -206,18 +208,22 @@ export default function SourcesPage({ onBack }) {
     }));
   }, [data]);
 
-  const considerees = useMemo(() => {
+  const nonDisponibles = useMemo(() => {
     if (!data) return [];
-    return data.categories
-      .flatMap((category) => category.sources)
-      .filter((s) => s.statut !== "disponible")
-      .sort((a, b) => a.nom.localeCompare(b.nom, "fr"));
+    return data.categories.flatMap((category) => category.sources).filter((s) => s.statut !== "disponible");
   }, [data]);
 
   // "retire" = intégrée un temps puis débranchée volontairement (voir la sémantique du statut
-  // dans db_inventory.yaml) : mise en avant séparément du reste des indisponibles, le lecteur
-  // qui voit "considérées" veut souvent aussi savoir "et qu'est-ce qui a déjà tourné avant ?".
-  const archivees = useMemo(() => considerees.filter((s) => s.statut === "retire"), [considerees]);
+  // dans db_inventory.yaml) : jamais "considérée" au même titre que le reste des indisponibles
+  // (jamais évaluée, écartée...), donc comptée et listée à part.
+  const archivees = useMemo(
+    () => nonDisponibles.filter((s) => s.statut === "retire").sort((a, b) => a.nom.localeCompare(b.nom, "fr")),
+    [nonDisponibles]
+  );
+  const considerees = useMemo(
+    () => nonDisponibles.filter((s) => s.statut !== "retire").sort((a, b) => a.nom.localeCompare(b.nom, "fr")),
+    [nonDisponibles]
+  );
 
   if (error) {
     return (
@@ -362,27 +368,29 @@ export default function SourcesPage({ onBack }) {
 
       <section className="sources-section">
         <h2>Non disponibles</h2>
-        <p className="considered-list">
-          {considerees.length} source{considerees.length > 1 ? "s" : ""} considérée{considerees.length > 1 ? "s" : ""} :{" "}
-          {considerees.map((s, i) => (
-            <span key={s.id}>
-              {s.url ? (
-                <a href={s.url} target="_blank" rel="noopener noreferrer" title={STATUT_LABELS[s.statut] || s.statut}>
-                  {s.nom}
-                </a>
-              ) : (
-                <span title={STATUT_LABELS[s.statut] || s.statut}>{s.nom}</span>
-              )}
-              {i < considerees.length - 1 && <span className="sep">, </span>}
-            </span>
-          ))}
-        </p>
-        {archivees.length > 0 && (
-          <p className="sources-archived">
-            {archivees.length} source{archivees.length > 1 ? "s" : ""} archivée
-            {archivees.length > 1 ? "s" : ""} : {archivees.map((s) => s.nom).join(", ")}
+        <div className="considered-list">
+          <p>
+            {considerees.length} source{considerees.length > 1 ? "s" : ""} considérée{considerees.length > 1 ? "s" : ""} :{" "}
+            {considerees.map((s, i) => (
+              <span key={s.id}>
+                {s.url ? (
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" title={STATUT_LABELS[s.statut] || s.statut}>
+                    {s.nom}
+                  </a>
+                ) : (
+                  <span title={STATUT_LABELS[s.statut] || s.statut}>{s.nom}</span>
+                )}
+                {i < considerees.length - 1 && <span className="sep">, </span>}
+              </span>
+            ))}
           </p>
-        )}
+          {archivees.length > 0 && (
+            <p className="sources-archived">
+              {archivees.length} source{archivees.length > 1 ? "s" : ""} archivée
+              {archivees.length > 1 ? "s" : ""} : {archivees.map((s) => s.nom).join(", ")}
+            </p>
+          )}
+        </div>
       </section>
     </SourcesHeader>
   );
