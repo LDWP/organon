@@ -18,7 +18,7 @@
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 
-derniere_maj: "2026-07-23"
+derniere_maj: "2026-09-05"
 
 categories:
   - id: generalistes
@@ -183,11 +183,12 @@ categories:
       - id: inpn
         nom: "Inventaire national du patrimoine naturel (INPN)"
         url: "https://taxref.mnhn.fr"
-        statut: bloque_temporaire
-        classification: {possible: false, estime: false, detail: "côté PHP, mod_inpn.php déclare classif=false"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "resondé en direct le 2026-07-23 : le site legacy (taxref.mnhn.fr/taxref-web) a migré vers un frontend Angular (inpn.mnhn.fr) ; l'ancien endpoint /api/taxa/search redirige (302) vers la page d'accueil SPA, le swagger documenté (/api/v2/api-docs) renvoie 404, et la page de démo d'API (inpn.mnhn.fr/docs-web/docs/apiDemo2) renvoie une Erreur 403 côté Angular — aucune API REST publique fonctionnelle trouvée, toujours indisponible"}
-        derniere_maj: "2026-07-23"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "lignée reconstruite ancêtre par ancêtre à partir du fil d'Ariane de la fiche détail (pas d'endpoint renvoyant la hiérarchie complète en un seul appel)"}
+        elements_recoltes: [identifiant, auteur, rang, règne, "chaîne de classification", "noms vernaculaires français"]
+        acces: {type: api_rest, detail: "API JSON pour la recherche (taxa/search), fiche détail en HTML (JSP, taxa/{cdNom}) pour la lignée et les noms vernaculaires ; WAF contourné par un en-tête User-Agent de navigateur (403 sinon, même symptôme que POWO)"}
+        derniere_maj: "2026-09-05"
+        notes: "Fiche laissée à l'état 'bloqué' par erreur : le module a en réalité été intégré le 2026-07-23, le blocage du site legacy (migration Angular) ayant été contourné par l'API JSON taxa/search plutôt que par le HTML legacy. Corrigé après lecture du code (organon/modules/inpn)."
       - id: taxref
         nom: TAXREF
         url: "https://taxref.mnhn.fr"
@@ -520,11 +521,12 @@ categories:
       - id: ictv
         nom: "International Committee on Taxonomy of Viruses (ICTV)"
         url: "https://ictv.global/msl"
-        statut: ecarte
-        classification: {possible: true, estime: true, detail: "taxonomie virale officielle"}
-        elements_recoltes: []
-        acces: {type: export, detail: "page HTML atteignable, pas de JSON confirmé — l'ICTV publie un fichier Excel maître (Master Species List)"}
-        derniere_maj: "MSL41, millésime 2025 (vérifié en direct sur ictv.global/msl)"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "chaîne de classification et sous-taxons reconstruits depuis le dataset embarqué (VMR) ; pas d'auteur ni de synonymes, l'ICTV n'en publie pas"}
+        elements_recoltes: [rang, règne, "chaîne de classification", "sous-taxons", "identifiant (rang espèce uniquement)"]
+        acces: {type: export, detail: "dataset TSV embarqué (organon/core/data/ictv_taxonomy.tsv), construit hors ligne depuis l'export VMR (Virus Metadata Resource, MSL41/2025) publié par l'ICTV sur GitHub — aucun appel réseau à l'exécution ; pas d'API interrogeable par nom de taxon (Taxonomy Browser limité à la recherche par rang, ontologie OLS/EBI obsolète depuis 2009)"}
+        derniere_maj: "2026-09-05"
+        notes: "Fiche laissée à l'état 'écarté' par erreur : le module a en réalité été intégré le 2026-08-02 sur dataset embarqué plutôt que sur API en direct. Corrigé après lecture du code (organon/modules/ictv)."
 
   - id: zoologie
     nom: "Zoologie générale"
