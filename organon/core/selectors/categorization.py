@@ -54,6 +54,9 @@ def lien_pour_portail(portail_defaut: str, struct: Struct, options: GenerateOpti
         ret = evaluate_ruleset("portails", struct)
         if ret is not None:
             return ret
+        dynamique = struct.liens.get("wp_portails", {}).get("portails")
+        if dynamique:
+            return dynamique
     return None
 
 

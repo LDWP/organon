@@ -37,6 +37,7 @@ from organon.modules.tpdb import module as _tpdb  # noqa: F401
 from organon.modules.tropicos import module as _tropicos  # noqa: F401
 from organon.modules.vascan import module as _vascan  # noqa: F401
 from organon.modules.wfo import module as _wfo  # noqa: F401
+from organon.modules.wp_portails import module as _wp_portails  # noqa: F401
 from organon.modules.wrms import module as _wrms  # noqa: F401
 from organon.modules.wsc import module as _wsc  # noqa: F401
 

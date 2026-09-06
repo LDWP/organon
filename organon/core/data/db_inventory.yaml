@@ -127,15 +127,6 @@ categories:
         acces: {type: api_rest, detail: "API REST/JSON publique, sans clé (eol.org/api/search/1.0, /api/pages/1.0)"}
         derniere_maj: null
         notes: "Absent de la version précédente par omission ; vérifié dans le code (organon/modules/eol)."
-      - id: externe
-        nom: "Liens transversaux Wikimédia (Wikidata, Commons, Wikispecies, Wiktionnaire)"
-        url: "https://www.wikidata.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "module de liens externes, ne fournit aucune classification"}
-        elements_recoltes: ["identifiant Wikidata (QID)", "existence de page Commons (article et catégorie)", "existence de page Wikispecies", "existence de page Wiktionnaire francophone"]
-        acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire)"}
-        derniere_maj: null
-        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique."
       - id: bhl
         nom: "Biodiversity Heritage Library (BHL)"
         url: "https://www.biodiversitylibrary.org"
@@ -252,6 +243,28 @@ categories:
         elements_recoltes: []
         acces: {type: inconnu, detail: "page d'accueil atteignable, pas d'API identifiée"}
         derniere_maj: null
+
+  - id: wikimedia
+    nom: "Wikimédia"
+    sources:
+      - id: externe
+        nom: "Liens transversaux Wikimédia (Wikidata, Commons, Wikispecies, Wiktionnaire)"
+        url: "https://www.wikidata.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "module de liens externes, ne fournit aucune classification"}
+        elements_recoltes: ["identifiant Wikidata (QID)", "existence de page Commons (article et catégorie)", "existence de page Wikispecies", "existence de page Wiktionnaire francophone"]
+        acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire)"}
+        derniere_maj: null
+        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique."
+      - id: wp_portails
+        nom: "fr.wikipedia.org"
+        url: "https://fr.wikipedia.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "module de choix des portails, ne fournit aucune classification"}
+        elements_recoltes: ["portails"]
+        acces: {type: api_rest, detail: "API MediaWiki standard (fr.wikipedia.org/w/api.php, action=query/prop=revisions), suit les redirections"}
+        derniere_maj: "2026-09-06"
+        notes: "Complète (jamais ne remplace) les règles statiques de organon/core/selectors/rules/portails.yaml : n'intervient qu'en repli, avant le dernier repli générique par règne — voir organon.core.selectors.categorization.lien_pour_portail. Pas une base taxonomique, mais Wikipédia elle-même."
 
   - id: paleo_paleozoologie
     nom: "Paléontologie — Paléozoologie"
