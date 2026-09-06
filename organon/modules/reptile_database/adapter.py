@@ -22,6 +22,7 @@ BASE_URL = "https://reptile-database.reptarium.cz"
 _NOT_FOUND_RE = re.compile(r"<h1>Species <em>[^<]+</em> was not found!</h1>")
 _FOUND_RE = re.compile(r"<h1><em>([^<]+)</em>([^<]*)</h1>")
 _HIGHER_TAXA_RE = re.compile(r"<tr><td>Higher Taxa</td><td>([^<]*)</td>")
+_SEARCH_NOT_FOUND_RE = re.compile(r"<p>No species were found\.</p>")
 
 _ORDRES_CONNUS = frozenset({"Squamata", "Testudines", "Crocodylia", "Rhynchocephalia"})
 """Les 4 seuls ordres de reptiles vivants couverts par la base (squamates, tortues,
@@ -103,3 +104,27 @@ class ReptileDatabaseAdapter(OwnedClientMixin):
         return SpeciesHit(
             nom=nom.strip(), auteur=(auteur.strip() or None), famille=famille, ordre=ordre
         )
+
+    async def _advanced_search_exists(self, champ: str, valeur: str) -> bool:
+        """Le site n'a pas de fiche dédiée genre/famille, seulement ce formulaire de recherche
+        (`/advanced_search`) listant les espèces correspondantes — `exact[]` est nécessaire car
+        sans lui la recherche fait une correspondance par sous-chaîne (ex. `genus=Varan` renvoie
+        aussi les 93 espèces de *Varanus*)."""
+        params = {
+            champ: valeur,
+            "exact[]": champ,
+            "ok": "Search",
+            "do": "AdvancedSearchForm-submit",
+        }
+        resp = await self._client.get(f"{BASE_URL}/advanced_search", params=params)
+        resp.raise_for_status()
+        return not _SEARCH_NOT_FOUND_RE.search(resp.text)
+
+    async def genus_exists(self, genus: str) -> bool:
+        return await self._advanced_search_exists("genus", genus)
+
+    async def family_exists(self, family: str) -> bool:
+        """Le champ « Higher Taxa » d'une fiche espèce mélange famille et ordre (voir
+        `_parse_higher_taxa`) ; côté recherche, ils partagent le même champ `taxon` ("Higher
+        taxa")."""
+        return await self._advanced_search_exists("taxon", family)

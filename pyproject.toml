@@ -43,6 +43,10 @@ packages = ["organon"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+# Sans ça, deux `test_module.py` de même nom dans des sous-dossiers différents (un par module,
+# ex. tests/modules/wsc et tests/modules/reptile_database) entrent en conflit d'import faute de
+# `__init__.py` — `importlib` les identifie par leur chemin plutôt que par ce nom partagé.
+addopts = "--import-mode=importlib"
 
 [tool.ruff]
 line-length = 100

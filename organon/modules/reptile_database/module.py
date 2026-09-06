@@ -5,10 +5,15 @@ façon fiable — voir `organon.modules.reptile_database.adapter._parse_higher_t
 des clades intermédiaires (sous-famille, super-famille, sous-ordre...) volontairement ignorés :
 rang non indiqué dans le HTML, et position incohérente d'une fiche à l'autre.
 
-Le site n'indexe que le nom binomial accepté (genre + épithète spécifique) : un nom qui n'est
-pas exactement à deux mots (genre seul, trinomial de sous-espèce, etc.) n'a pas de fiche
-`/Genus/species` correspondante et est donc ignoré ici plutôt que d'être tronqué au hasard —
-cette base ne peut donc jamais classifier au rang sous-espèce."""
+Le site n'a de fiche dédiée (`/Genus/species`) que pour le nom binomial accepté (genre +
+épithète spécifique) : un nom trinomial de sous-espèce n'y correspond à rien et est donc ignoré
+plutôt que d'être tronqué au hasard — cette base ne peut donc jamais classifier au rang
+sous-espèce. Un nom à un seul mot (genre ou famille) n'a lui non plus aucune fiche, seulement un
+formulaire de recherche listant les espèces correspondantes (voir
+`ReptileDatabaseAdapter.genus_exists`/`family_exists`) : insuffisant pour classifier (pas de
+rang parent extractible), mais assez pour confirmer la présence du taxon et publier une
+citation ({{ReptileDB genre}}/{{ReptileDB famille}}) une fois son rang déjà résolu par un autre
+module — voir `collect()`."""
 
 from __future__ import annotations
 
@@ -33,16 +38,29 @@ class ReptileDatabaseModule(TaxonomyModule):
     ) -> Struct | None:
         taxon = struct.taxon.nom
         mots = taxon.split()
-        if len(mots) != 2:
-            return None
-        genre, espece = mots
+        if len(mots) == 2:
+            return await self._collect_espece(struct, is_classification, *mots)
+        # Le site n'a pas de fiche genre/famille (voir adapter.py), seulement un formulaire de
+        # recherche : on ne peut donc pas classifier à ces rangs, uniquement y ajouter une
+        # citation une fois le rang déjà résolu par un autre module de classification.
+        if len(mots) == 1 and not is_classification and struct.taxon.rang in ("genre", "famille"):
+            return await self._collect_taxon_superieur(struct, struct.taxon.rang, mots[0])
+        return None
 
+    async def _collect_espece(
+        self, struct: Struct, is_classification: bool, genre: str, espece: str
+    ) -> Struct | None:
         hit = await self._adapter.get_species(genre, espece)
         if hit is None:
             return None
 
         auteur = format_auteur(hit.auteur)
-        struct.liens["reptile_database"] = {"genre": genre, "espece": espece, "auteur": auteur}
+        struct.liens["reptile_database"] = {
+            "rang": "espèce",
+            "genre": genre,
+            "espece": espece,
+            "auteur": auteur,
+        }
 
         if not is_classification:
             return struct
@@ -62,22 +80,43 @@ class ReptileDatabaseModule(TaxonomyModule):
 
         return struct
 
+    async def _collect_taxon_superieur(self, struct: Struct, rang: str, nom: str) -> Struct | None:
+        existe = (
+            await self._adapter.genus_exists(nom)
+            if rang == "genre"
+            else await self._adapter.family_exists(nom)
+        )
+        if not existe:
+            return None
+        struct.liens["reptile_database"] = {"rang": rang, "nom": nom}
+        return struct
+
     def render_bioref(self, struct: Struct) -> str | None:
         data = struct.liens.get("reptile_database")
         if not data:
             return None
         cdate = dates_recupere()
-        auteur = f" | {data['auteur']}" if data.get("auteur") else ""
-        return (
-            f"{{{{ReptileDB espèce | {data['genre']} | {data['espece']}{auteur} "
-            f"| consulté le={cdate} }}}}"
-        )
+        if data["rang"] == "espèce":
+            auteur = f" | {data['auteur']}" if data.get("auteur") else ""
+            return (
+                f"{{{{ReptileDB espèce | {data['genre']} | {data['espece']}{auteur} "
+                f"| consulté le={cdate} }}}}"
+            )
+        modele = "ReptileDB genre" if data["rang"] == "genre" else "ReptileDB famille"
+        return f"{{{{{modele} | {data['nom']} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
         data = struct.liens.get("reptile_database")
         if not data:
             return None
-        url = f"{BASE_URL}/{data['genre']}/{data['espece']}"
+        if data["rang"] == "espèce":
+            url = f"{BASE_URL}/{data['genre']}/{data['espece']}"
+        else:
+            champ = "genus" if data["rang"] == "genre" else "taxon"
+            url = (
+                f"{BASE_URL}/advanced_search?{champ}={data['nom']}&exact%5B%5D={champ}"
+                "&ok=Search&do=AdvancedSearchForm-submit"
+            )
         return f"<a href='{url}' target='_blank' rel='noopener noreferrer'>Reptile Database</a>"
 
 
