@@ -14,7 +14,7 @@ from __future__ import annotations
 import re
 from collections import Counter
 
-from organon.core.domains import build_module_domain_tree, rec_strict_domaine
+from organon.core.domains import build_module_domain_tree, domaine_couvre
 from organon.core.models import RangIncoherence, RegneIncoherence, Struct
 from organon.core.registry import get_module
 
@@ -158,12 +158,15 @@ def reference_module_coherente(module_id: str, regne: str) -> bool:
     S'appuie sur `ModuleMeta.domains` (déjà utilisé pour sélectionner les classifications
     possibles, voir `organon.core.domains`) plutôt que sur une liste ad hoc : un module dont le
     domaine déclaré exclut le règne du taxon (ex. IndexFungorum, réservé aux champignons,
-    référencé sur un animal) est jugé incohérent. Règne vide ou "neutre" (rang au-dessus de
-    l'espèce, ou règne non résolu) : aucune détection fiable possible, jugé cohérent par défaut
-    plutôt que de décocher à tort."""
+    référencé sur un animal) est jugé incohérent. Un domaine déclaré plus fin que le règne
+    stocké (ex. MSW -> `["mammifère"]`, alors que `struct.regne` ne descend jamais sous
+    "animal", voir `regne_depuis_classification`) reste cohérent : `domaine_couvre` accepte
+    aussi ce cas ancêtre/descendant. Règne vide ou "neutre" (rang au-dessus de l'espèce, ou
+    règne non résolu) : aucune détection fiable possible, jugé cohérent par défaut plutôt que de
+    décocher à tort."""
     if not regne or regne == _REGNE_INCONNU:
         return True
     module = get_module(module_id)
     if module is None:
         return True
-    return rec_strict_domaine(regne, build_module_domain_tree(module.meta.domains))
+    return domaine_couvre(regne, build_module_domain_tree(module.meta.domains))

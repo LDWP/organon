@@ -140,6 +140,19 @@ def rec_strict_domaine(domaine: str, def_: DomainTree) -> bool:
     return False
 
 
+def domaine_couvre(domaine: str, def_: DomainTree) -> bool:
+    """Le module (via son arbre de domaines `def_`) couvre-t-il `domaine` ? Vrai si `domaine`
+    lui-même est accepté, mais aussi si un de ses sous-domaines l'est (ex. `domaine="animal"`
+    face à un module restreint à `["mammifère"]` : le nœud "animal" n'est pas accepté
+    directement, seul son descendant "mammifère" l'est — cas réel de MSW, dont le domaine
+    déclaré est plus fin que le règne grossier stocké dans `struct.regne`, voir
+    `organon.core.selectors.coherence.reference_module_coherente`)."""
+    if rec_strict_domaine(domaine, def_):
+        return True
+    base = rec_contenu_domaine(domaine, def_)
+    return base is not None and vrai_dans_domaine({"anonymous": base})
+
+
 def modules_possibles(domaine: str, module_trees: dict[str, DomainTree]) -> list[str] | None:
     """`module_trees` associe id-module -> son arbre de domaines. Retourne None si le domaine
     demandé n'existe pas du tout dans `TOUS_DOMAINES`."""
@@ -149,15 +162,7 @@ def modules_possibles(domaine: str, module_trees: dict[str, DomainTree]) -> list
     if domaine == "*":
         return list(module_trees.keys())
 
-    out = []
-    for nom, tree in module_trees.items():
-        if rec_strict_domaine(domaine, tree):
-            out.append(nom)
-            continue
-        base = rec_contenu_domaine(domaine, tree)
-        if base is not None and vrai_dans_domaine({"anonymous": base}):
-            out.append(nom)
-    return out
+    return [nom for nom, tree in module_trees.items() if domaine_couvre(domaine, tree)]
 
 
 def rec_prof_classification(def_: DomainTree, domaine: str, prof: int) -> float:
