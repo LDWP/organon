@@ -21,6 +21,7 @@ plutôt que l'IP seule. `_BROWSER_HEADERS` imite un navigateur pour contourner c
 
 from __future__ import annotations
 
+import html
 import re
 
 import httpx
@@ -66,19 +67,24 @@ class InpnAdapter(OwnedClientMixin):
         return resp.text
 
     @staticmethod
-    def parse_breadcrumb(html: str) -> list[tuple[int, str]]:
+    def parse_breadcrumb(html_page: str) -> list[tuple[int, str]]:
         """Lignée complète racine -> parent immédiat (le taxon lui-même n'apparaît pas dans
         son propre fil d'Ariane, qui ne montre que les ancêtres)."""
-        return [(int(m.group("id")), m.group("nom").strip()) for m in _BREADCRUMB_RE.finditer(html)]
+        return [
+            (int(m.group("id")), html.unescape(m.group("nom")).strip())
+            for m in _BREADCRUMB_RE.finditer(html_page)
+        ]
 
     @staticmethod
-    def parse_vernacular_french(html: str) -> list[str]:
-        block_match = _VERNACULAR_BLOCK_RE.search(html)
+    def parse_vernacular_french(html_page: str) -> list[str]:
+        block_match = _VERNACULAR_BLOCK_RE.search(html_page)
         if block_match is None:
             return []
         out: list[str] = []
         for m in _VERNACULAR_ENTRY_RE.finditer(block_match.group("block")):
             if m.group("langue").strip() != "Français":
                 continue
-            out.extend(nom.strip() for nom in m.group("noms").split(",") if nom.strip())
+            out.extend(
+                html.unescape(nom).strip() for nom in m.group("noms").split(",") if nom.strip()
+            )
         return out

@@ -113,11 +113,13 @@ def extract_aphia_original_description(html_page: str) -> str | None:
     if span_match is None:
         return None
     texte = _TAG_RE.sub("", span_match.group("texte"))
-    # Le titre d'ouvrage est stocké échappé (ex. "&lt;i&gt;Systema Naturae...&lt;/i&gt;") : une
-    # fois décodé, ce sont des balises <i>/</i> réelles à convertir en italique wikitexte plutôt
-    # que laissées en HTML brut (même convention que le champ "originale" d'AlgaeBase, voir
+    # Le titre d'ouvrage est stocké échappé (ex. "&lt;i&gt;Systema Naturae...&lt;/i&gt;" ou
+    # "&lt;em&gt;...&lt;/em&gt;", les deux formes observées en direct) : une fois décodé, ce sont
+    # des balises <i>/<em> réelles à convertir en italique wikitexte plutôt que laissées en HTML
+    # brut (même convention que le champ "originale" d'AlgaeBase, voir
     # `organon/modules/algaebase/module.py`).
-    texte = _html.unescape(texte).replace("<i>", "''").replace("</i>", "''").strip()
+    texte = _html.unescape(texte)
+    texte = re.sub(r"</?(?:i|em)>", "''", texte).strip()
     return texte or None
 
 
