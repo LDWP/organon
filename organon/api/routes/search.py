@@ -67,7 +67,11 @@ def _clean_name(entry: dict) -> str | None:
     nom = entry.get("scientificName") or entry.get("canonicalName")
     if not nom:
         return None
-    auteur = entry.get("authorship") or ""
+    # `.strip()` : GBIF renvoie parfois `authorship` avec un espace final absent du même
+    # suffixe dans `scientificName` (ex. "Panthera leo (Linnaeus, 1758)" avec authorship
+    # "(Linnaeus, 1758) ") — `endswith` échouait alors silencieusement, laissant l'auteur
+    # dans le nom nettoyé et cassant la correspondance exacte de `_relevance`.
+    auteur = (entry.get("authorship") or "").strip()
     if auteur and nom.endswith(auteur):
         nom = nom[: -len(auteur)].rstrip()
     return nom or None
