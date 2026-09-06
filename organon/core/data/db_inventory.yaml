@@ -191,9 +191,9 @@ categories:
         url: "https://www.iucnredlist.org"
         statut: disponible
         classification: {possible: false, estime: false, detail: "statut de conservation, pas une classification"}
-        elements_recoltes: [statut de conservation, critères d'évaluation]
+        elements_recoltes: [statut de conservation, critères d'évaluation, auteur, identifiant]
         acces: {type: api_rest, detail: "API v4 REST/JSON (api.iucnredlist.org), jeton individuel gratuit requis"}
-        derniere_maj: "2026-09-04"
+        derniere_maj: "2026-09-05"
       - id: sealifebase
         nom: SeaLifeBase
         url: null

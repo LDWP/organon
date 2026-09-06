@@ -1,13 +1,21 @@
 """Logique métier du module IUCN Red List (statut de conservation). Module d'enrichissement
 uniquement (pas de classification) : alimente `{{Taxobox UICN}}` (voir
-`organon.core.rendering.sections.render_taxobox`).
+`organon.core.rendering.sections.render_taxobox`) et le modèle de référence `{{UICN}}` (voir
+`render_bioref`), les deux étant systématiquement appariés par la documentation wiki du modèle
+(« N'oubliez pas d'ajouter un {{UICN}} à la page »). `{{UICN}}` attend en premier paramètre le
+code numérique du taxon sur iucnredlist.org (ex. 15951 pour Panthera leo, vérifié en direct sur
+https://fr.wikipedia.org/wiki/Modèle:UICN) : c'est le `sis_id` déjà présent dans la réponse
+`/taxa/scientific_name` (aucun appel réseau supplémentaire), et il correspond exactement à la
+propriété Wikidata P627 "IUCN taxon ID" (vérifiée en direct sur wikidata.org).
 
 Remplace l'ancien passager posé par le module GBIF (`struct.liens["uicn"] = {"risque": code}`,
 voir l'historique de `organon.modules.gbif.module`) : GBIF n'expose que le code de catégorie, pas
 les critères d'évaluation (ex. "A2abd+4abd") — paramètre optionnel déjà lu par `render_taxobox`
-mais resté vide faute de source. Seule l'API IUCN v4 directe les fournit. La clé
-`struct.liens["uicn"]` (pas "iucn", historique) est conservée telle quelle : elle est aussi lue
-indépendamment par `organon.api.routes.generate` et `organon.api.schemas`.
+mais resté vide faute de source. Seule l'API IUCN v4 directe les fournit. La clé `struct.liens`
+utilisée ici est désormais `"iucn"`, alignée sur `meta.id` : l'ancienne clé `"uicn"` (héritée du
+passager GBIF) empêchait silencieusement `_compute_ext_liens_items`
+(`organon.core.rendering.sections`) de retrouver ce module par son id lors de l'assemblage du
+bloc `{{Bioref}}`, ce qui rendait `render_bioref` inatteignable quel que soit son contenu.
 
 Un taxon porte souvent plusieurs évaluations à la fois, une par périmètre géographique (Global,
 Europe, Méditerranée...), chacune pouvant être "latest" dans son propre périmètre — voir
@@ -19,6 +27,9 @@ from __future__ import annotations
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
+from organon.core.rendering.grammar import wp_met_italiques
+from organon.core.rendering.support import dates_recupere
+from organon.modules.common import format_auteur
 from organon.modules.iucn.adapter import IucnAdapter
 
 _MARQUEURS_RANG = {"subsp.", "ssp.", "var.", "f.", "forma"}
@@ -58,10 +69,10 @@ class IucnModule(TaxonomyModule):
         # Priorité la plus haute du dépôt (au-dessus de COL, 999) : `EnrichmentRunner.run`
         # fusionne `struct.liens` module par module dans l'ordre croissant de priorité, dernier
         # appliqué gagnant sur une clé partagée (voir organon/api/routes/generate.py). Personne
-        # d'autre n'écrit `liens["uicn"]` aujourd'hui, mais GBIF le faisait avant ce module (voir
-        # git history) : si cette écriture était réintroduite par erreur, cette priorité garantit
-        # que la donnée UICN directe (avec critère d'évaluation) l'emporte toujours sur un
-        # passager plus pauvre, plutôt que l'inverse silencieux.
+        # d'autre n'écrit `liens["iucn"]` aujourd'hui, mais GBIF écrivait `liens["uicn"]` avant ce
+        # module (voir git history) : si cette écriture était réintroduite par erreur, cette
+        # priorité garantit que la donnée UICN directe (avec critère d'évaluation) l'emporte
+        # toujours sur un passager plus pauvre, plutôt que l'inverse silencieux.
         priority=1000,
     )
 
@@ -87,15 +98,29 @@ class IucnModule(TaxonomyModule):
         if evaluation is None or not evaluation.get("red_list_category_code"):
             return None
 
-        struct.liens["uicn"] = {
+        taxon = data.get("taxon") or {}
+        struct.liens["iucn"] = {
+            "id": taxon.get("sis_id"),
+            "nom": taxon.get("scientific_name") or struct.taxon.nom,
+            "auteur": format_auteur(taxon.get("authority")),
             "risque": evaluation["red_list_category_code"],
             "critere": evaluation.get("criteria") or "",
             "url": evaluation.get("url"),
         }
         return struct
 
+    def render_bioref(self, struct: Struct) -> str | None:
+        data = struct.liens.get("iucn")
+        if not data or not data.get("id"):
+            return None
+        cdate = dates_recupere()
+        cible = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
+        if data.get("auteur"):
+            cible += " " + data["auteur"]
+        return f"{{{{UICN | {data['id']} | {cible} | consulté le={cdate} }}}}"
+
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("uicn")
+        data = struct.liens.get("iucn")
         if not data or not data.get("url"):
             return None
         return f"<a href='{data['url']}' target='_blank' rel='noopener noreferrer'>UICN</a>"

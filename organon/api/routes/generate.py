@@ -714,7 +714,7 @@ def _assemble_response(
         domain_used=struct.domaine,
         regne=struct.regne,
         eteint=bool(struct.taxon.eteint),
-        uicn_statut=struct.liens.get("uicn", {}).get("risque", ""),
+        uicn_statut=struct.liens.get("iucn", {}).get("risque", ""),
         vernacular_names=list(vernacular_merged)[:6],
         autres_noms=autres_noms_response,
         wikitext=wikitext,
