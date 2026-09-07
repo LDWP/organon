@@ -418,8 +418,12 @@ class GbifModule(TaxonomyModule):
             if col_xr.get("auteur"):
                 cible_col += " " + col_xr["auteur"]
             sup_col = " | éteint=oui" if col_xr.get("eteint") else ""
+            # Pas de `nv` ici : `find_col_xr_link` ne renvoie jamais une fiche synonyme (voir sa
+            # docstring), contrairement au statut GBIF ci-dessus qui peut différer — reprendre
+            # `nv` casserait le dédoublonnage avec la ligne équivalente de `ColModule`, qui ne
+            # marque jamais `nv` sur une fiche accepted.
             out.append(
-                f"{{{{CatalogueofLife | {data['id']} | {cible_col}{sup_col}{nv} | "
+                f"{{{{CatalogueofLife | {data['id']} | {cible_col}{sup_col} | "
                 f"consulté le={cdate} }}}}"
             )
         return out
