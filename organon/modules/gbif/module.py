@@ -297,6 +297,7 @@ class GbifModule(TaxonomyModule):
             if options.suivre_synonymes:
                 if hop >= MAX_SYNONYM_HOPS:
                     return None
+                assert accepted_key is not None  # garanti par is_synonym (ligne 287)
                 accepted_info = await _taxon_info(adapter, accepted_key)
                 if accepted_info is None:
                     return None

@@ -151,9 +151,11 @@ async def _collect_species(
     if found is None:
         return None
 
-    detail_resp = await adapter.species_detail(key, found.get("dwc:acceptedNameUsageID"))
-    if detail_resp and detail_resp.get("details"):
-        found = detail_resp["details"]
+    accepted_id = found.get("dwc:acceptedNameUsageID")
+    if accepted_id is not None:
+        detail_resp = await adapter.species_detail(key, accepted_id)
+        if detail_resp and detail_resp.get("details"):
+            found = detail_resp["details"]
 
     blob = _base_blob(found, taxon, id_field="dwc:acceptedNameUsageID")
     struct.liens["algaebase"] = blob
