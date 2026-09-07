@@ -18,4 +18,4 @@ router = APIRouter()
 @router.get("/sources", response_model=SourcesResponse)
 async def list_sources() -> SourcesResponse:
     ensure_modules_registered()
-    return build_sources_overview()
+    return SourcesResponse(**build_sources_overview().model_dump())
