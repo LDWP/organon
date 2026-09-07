@@ -125,7 +125,10 @@ class IndexFungorumModule(TaxonomyModule):
         if not full.get("Genus_name"):
             return None  # rang famille et au-dessus : NameByKey ne joint pas la hiérarchie
 
-        struct.regne = ixf_regne(full.get("Kingdom_name"))
+        regne = ixf_regne(full.get("Kingdom_name"))
+        if regne is None:
+            return None  # Kingdom_name absent : donnée de classification insuffisante.
+        struct.regne = regne
         struct.taxon.rang = ixf_rang(full.get("INFRASPECIFIC_RANK"))
         struct.taxon.auteur = format_auteur(auteur_annee)
 
