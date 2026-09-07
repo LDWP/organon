@@ -370,7 +370,9 @@ class GbifModule(TaxonomyModule):
                         out.append(RankName.model_validate(child_info))
                 return out, len(raw), page.get("endOfRecords", True)
 
-            liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
+            liste, coupe = await collect_pages(
+                fetch_children, limit=as_limit(options.limite_listes)
+            )
             if liste:
                 struct.sous_taxons = SubTaxonList(liste=liste, source="GBIF", coupe=coupe)
 
@@ -382,11 +384,17 @@ class GbifModule(TaxonomyModule):
                 blob = await _taxon_info(adapter, c["key"])
                 if blob is not None:
                     out.append(
-                        RankName(nom=blob["nom"], auteur=format_auteur(blob["auteur"]), rang=blob.get("rang"))
+                        RankName(
+                            nom=blob["nom"],
+                            auteur=format_auteur(blob["auteur"]),
+                            rang=blob.get("rang"),
+                        )
                     )
             return out, len(raw), page.get("endOfRecords", True)
 
-        synonymes, coupe = await collect_pages(fetch_synonyms, limit=as_limit(options.limite_listes))
+        synonymes, coupe = await collect_pages(
+            fetch_synonyms, limit=as_limit(options.limite_listes)
+        )
         if synonymes:
             struct.synonymes = SynonymList(liste=synonymes, source="GBIF", coupe=coupe)
 
