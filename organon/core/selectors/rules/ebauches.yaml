@@ -1,6 +1,11 @@
-# Généré depuis selecteurs/ebauches.lst par scripts/migrate_selectors.py.
-# Ne pas éditer à la main sans mettre à jour le fichier source ci-dessus, ou
-# créer un ebauches.local.yaml pour des règles spécifiques (voir README).
+# Règles de correspondance rang taxonomique -> {{ébauche|...}}, évaluées dans l'ordre (la
+# première qui matche l'emporte) — voir organon.core.selectors.categorization.wp_ebauche.
+# Fichier maintenu à la main : créer un ebauches.local.yaml pour des règles spécifiques
+# plutôt que d'éditer celui-ci si la surcharge est locale/temporaire.
+#
+# La règle Nematocera précède volontairement celle de Diptera : un diptère nématocère porte
+# les deux rangs ("sous-ordre": "Nematocera" et "ordre": "Diptera") dans sa chaîne de
+# classification, et seule la première règle qui matche est retenue.
 
 - when:
     field: rangs.embranchement
@@ -20,3 +25,462 @@
     eq: Testudines
   return:
   - tortue
+
+# Arthropodes (arachnides et ordres apparentés)
+- when:
+    any_of:
+    - field: rangs.sous-classe
+      eq: Acari
+    - field: rangs.superordre
+      eq: Acari
+    - field: rangs.ordre
+      eq: Acari
+  return:
+  - acarien
+- when:
+    field: rangs.ordre
+    eq: Amblypygi
+  return:
+  - amblypyge
+- when:
+    field: rangs.ordre
+    eq: Araneae
+  return:
+  - araignée
+- when:
+    field: rangs.ordre
+    eq: Opiliones
+  return:
+  - opilion
+- when:
+    field: rangs.ordre
+    eq: Palpigradi
+  return:
+  - palpigrade
+- when:
+    field: rangs.ordre
+    eq: Pseudoscorpiones
+  return:
+  - pseudoscorpion
+- when:
+    field: rangs.ordre
+    eq: Ricinulei
+  return:
+  - ricinule
+- when:
+    field: rangs.ordre
+    eq: Schizomida
+  return:
+  - schizomide
+- when:
+    field: rangs.ordre
+    eq: Scorpiones
+  return:
+  - scorpion
+- when:
+    field: rangs.ordre
+    eq: Solifugae
+  return:
+  - solifuge
+- when:
+    any_of:
+    - field: rangs.ordre
+      eq: Uropygi
+    - field: rangs.ordre
+      eq: Thelyphonida
+  return:
+  - uropyge
+
+# Arthropodes (insectes et ordres apparentés)
+- when:
+    field: rangs.sous-ordre
+    eq: Nematocera
+  return:
+  - Nematocera
+- when:
+    any_of:
+    - field: rangs.ordre
+      eq: Blattaria
+    - field: rangs.ordre
+      eq: Blattodea
+  return:
+  - Blattaria
+- when:
+    field: rangs.ordre
+    eq: Coleoptera
+  return:
+  - Coleoptera
+- when:
+    field: rangs.ordre
+    eq: Diptera
+  return:
+  - Diptera
+- when:
+    field: rangs.ordre
+    eq: Mantodea
+  return:
+  - Mantodea
+- when:
+    field: rangs.ordre
+    eq: Odonata
+  return:
+  - Odonata
+- when:
+    field: rangs.ordre
+    eq: Orthoptera
+  return:
+  - Orthoptera
+- when:
+    field: rangs.ordre
+    eq: Lepidoptera
+  return:
+  - lépidoptère
+- when:
+    any_of:
+    - field: rangs.classe
+      eq: Collembola
+    - field: rangs.ordre
+      eq: Collembola
+  return:
+  - collembole
+- when:
+    field: rangs.classe
+    eq: Insecta
+  return:
+  - insecte
+
+# Autres invertébrés
+- when:
+    field: rangs.embranchement
+    eq: Acanthocephala
+  return:
+  - acanthocéphale
+- when:
+    field: rangs.embranchement
+    eq: Echinodermata
+  return:
+  - échinoderme
+- when:
+    field: rangs.embranchement
+    eq: Kinorhyncha
+  return:
+  - kinorhyncha
+- when:
+    field: rangs.embranchement
+    eq: Loricifera
+  return:
+  - loricifère
+- when:
+    field: rangs.embranchement
+    eq: Priapulida
+  return:
+  - priapulien
+- when:
+    field: rangs.embranchement
+    eq: Tardigrada
+  return:
+  - tardigrade
+- when:
+    field: rangs.embranchement
+    eq: Platyhelminthes
+  return:
+  - plathelminthe
+- when:
+    field: rangs.embranchement
+    eq: Nematoda
+  return:
+  - nématode
+- when:
+    field: rangs.embranchement
+    eq: Mollusca
+  return:
+  - mollusque
+- when:
+    field: rangs.embranchement
+    eq: Porifera
+  return:
+  - éponge
+- when:
+    field: rangs.sous-embranchement
+    eq: Crustacea
+  return:
+  - crustacé
+
+# Vertébrés
+- when:
+    field: rangs.famille
+    eq: Bovidae
+  return:
+  - bovidé
+- when:
+    field: rangs.famille
+    eq: Canidae
+  return:
+  - canidés
+- when:
+    field: rangs.ordre
+    eq: Carnivora
+  return:
+  - carnivore
+- when:
+    field: rangs.ordre
+    eq: Chiroptera
+  return:
+  - chiroptère
+- when:
+    field: rangs.ordre
+    eq: Crocodylia
+  return:
+  - crocodilien
+- when:
+    field: rangs.infra-ordre
+    eq: Cetacea
+  return:
+  - cétacé
+- when:
+    field: rangs.famille
+    eq: Felidae
+  return:
+  - félin
+- when:
+    field: rangs.famille
+    eq: Leporidae
+  return:
+  - lapin
+- when:
+    field: rangs.ordre
+    eq: Primates
+  return:
+  - primate
+- when:
+    field: rangs.ordre
+    eq: Rodentia
+  return:
+  - rongeur
+- when:
+    field: rangs.sous-ordre
+    eq: Serpentes
+  return:
+  - serpent
+# Testudines et Crocodylia (autres ordres de reptiles) ont déjà une règle dédiée plus haut
+# (tortue/crocodilien) et ne sont donc pas répétés ici.
+- when:
+    any_of:
+    - field: rangs.ordre
+      eq: Squamata
+    - field: rangs.ordre
+      eq: Rhynchocephalia
+    - field: rangs.famille
+      eq: Sphenodontidae
+  return:
+  - reptile
+- when:
+    any_of:
+    - field: rangs.superordre
+      eq: Selachimorpha
+    - field: rangs.infra-classe
+      eq: Elasmobranchii
+  return:
+  - requin
+- when:
+    any_of:
+    - field: rangs.classe
+      eq: Chondrichthyes
+    - field: rangs.super-classe
+      eq: Osteichthyes
+  return:
+  - poisson
+- when:
+    field: rangs.clade
+    eq: Dinosauria
+  return:
+  - dinosaure
+- when:
+    field: rangs.classe
+    eq: Aves
+  return:
+  - oiseau
+- when:
+    field: rangs.classe
+    eq: Mammalia
+  return:
+  - mammifère
+
+# Plantes (familles)
+- when:
+    field: rangs.famille
+    eq: Amaranthaceae
+  return:
+  - Amaranthaceae
+- when:
+    field: rangs.famille
+    eq: Arecaceae
+  return:
+  - palmier
+- when:
+    field: rangs.famille
+    eq: Asteraceae
+  return:
+  - composée
+- when:
+    field: rangs.famille
+    eq: Brassicaceae
+  return:
+  - crucifère
+- when:
+    field: rangs.famille
+    eq: Bromeliaceae
+  return:
+  - Bromeliaceae
+- when:
+    field: rangs.famille
+    eq: Burseraceae
+  return:
+  - Burseraceae
+- when:
+    field: rangs.famille
+    eq: Cactaceae
+  return:
+  - cactus
+- when:
+    field: rangs.famille
+    eq: Casuarinaceae
+  return:
+  - Casuarinaceae
+- when:
+    field: rangs.famille
+    eq: Convolvulaceae
+  return:
+  - Convolvulaceae
+- when:
+    field: rangs.famille
+    eq: Cucurbitaceae
+  return:
+  - Cucurbitaceae
+- when:
+    field: rangs.famille
+    eq: Euphorbiaceae
+  return:
+  - Euphorbiaceae
+- when:
+    field: rangs.famille
+    eq: Fabaceae
+  return:
+  - Fabaceae
+- when:
+    field: rangs.famille
+    eq: Fagaceae
+  return:
+  - Fagaceae
+- when:
+    field: rangs.famille
+    eq: Hamamelidaceae
+  return:
+  - Hamamelidaceae
+- when:
+    field: rangs.famille
+    eq: Lamiaceae
+  return:
+  - lamiacée
+- when:
+    field: rangs.famille
+    eq: Lauraceae
+  return:
+  - Lauraceae
+- when:
+    field: rangs.famille
+    eq: Magnoliaceae
+  return:
+  - Magnoliaceae
+- when:
+    field: rangs.famille
+    eq: Menispermaceae
+  return:
+  - Menispermaceae
+- when:
+    field: rangs.famille
+    eq: Moraceae
+  return:
+  - Moraceae
+- when:
+    field: rangs.famille
+    eq: Oleaceae
+  return:
+  - Oleaceae
+- when:
+    field: rangs.famille
+    eq: Orchidaceae
+  return:
+  - orchidée
+- when:
+    field: rangs.famille
+    eq: Oxalidaceae
+  return:
+  - Oxalidaceae
+- when:
+    field: rangs.famille
+    eq: Poaceae
+  return:
+  - graminée
+- when:
+    field: rangs.famille
+    eq: Polygalaceae
+  return:
+  - Polygalaceae
+- when:
+    field: rangs.famille
+    eq: Proteaceae
+  return:
+  - Proteaceae
+- when:
+    field: rangs.famille
+    eq: Ranunculaceae
+  return:
+  - Ranunculaceae
+- when:
+    field: rangs.famille
+    eq: Rosaceae
+  return:
+  - rosacée
+- when:
+    field: rangs.famille
+    eq: Rutaceae
+  return:
+  - Rutaceae
+- when:
+    field: rangs.famille
+    eq: Santalaceae
+  return:
+  - Santalaceae
+- when:
+    field: rangs.famille
+    eq: Solanaceae
+  return:
+  - Solanaceae
+- when:
+    field: rangs.famille
+    eq: Velloziaceae
+  return:
+  - Velloziaceae
+- when:
+    field: rangs.famille
+    eq: Violaceae
+  return:
+  - Violaceae
+
+# Plantes (genres)
+- when:
+    field: rangs.genre
+    eq: Carex
+  return:
+  - carex
+- when:
+    field: rangs.genre
+    eq: Croton
+  return:
+  - croton
+- when:
+    field: rangs.genre
+    eq: Rhododendron
+  return:
+  - rhododendron
