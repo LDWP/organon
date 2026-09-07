@@ -271,7 +271,9 @@ def _pick_classification_winner(
     mêmes (ex. GBIF/ITIS/WoRMS) sert de domaine de facto pour `meilleure_classification` — un
     module spécialisé (LPSN pour une bactérie, POWO pour une plante...) doit l'emporter sur un
     généraliste mieux priorisé même quand l'utilisateur n'a rien filtré à la recherche."""
-    regnes = {cid: results[cid][0].regne for cid in successes if results[cid][0] is not None}
+    regnes = {
+        cid: struct.regne for cid in successes if (struct := results[cid][0]) is not None
+    }
     coherents, exclus, regne_majoritaire = classification_regne_coherents(successes, regnes)
     pool = coherents or successes
 
@@ -280,13 +282,17 @@ def _pick_classification_winner(
 
     if len(pool) == 1 or domaine == "*":
         return max(pool, key=lambda m: priorities.get(m, 0)), exclus
+    # `meilleure_classification` peut renvoyer None (aucun module noté positivement sur ce
+    # domaine ET aucun module de classification par défaut enregistré) — n'arrive pas en
+    # pratique (COL est toujours enregistré comme module par défaut), mais un repli sur le
+    # premier candidat de `pool` (non vide ici, `len(pool) >= 2`) reste préférable à un plantage.
     winner = meilleure_classification(
         domaine,
         classification_module_ids=pool,
         module_trees=trees,
         module_priorities=priorities,
         default_module=default_classification_module(),
-    )
+    ) or pool[0]
     return winner, exclus
 
 
@@ -298,10 +304,10 @@ def _avertissements_exclusion_regne(
     pour un genre de champignon) — le signaler plutôt que le faire disparaître silencieusement,
     au même titre que les autres avertissements affichés dans le panneau Données."""
     return [
-        f"{cid.upper()} écarté de la classification : règne « {results[cid][0].regne} » "
+        f"{cid.upper()} écarté de la classification : règne « {struct.regne} » "
         "minoritaire face aux autres sources (possible homonyme inter-règnes)."
         for cid in exclus
-        if results[cid][0] is not None
+        if (struct := results[cid][0]) is not None
     ]
 
 
@@ -372,6 +378,7 @@ class EnrichmentRunner:
         l'entrelacement de la boucle d'événements plutôt que de la priorité déclarée — `run()`
         fusionne ensuite ces copies indépendantes dans l'ordre de priorité."""
         module = get_module(module_id)
+        assert module is not None  # garanti par le filtre de `_enrichment_ids` (registre statique)
         try:
             updated = await _collect_with_timeout(
                 module,
@@ -488,6 +495,7 @@ async def _generate_core(req: GenerateRequest) -> GenerateResponse:
         req.domaine, successes, trees, priorities, results
     )
     struct = results[classification_id][0]
+    assert struct is not None  # garanti par `successes` (voir _pick_classification_winner)
     logs.append(f"Classification : {classification_id}")
     warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
 
@@ -774,7 +782,7 @@ def _assemble_response(
         auteur_consolide=struct.taxon.auteur or "",
         auteur_resolu=struct.taxon.auteur_resolu or "",
         synonymes=struct.synonymes.liste if struct.synonymes else [],
-        synonymes_source=struct.synonymes.source if struct.synonymes else "",
+        synonymes_source=(struct.synonymes.source or "") if struct.synonymes else "",
         basionyme=struct.basionyme,
         logs=logs,
         warnings=warnings,
@@ -876,6 +884,7 @@ async def generate_stream(
         logs.append(f"Classification : {classification_id}")
         warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
         struct = results[classification_id][0]
+        assert struct is not None  # garanti par `successes` (voir _pick_classification_winner)
 
         applicable = modules_possibles(struct.domaine, trees) or []
         enrichment_ids = [
