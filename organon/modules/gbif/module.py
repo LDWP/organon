@@ -401,7 +401,11 @@ class GbifModule(TaxonomyModule):
         if data.get("auteur"):
             cible += " " + data["auteur"]
         sup = " | éteint=oui" if data.get("eteint") else ""
-        nv = " | nv" if data.get("synonyme") else ""
+        # Quand `data["id"]` est l'identifiant ChecklistBank (COL XR), le lien {{GBIF}} pointe
+        # déjà, via ce même id, vers la fiche COL XR accepted (voir ci-dessous) — `nv` refléterait
+        # alors le statut du backbone GBIF sur un id qui n'est plus le sien, contredisant la fiche
+        # réellement liée. Ne s'applique donc qu'à la clé numérique GBIF legacy.
+        nv = " | nv" if data.get("synonyme") and not isinstance(data["id"], str) else ""
         out = [f"{{{{GBIF | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"]
         if isinstance(data["id"], str):
             # Identifiant ChecklistBank (COL XR) plutôt que la clé numérique GBIF legacy : la
