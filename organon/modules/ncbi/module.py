@@ -43,7 +43,10 @@ class NcbiModule(TaxonomyModule):
 
     def debug_link(self, struct: Struct) -> str | None:
         return simple_debug_link(
-            struct, "ncbi", "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={id}", "NCBI"
+            struct,
+            "ncbi",
+            "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={id}",
+            "NCBI",
         )
 
 

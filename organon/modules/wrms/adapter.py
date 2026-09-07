@@ -58,7 +58,9 @@ class WrmsAdapter(OwnedClientMixin):
             empty_statuses=(204,),
         )
 
-    async def children_by_id(self, aphia_id: int, marine_only: bool = False, offset: int = 1) -> list[dict]:
+    async def children_by_id(
+        self, aphia_id: int, marine_only: bool = False, offset: int = 1
+    ) -> list[dict]:
         data = await fetch_json(
             self._client,
             f"{BASE_URL}/AphiaChildrenByAphiaID/{aphia_id}",

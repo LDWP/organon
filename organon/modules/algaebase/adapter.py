@@ -45,7 +45,9 @@ class AlgaeBaseAdapter(OwnedClientMixin):
         return await fetch_json(self._client, f"{API_BASE}{path}", params=params, headers=headers)
 
     async def search_genus(self, key: str, genus: str) -> dict | None:
-        return await self._get(key, "/genus", params={"genus": genus, "offset": 0, "order": "genus,false"})
+        return await self._get(
+            key, "/genus", params={"genus": genus, "offset": 0, "order": "genus,false"}
+        )
 
     async def genus_detail(self, key: str, taxon_id: int) -> dict | None:
         return await self._get(key, f"/genus/{taxon_id}")

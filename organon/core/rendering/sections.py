@@ -17,7 +17,6 @@ from organon.core.rendering.grammar import (
     lien_pour_basionyme,
     lien_pour_synonyme,
     wp_est_infraspecifique,
-    wp_est_italique,
     wp_eteint_rang,
     wp_inf_rang,
     wp_le_rang,
@@ -148,7 +147,10 @@ def render_taxobox(struct: Struct, options: GenerateOptions, ebauche: list[str])
     classification = f"classification={struct.classification_taxobox}"
     cache = " |règne=cacher " if struct.cacher_regne else ""
 
-    resu += f"{{{{Taxobox début | {regne} | {afftaxon} | {image} | {legende} | {classification}{cache}}}}}\n"
+    resu += (
+        f"{{{{Taxobox début | {regne} | {afftaxon} | {image} | {legende} | "
+        f"{classification}{cache}}}}}\n"
+    )
 
     rank_lines = compute_rank_lines(struct)
     resu += "\n".join(line for _, _, line in reversed(rank_lines))
@@ -233,7 +235,9 @@ def compute_rang_txt(liste: list[RankName]) -> tuple[str, str, str]:
     return rang_txt, rang_txt_singulier, rang_defaut
 
 
-def render_subtaxon_line(sous_taxon: RankName, regne: str, rang_defaut: str, taxon_rang: str) -> str:
+def render_subtaxon_line(
+    sous_taxon: RankName, regne: str, rang_defaut: str, taxon_rang: str
+) -> str:
     """Rendu wikitexte d'une ligne de sous-taxon (`"* ''Nom'' Auteur\\n"`, italiques/éteint
     compris) — extrait de `render_inf` pour être partagé avec
     `organon.core.rendering.subtaxa_merge` (mêmes règles de mise en forme pour le rendu
@@ -277,7 +281,10 @@ def render_inf(struct: Struct, options: GenerateOptions) -> str:
         ret += ret0
 
     if sous_taxons.coupe:
-        ret += "ATTENTION : liste des sous-taxons tronquée car trop longue. Utilisez '-limite-listes' pour modifier ce comportement.\n"
+        ret += (
+            "ATTENTION : liste des sous-taxons tronquée car trop longue. "
+            "Utilisez '-limite-listes' pour modifier ce comportement.\n"
+        )
 
     return "\n" + ret
 
@@ -363,7 +370,8 @@ def render_supp(struct: Struct, options: GenerateOptions) -> str:
     if struct.synonymes is not None and struct.synonymes.liste:
         target = lien_pour_synonyme(struct.regne)
         cible = wp_met_italiques(struct.taxon.nom, struct.taxon.rang, struct.regne)
-        pl = f"{cible} a pour [[{target}|synonymes]]" if len(struct.synonymes.liste) > 1 else f"{cible} a pour [[{target}|synonyme]]"
+        mot = "synonymes" if len(struct.synonymes.liste) > 1 else "synonyme"
+        pl = f"{cible} a pour [[{target}|{mot}]]"
         ret += f"{pl}{{{{Bioref|{struct.synonymes.source}|{cdate}|ref}}}} :\n"
 
         ret_t = []
@@ -386,7 +394,10 @@ def render_supp(struct: Struct, options: GenerateOptions) -> str:
             ret += ret0
 
         if struct.synonymes.coupe:
-            ret += "ATTENTION : liste des synonymes tronquée car trop longue. Utilisez '-limite-listes' pour modifier ce comportement.\n"
+            ret += (
+                "ATTENTION : liste des synonymes tronquée car trop longue. "
+                "Utilisez '-limite-listes' pour modifier ce comportement.\n"
+            )
 
     return "\n\n" + ret if ret else ""
 
@@ -463,7 +474,9 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
                 resu += f"|introduit={','.join(wgsrpd_introduit)}"
             if wgsrpd_eteint:
                 resu += f"|eteint={','.join(wgsrpd_eteint)}"
-            resu += f"|source=[[Plants of the World Online|POWO]]{{{{Bioref|{source}|{cdate}|ref}}}}"
+            resu += (
+                f"|source=[[Plants of the World Online|POWO]]{{{{Bioref|{source}|{cdate}|ref}}}}"
+            )
             resu += "}}\n"
         total = len(certain) + len(uncertain) + len(introduit) + len(eteint)
         if total > SEUIL_LISTE_DISTRIBUTION:
@@ -473,7 +486,10 @@ def render_distribution(struct: Struct, options: GenerateOptions) -> str:
         else:
             resu += _phrase_distribution(certain, uncertain, introduit, eteint, source, cdate)
     else:
-        resu += "''Une distribution issue de plusieurs sources existe. Non implémenté pour le moment''\n"
+        resu += (
+            "''Une distribution issue de plusieurs sources existe. Non implémenté pour le "
+            "moment''\n"
+        )
     return resu
 
 
@@ -581,7 +597,8 @@ def _resume_et_liste_distribution(
     remplace `_phrase_distribution` au-delà de `SEUIL_LISTE_DISTRIBUTION`."""
     ref = f"{{{{Bioref|{source}|{cdate}|ref}}}}"
     # Pas de |ref (pas de balise <ref>) dans la liste déroulante : {{Bioref}} y sert de simple
-    # lien de citation en ligne, la note de bas de page numérotée est déjà posée par `ref` ci-dessus.
+    # lien de citation en ligne, la note de bas de page numérotée est déjà posée par `ref`
+    # ci-dessus.
     citation = f"{{{{Bioref|{source}|{cdate}}}}}"
 
     resu = ""
@@ -668,7 +685,9 @@ def render_originale(struct: Struct, options: GenerateOptions) -> str:
         return ""
 
     pubs = struct.originale if isinstance(struct.originale, list) else [struct.originale]
-    titre = "\n== Publications originales ==\n" if len(pubs) > 1 else "\n== Publication originale ==\n"
+    titre = (
+        "\n== Publications originales ==\n" if len(pubs) > 1 else "\n== Publication originale ==\n"
+    )
     resu = titre
     for pub in sorted(pubs):
         resu += f"* {pub}\n"
@@ -686,7 +705,7 @@ def _compute_ext_liens_items(struct: Struct) -> list[tuple[str, str]]:
     identifiant, voir gbif/module.py render_bioref)."""
     items: list[tuple[str, str]] = []
     seen: set[str] = set()
-    for module_id, data in struct.liens.items():
+    for module_id, _data in struct.liens.items():
         module = None
         from organon.core.registry import get_module  # import tardif : évite un cycle
 

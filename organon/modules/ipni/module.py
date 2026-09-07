@@ -37,7 +37,9 @@ from organon.modules.ipni.adapter import IpniAdapter
 
 
 class IpniModule(TaxonomyModule):
-    meta = ModuleMeta(id="ipni", can_classify=False, can_render_external_link=True, domains=["végétal"])
+    meta = ModuleMeta(
+        id="ipni", can_classify=False, can_render_external_link=True, domains=["végétal"]
+    )
 
     def __init__(self, adapter: IpniAdapter | None = None) -> None:
         self._adapter = adapter or IpniAdapter()

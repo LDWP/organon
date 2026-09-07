@@ -38,8 +38,8 @@ async def _wikidata_qid_for_doi(client: httpx.AsyncClient, doi: str) -> str | No
     `UCASE` plutôt qu'une égalité stricte : Wikidata normalise les valeurs P356 en majuscules
     par convention, mais ce n'est pas garanti pour toutes les entrées."""
     query = (
-        'SELECT ?item WHERE { ?item wdt:P356 ?doi . FILTER(UCASE(STR(?doi)) = UCASE("%s")) }'
-        % sparql_escape(doi)
+        "SELECT ?item WHERE "
+        f'{{ ?item wdt:P356 ?doi . FILTER(UCASE(STR(?doi)) = UCASE("{sparql_escape(doi)}")) }}'
     )
     resp = await client.get(
         WIKIDATA_SPARQL_URL,

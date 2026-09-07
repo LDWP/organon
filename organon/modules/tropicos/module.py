@@ -26,7 +26,9 @@ from organon.modules.tropicos.adapter import TropicosAdapter
 
 
 class TropicosModule(TaxonomyModule):
-    meta = ModuleMeta(id="tropicos", can_classify=False, can_render_external_link=True, domains=["végétal"])
+    meta = ModuleMeta(
+        id="tropicos", can_classify=False, can_render_external_link=True, domains=["végétal"]
+    )
 
     def __init__(self, adapter: TropicosAdapter | None = None) -> None:
         self._adapter = adapter or TropicosAdapter()

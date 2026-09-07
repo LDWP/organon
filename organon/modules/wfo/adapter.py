@@ -22,7 +22,8 @@ BASE_URL = "https://www.worldfloraonline.org"
 # botaniques scrapés (eFlora, Tropicos) — utilisé comme signal de désambiguïsation en aval.
 _RESULT_RE = re.compile(
     r'<a title="(?P<nom>[^"]+)" href="/taxon/(?P<id>wfo-\d+);jsessionid=[^"]*" class="result">'
-    r'<h4 class="h4Results">(?:<strong>)?<em>[^<]+</em>\s*(?P<auteur>[^<]*?)\s*(?:</strong>)?</h4></a>'
+    r'<h4 class="h4Results">(?:<strong>)?<em>[^<]+</em>\s*(?P<auteur>[^<]*?)\s*'
+    r'(?:</strong>)?</h4></a>'
     r'.*?<span id="entryStatus">(?P<statut>[^<]*)</span>',
     re.DOTALL,
 )

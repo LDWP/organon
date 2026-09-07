@@ -11,7 +11,8 @@ BASE_URL = "https://www.speciesplus.net/api/v1"
 class CitesAdapter(OwnedClientMixin):
     async def autocomplete(self, name: str) -> list[dict]:
         resp = await self._client.get(
-            f"{BASE_URL}/auto_complete_taxon_concepts", params={"taxonomy": "cites", "taxon_concept_query": name}
+            f"{BASE_URL}/auto_complete_taxon_concepts",
+            params={"taxonomy": "cites", "taxon_concept_query": name},
         )
         resp.raise_for_status()
         return resp.json().get("auto_complete_taxon_concepts") or []

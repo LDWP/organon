@@ -13,7 +13,6 @@ from __future__ import annotations
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
 from organon.modules.eflora.adapter import EfloraAdapter
 

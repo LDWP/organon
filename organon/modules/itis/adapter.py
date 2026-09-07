@@ -123,5 +123,10 @@ class ItisAdapter(OwnedClientMixin):
         for el in _local_all(root, "commonNames"):
             if el.attrib.get("{http://www.w3.org/2001/XMLSchema-instance}nil") == "true":
                 continue
-            out.append({"language": _text(_local(el, "language")), "commonName": _text(_local(el, "commonName"))})
+            out.append(
+                {
+                    "language": _text(_local(el, "language")),
+                    "commonName": _text(_local(el, "commonName")),
+                }
+            )
         return out

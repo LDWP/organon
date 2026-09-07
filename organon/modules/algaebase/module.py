@@ -54,7 +54,10 @@ def _blob_to_taxon(blob: dict) -> TaxonInfo:
 
 def _to_rankname(entry: dict) -> RankName:
     return RankName(
-        nom=entry["nom"], rang=entry.get("rang"), auteur=entry.get("auteur"), eteint=entry.get("eteint")
+        nom=entry["nom"],
+        rang=entry.get("rang"),
+        auteur=entry.get("auteur"),
+        eteint=entry.get("eteint"),
     )
 
 
@@ -137,7 +140,11 @@ async def _find_species(adapter: AlgaeBaseAdapter, key: str, taxon: str) -> dict
 
 
 async def _collect_species(
-    adapter: AlgaeBaseAdapter, key: str, struct: Struct, is_classification: bool, options: GenerateOptions
+    adapter: AlgaeBaseAdapter,
+    key: str,
+    struct: Struct,
+    is_classification: bool,
+    options: GenerateOptions,
 ) -> Struct | None:
     taxon = struct.taxon.nom
     found = await _find_species(adapter, key, taxon)
@@ -194,7 +201,11 @@ async def _collect_species(
 
 
 async def _collect_genus(
-    adapter: AlgaeBaseAdapter, key: str, struct: Struct, is_classification: bool, options: GenerateOptions
+    adapter: AlgaeBaseAdapter,
+    key: str,
+    struct: Struct,
+    is_classification: bool,
+    options: GenerateOptions,
 ) -> Struct | None:
     taxon = struct.taxon.nom
     res = await adapter.search_genus(key, taxon)
@@ -253,7 +264,9 @@ async def _collect_genus(
     if lower:
         sub_tbl, _, _ = _extract_classification(lower)
         if sub_tbl:
-            struct.sous_taxons = SubTaxonList(liste=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE")
+            struct.sous_taxons = SubTaxonList(
+                liste=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE"
+            )
 
     struct.regne = algaebase_charte(phylum, kingdom)
     if struct.regne != "algue":
@@ -267,7 +280,11 @@ async def _collect_genus(
 
 
 async def _collect_superior(
-    adapter: AlgaeBaseAdapter, key: str, struct: Struct, is_classification: bool, options: GenerateOptions
+    adapter: AlgaeBaseAdapter,
+    key: str,
+    struct: Struct,
+    is_classification: bool,
+    options: GenerateOptions,
 ) -> Struct | None:
     taxon = struct.taxon.nom
     res = await adapter.search_taxonomy(key, taxon)
@@ -313,7 +330,9 @@ async def _collect_superior(
     if lower:
         sub_tbl, _, _ = _extract_classification(lower)
         if sub_tbl:
-            struct.sous_taxons = SubTaxonList(liste=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE")
+            struct.sous_taxons = SubTaxonList(
+                liste=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE"
+            )
 
     struct.regne = algaebase_charte(phylum, kingdom)
     if struct.regne != "algue":

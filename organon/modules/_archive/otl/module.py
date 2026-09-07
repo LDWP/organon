@@ -110,7 +110,9 @@ class OtlModule(TaxonomyModule):
         if synonyms:
             coupe = limit is not None and len(synonyms) > limit
             noms = synonyms[:limit] if coupe else synonyms
-            struct.synonymes = SynonymList(liste=[RankName(nom=s) for s in noms], source="OTL", coupe=coupe)
+            struct.synonymes = SynonymList(
+                liste=[RankName(nom=s) for s in noms], source="OTL", coupe=coupe
+            )
 
         return struct
 

@@ -22,7 +22,9 @@ class EfloraAdapter(OwnedClientMixin):
     async def search(self, name: str) -> list[tuple[int, int, str]]:
         """Renvoie une liste de `(flora_id, taxon_id, nom_affiché)`, déjà filtrée aux flores
         valides mais pas encore au nom recherché (laissé à module.py)."""
-        resp = await self._client.get(f"{BASE_URL}/browse.aspx", params={"flora_id": 0, "name_str": name})
+        resp = await self._client.get(
+            f"{BASE_URL}/browse.aspx", params={"flora_id": 0, "name_str": name}
+        )
         resp.raise_for_status()
         out = []
         for fid_s, tid_s, nom in _RESULT_RE.findall(resp.text):

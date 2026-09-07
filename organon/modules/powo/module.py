@@ -232,7 +232,12 @@ class PowoModule(TaxonomyModule):
         # `classification` ne remonte que famille+genre (WCVP) : les rangs supérieurs
         # (embranchement, classe, sous-classe, ordre) sont des champs scalaires séparés sur la
         # fiche, absents de la chaîne — sans quoi la taxobox POWO s'arrêtait à la famille.
-        for field, rank_code in (("order", "ORDER"), ("subclass", "SUBCLASS"), ("clazz", "CLASS"), ("phylum", "PHYLUM")):
+        for field, rank_code in (
+            ("order", "ORDER"),
+            ("subclass", "SUBCLASS"),
+            ("clazz", "CLASS"),
+            ("phylum", "PHYLUM"),
+        ):
             nom = detail.get(field)
             if nom:
                 rangs.append(RankName(nom=nom, rang=powo_cherche_rang(rank_code)))

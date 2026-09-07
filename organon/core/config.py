@@ -48,7 +48,10 @@ class GenerateOptions(BaseModel):
 
     auteurs: AuteursMode = Field(
         default="n",
-        description="Mode de traitement des auteurs : s=standard, n=nouveau, n1=nouveau+ajout réponse unique",
+        description=(
+            "Mode de traitement des auteurs : s=standard, n=nouveau, n1=nouveau+ajout "
+            "réponse unique"
+        ),
     )
     auteur_source: str | None = Field(
         default=None,
@@ -61,16 +64,21 @@ class GenerateOptions(BaseModel):
         ),
     )
 
-    liens_synonymes: bool = Field(default=True, description="Ajouter des wikiliens autour des synonymes")
+    liens_synonymes: bool = Field(
+        default=True, description="Ajouter des wikiliens autour des synonymes"
+    )
     liens_inf_sp: bool = Field(
         default=False, description="Ajouter des wikiliens pour les taxons inférieurs à l'espèce"
     )
     suivre_synonymes: bool = Field(
         default=True,
-        description="Si la classification indique que le taxon demandé est un synonyme, traiter la cible",
+        description=(
+            "Si la classification indique que le taxon demandé est un synonyme, traiter la cible"
+        ),
     )
     trier_synonymes: bool = Field(
-        default=True, description="Trier les synonymes par ordre alphabétique plutôt que l'ordre de la source"
+        default=True,
+        description="Trier les synonymes par ordre alphabétique plutôt que l'ordre de la source",
     )
     inclure_invalides: bool = Field(
         default=False, description="Inclure dans les liens externes les taxons invalides trouvés"
@@ -81,22 +89,34 @@ class GenerateOptions(BaseModel):
     )
     selecteurs: bool = Field(
         default=True,
-        description="Autorise l'utilisation des règles de définition des ébauches/catégories/portails",
+        description=(
+            "Autorise l'utilisation des règles de définition des ébauches/catégories/portails"
+        ),
     )
     plan: bool = Field(
         default=False, description="Générer un plan-type même quand il n'y a pas d'information"
     )
-    article: bool = Field(default=False, description="Ne générer que le texte de l'article, rien d'autre")
+    article: bool = Field(
+        default=False, description="Ne générer que le texte de l'article, rien d'autre"
+    )
 
     seuil_colonnes: int = Field(
         default=25, description="Nombre-seuil d'éléments dans une liste avant mise en colonnes"
     )
     limite_listes: int = Field(
-        default=-1, description="Nombre maximum d'éléments dans les listes (sous-taxons, synonymes) ; <=0 = pas de limite"
+        default=-1,
+        description=(
+            "Nombre maximum d'éléments dans les listes (sous-taxons, synonymes) ; "
+            "<=0 = pas de limite"
+        ),
     )
-    timeout: float = Field(default=0, description="Durée max de fonctionnement d'un module (0 = pas de timeout)")
+    timeout: float = Field(
+        default=0, description="Durée max de fonctionnement d'un module (0 = pas de timeout)"
+    )
 
-    off: list[str] = Field(default_factory=list, description="Identifiants des modules à désactiver")
+    off: list[str] = Field(
+        default_factory=list, description="Identifiants des modules à désactiver"
+    )
     ua: str = Field(default="", description="User-Agent personnalisé pour les requêtes HTTP")
 
     marine_only: bool = Field(

@@ -43,7 +43,9 @@ class GbifAdapter(OwnedClientMixin):
         return await fetch_json(self._client, f"{BASE_URL}/species/{key}")
 
     async def children_page(self, key: int, offset: int = 0) -> dict:
-        resp = await self._client.get(f"{BASE_URL}/species/{key}/children", params={"offset": offset})
+        resp = await self._client.get(
+            f"{BASE_URL}/species/{key}/children", params={"offset": offset}
+        )
         resp.raise_for_status()
         return resp.json()
 
@@ -55,7 +57,9 @@ class GbifAdapter(OwnedClientMixin):
         return resp.json()
 
     async def synonyms_page(self, key: int, offset: int = 0) -> dict:
-        resp = await self._client.get(f"{BASE_URL}/species/{key}/synonyms", params={"offset": offset})
+        resp = await self._client.get(
+            f"{BASE_URL}/species/{key}/synonyms", params={"offset": offset}
+        )
         resp.raise_for_status()
         return resp.json()
 

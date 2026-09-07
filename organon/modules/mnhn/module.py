@@ -51,7 +51,9 @@ class MnhnModule(TaxonomyModule):
         if not data or "id" not in data:
             return None
         cdate = dates_recupere()
-        description = wp_met_italiques(struct.taxon.nom, data.get("rang") or struct.taxon.rang, struct.regne)
+        description = wp_met_italiques(
+            struct.taxon.nom, data.get("rang") or struct.taxon.rang, struct.regne
+        )
         return f"{{{{MNHN | {data['rang']} | {data['id']} | {description} | consulté le={cdate}}}}}"
 
     def debug_link(self, struct: Struct) -> str | None:

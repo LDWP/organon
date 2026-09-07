@@ -6,7 +6,6 @@ N'importe jamais `organon.core`/`organon.modules`.
 from __future__ import annotations
 
 import json as jsonlib
-import sys
 from typing import Annotated
 
 import httpx
@@ -14,14 +13,18 @@ import typer
 
 DEFAULT_API_URL = "https://organon.toolforge.org/api/v1"
 
-app = typer.Typer(add_completion=False, help="Génère un squelette d'article Wikipédia pour un taxon.")
+app = typer.Typer(
+    add_completion=False, help="Génère un squelette d'article Wikipédia pour un taxon."
+)
 
 
 @app.command()
 def main(
     taxon: Annotated[str, typer.Argument(help="Nom scientifique du taxon")],
     api_url: Annotated[str, typer.Option(help="URL de base de l'API Organon")] = DEFAULT_API_URL,
-    classification: Annotated[str, typer.Option(help="Module de classification à utiliser (vide = auto)")] = "",
+    classification: Annotated[
+        str, typer.Option(help="Module de classification à utiliser (vide = auto)")
+    ] = "",
     domaine: Annotated[str, typer.Option(help="Domaine du vivant (filtre les sources)")] = "*",
     force_regne: Annotated[str, typer.Option("--force-regne", help="Force le règne")] = "",
     force_rang: Annotated[str, typer.Option("--force-rang", help="Force le rang")] = "",
@@ -29,10 +32,16 @@ def main(
     liens_synonymes: Annotated[bool, typer.Option(help="Wikiliens autour des synonymes")] = True,
     liens_inf_sp: Annotated[bool, typer.Option(help="Wikiliens pour les taxons < espèce")] = False,
     suivre_synonymes: Annotated[bool, typer.Option(help="Suivre la cible d'un synonyme")] = True,
-    trier_synonymes: Annotated[bool, typer.Option(help="Trier les synonymes alphabétiquement")] = True,
-    inclure_invalides: Annotated[bool, typer.Option(help="Inclure les taxons invalides trouvés")] = False,
+    trier_synonymes: Annotated[
+        bool, typer.Option(help="Trier les synonymes alphabétiquement")
+    ] = True,
+    inclure_invalides: Annotated[
+        bool, typer.Option(help="Inclure les taxons invalides trouvés")
+    ] = False,
     juste_ext: Annotated[bool, typer.Option(help="Ne déterminer que les liens externes")] = False,
-    selecteurs: Annotated[bool, typer.Option(help="Autoriser les règles ébauches/catégories/portails")] = True,
+    selecteurs: Annotated[
+        bool, typer.Option(help="Autoriser les règles ébauches/catégories/portails")
+    ] = True,
     plan: Annotated[bool, typer.Option(help="Générer un plan-type même sans information")] = False,
     article: Annotated[bool, typer.Option(help="Ne générer que le texte de l'article")] = False,
     seuil_colonnes: Annotated[int, typer.Option(help="Seuil de mise en colonnes des listes")] = 25,
@@ -41,8 +50,12 @@ def main(
     off: Annotated[str, typer.Option(help="Modules à désactiver, séparés par des virgules")] = "",
     ua: Annotated[str, typer.Option(help="User-Agent personnalisé")] = "",
     marine_only: Annotated[bool, typer.Option(help="Limiter WoRMS aux taxons marins")] = False,
-    as_json: Annotated[bool, typer.Option("--json", help="Sortie JSON brute plutôt que wikitexte")] = False,
-    debug: Annotated[bool, typer.Option(help="Afficher les logs/avertissements de génération")] = False,
+    as_json: Annotated[
+        bool, typer.Option("--json", help="Sortie JSON brute plutôt que wikitexte")
+    ] = False,
+    debug: Annotated[
+        bool, typer.Option(help="Afficher les logs/avertissements de génération")
+    ] = False,
 ) -> None:
     payload = {
         "taxon": taxon,
@@ -75,9 +88,8 @@ def main(
         raise typer.Exit(1) from exc
 
     if resp.status_code >= 400:
-        detail = resp.json().get("detail", resp.text) if resp.headers.get("content-type", "").startswith(
-            "application/json"
-        ) else resp.text
+        is_json = resp.headers.get("content-type", "").startswith("application/json")
+        detail = resp.json().get("detail", resp.text) if is_json else resp.text
         typer.echo(f"Erreur ({resp.status_code}) : {detail}", err=True)
         raise typer.Exit(1)
 

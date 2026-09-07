@@ -76,7 +76,9 @@ def detect_regne_incoherences(struct: Struct, classification_id: str) -> list[Re
         regne_detecte = data.get("regne_detecte")
         if regne_detecte and regne_detecte != _REGNE_INCONNU and regne_detecte != struct.regne:
             incoherences.append(
-                RegneIncoherence(module=module_id, regne_suggere=regne_detecte, regne_retenu=struct.regne)
+                RegneIncoherence(
+                    module=module_id, regne_suggere=regne_detecte, regne_retenu=struct.regne
+                )
             )
     return incoherences
 
@@ -140,7 +142,9 @@ def classification_regne_coherents(
     au règne connu) : à égalité ou en dessous, la situation est ambiguë (pas assez de signal
     pour désigner un outlier) et aucun candidat n'est exclu. Règne vide/"neutre" : aucun signal
     fiable, candidat toujours conservé quel que soit le résultat de la majorité."""
-    signalles = {cid: regnes[cid] for cid in successes if regnes.get(cid) and regnes[cid] != _REGNE_INCONNU}
+    signalles = {
+        cid: regnes[cid] for cid in successes if regnes.get(cid) and regnes[cid] != _REGNE_INCONNU
+    }
     if len(signalles) < 2:
         return successes, [], None
 
@@ -148,7 +152,9 @@ def classification_regne_coherents(
     if effectif_majoritaire * 2 <= len(signalles):
         return successes, [], None
 
-    exclus = [cid for cid in successes if signalles.get(cid, regne_majoritaire) != regne_majoritaire]
+    exclus = [
+        cid for cid in successes if signalles.get(cid, regne_majoritaire) != regne_majoritaire
+    ]
     coherents = [cid for cid in successes if cid not in exclus]
     return coherents, exclus, regne_majoritaire
 

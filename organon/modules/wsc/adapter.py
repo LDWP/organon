@@ -17,7 +17,7 @@ from __future__ import annotations
 import asyncio
 import csv
 import io
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import httpx
 
@@ -35,7 +35,7 @@ class WscAdapter(OwnedClientMixin):
         self._lock = asyncio.Lock()
 
     async def _ensure_loaded(self) -> None:
-        today = datetime.now(timezone.utc).strftime("%Y%m%d")
+        today = datetime.now(UTC).strftime("%Y%m%d")
         if self._cached_date == today:
             return
         async with self._lock:
@@ -43,7 +43,9 @@ class WscAdapter(OwnedClientMixin):
                 return
             rows = await self._download(today)
             if rows is None:
-                return  # échec de téléchargement : garde l'index précédent (même périmé) plutôt que de tout perdre
+                # échec de téléchargement : garde l'index précédent (même périmé) plutôt que
+                # de tout perdre
+                return
             by_name: dict[str, dict] = {}
             for row in rows:
                 if not row.get("speciesId"):

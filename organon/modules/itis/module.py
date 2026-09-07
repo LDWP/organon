@@ -107,7 +107,9 @@ class ItisModule(TaxonomyModule):
             if rang_wp in RANGS_REGNE:
                 continue  # le "règne" est stocké dans struct.regne, pas dans struct.rangs
             rangs.append(
-                RankName(nom=entry["taxonName"], rang=rang_wp, auteur=format_auteur(entry.get("author")))
+                RankName(
+                    nom=entry["taxonName"], rang=rang_wp, auteur=format_auteur(entry.get("author"))
+                )
             )
         rangs.reverse()  # racine->feuille dans la réponse ITIS ; on veut proche->lointain
         struct.rangs = rangs

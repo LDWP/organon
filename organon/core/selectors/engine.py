@@ -9,7 +9,6 @@ de conditions typé (Pydantic), capable d'exprimer exactement ce corpus sans jam
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Union
 
 import yaml
 from pydantic import BaseModel, Field, RootModel
@@ -25,14 +24,14 @@ class FieldEq(BaseModel):
 
 
 class AllOf(BaseModel):
-    all_of: list["Condition"]
+    all_of: list[Condition]
 
 
 class AnyOf(BaseModel):
-    any_of: list["Condition"]
+    any_of: list[Condition]
 
 
-Condition = Union[FieldEq, AllOf, AnyOf]
+Condition = FieldEq | AllOf | AnyOf
 
 
 class Rule(BaseModel):

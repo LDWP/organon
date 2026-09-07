@@ -36,7 +36,9 @@ from organon.modules.common import as_limit, simple_debug_link
 
 
 class InaturalistModule(TaxonomyModule):
-    meta = ModuleMeta(id="inaturalist", can_classify=True, can_render_external_link=True, domains="all")
+    meta = ModuleMeta(
+        id="inaturalist", can_classify=True, can_render_external_link=True, domains="all"
+    )
 
     def __init__(self, adapter: InaturalistAdapter | None = None) -> None:
         self._adapter = adapter or InaturalistAdapter()
@@ -159,7 +161,9 @@ class InaturalistModule(TaxonomyModule):
         )
 
     def debug_link(self, struct: Struct) -> str | None:
-        return simple_debug_link(struct, "inaturalist", "https://www.inaturalist.org/taxa/{id}", "iNaturalist")
+        return simple_debug_link(
+            struct, "inaturalist", "https://www.inaturalist.org/taxa/{id}", "iNaturalist"
+        )
 
 
 register_module(InaturalistModule)

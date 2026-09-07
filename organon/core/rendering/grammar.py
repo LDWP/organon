@@ -121,7 +121,9 @@ def wp_rang_valide(rang: str, table: RankTable | None = None) -> bool:
     return rang in table.ranks
 
 
-def wp_nom_rang(rang: str, lien: bool, maj: bool, plur: bool, table: RankTable | None = None) -> str:
+def wp_nom_rang(
+    rang: str, lien: bool, maj: bool, plur: bool, table: RankTable | None = None
+) -> str:
     """Retourne le nom d'un rang selon les options : avec/sans wikilien, avec/sans
     majuscule, au singulier/pluriel. Les formes sont calculées à partir du nom minuscule
     canonique (clé YAML) et des irrégularités éventuelles, pas stockées telles quelles."""
@@ -231,7 +233,8 @@ def wp_est_italique(rang: str, regne: str, table: RankTable | None = None) -> bo
 _EXCLUSIONS: list[tuple[str, str]] = [
     (r" cl[.]", " ''cl.''"), (r"convar[.]", "''convar.''"), (r"f[.]sp[.]", "''f.sp.''"),
     (r" f[.]", " ''f.''"), (r" gen[.]", " ''gen.''"), (r"kl[.]", "''kl.''"),
-    (r"nothog[.]", "''nothog.''"), (r"nothosp[.]", "''nothosp.''"), (r"nothovar[.]", "''nothovar.''"),
+    (r"nothog[.]", "''nothog.''"), (r"nothosp[.]", "''nothosp.''"),
+    (r"nothovar[.]", "''nothovar.''"),
     (r" ord[.]", " ''ord.''"), (r" fam[.]", " ''fam.''"), (r" sect[.]", " ''sect.''"),
     (r" ser[.]", " ''ser.''"), (r" sp[.]", " ''sp.''"), (r"subg[.]", "''subg.''"),
     (r"subsp[.]", "''subsp.''"), (r"Groupe", "''Groupe''"), (r" tr[.]", " ''tr.''"),
@@ -239,14 +242,17 @@ _EXCLUSIONS: list[tuple[str, str]] = [
     (r"pv", "''pv''"), (r"pathovar", "''pathovar''"), (r"morphovar", "''morphovar''"),
     (r"phagovar", "''phagovar''"), (r"serovar", "''serovar''"), (r"chemovar", "''chemovar''"),
     (r"cultivar", "''cultivar''"), (r"chemoform", "''chemoform''"), (r"chemotype", "''chemotype''"),
-    (r"morphotype", "''morphotype''"), (r"pathotype", "''pathotype''"), (r"phagotype", "''phagotype''"),
+    (r"morphotype", "''morphotype''"), (r"pathotype", "''pathotype''"),
+    (r"phagotype", "''phagotype''"),
     (r"lysotype", "''lysotype''"), (r"phase", "''phase''"), (r"serotype", "''serotype''"),
     (r"state", "''state''"), (r"forma specialis", "''forma specialis''"),
 ]
 # Frontière de fin en lookahead négatif (pas \b) : un point suivi d'un espace n'est pas une
 # frontière de mot ("." et " " sont tous deux non-alphanumériques), ce qui ferait échouer \b
 # sur l'immense majorité des motifs ci-dessus (ex. "var. macrocarpum").
-_EXCLUSIONS_COMPILED = [(re.compile(r"\b" + pattern + r"(?!\w)"), repl) for pattern, repl in _EXCLUSIONS]
+_EXCLUSIONS_COMPILED = [
+    (re.compile(r"\b" + pattern + r"(?!\w)"), repl) for pattern, repl in _EXCLUSIONS
+]
 
 
 def wp_met_italiques(

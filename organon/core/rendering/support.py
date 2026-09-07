@@ -102,7 +102,9 @@ def _nb_accents(mot: str) -> int:
 
 def est_similaire(mot_1: str, mot_2: str) -> bool:
     """Compare deux mots en ignorant la casse, les tirets et les accents."""
-    normalise = lambda m: _sans_accents(m.lower().replace("-", " "))
+    def normalise(m: str) -> str:
+        return _sans_accents(m.lower().replace("-", " "))
+
     return normalise(mot_1) == normalise(mot_2)
 
 

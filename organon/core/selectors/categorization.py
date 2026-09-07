@@ -49,7 +49,9 @@ def lien_pour_categorie(struct: Struct, options: GenerateOptions) -> list[str] |
     return None
 
 
-def lien_pour_portail(portail_defaut: str, struct: Struct, options: GenerateOptions) -> list[str] | None:
+def lien_pour_portail(
+    portail_defaut: str, struct: Struct, options: GenerateOptions
+) -> list[str] | None:
     if options.selecteurs:
         ret = evaluate_ruleset("portails", struct)
         if ret is not None:

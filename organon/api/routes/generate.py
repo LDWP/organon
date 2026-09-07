@@ -143,7 +143,11 @@ def _all_applicable_classification_modules(
     domaine: str, off: set[str], trees: dict[str, DomainTree]
 ) -> list[tuple[str, TaxonomyModule]]:
     applicable = set(modules_possibles(domaine, trees) or [])
-    candidates = [(m, get_module(m)) for m in classification_modules() if m in applicable and m not in off]
+    candidates = [
+        (m, get_module(m))
+        for m in classification_modules()
+        if m in applicable and m not in off
+    ]
     return [(m, module) for m, module in candidates if module is not None]
 
 
@@ -190,7 +194,9 @@ async def _attempt_classification(
     """Ne lève jamais (même contrat que `EnrichmentRunner.collect_one_module`) : le résultat
     porte l'erreur éventuelle plutôt que de la laisser se propager hors du `gather`/
     `as_completed`."""
-    struct = Struct(taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine)
+    struct = Struct(
+        taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine
+    )
     try:
         resolved = await _collect_with_timeout(
             module,
@@ -217,7 +223,9 @@ async def _run_classification_batch(
     `_classification_network_fallback` dans `event_stream()`."""
     for cid, _ in batch:
         yield _sse(ModuleStatusEvent(module_id=cid, role="classification", status="running"))
-    tasks = [asyncio.create_task(_attempt_classification(cid, cm, req, options)) for cid, cm in batch]
+    tasks = [
+        asyncio.create_task(_attempt_classification(cid, cm, req, options)) for cid, cm in batch
+    ]
     for task in asyncio.as_completed(tasks):
         module_id, resolved, exc = await task
         results[module_id] = (resolved, exc)
@@ -287,8 +295,8 @@ def _avertissements_exclusion_regne(
     pour un genre de champignon) — le signaler plutôt que le faire disparaître silencieusement,
     au même titre que les autres avertissements affichés dans le panneau Données."""
     return [
-        f"{cid.upper()} écarté de la classification : règne « {results[cid][0].regne} » minoritaire "
-        f"face aux autres sources (possible homonyme inter-règnes)."
+        f"{cid.upper()} écarté de la classification : règne « {results[cid][0].regne} » "
+        "minoritaire face aux autres sources (possible homonyme inter-règnes)."
         for cid in exclus
         if results[cid][0] is not None
     ]
@@ -360,7 +368,10 @@ class EnrichmentRunner:
         module = get_module(module_id)
         try:
             updated = await _collect_with_timeout(
-                module, self.struct.model_copy(deep=True), is_classification=False, options=self._options
+                module,
+                self.struct.model_copy(deep=True),
+                is_classification=False,
+                options=self._options,
             )
             return module_id, updated, None
         except Exception as exc:  # noqa: BLE001 — un module tiers en échec ne doit pas casser la génération
@@ -378,7 +389,9 @@ class EnrichmentRunner:
         chaque copie ne porte que la clé de son propre module, donc un simple `update()` les
         fusionne sans conflit ; seuls les champs mono-valeur de `_MONOVALUE_FIELDS` nécessitent
         un choix par priorité, tranché en comparant chaque copie à `self._baseline`."""
-        started: dict[str, float] = {module_id: time.monotonic() for module_id in self._enrichment_ids}
+        started: dict[str, float] = {
+            module_id: time.monotonic() for module_id in self._enrichment_ids
+        }
         tasks = [
             asyncio.create_task(self.collect_one_module(module_id), name=module_id)
             for module_id in self._enrichment_ids
@@ -394,7 +407,9 @@ class EnrichmentRunner:
                 logger.warning(
                     "Module '%s' (enrichissement) : erreur réseau (%s), ignoré.", module_id, exc
                 )
-                yield ModuleRunEvent(module_id, "error", message=str(exc), duration_seconds=duration)
+                yield ModuleRunEvent(
+                    module_id, "error", message=str(exc), duration_seconds=duration
+                )
             elif updated is not None:
                 results[module_id] = updated
                 yield ModuleRunEvent(module_id, "found", duration_seconds=duration)
@@ -433,7 +448,9 @@ async def _generate_core(req: GenerateRequest) -> GenerateResponse:
     priorities = module_priorities(exclude=off)
 
     candidates = _classification_candidates(req, off, trees, priorities)
-    attempts = await asyncio.gather(*(_attempt_classification(cid, cm, req, options) for cid, cm in candidates))
+    attempts = await asyncio.gather(
+        *(_attempt_classification(cid, cm, req, options) for cid, cm in candidates)
+    )
     results = {cid: (resolved, exc) for cid, resolved, exc in attempts}
 
     fallback = _classification_network_fallback(req, off, trees, results)
@@ -448,13 +465,22 @@ async def _generate_core(req: GenerateRequest) -> GenerateResponse:
     if not successes:
         if all(exc is not None for _, exc in results.values()):
             raise HTTPException(
-                502, detail=f"Modules de classification en erreur réseau : {', '.join(sorted(results))}."
+                502,
+                detail=(
+                    f"Modules de classification en erreur réseau : {', '.join(sorted(results))}."
+                ),
             )
         raise HTTPException(
-            404, detail=f"Taxon « {req.taxon} » non trouvé (classifications essayées : {', '.join(sorted(results))})."
+            404,
+            detail=(
+                f"Taxon « {req.taxon} » non trouvé "
+                f"(classifications essayées : {', '.join(sorted(results))})."
+            ),
         )
 
-    classification_id, exclus_regne = _pick_classification_winner(req.domaine, successes, trees, priorities, results)
+    classification_id, exclus_regne = _pick_classification_winner(
+        req.domaine, successes, trees, priorities, results
+    )
     struct = results[classification_id][0]
     logs.append(f"Classification : {classification_id}")
     warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
@@ -465,7 +491,14 @@ async def _generate_core(req: GenerateRequest) -> GenerateResponse:
         pass  # /generate ignore la progression intermédiaire ; /generate/stream l'observe.
 
     return _assemble_response(
-        req, options, classification_id, runner.struct, runner.ran_modules, warnings + runner.warnings, logs, started
+        req,
+        options,
+        classification_id,
+        runner.struct,
+        runner.ran_modules,
+        warnings + runner.warnings,
+        logs,
+        started,
     )
 
 
@@ -652,7 +685,9 @@ def _assemble_response(
         for module_id, wikitext in render_references_items_block(struct)
     ]
     references_wikitext = (
-        "\n".join(f"* {item.wikitext}" for item in reference_items) + "\n" if reference_items else ""
+        "\n".join(f"* {item.wikitext}" for item in reference_items) + "\n"
+        if reference_items
+        else ""
     )
     rank_lines = (
         []
@@ -702,7 +737,8 @@ def _assemble_response(
 
     distribution_merged: dict[str, list[str]] = {}
     for module_id, entry in struct.distribution.items():
-        noms = sorted(dict.fromkeys(data_pays_code(code) for code in {**entry.certain, **entry.uncertain}))
+        codes = {**entry.certain, **entry.uncertain}
+        noms = sorted(dict.fromkeys(data_pays_code(code) for code in codes))
         if noms:
             distribution_merged[module_id] = noms
 
@@ -789,12 +825,16 @@ async def generate_stream(
 
         classification_started = time.monotonic()
         results: dict[str, tuple[Struct | None, Exception | None]] = {}
-        async for event in _run_classification_batch(candidates, req, options, results, classification_started):
+        async for event in _run_classification_batch(
+            candidates, req, options, results, classification_started
+        ):
             yield event
 
         fallback = _classification_network_fallback(req, off, trees, results)
         if fallback:
-            async for event in _run_classification_batch(fallback, req, options, results, classification_started):
+            async for event in _run_classification_batch(
+                fallback, req, options, results, classification_started
+            ):
                 yield event
 
         # Ordre des candidats déclarés, pas `results` (rempli via `as_completed`, donc en ordre
@@ -806,14 +846,20 @@ async def generate_stream(
                 yield _sse(
                     FatalErrorEvent(
                         status_code=502,
-                        detail=f"Modules de classification en erreur réseau : {', '.join(sorted(results))}.",
+                        detail=(
+                            "Modules de classification en erreur réseau : "
+                            f"{', '.join(sorted(results))}."
+                        ),
                     )
                 )
             else:
                 yield _sse(
                     FatalErrorEvent(
                         status_code=404,
-                        detail=f"Taxon « {req.taxon} » non trouvé (classifications essayées : {', '.join(sorted(results))}).",
+                        detail=(
+                            f"Taxon « {req.taxon} » non trouvé "
+                            f"(classifications essayées : {', '.join(sorted(results))})."
+                        ),
                     )
                 )
             return
@@ -827,7 +873,9 @@ async def generate_stream(
 
         applicable = modules_possibles(struct.domaine, trees) or []
         enrichment_ids = [
-            m for m in applicable if m != classification_id and m not in off and get_module(m) is not None
+            m
+            for m in applicable
+            if m != classification_id and m not in off and get_module(m) is not None
         ]
         yield _sse(PlanEvent(classification_id=classification_id, modules=enrichment_ids))
 
@@ -844,7 +892,14 @@ async def generate_stream(
             )
 
         response = _assemble_response(
-            req, options, classification_id, runner.struct, runner.ran_modules, warnings + runner.warnings, logs, started
+            req,
+            options,
+            classification_id,
+            runner.struct,
+            runner.ran_modules,
+            warnings + runner.warnings,
+            logs,
+            started,
         )
         yield _sse(ResultEvent(data=response))
 

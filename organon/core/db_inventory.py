@@ -172,7 +172,11 @@ def _reconcile(entry: SourceEntry, module, default_id: str | None) -> SourceEntr
 
 
 def _from_live_only(module, default_id: str | None) -> SourceEntry:
-    domains = module.meta.domains if isinstance(module.meta.domains, str) else ", ".join(module.meta.domains)
+    domains = (
+        module.meta.domains
+        if isinstance(module.meta.domains, str)
+        else ", ".join(module.meta.domains)
+    )
     return SourceEntry(
         id=module.meta.id,
         nom=module.meta.id.upper(),

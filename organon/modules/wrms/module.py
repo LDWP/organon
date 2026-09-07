@@ -65,7 +65,9 @@ class WrmsModule(TaxonomyModule):
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        results = await self._adapter.records_by_name(struct.taxon.nom, marine_only=options.marine_only)
+        results = await self._adapter.records_by_name(
+            struct.taxon.nom, marine_only=options.marine_only
+        )
         if not results:
             return None
         cur = next((r for r in results if r.get("status") == "accepted"), None)
@@ -118,7 +120,9 @@ class WrmsModule(TaxonomyModule):
                     return None
                 struct.redirection = Redirection(nom=struct.taxon.nom)
                 struct.taxon = TaxonInfo(nom=accepted["scientificname"])
-                return await self._process(struct, accepted, is_classification, options, hop=hop + 1)
+                return await self._process(
+                    struct, accepted, is_classification, options, hop=hop + 1
+                )
             # suivre_synonymes désactivé : on continue avec les données du synonyme tel quel
 
         if not is_classification:
@@ -140,7 +144,8 @@ class WrmsModule(TaxonomyModule):
         classification_tree = await adapter.classification_by_id(aphia_id)
         rangs: list[RankName] = []
         if classification_tree is not None:
-            chain = _flatten_classification(classification_tree)[:-1]  # le dernier est le taxon lui-même
+            # le dernier est le taxon lui-même
+            chain = _flatten_classification(classification_tree)[:-1]
             chain = filter_ancestors_above_regne(
                 chain, cur["kingdom"], struct.regne in CHARTES_GARDENT_REGNE
             )
@@ -171,17 +176,25 @@ class WrmsModule(TaxonomyModule):
         async def fetch_synonyms(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.synonyms_by_id(aphia_id, offset=offset)
             items = [
-                RankName(nom=s["scientificname"], auteur=format_auteur(s.get("authority")), rang=wrms_rang(s["rank"]))
+                RankName(
+                    nom=s["scientificname"],
+                    auteur=format_auteur(s.get("authority")),
+                    rang=wrms_rang(s["rank"]),
+                )
                 for s in page
             ]
             return items, len(page), len(page) < PAGE_SIZE
 
-        synonyms, _ = await collect_pages(fetch_synonyms, start_offset=1, limit=as_limit(options.limite_listes))
+        synonyms, _ = await collect_pages(
+            fetch_synonyms, start_offset=1, limit=as_limit(options.limite_listes)
+        )
         if synonyms:
             struct.synonymes = SynonymList(liste=synonyms, source="WRMS")
 
         async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
-            page = await adapter.children_by_id(aphia_id, marine_only=options.marine_only, offset=offset)
+            page = await adapter.children_by_id(
+                aphia_id, marine_only=options.marine_only, offset=offset
+            )
             items = [
                 RankName(
                     nom=c["scientificname"],
@@ -190,11 +203,14 @@ class WrmsModule(TaxonomyModule):
                     eteint=bool(c.get("isExtinct")) or None,
                 )
                 for c in page
-                if c.get("status") == "accepted"  # synonymes/incertain/nomen dubium exclus — filtre REST explicite
+                # synonymes/incertain/nomen dubium exclus — filtre REST explicite
+                if c.get("status") == "accepted"
             ]
             return items, len(page), len(page) < PAGE_SIZE
 
-        sous_taxons, _ = await collect_pages(fetch_children, start_offset=1, limit=as_limit(options.limite_listes))
+        sous_taxons, _ = await collect_pages(
+            fetch_children, start_offset=1, limit=as_limit(options.limite_listes)
+        )
         if sous_taxons:
             struct.sous_taxons = SubTaxonList(liste=sous_taxons, source="WRMS")
 

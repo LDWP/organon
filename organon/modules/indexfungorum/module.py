@@ -42,7 +42,12 @@ from organon.modules.common import (
     simple_debug_link,
 )
 from organon.modules.indexfungorum.adapter import IndexFungorumAdapter
-from organon.modules.indexfungorum.ranks import CLASSIFICATION_LADDER, UNRESOLVED_PLACEHOLDER, ixf_rang, ixf_regne
+from organon.modules.indexfungorum.ranks import (
+    CLASSIFICATION_LADDER,
+    UNRESOLVED_PLACEHOLDER,
+    ixf_rang,
+    ixf_regne,
+)
 
 MAX_NUMBER = 50
 
@@ -68,7 +73,8 @@ class IndexFungorumModule(TaxonomyModule):
             return None
 
         accepted_hit = next(
-            (r for r in exact if r.get("CURRENT_NAME_RECORD_NUMBER") == r.get("RECORD_NUMBER")), None
+            (r for r in exact if r.get("CURRENT_NAME_RECORD_NUMBER") == r.get("RECORD_NUMBER")),
+            None,
         )
         if accepted_hit is not None:
             full = await self._adapter.name_by_key(accepted_hit["RECORD_NUMBER"])
@@ -146,7 +152,9 @@ class IndexFungorumModule(TaxonomyModule):
             basio = await self._adapter.name_by_key(basionym_id)
             if basio is not None:
                 struct.basionyme = Basionym(
-                    nom=basio["NAME_OF_FUNGUS"], auteur=format_auteur(basio.get("AUTHORS")), source="Index Fungorum"
+                    nom=basio["NAME_OF_FUNGUS"],
+                    auteur=format_auteur(basio.get("AUTHORS")),
+                    source="Index Fungorum",
                 )
 
         synonym_records = await self._adapter.names_by_current_key(full["RECORD_NUMBER"])
@@ -163,7 +171,9 @@ class IndexFungorumModule(TaxonomyModule):
             limit = as_limit(options.limite_listes)
             coupe = limit is not None and len(synonymes) > limit
             struct.synonymes = SynonymList(
-                liste=synonymes[:limit] if coupe else synonymes, source="Index Fungorum", coupe=coupe
+                liste=synonymes[:limit] if coupe else synonymes,
+                source="Index Fungorum",
+                coupe=coupe,
             )
 
         return struct

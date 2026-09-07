@@ -63,7 +63,10 @@ class CitesModule(TaxonomyModule):
 
     def debug_link(self, struct: Struct) -> str | None:
         return simple_debug_link(
-            struct, "cites", "https://www.speciesplus.net/#/taxon_concepts/{id}/legal", "CITES species+"
+            struct,
+            "cites",
+            "https://www.speciesplus.net/#/taxon_concepts/{id}/legal",
+            "CITES species+",
         )
 
 

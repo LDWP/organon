@@ -23,7 +23,9 @@ from organon.modules.vascan.adapter import VascanAdapter
 
 
 class VascanModule(TaxonomyModule):
-    meta = ModuleMeta(id="vascan", can_classify=False, can_render_external_link=True, domains=["végétal"])
+    meta = ModuleMeta(
+        id="vascan", can_classify=False, can_render_external_link=True, domains=["végétal"]
+    )
 
     def __init__(self, adapter: VascanAdapter | None = None) -> None:
         self._adapter = adapter or VascanAdapter()
@@ -67,7 +69,9 @@ class VascanModule(TaxonomyModule):
         return f"{{{{VASCAN | {data['id']} | {cible}{nv} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        return simple_debug_link(struct, "vascan", "https://data.canadensys.net/vascan/taxon/{id}", "VASCAN")
+        return simple_debug_link(
+            struct, "vascan", "https://data.canadensys.net/vascan/taxon/{id}", "VASCAN"
+        )
 
 
 register_module(VascanModule)

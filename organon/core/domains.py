@@ -23,9 +23,9 @@ noms de domaines."""
 @dataclass
 class DomainNode:
     accepte: bool
-    sous: dict[str, "DomainNode"] = field(default_factory=dict)
+    sous: dict[str, DomainNode] = field(default_factory=dict)
 
-    def copy(self) -> "DomainNode":
+    def copy(self) -> DomainNode:
         return DomainNode(accepte=self.accepte, sous={k: v.copy() for k, v in self.sous.items()})
 
 

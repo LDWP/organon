@@ -22,7 +22,9 @@ from organon.modules.wfo.adapter import WfoAdapter
 
 
 class WfoModule(TaxonomyModule):
-    meta = ModuleMeta(id="wfo", can_classify=False, can_render_external_link=True, domains=["végétal"])
+    meta = ModuleMeta(
+        id="wfo", can_classify=False, can_render_external_link=True, domains=["végétal"]
+    )
 
     def __init__(self, adapter: WfoAdapter | None = None) -> None:
         self._adapter = adapter or WfoAdapter()
@@ -60,7 +62,9 @@ class WfoModule(TaxonomyModule):
         return f"{{{{WFO | {wfo_id} | {data['nom']}{auteur} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        return simple_debug_link(struct, "wfo", "https://www.worldfloraonline.org/taxon/{id}", "WFO")
+        return simple_debug_link(
+            struct, "wfo", "https://www.worldfloraonline.org/taxon/{id}", "WFO"
+        )
 
 
 register_module(WfoModule)
