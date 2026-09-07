@@ -253,14 +253,14 @@ categories:
         classification: {possible: false, estime: false, detail: "module de liens externes, ne fournit aucune classification"}
         acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire/fr.wikipedia.org)"}
         derniere_maj: "2026-09-06"
-        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique. Orchestrateur avec un sous-module par site (organon/modules/wikimedia/{wikidata,commons,species,wiktionnaire,wikipedia}) — un autre wiki ou une autre édition linguistique s'ajoute comme sous-module plutôt qu'en surchargeant un adaptateur unique. Le volet fr.wikipedia.org complète, sans jamais les remplacer, les règles statiques de organon/core/selectors/rules/portails.yaml (n'intervient qu'en repli, voir organon.core.selectors.categorization.lien_pour_portail) ; d'autres usages de fr.wikipedia.org (catégories, ébauches, existence de page...) rejoindront ce même volet au fil de l'eau plutôt qu'un module dédié par usage."
+        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique. Orchestrateur avec un sous-module par site (organon/modules/wikimedia/{wikidata,commons,species,wiktionnaire,wikipedia}) — un autre wiki ou une autre édition linguistique s'ajoute comme sous-module plutôt qu'en surchargeant un adaptateur unique. Le volet fr.wikipedia.org complète, sans jamais les remplacer, les règles statiques de organon/core/selectors/rules/portails.yaml (n'intervient qu'en repli, voir organon.core.selectors.categorization.lien_pour_portail) ; d'autres usages de fr.wikipedia.org (catégories, ébauches, existence de page...) rejoindront ce même volet au fil de l'eau plutôt qu'un module dédié par usage. La suggestion d'images du volet Commons vient de organon/modules/commons_images (pas un TaxonomyModule enregistré : appelé par la route dédiée GET /api/v1/commons-images, pas par ce module.collect())."
         volets:
           - nom: Wikidata
             url: "https://www.wikidata.org"
             elements_recoltes: ["identifiant Wikidata (QID)"]
           - nom: "Wikimedia Commons"
             url: "https://commons.wikimedia.org"
-            elements_recoltes: ["Autres projets"]
+            elements_recoltes: ["Autres projets", "image(s)"]
           - nom: Wikispecies
             url: "https://species.wikimedia.org"
             elements_recoltes: ["Autres projets"]
@@ -580,7 +580,7 @@ categories:
         url: "https://animaldiversity.org"
         statut: disponible
         classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: [auteur, date]
+        elements_recoltes: [auteur, date, identifiant]
         acces: {type: scraping, detail: "scraping HTML de la fiche taxon (accounts/<nom>/), extraction d'auteur[s]/année par regex sur le paragraphe \"To cite this page:\""}
         derniere_maj: "2026-07-23"
       - id: animalbase
