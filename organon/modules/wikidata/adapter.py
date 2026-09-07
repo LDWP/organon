@@ -1,6 +1,6 @@
 """Couche d'accès en lecture à l'item Wikidata d'un taxon, via l'API d'action `wbgetentities`
-(distincte du service SPARQL WDQS déjà utilisé par `organon.modules.externe.adapter` pour la
-résolution nom -> QID : ici l'entrée est déjà un QID, obtenu depuis la recherche par item
+(distincte du service SPARQL WDQS déjà utilisé par `organon.modules.wikimedia.wikidata.adapter`
+pour la résolution nom -> QID : ici l'entrée est déjà un QID, obtenu depuis la recherche par item
 Wikidata, voir `organon.api.routes.search`).
 
 `EXTERNAL_ID_PROPERTIES` ne couvre que les propriétés vérifiées en direct sur

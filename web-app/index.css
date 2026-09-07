@@ -33,6 +33,7 @@
   --chip-basio-bg: #fdf2d5;    --chip-basio-fg: #735421;
   --chip-eteint-bg: #ffe9e5;   --chip-eteint-fg: #9f3526;
   --chip-ident-bg: #eaecf0;    --chip-ident-fg: #404244;
+  --chip-projets-bg: #e6f4fb;  --chip-projets-fg: #1c6b8c;
 
   --disp: "Bahnschrift", "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
   --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -68,6 +69,7 @@
     --chip-basio-bg: #453217;   --chip-basio-fg: #ffcf4f;
     --chip-eteint-bg: #612419;  --chip-eteint-fg: #ffc8bd;
     --chip-ident-bg: #27292d;   --chip-ident-fg: #c8ccd1;
+    --chip-projets-bg: #163542; --chip-projets-fg: #8fd3ea;
     color-scheme: dark;
   }
 }
@@ -97,6 +99,7 @@
   --chip-basio-bg: #453217;   --chip-basio-fg: #ffcf4f;
   --chip-eteint-bg: #612419;  --chip-eteint-fg: #ffc8bd;
   --chip-ident-bg: #27292d;   --chip-ident-fg: #c8ccd1;
+  --chip-projets-bg: #163542; --chip-projets-fg: #8fd3ea;
   color-scheme: dark;
 }
 
@@ -125,6 +128,7 @@
   --chip-basio-bg: #fdf2d5;    --chip-basio-fg: #735421;
   --chip-eteint-bg: #ffe9e5;   --chip-eteint-fg: #9f3526;
   --chip-ident-bg: #eaecf0;    --chip-ident-fg: #404244;
+  --chip-projets-bg: #e6f4fb;  --chip-projets-fg: #1c6b8c;
   color-scheme: light;
 }
 
@@ -634,6 +638,7 @@ footer .footer-meta span[title] { cursor: help; border-bottom: 1px dotted var(--
 .chip-basio { background: var(--chip-basio-bg); color: var(--chip-basio-fg); }
 .chip-eteint { background: var(--chip-eteint-bg); color: var(--chip-eteint-fg); }
 .chip-ident { background: var(--chip-ident-bg); color: var(--chip-ident-fg); }
+.chip-projets { background: var(--chip-projets-bg); color: var(--chip-projets-fg); }
 
 .specifique-text { color: var(--ink-soft); font-style: italic; font-size: 13.5px; max-width: 240px; display: block; }
 .none-cell { color: var(--ink-soft); }

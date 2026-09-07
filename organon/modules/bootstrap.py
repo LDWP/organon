@@ -14,7 +14,6 @@ from organon.modules.col import module as _col  # noqa: F401
 from organon.modules.doris import module as _doris  # noqa: F401
 from organon.modules.eflora import module as _eflora  # noqa: F401
 from organon.modules.eol import module as _eol  # noqa: F401
-from organon.modules.externe import module as _externe  # noqa: F401
 from organon.modules.gbif import module as _gbif  # noqa: F401
 from organon.modules.hesperomys import module as _hesperomys  # noqa: F401
 from organon.modules.ictv import module as _ictv  # noqa: F401
@@ -37,7 +36,7 @@ from organon.modules.tpdb import module as _tpdb  # noqa: F401
 from organon.modules.tropicos import module as _tropicos  # noqa: F401
 from organon.modules.vascan import module as _vascan  # noqa: F401
 from organon.modules.wfo import module as _wfo  # noqa: F401
-from organon.modules.wp_portails import module as _wp_portails  # noqa: F401
+from organon.modules.wikimedia import module as _wikimedia  # noqa: F401
 from organon.modules.wrms import module as _wrms  # noqa: F401
 from organon.modules.wsc import module as _wsc  # noqa: F401
 

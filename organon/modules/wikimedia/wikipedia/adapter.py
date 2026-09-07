@@ -1,14 +1,16 @@
-"""Couche d'accès réseau pour l'ancrage catégorie de fr.wikipedia.org : lit le wikitexte de
-l'article d'un taxon (famille/ordre/classe, voir module.py) et en extrait le(s) portail(s) déjà
-déclaré(s) via `{{Portail|...}}`, plutôt que de deviner à partir des catégories cachées rendues
-sur la page (qui incluent les portails "parents" par cascade — ex. l'article Falconidae ne
-déclare que `{{Portail|ornithologie}}` mais affiche aussi Zoologie/Biologie/Sciences par cascade
-de catégories, vérifié en direct).
+"""Adaptateur fr.wikipedia.org : lit le wikitexte de l'article d'un taxon (famille/ordre/classe,
+voir module.py) et en extrait le(s) portail(s) déjà déclaré(s) via `{{Portail|...}}`, plutôt que
+de deviner à partir des catégories cachées rendues sur la page (qui incluent les portails
+"parents" par cascade — ex. l'article Falconidae ne déclare que `{{Portail|ornithologie}}` mais
+affiche aussi Zoologie/Biologie/Sciences par cascade de catégories, vérifié en direct).
 
 `redirects=1` : les noms scientifiques de rang classe/ordre redirigent très souvent vers le nom
 vernaculaire (ex. Aves -> Oiseau, Insecta -> Insecte, vérifié en direct) ; sans ce paramètre,
 `prop=revisions` renverrait le contenu de la page de redirection elle-même (une ligne
-`#REDIRECT [[...]]`), jamais celui de la cible."""
+`#REDIRECT [[...]]`), jamais celui de la cible.
+
+Édition fr uniquement pour l'instant ; d'autres méthodes (catégories, ébauches, existence de
+page) rejoindront cet adaptateur au fil de l'eau — voir module.py."""
 
 from __future__ import annotations
 
@@ -30,7 +32,7 @@ def _extrait_portails(wikitext: str) -> list[str]:
     return [p.strip() for p in match.group(1).split("|") if p.strip()]
 
 
-class WpPortailsAdapter(OwnedClientMixin):
+class WikipediaAdapter(OwnedClientMixin):
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         super().__init__(client, headers={"User-Agent": USER_AGENT})
 

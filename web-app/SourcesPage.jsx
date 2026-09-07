@@ -18,6 +18,7 @@ const FREQUENT_ELEMENTS = [
   { label: "Basionyme", css: "chip-basio", test: (s) => s.toLowerCase() === "basionyme" },
   { label: "Éteint", css: "chip-eteint", test: (s) => s.toLowerCase() === "éteint" },
   { label: "Identifiant", css: "chip-ident", test: (s) => s.toLowerCase().startsWith("identifiant") },
+  { label: "Autres projets", css: "chip-projets", test: (s) => s.toLowerCase() === "autres projets" },
 ];
 
 // Regroupement de "Méthode d'accès" pour le rendre triable — suit acces.type, une énumération
@@ -37,34 +38,20 @@ function accessGroupLabel(source) {
   return (ACCESS_GROUPS.find((g) => g.test(source)) ?? { label: "Autre" }).label;
 }
 
-// Le module "Liens transversaux Wikimédia" (id `externe` dans db_inventory.yaml) est une entrée
-// unique côté backend, mais couvre plusieurs sites indépendants (Wikidata, Commons, Wikispecies,
-// Wiktionnaire...) — on l'éclate ici en une ligne par site, réunies dans leur propre groupe
-// "Wikimédia" plutôt que noyées dans "Données généralistes". Repérée par id, pas par un texte
-// contenant "wikidata"/"commons"/etc. : une autre source peut légitimement mentionner ces mots
-// (ex. "résolution DOI en repli après une recherche Wikidata infructueuse" pour crossref) sans
-// être elle-même un agrégateur Wikimédia à éclater.
-const WIKI_AGGREGATOR_ID = "externe";
-const WIKI_PROPERTIES = [
-  { test: /wikidata/i, nom: "Wikidata", url: "https://www.wikidata.org" },
-  { test: /commons/i, nom: "Wikimedia Commons", url: "https://commons.wikimedia.org" },
-  { test: /wikispecies/i, nom: "Wikispecies", url: "https://species.wikimedia.org" },
-  { test: /wiktionnaire/i, nom: "Wiktionnaire (français)", url: "https://fr.wiktionary.org" },
-  { test: /wikip[ée]dia/i, nom: "Wikipédia", url: "https://www.wikipedia.org" },
-];
-
-function isWikimediaAggregator(source) {
-  return source.id === WIKI_AGGREGATOR_ID;
-}
-
-function splitWikimediaSource(source) {
-  return source.elements_recoltes
-    .map((raw, i) => {
-      const prop = WIKI_PROPERTIES.find((p) => p.test.test(raw));
-      if (!prop) return null;
-      return { ...source, id: `${source.id}-${i}`, nom: prop.nom, url: prop.url, elements_recoltes: [raw] };
-    })
-    .filter(Boolean);
+// Une source peut couvrir plusieurs sites/usages distincts sous un même module (même id, même
+// statut/accès) — ex. le module `externe` couvre Wikidata, Commons, Wikispecies, Wiktionnaire et
+// fr.wikipedia.org. Le détail par site vient alors de `source.volets` (db_inventory.yaml), pas
+// d'une déduction sur le texte de `elements_recoltes` : une ligne par volet, avec le nom/url
+// propres à celui-ci et le reste hérité de la source parente.
+function expandVolets(source) {
+  if (!source.volets?.length) return [source];
+  return source.volets.map((volet, i) => ({
+    ...source,
+    id: `${source.id}-${i}`,
+    nom: volet.nom,
+    url: volet.url,
+    elements_recoltes: volet.elements_recoltes,
+  }));
 }
 
 function splitElements(list) {
@@ -176,21 +163,12 @@ export default function SourcesPage({ onBack }) {
   const grouped = useMemo(() => {
     if (!data) return null;
 
-    const wikimediaSources = [];
     const categories = data.categories
       .map((category) => ({
         nom: category.nom,
-        sources: category.sources.filter((s) => {
-          if (s.statut !== "disponible") return false;
-          if (isWikimediaAggregator(s)) {
-            wikimediaSources.push(...splitWikimediaSource(s));
-            return false;
-          }
-          return true;
-        }),
+        sources: category.sources.filter((s) => s.statut === "disponible").flatMap(expandVolets),
       }))
       .filter((category) => category.sources.length > 0);
-    if (wikimediaSources.length) categories.push({ nom: "Wikimédia", sources: wikimediaSources });
 
     return categories.map((category) => ({
       nom: category.nom,
@@ -241,9 +219,9 @@ export default function SourcesPage({ onBack }) {
     );
   }
 
-  // Nombre d'entrées yaml "disponible" avant l'éclatement Wikimédia (voir `grouped` ci-dessus) —
-  // sinon le titre grimperait de +3 dès qu'un module d'agrégation liens externes est affiché en
-  // plusieurs lignes, sans rapport avec le nombre réel de sources distinctes. Même calcul que le
+  // Nombre d'entrées yaml "disponible" avant l'éclatement en volets (voir `grouped` ci-dessus) —
+  // sinon le titre grimperait dès qu'une source à volets (ex. `externe`) est affichée en
+  // plusieurs lignes, sans rapport avec le nombre réel de modules distincts. Même calcul que le
   // badge de l'en-tête (App.jsx), pour que les deux nombres restent toujours identiques.
   const totalDisponibles = data.categories.reduce(
     (n, c) => n + c.sources.filter((s) => s.statut === "disponible").length,

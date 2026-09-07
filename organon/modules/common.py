@@ -10,6 +10,8 @@ import html as _html
 import re
 from collections.abc import Awaitable, Callable
 
+import httpx
+
 from organon.core.models import Struct
 from organon.core.rendering.support import rempl_et_al
 
@@ -157,6 +159,17 @@ def sparql_escape(value: str) -> str:
         .replace("\n", "\\n")
         .replace("\r", "\\r")
     )
+
+
+async def mediawiki_page_exists(client: httpx.AsyncClient, api_url: str, title: str) -> bool:
+    """Existence d'une page via l'API MediaWiki standard (`action=query`) : une page manquante
+    renvoie `pageid: -1` avec une clé `missing`, une page existante un `pageid` positif sans
+    cette clé (vérifié en direct sur les deux cas). Partagé par les adaptateurs Commons,
+    Wikispecies et Wiktionnaire (organon/modules/wikimedia/*), chacun sur son propre domaine."""
+    resp = await client.get(api_url, params={"action": "query", "titles": title, "format": "json"})
+    resp.raise_for_status()
+    pages = resp.json().get("query", {}).get("pages", {})
+    return any("missing" not in page for page in pages.values())
 
 
 def simple_debug_link(struct: Struct, module_id: str, url_template: str, label: str) -> str | None:

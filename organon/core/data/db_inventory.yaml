@@ -247,24 +247,29 @@ categories:
   - id: wikimedia
     nom: "Wikimédia"
     sources:
-      - id: externe
-        nom: "Liens transversaux Wikimédia (Wikidata, Commons, Wikispecies, Wiktionnaire)"
-        url: "https://www.wikidata.org"
+      - id: wikimedia
+        nom: "Liens transversaux + ancrage fr.wikipedia.org"
         statut: disponible
         classification: {possible: false, estime: false, detail: "module de liens externes, ne fournit aucune classification"}
-        elements_recoltes: ["identifiant Wikidata (QID)", "existence de page Commons (article et catégorie)", "existence de page Wikispecies", "existence de page Wiktionnaire francophone"]
-        acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire)"}
-        derniere_maj: null
-        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique."
-      - id: wp_portails
-        nom: "fr.wikipedia.org"
-        url: "https://fr.wikipedia.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "module de choix des portails, ne fournit aucune classification"}
-        elements_recoltes: ["portails"]
-        acces: {type: api_rest, detail: "API MediaWiki standard (fr.wikipedia.org/w/api.php, action=query/prop=revisions), suit les redirections"}
+        acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire/fr.wikipedia.org)"}
         derniere_maj: "2026-09-06"
-        notes: "Complète (jamais ne remplace) les règles statiques de organon/core/selectors/rules/portails.yaml : n'intervient qu'en repli, avant le dernier repli générique par règne — voir organon.core.selectors.categorization.lien_pour_portail. Pas une base taxonomique, mais Wikipédia elle-même."
+        notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique. Orchestrateur avec un sous-module par site (organon/modules/wikimedia/{wikidata,commons,species,wiktionnaire,wikipedia}) — un autre wiki ou une autre édition linguistique s'ajoute comme sous-module plutôt qu'en surchargeant un adaptateur unique. Le volet fr.wikipedia.org complète, sans jamais les remplacer, les règles statiques de organon/core/selectors/rules/portails.yaml (n'intervient qu'en repli, voir organon.core.selectors.categorization.lien_pour_portail) ; d'autres usages de fr.wikipedia.org (catégories, ébauches, existence de page...) rejoindront ce même volet au fil de l'eau plutôt qu'un module dédié par usage."
+        volets:
+          - nom: Wikidata
+            url: "https://www.wikidata.org"
+            elements_recoltes: ["identifiant Wikidata (QID)"]
+          - nom: "Wikimedia Commons"
+            url: "https://commons.wikimedia.org"
+            elements_recoltes: ["Autres projets"]
+          - nom: Wikispecies
+            url: "https://species.wikimedia.org"
+            elements_recoltes: ["Autres projets"]
+          - nom: "Wiktionnaire (français)"
+            url: "https://fr.wiktionary.org"
+            elements_recoltes: ["Autres projets"]
+          - nom: "Wikipédia (français)"
+            url: "https://fr.wikipedia.org"
+            elements_recoltes: ["portail(s)"]
 
   - id: paleo_paleozoologie
     nom: "Paléontologie — Paléozoologie"

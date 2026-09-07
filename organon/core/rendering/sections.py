@@ -721,10 +721,10 @@ def render_references_items(struct: Struct) -> list[tuple[str, str]]:
 def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
     autres: list[str] = []
 
-    externe = struct.liens.get("externe", {})
-    if any(k in externe for k in ("commons", "species", "ccommons", "frwiktionary")):
-        commons_page = (externe.get("commons") or {}).get("page")
-        commons_cat_page = (externe.get("ccommons") or {}).get("page")
+    wikimedia = struct.liens.get("wikimedia", {})
+    if any(k in wikimedia for k in ("commons", "species", "ccommons", "frwiktionary")):
+        commons_page = (wikimedia.get("commons") or {}).get("page")
+        commons_cat_page = (wikimedia.get("ccommons") or {}).get("page")
         if commons_page and not commons_cat_page:
             autres.append(f"commons={commons_page}")
         elif commons_page and commons_cat_page:
@@ -734,10 +734,10 @@ def render_voir_aussi(struct: Struct, options: GenerateOptions) -> str:
         elif not commons_page and commons_cat_page:
             autres.append(f"commons=Category:{commons_cat_page}")
             autres.append(f"commons titre=Catégorie {commons_cat_page}")
-        if (externe.get("species") or {}).get("page"):
-            autres.append(f"species={externe['species']['page']}")
-        if (externe.get("frwiktionary") or {}).get("page"):
-            autres.append(f"wiktionary={externe['frwiktionary']['page']}")
+        if (wikimedia.get("species") or {}).get("page"):
+            autres.append(f"species={wikimedia['species']['page']}")
+        if (wikimedia.get("frwiktionary") or {}).get("page"):
+            autres.append(f"wiktionary={wikimedia['frwiktionary']['page']}")
 
     ext = _compute_ext_liens(struct)
     categorie_principale = struct.taxon.rang in RANGS_CATEGORIE_HOMONYME

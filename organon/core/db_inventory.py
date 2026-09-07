@@ -71,9 +71,23 @@ class AccesInfo(BaseModel):
     detail: str
 
 
+class SourceVolet(BaseModel):
+    """Un site/usage distinct couvert par un même module (même id, même statut/accès) mais
+    affiché comme sa propre ligne sur la page Sources — ex. le module `externe` couvre Wikidata,
+    Commons, Wikispecies, Wiktionnaire et fr.wikipedia.org sous un seul id de registre. Décrit
+    explicitement ici plutôt que déduit côté frontend par correspondance de texte sur
+    `elements_recoltes` (fragile, et hors de propos pour le fichier de données)."""
+
+    nom: str
+    url: str | None = None
+    elements_recoltes: list[str] = []
+
+
 class SourceEntry(BaseModel):
     """Une base de données, intégrée ou non. `elements_recoltes` ne prend sens que pour une
-    source `disponible` (rien n'est collecté pour une base non intégrée)."""
+    source `disponible` (rien n'est collecté pour une base non intégrée). Une source avec
+    `volets` non vide délègue le détail par site à ceux-ci ; `elements_recoltes` reste alors
+    vide au niveau de la source elle-même."""
 
     id: str
     nom: str
@@ -81,6 +95,7 @@ class SourceEntry(BaseModel):
     statut: Statut
     classification: ClassificationInfo
     elements_recoltes: list[str] = []
+    volets: list[SourceVolet] = []
     acces: AccesInfo
     derniere_maj: str | None = None
     notes: str | None = None
