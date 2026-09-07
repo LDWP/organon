@@ -78,7 +78,7 @@ def rendu_vide(section: str, options: GenerateOptions) -> bool:
 
 
 def render_intro(struct: Struct) -> str:
-    rang_cite = _RANG_PARENT_CITE.get(struct.taxon.rang, "famille")
+    rang_cite = _RANG_PARENT_CITE.get(struct.taxon.rang or "", "famille")
     parent = None
     for rang in struct.rangs:
         if rang.rang == rang_cite:
@@ -120,9 +120,13 @@ def compute_rank_lines(struct: Struct) -> list[tuple[str, str, str]]:
 
     lines: list[tuple[str, str, str]] = []
     for r in rangs:
+        # `r.rang` non résolu par la source (None) suit le même repli "NOTFOUND" que les autres
+        # rangs inconnus (voir grammar.wp_nom_rang) plutôt que de fuiter tel quel dans le
+        # wikicode ("Taxobox | None").
+        rang = r.rang or "NOTFOUND"
         eteint = " | éteint=oui" if r.eteint else ""
         page_hom, hom = cherche_homonyme(r.nom, regne)
-        taxobox = f"{{{{Taxobox | {r.rang}"
+        taxobox = f"{{{{Taxobox | {rang}"
         if hom is None:
             taxobox += f" | {r.nom}"
         elif page_hom:
@@ -130,7 +134,7 @@ def compute_rank_lines(struct: Struct) -> list[tuple[str, str, str]]:
         else:
             taxobox += f" | {hom} | {r.nom}"
         taxobox += f"{eteint} }}}}"
-        lines.append((r.rang, r.nom, taxobox))
+        lines.append((rang, r.nom, taxobox))
     return lines
 
 
@@ -236,7 +240,7 @@ def compute_rang_txt(liste: list[RankName]) -> tuple[str, str, str]:
 
 
 def render_subtaxon_line(
-    sous_taxon: RankName, regne: str, rang_defaut: str, taxon_rang: str
+    sous_taxon: RankName, regne: str, rang_defaut: str, taxon_rang: str | None
 ) -> str:
     """Rendu wikitexte d'une ligne de sous-taxon (`"* ''Nom'' Auteur\\n"`, italiques/éteint
     compris) — extrait de `render_inf` pour être partagé avec

@@ -116,59 +116,68 @@ DOMAINES_SANS_ITALIQUE_SYSTEMATIQUE: set[str] = {
 }
 
 
-def wp_rang_valide(rang: str, table: RankTable | None = None) -> bool:
+def wp_rang_valide(rang: str | None, table: RankTable | None = None) -> bool:
     table = table or load_rank_table()
     return rang in table.ranks
 
 
 def wp_nom_rang(
-    rang: str, lien: bool, maj: bool, plur: bool, table: RankTable | None = None
+    rang: str | None, lien: bool, maj: bool, plur: bool, table: RankTable | None = None
 ) -> str:
     """Retourne le nom d'un rang selon les options : avec/sans wikilien, avec/sans
     majuscule, au singulier/pluriel. Les formes sont calculées à partir du nom minuscule
-    canonique (clé YAML) et des irrégularités éventuelles, pas stockées telles quelles."""
+    canonique (clé YAML) et des irrégularités éventuelles, pas stockées telles quelles.
+    `rang=None` (rang non résolu par la source) suit le même repli "NOTFOUND" qu'un rang
+    inconnu de la table : `wp_rang_valide` le rejette via `in table.ranks`, sans distinction."""
     table = table or load_rank_table()
     if not wp_rang_valide(rang, table):
         return "NOTFOUND"
+    assert rang is not None  # garanti par wp_rang_valide (une clé de dict n'est jamais None)
     entry = table.ranks[rang]
     if lien:
         return _forme_lien(rang, entry, maj)
     return _forme_nom(rang, entry, maj, plur)
 
 
-def wp_un_rang(rang: str, table: RankTable | None = None) -> str:
+def wp_un_rang(rang: str | None, table: RankTable | None = None) -> str:
     table = table or load_rank_table()
     if not wp_rang_valide(rang, table):
         return "NOTFOUND"
+    assert rang is not None
     return "un " if table.ranks[rang].genre == "masculin" else "une "
 
 
-def wp_le_rang(rang: str, table: RankTable | None = None) -> str:
+def wp_le_rang(rang: str | None, table: RankTable | None = None) -> str:
     table = table or load_rank_table()
     if not wp_rang_valide(rang, table):
         return "NOTFOUND"
+    assert rang is not None
     if _commence_par_son_vocalique(rang):
         return "l'"
     return "le " if table.ranks[rang].genre == "masculin" else "la "
 
 
-def wp_inf_rang(rang: str, table: RankTable | None = None) -> bool | str:
+def wp_inf_rang(rang: str | None, table: RankTable | None = None) -> bool | str:
     """Indique si le rang est inférieur au genre (au sens de « rang d'espèce ou en dessous »
     utilisé par wp_est_italique — pas seulement < espèce)."""
     table = table or load_rank_table()
     if not wp_rang_valide(rang, table):
         return "NOTFOUND"
+    assert rang is not None
     return table.ranks[rang].rang_inferieur_espece
 
 
-def wp_rang_plus_specifique(rang: str, reference: str, table: RankTable | None = None) -> bool:
+def wp_rang_plus_specifique(
+    rang: str | None, reference: str | None, table: RankTable | None = None
+) -> bool:
     """Indique si `rang` est plus spécifique (inférieur, au sens taxonomique) que `reference`,
     selon l'ordre de `ranks.yaml` (du plus spécifique au plus large — l'ordre d'insertion du
     dict `table.ranks` reflète l'ordre du fichier). Utilisé pour décider si un sous-taxon mérite
     un wikilien par comparaison à son propre taxon plutôt qu'à un seuil absolu (voir
-    `sections.render_subtaxon_line`) : un rang absent de la table (donnée malformée) est
-    considéré comme plus spécifique par défaut, pour ne pas priver un sous-taxon légitime de son
-    lien sur un cas qui ne devrait pas se présenter en pratique."""
+    `sections.render_subtaxon_line`) : un rang absent de la table (donnée malformée ou non
+    résolue par la source, `None` compris) est considéré comme plus spécifique par défaut, pour
+    ne pas priver un sous-taxon légitime de son lien sur un cas qui ne devrait pas se présenter
+    en pratique."""
     table = table or load_rank_table()
     ordre = list(table.ranks)
     if rang not in ordre or reference not in ordre:
@@ -176,7 +185,7 @@ def wp_rang_plus_specifique(rang: str, reference: str, table: RankTable | None =
     return ordre.index(rang) < ordre.index(reference)
 
 
-def wp_est_infraspecifique(rang: str, table: RankTable | None = None) -> bool:
+def wp_est_infraspecifique(rang: str | None, table: RankTable | None = None) -> bool:
     """Indique si `rang` est un rang infra-spécifique (sous-espèce, variété, forme, etc. —
     strictement plus spécifique qu'espèce dans l'ordre de `ranks.yaml`). Ces taxons n'ont
     presque jamais d'article dédié sur Wikipédia, d'où l'exclusion du wikilien dans
@@ -208,14 +217,15 @@ def wp_accorde_adjectif(
     return forme
 
 
-def wp_eteint_rang(rang: str, table: RankTable | None = None) -> str:
+def wp_eteint_rang(rang: str | None, table: RankTable | None = None) -> str:
     table = table or load_rank_table()
     if not wp_rang_valide(rang, table):
         return "NOTFOUND"
+    assert rang is not None
     return wp_accorde_adjectif("éteint", table.ranks[rang].genre, table=table)
 
 
-def wp_est_italique(rang: str, regne: str, table: RankTable | None = None) -> bool:
+def wp_est_italique(rang: str | None, regne: str, table: RankTable | None = None) -> bool:
     """Italique systématique pour la plupart des règnes
     (algue/archaea/bactérie/champignon/végétal/virus/procaryote/neutre), sinon dépend du
     rang (italique seulement à partir du rang espèce et en dessous, comme en zoologie)."""
@@ -257,7 +267,7 @@ _EXCLUSIONS_COMPILED = [
 
 def wp_met_italiques(
     taxon: str,
-    rang: str,
+    rang: str | None,
     regne: str,
     lien: bool = False,
     souslien: bool = True,
