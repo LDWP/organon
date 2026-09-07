@@ -28,6 +28,7 @@ import logging
 import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -229,6 +230,8 @@ async def _run_classification_batch(
     for task in asyncio.as_completed(tasks):
         module_id, resolved, exc = await task
         results[module_id] = (resolved, exc)
+        status: _ModuleStatus
+        message: str | None
         if exc is not None:
             status, message = "error", str(exc)
         elif resolved is None:
@@ -302,12 +305,15 @@ def _avertissements_exclusion_regne(
     ]
 
 
+_ModuleStatus = Literal["running", "found", "empty", "error"]
+
+
 @dataclass
 class ModuleRunEvent:
     """Un pas de progression émis par `EnrichmentRunner.run()` pour un module donné."""
 
     module_id: str
-    status: str  # "running" | "found" | "empty" | "error"
+    status: _ModuleStatus
     message: str | None = None
     duration_seconds: float | None = None
 
