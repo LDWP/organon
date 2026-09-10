@@ -406,38 +406,33 @@ class GbifModule(TaxonomyModule):
         if not data or "id" not in data:
             return None
         cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], data.get("rang", struct.taxon.rang), struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        sup = " | éteint=oui" if data.get("eteint") else ""
-        # Quand `data["id"]` est l'identifiant ChecklistBank (COL XR), le lien {{GBIF}} pointe
-        # déjà, via ce même id, vers la fiche COL XR accepted (voir ci-dessous) — `nv` refléterait
-        # alors le statut du backbone GBIF sur un id qui n'est plus le sien, contredisant la fiche
-        # réellement liée. Ne s'applique donc qu'à la clé numérique GBIF legacy.
-        nv = " | nv" if data.get("synonyme") and not isinstance(data["id"], str) else ""
+        col_xr = data.get("col_xr")
+        # Quand `data["id"]` est l'identifiant ChecklistBank (COL XR), il ne désigne plus le
+        # backbone GBIF mais la fiche COL XR (`col_xr`, voir _collect) : le nom/auteur/rang/éteint
+        # cités par {{GBIF}} doivent donc être ceux de cette fiche-là, sinon la citation contredit
+        # la page réellement pointée par cet id (constaté sur Amanita muscaria, id 5TYZ9 : citation
+        # "(L.) Pers." du backbone alors que la fiche COL XR/GBIF réellement affichée à cet id est
+        # "(L.) Lam.").
+        source = col_xr if col_xr is not None else data
+        rang = source.get("rang") or struct.taxon.rang
+        cible = wp_met_italiques(source["nom"], rang, struct.regne)
+        if source.get("auteur"):
+            cible += " " + source["auteur"]
+        sup = " | éteint=oui" if source.get("eteint") else ""
+        # `nv` reflète le statut du backbone GBIF : ne s'applique qu'à la clé numérique GBIF
+        # legacy, jamais à un id substitué par COL XR (`find_col_xr_link` ne renvoie jamais une
+        # fiche synonyme, voir col_xr/lookup.py) qui contredirait la fiche accepted réellement liée.
+        nv = " | nv" if data.get("synonyme") and col_xr is None else ""
         out = [f"{{{{GBIF | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"]
-        if isinstance(data["id"], str):
+        if col_xr is not None:
             # Identifiant ChecklistBank (COL XR) plutôt que la clé numérique GBIF legacy : la
-            # même fiche existe aussi sur catalogueoflife.org, d'où ce second lien. Cité avec le
-            # nom/auteur propres à cette fiche COL XR (`col_xr`), pas ceux du backbone GBIF
-            # ci-dessus : les deux peuvent diverger (ex. auteur absent côté GBIF), et un lien
-            # {{CatalogueofLife}} doit citer la même chose que `ColModule` citerait pour la même
-            # fiche, sans quoi le dédoublonnage par ligne de `_compute_ext_liens_items` ne les
-            # reconnaît pas comme la même référence.
-            col_xr = data["col_xr"]
-            cible_col = wp_met_italiques(
-                col_xr["nom"], col_xr.get("rang") or struct.taxon.rang, struct.regne
-            )
-            if col_xr.get("auteur"):
-                cible_col += " " + col_xr["auteur"]
-            sup_col = " | éteint=oui" if col_xr.get("eteint") else ""
-            # Pas de `nv` ici : `find_col_xr_link` ne renvoie jamais une fiche synonyme (voir sa
-            # docstring), contrairement au statut GBIF ci-dessus qui peut différer — reprendre
-            # `nv` casserait le dédoublonnage avec la ligne équivalente de `ColModule`, qui ne
-            # marque jamais `nv` sur une fiche accepted.
+            # même fiche existe aussi sur catalogueoflife.org, d'où ce second lien, avec la même
+            # citation que {{GBIF}} ci-dessus (`source` = `col_xr`) — un lien {{CatalogueofLife}}
+            # doit citer la même chose que `ColModule` citerait pour la même fiche, sans quoi le
+            # dédoublonnage par ligne de `_compute_ext_liens_items` ne les reconnaît pas comme la
+            # même référence.
             out.append(
-                f"{{{{CatalogueofLife | {data['id']} | {cible_col}{sup_col} | "
-                f"consulté le={cdate} }}}}"
+                f"{{{{CatalogueofLife | {data['id']} | {cible}{sup} | consulté le={cdate} }}}}"
             )
         return out
 
