@@ -1,29 +1,36 @@
-"""Logique métier du module WFO (World Flora Online) : enrichissement botanique pur
-(identifiant, auteur), domaine `['végétal']`. Aucune classification malgré la hiérarchie
-affichée sur chaque fiche détail (Angiosperms > ordre > famille > genre > ...) : cette
-hiérarchie ne descend pas jusqu'au règne/embranchement et mélange des nœuds génériques sans
-auteur (ex. « Angiosperms », `wfo-9949999999`) avec des rangs réels — jugée insuffisamment
-fiable pour `can_classify=True`, comme déjà tranché côté ancien PHP.
+"""Logique métier du module WFO (World Flora Online) : classification (domaine `['végétal']`),
+identifiant, auteur — limitée aux noms de statut `Accepted Name` (`taxonomicStatus=Accepted`) :
+vérifié sur le backbone téléchargeable (2026-06, `classification.csv`) que la chaîne
+`parentNameUsageID` est complète à 100 % pour les espèces/genres/familles acceptés (le vide
+observé ailleurs ne touche que les synonymes/noms non vérifiés, qui pointent vers leur nom
+accepté via `acceptedNameUsageID` plutôt que vers un parent taxonomique — pas une lacune de
+données). Aucun rang n'est exposé pour les ancêtres de la chaîne (ni sur `/search`, ni sur la
+fiche détail) : déduit par `organon.modules.wfo.ranks.wfo_cherche_rang_ancetre` (voir sa
+docstring) — y compris « Angiosperms » (`wfo-9949999999`), nœud Accepted de rang phylum côté
+backbone bien que sans terminaison standard ni auteur.
 
 `/search` peut renvoyer plusieurs enregistrements partageant le même nom (homonymes/
 combinaisons distinctes, ex. « Quercus robur » a au moins Asso 1779 et L. 1753) : contrairement
 à Tropicos, WFO expose un statut taxonomique explicite par résultat (« Accepted Name » /
 « Synonym of ... » / « Unchecked »), utilisé ici comme signal de préférence — même principe que
-le champ `inPowo` d'IPNI."""
+le champ `inPowo` d'IPNI. Pas de suivi de synonyme (contrairement à POWO/GBIF/ITIS) : un
+enregistrement non `Accepted Name` reste utilisable en enrichissement mais ne produit aucune
+classification, plutôt que de relancer la collecte sur un nom accepté potentiellement absent."""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
+from organon.core.models import RankName, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
 from organon.core.rendering.support import dates_recupere
 from organon.modules.common import format_auteur, simple_debug_link
 from organon.modules.wfo.adapter import WfoAdapter
+from organon.modules.wfo.ranks import wfo_cherche_rang, wfo_cherche_rang_ancetre
 
 
 class WfoModule(TaxonomyModule):
     meta = ModuleMeta(
-        id="wfo", can_classify=False, can_render_external_link=True, domains=["végétal"]
+        id="wfo", can_classify=True, can_render_external_link=True, domains=["végétal"]
     )
 
     def __init__(self, adapter: WfoAdapter | None = None) -> None:
@@ -32,9 +39,6 @@ class WfoModule(TaxonomyModule):
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        if is_classification:
-            return None
-
         taxon = struct.taxon.nom
         results = await self._adapter.search(taxon)
         exact = [r for r in results if r["nom"] == taxon]
@@ -47,6 +51,27 @@ class WfoModule(TaxonomyModule):
             "nom": match["nom"],
             "auteur": format_auteur(match.get("auteur")),
         }
+
+        if not is_classification:
+            return struct
+        if match["statut"] != "Accepted Name":
+            return None
+
+        ancestors = await self._adapter.ancestors(match["id"])
+        rangs = [
+            RankName(nom=a["nom"], auteur=format_auteur(a["auteur"]), rang=rang)
+            for a in ancestors
+            if (rang := wfo_cherche_rang_ancetre(a["id"], a["nom"], taxon)) is not None
+            and rang != "règne"
+        ]
+        rangs.reverse()
+
+        struct.taxon.rang = wfo_cherche_rang(match.get("rang_brut"))
+        struct.taxon.auteur = format_auteur(match.get("auteur"))
+        struct.regne = "végétal"
+        struct.classification = "WFO"
+        struct.classification_taxobox = "WFO"
+        struct.rangs = rangs
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
