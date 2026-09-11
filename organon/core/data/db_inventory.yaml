@@ -22,7 +22,7 @@
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 
-derniere_maj: "2026-09-06"
+derniere_maj: "2026-09-11"
 
 categories:
   - id: generalistes
@@ -430,6 +430,15 @@ categories:
         acces: {type: api_rest, detail: "API REST/JSON avec jeton Bearer (jeton public utilisé par le widget de recherche du site lui-même)"}
         derniere_maj: null
         notes: "Intégré après cet inventaire (classé « à trancher ») ; corrigé après lecture du code."
+      - id: bryonames
+        nom: "Bryonames (The Bryophyte Nomenclator)"
+        url: "https://www.bryonames.org"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "classification des bryophytes (mousses, hépatiques, anthocérotes) seulement — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 170394, alias « Bryonames », DOI 10.48580/d8zmp) — même plateforme et même schéma que le module col"}
+        derniere_maj: "2026-09-11"
+        notes: "Le site bryonames.org lui-même est derrière un challenge JS Cloudflare (bloqué même en navigateur automatisé réel, testé en direct) ; les données sont cependant distribuées sans restriction via ChecklistBank, qui sert le module à la place. La page web publique du dataset sur checklistbank.org est elle aussi derrière un contrôle anti-bot (403 même en navigateur automatisé) — render_bioref/debug_link pointent donc vers la fiche Tropicos d'origine (champ name.link de l'API, toujours présent en pratique) plutôt que vers checklistbank.org."
       - id: wfo
         nom: "World Flora Online (WFO)"
         url: "https://www.worldfloraonline.org"
