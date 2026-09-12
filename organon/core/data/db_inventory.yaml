@@ -367,7 +367,8 @@ categories:
         classification: {possible: true, estime: false, detail: "côté PHP : classif=true, priorité 997"}
         elements_recoltes: []
         acces: {type: contact_requis, detail: "webservices disponibles sur inscription/contact"}
-        derniere_maj: null
+        derniere_maj: "2026-09-11"
+        notes: "Reconsidéré via le mirroir ChecklistBank (clé 2002, voir docs/md/db-inventory.md § Sources indisponibles en direct mais mirrorées sur ChecklistBank) : écarté à nouveau — dataset type=nomenclatural (pas de hiérarchie/enfants/synonymes, classification exclue) et surtout `id`/`verbatimKey` ChecklistBank ≠ vrai numéro MycoBank (vérifié via Wikidata P962 croisé avec organon/modules/indexfungorum, même RECORD_NUMBER que MycoBank) — des citations {{MycoBank}} bâties sur ce dataset seraient fausses."
       - id: fongiref
         nom: FongiRef
         url: null
