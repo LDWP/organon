@@ -10,6 +10,7 @@ suivi vers son nom accepté — portée volontairement réduite pour cette premi
 from __future__ import annotations
 
 import asyncio
+import re
 
 from organon.core.config import GenerateOptions
 from organon.core.models import RankName, Struct
@@ -23,6 +24,12 @@ from organon.modules.inpn.ranks import RANGS_REGNE, inpn_cherche_rang, inpn_cher
 # Racine technique de TAXREF (pas un taxon biologique réel) : toujours en tête du fil
 # d'Ariane, filtrée avant résolution plutôt que de lui chercher un rang.
 _ROOT_NAME = "Biota"
+
+# TAXREF n'indexe jamais la notation "Genre (Sous-genre)" : le sous-genre y est stocké sous son
+# seul nom (`lbNom`), identique à celui du genre pour le sous-genre nominotypique (ex.
+# "Eupelmus (Eupelmus)" -> lbNom "Eupelmus", rang SSGN, à côté du genre "Eupelmus" lui-même,
+# rang GN, même lbNom) — une recherche littérale avec parenthèse ne renvoie donc jamais rien.
+_SUBGENUS_RE = re.compile(r"^(?P<genre>\S+)\s*\((?P<sousgenre>\S+)\)$")
 
 
 class InpnModule(TaxonomyModule):
@@ -39,9 +46,26 @@ class InpnModule(TaxonomyModule):
         adapter = self._adapter
         taxon = struct.taxon.nom
 
-        results = await adapter.search(taxon)
+        subgenre = _SUBGENUS_RE.match(taxon)
+        nom_recherche = subgenre.group("sousgenre") if subgenre else taxon
+
+        def _rang_correspond(r: dict) -> bool:
+            # Sans parenthèse dans la requête, écarte le sous-genre nominotypique homonyme du
+            # genre (même lbNom, rang SSGN) pour ne jamais le retenir à la place du genre lui-même
+            # au hasard de l'ordre de l'API — avec parenthèse, exige au contraire ce rang SSGN.
+            code = (r.get("rang") or {}).get("rang")
+            return code == "SSGN" if subgenre else code != "SSGN"
+
+        results = await adapter.search(nom_recherche)
         match = next(
-            (r for r in results if r.get("lbNom") == taxon and r.get("validite") == "NR"), None
+            (
+                r
+                for r in results
+                if r.get("lbNom") == nom_recherche
+                and r.get("validite") == "NR"
+                and _rang_correspond(r)
+            ),
+            None,
         )
         if match is None or not match.get("cdNom"):
             return None
@@ -49,7 +73,7 @@ class InpnModule(TaxonomyModule):
         cd_nom = match["cdNom"]
         auteur = format_auteur(match.get("lbAuteur"))
 
-        struct.liens["inpn"] = {"id": cd_nom, "nom": match.get("lbNom") or taxon}
+        struct.liens["inpn"] = {"id": cd_nom, "nom": taxon}
         if auteur:
             struct.liens["inpn"]["auteur"] = auteur
 
