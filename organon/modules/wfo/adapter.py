@@ -1,104 +1,100 @@
-"""Couche d'accès réseau pour World Flora Online (worldfloraonline.org) : aucune API
-structurée trouvée (recherche confirmée en sondage direct), scraping HTML de la page de
-résultats de recherche par expression régulière ciblée — même approche que
-`organon.modules.eflora`.
+"""Couche d'accès réseau pour World Flora Online : l'API GraphQL qui alimente wfoplantlist.org
+(`https://list.worldfloraonline.org/gql.php`, introspection ouverte, endpoint découvert dans le
+bundle JS du site — CORS bloque l'appel direct depuis un navigateur sur cette origine, sans
+incidence ici puisque l'appel se fait côté serveur) — pas le scraping HTML de
+`worldfloraonline.org` (portail historique, sans schéma exposé, utilisé par la première version
+de ce module). Mêmes identifiants `wfo-<n>` des deux côtés (vérifié : Cyperaceae = wfo-7000000170
+sur les deux sites) : seuls les liens externes/citations restent pointés vers
+`worldfloraonline.org` (voir `module.py`), l'API ne servant qu'à la recherche et à la
+classification.
 
-Le paramètre `limit` de `/search` est respecté au-delà de sa valeur par défaut (24, vérifié
-en direct jusqu'à 100) : demandé ici à 100 pour limiter le risque de rater un homonyme classé
-au-delà de la première page plutôt que de paginer.
+`taxonNameSuggestion` fait de l'auto-complétion par terme : le champ `nameString` d'un résultat
+ne renvoie que son dernier épithète (ex. "robur" pour "Quercus robur" — inutilisable pour un
+filtre de correspondance exacte), et la réponse mélange les homonymes du nom demandé avec des
+taxons non apparentés partageant seulement un terme (vérifié sur "Quercus robur" : les deux
+homonymes attendus, mais aussi des variétés sans rapport comme "Quercus robur var. brevipes").
+`fullNameStringNoAuthorsPlain` donne le nom complet correct à tout rang (y compris les rangs
+infragénériques comme "Quercus sect. Quercus", vérifié en direct) et sert ici de filtre exact,
+laissé à `module.py` comme avant.
 
-`ancestors()` (mode classification uniquement) récupère la chaîne d'ancêtres depuis la fiche
-détail (`#taxonHierarchy`, voir `organon.modules.wfo.ranks` pour l'attribution des rangs).
-Au-delà d'une certaine profondeur, la page replie les rangs supérieurs derrière un lien
-« N higher taxa » pointant vers la page du premier ancêtre visible (vérifié en direct sur une
-espèce : règne/sous-règne/embranchement repliés) — `ancestors()` suit ce lien jusqu'à
-`MAX_ANCESTOR_HOPS` fois, la page de l'ancêtre visé n'étant en général plus repliée (vérifié :
-une fiche de rang famille, moins profonde, ne replie jamais sa propre chaîne)."""
+`taxonNameById(id).currentPreferredUsage.path` donne la chaîne complète et non tronquée du
+taxon accepté jusqu'à la racine technique (rang `code`, pas un vrai rang taxonomique — voir
+`organon.modules.wfo.ranks`), avec le rang exact de chaque ancêtre (enum GraphQL `Rank`) : plus
+besoin de le déduire par terminaison latine comme la première version de ce module."""
 
 from __future__ import annotations
 
-import html
-import re
-
 from organon.core.http import OwnedClientMixin
 
-BASE_URL = "https://www.worldfloraonline.org"
+GRAPHQL_URL = "https://list.worldfloraonline.org/gql.php"
 
-# Chaque ligne de résultat associe un lien `/taxon/wfo-<id>` à son nom (attribut `title`,
-# sans auteur), l'auteur affiché à part dans le même bloc `<h4>`, un statut taxonomique
-# explicite (`Accepted Name` / `Synonym of ...` / `Unchecked`) absent des autres modules
-# botaniques scrapés (eFlora, Tropicos) — utilisé comme signal de désambiguïsation en aval —
-# et le rang du taxon lui-même (`Rank:`, ex. "Species"/"Variety"/"Family").
-_RESULT_RE = re.compile(
-    r'<a title="(?P<nom>[^"]+)" href="/taxon/(?P<id>wfo-\d+);jsessionid=[^"]*" class="result">'
-    r'<h4 class="h4Results">(?:<strong>)?<em>[^<]+</em>\s*(?P<auteur>[^<]*?)\s*'
-    r'(?:</strong>)?</h4></a>'
-    r'.*?<span id="entryStatus">(?P<statut>[^<]*)</span>'
-    r'.*?<span id="entryRank">(?P<rang_brut>[^<]*)</span>',
-    re.DOTALL,
-)
+_SEARCH_QUERY = """
+query($terms: String!, $limit: Int!) {
+  taxonNameSuggestion(termsString: $terms, limit: $limit, excludeDeprecated: false) {
+    id
+    fullNameStringNoAuthorsPlain
+    authorsString
+    rank
+    role
+  }
+}
+"""
 
-_ANCESTOR_RE = re.compile(
-    r'<a href="/taxon/(?P<id>wfo-\d+)[^"]*" class="ancestorsList"><em>(?P<nom>[^<]+)</em>'
-    r'\s*(?P<auteur>[^<]*?)</a>'
-)
-_TRUNCATED_RE = re.compile(
-    r'<a href="/taxon/(?P<id>wfo-\d+)[^"]*" class="ancestorsList">\s*\d+ higher taxa\s*</a>'
-)
+_ANCESTORS_QUERY = """
+query($id: String!) {
+  taxonNameById(nameId: $id) {
+    currentPreferredUsage {
+      path { hasName { fullNameStringNoAuthorsPlain rank authorsString } }
+    }
+  }
+}
+"""
 
-MAX_ANCESTOR_HOPS = 4
-"""Borne le nombre de pages suivies pour désempiler le lien « N higher taxa » (voir docstring
-du module) : la profondeur réelle d'une classification botanique (règne -> ... -> genre) ne
-justifie jamais plus de quelques replis successifs."""
+SEARCH_LIMIT = 50
+"""Assez large pour couvrir les homonymes du nom demandé malgré le bruit d'auto-complétion
+propre à `taxonNameSuggestion` (voir docstring du module), sans avoir à paginer."""
 
 
 class WfoAdapter(OwnedClientMixin):
-    async def search(self, name: str) -> list[dict]:
-        """Renvoie une liste de `{id, nom, auteur, statut, rang_brut}`, déjà nettoyée
-        (entités HTML décodées) mais pas encore filtrée au nom recherché (laissé à
-        module.py)."""
-        resp = await self._client.get(f"{BASE_URL}/search", params={"query": name, "limit": 100})
+    async def _graphql(self, query: str, variables: dict) -> dict | None:
+        resp = await self._client.post(GRAPHQL_URL, json={"query": query, "variables": variables})
         resp.raise_for_status()
-        out = []
-        for m in _RESULT_RE.finditer(resp.text):
-            out.append(
-                {
-                    "id": m.group("id"),
-                    "nom": html.unescape(m.group("nom")).strip(),
-                    "auteur": html.unescape(m.group("auteur")).strip() or None,
-                    "statut": html.unescape(m.group("statut")).strip(),
-                    "rang_brut": html.unescape(m.group("rang_brut")).strip() or None,
-                }
-            )
-        return out
+        payload = resp.json()
+        if "errors" in payload:
+            return None
+        return payload.get("data")
+
+    async def search(self, name: str) -> list[dict]:
+        """Renvoie une liste de `{id, nom, auteur, statut, rang_brut}` — pas encore filtrée au
+        nom recherché (laissé à module.py)."""
+        data = await self._graphql(_SEARCH_QUERY, {"terms": name, "limit": SEARCH_LIMIT})
+        if not data:
+            return []
+        return [
+            {
+                "id": r["id"],
+                "nom": r["fullNameStringNoAuthorsPlain"],
+                "auteur": r.get("authorsString"),
+                "statut": r["role"],
+                "rang_brut": r.get("rank"),
+            }
+            for r in data.get("taxonNameSuggestion") or []
+        ]
 
     async def ancestors(self, wfo_id: str) -> list[dict]:
-        """Renvoie la chaîne des ancêtres `{id, nom, auteur}`, triée du règne vers le parent
-        le plus proche — sans le taxon lui-même (voir docstring du module pour le repli
-        « N higher taxa »)."""
-        chain: list[dict] = []
-        seen: set[str] = set()
-        current = wfo_id
-        for _ in range(MAX_ANCESTOR_HOPS):
-            resp = await self._client.get(f"{BASE_URL}/taxon/{current}")
-            resp.raise_for_status()
-            page = resp.text
-            level = []
-            for m in _ANCESTOR_RE.finditer(page):
-                ancestor_id = m.group("id")
-                if ancestor_id in seen:
-                    continue
-                seen.add(ancestor_id)
-                level.append(
-                    {
-                        "id": ancestor_id,
-                        "nom": html.unescape(m.group("nom")).strip(),
-                        "auteur": html.unescape(m.group("auteur")).strip() or None,
-                    }
-                )
-            chain = level + chain
-            truncated = _TRUNCATED_RE.search(page)
-            if not truncated:
-                break
-            current = truncated.group("id")
-        return chain
+        """Renvoie la chaîne des ancêtres `{nom, auteur, rang_brut}`, triée du parent le plus
+        proche vers le nœud racine (rang technique `code`, voir docstring du module) — sans le
+        taxon lui-même. `path` est déjà dans cet ordre côté GraphQL (le taxon lui-même en
+        premier élément, exclu ici) : aucun tri à refaire."""
+        data = await self._graphql(_ANCESTORS_QUERY, {"id": wfo_id})
+        if not data or not data.get("taxonNameById"):
+            return []
+        path = (data["taxonNameById"].get("currentPreferredUsage") or {}).get("path") or []
+        return [
+            {
+                "nom": p["hasName"]["fullNameStringNoAuthorsPlain"],
+                "auteur": p["hasName"].get("authorsString"),
+                "rang_brut": p["hasName"]["rank"],
+            }
+            for p in path[1:]
+        ]
