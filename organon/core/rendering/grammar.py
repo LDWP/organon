@@ -248,7 +248,7 @@ _EXCLUSIONS: list[tuple[str, str]] = [
     (r" ord[.]", " ''ord.''"), (r" fam[.]", " ''fam.''"), (r" sect[.]", " ''sect.''"),
     (r" ser[.]", " ''ser.''"), (r" sp[.]", " ''sp.''"), (r"subg[.]", "''subg.''"),
     (r"subsp[.]", "''subsp.''"), (r"Groupe", "''Groupe''"), (r" tr[.]", " ''tr.''"),
-    (r" var[.]", " ''var.''"), (r"×", "''×''"), (r"[(]", "''(''"), (r"[)]", "'')''"),
+    (r" var[.]", " ''var.''"), (r"×", "''×''"),
     (r"pv", "''pv''"), (r"pathovar", "''pathovar''"), (r"morphovar", "''morphovar''"),
     (r"phagovar", "''phagovar''"), (r"serovar", "''serovar''"), (r"chemovar", "''chemovar''"),
     (r"cultivar", "''cultivar''"), (r"chemoform", "''chemoform''"), (r"chemotype", "''chemotype''"),
@@ -263,6 +263,23 @@ _EXCLUSIONS: list[tuple[str, str]] = [
 _EXCLUSIONS_COMPILED = [
     (re.compile(r"\b" + pattern + r"(?!\w)"), repl) for pattern, repl in _EXCLUSIONS
 ]
+# "(" et ")" n'ont pas de sémantique de mot : \b/(?!\w) échouent systématiquement dessus
+# (ex. "Genre (Sous-genre)" : "(" est précédée d'un espace et suivie d'une lettre, ni l'un
+# ni l'autre n'étant une frontière \b ou une fin (?!\w)), donc regex dédiées sans ce garde.
+_EXCLUSIONS_PARENTHESES_COMPILED = [
+    (re.compile(r"[(]"), "''(''"), (re.compile(r"[)]"), "'')''"),
+]
+
+
+def _sans_italique_vide(wikitexte: str) -> str:
+    """Une exclusion en toute fin de nom (ex. une parenthèse fermante finale) rouvre
+    l'italique juste avant que l'enveloppe globale `''...''` ne le referme aussitôt,
+    produisant une paire vide adjacente ("''''" : 4 apostrophes) que MediaWiki interprète
+    comme gras + apostrophe littérale au lieu d'un italique vide inoffensif. On la
+    supprime (en boucle, au cas où plusieurs paires vides se suivent)."""
+    while "''''" in wikitexte:
+        wikitexte = wikitexte.replace("''''", "")
+    return wikitexte
 
 
 def wp_met_italiques(
@@ -287,6 +304,8 @@ def wp_met_italiques(
     modifie = taxon
     for pattern, repl in _EXCLUSIONS_COMPILED:
         modifie = pattern.sub(repl, modifie)
+    for pattern, repl in _EXCLUSIONS_PARENTHESES_COMPILED:
+        modifie = pattern.sub(repl, modifie)
 
     if modifie == ref:
         if lien:
@@ -294,8 +313,8 @@ def wp_met_italiques(
         return f"''{taxon}''" if souslien else taxon
 
     if lien:
-        return f"[[{ref}|''{modifie}'']]"
-    return f"''{modifie}''" if souslien else modifie
+        return _sans_italique_vide(f"[[{ref}|''{modifie}'']]")
+    return _sans_italique_vide(f"''{modifie}''") if souslien else modifie
 
 
 # Tables associatives par règne (liens vers les pages de convention Wikipédia).
