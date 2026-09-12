@@ -42,7 +42,7 @@ EXTERNAL_ID_PROPERTIES: dict[str, str] = {
     "P960": "tropicos",
     "P7715": "wfo",
     "P10585": "col",
-    "P959": "msw",
+    "P12560": "mdd",
     "P4024": "adw",
     "P11043": "hesperomys",
     "P10907": "tpdb",

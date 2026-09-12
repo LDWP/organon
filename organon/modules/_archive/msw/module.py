@@ -1,4 +1,11 @@
-"""Logique métier du module MSW (Mammal Species of the World, 3e éd., Bucknell/ASM).
+"""Module archivé : retiré du registre actif (voir organon.modules.bootstrap), plus intégré à
+l'application. Remplacé par `organon.modules.mdd` (Mammal Diversity Database, ChecklistBank
+dataset 9802) : source successeur activement maintenue par l'ASM, alors que MSW3 (ci-dessous)
+est figée depuis 2005 ; contrairement à MSW (enrichissement seul), MDD classe en plus. Le code
+reste ici tel quel (fonctionnel, juste plus appelé) au cas où cette substitution serait
+reconsidérée.
+
+Logique métier du module MSW (Mammal Species of the World, 3e éd., Bucknell/ASM).
 Enrichissement uniquement (`can_classify=False`), limité au domaine mammifère. `search.asp`
 faisant de la recherche plein texte, chaque résultat est revérifié contre le nom exact demandé
 avant d'être accepté (voir `organon.modules.eflora`, même défaut côté source). Contrairement à
@@ -9,11 +16,11 @@ from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
-from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
+from organon.core.registry import ModuleMeta, TaxonomyModule
 from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
+from organon.modules._archive.msw.adapter import MswAdapter
 from organon.modules.common import format_auteur
-from organon.modules.msw.adapter import MswAdapter
 
 
 class MswModule(TaxonomyModule):
@@ -59,6 +66,3 @@ class MswModule(TaxonomyModule):
             f"<a href='https://www.departments.bucknell.edu/biology/resources/msw3/browse.asp"
             f"?s=y&id={data['id']}' target='_blank' rel='noopener noreferrer'>MSW</a>"
         )
-
-
-register_module(MswModule)

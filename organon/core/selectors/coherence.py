@@ -165,7 +165,7 @@ def reference_module_coherente(module_id: str, regne: str) -> bool:
     possibles, voir `organon.core.domains`) plutôt que sur une liste ad hoc : un module dont le
     domaine déclaré exclut le règne du taxon (ex. IndexFungorum, réservé aux champignons,
     référencé sur un animal) est jugé incohérent. Un domaine déclaré plus fin que le règne
-    stocké (ex. MSW -> `["mammifère"]`, alors que `struct.regne` ne descend jamais sous
+    stocké (ex. MDD -> `["mammifère"]`, alors que `struct.regne` ne descend jamais sous
     "animal", voir `regne_depuis_classification`) reste cohérent : `domaine_couvre` accepte
     aussi ce cas ancêtre/descendant. Règne vide ou "neutre" (rang au-dessus de l'espèce, ou
     règne non résolu) : aucune détection fiable possible, jugé cohérent par défaut plutôt que de

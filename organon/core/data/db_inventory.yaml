@@ -795,20 +795,21 @@ categories:
       - id: mdd
         nom: "Mammal Diversity Database (MDD)"
         url: "https://www.mammaldiversity.org"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "recommandée par Wikipédia fr en remplacement de MSW (obsolète) ; piste export CSV, pattern identique au module wsc déjà porté"}
-        elements_recoltes: []
-        acces: {type: export, detail: "site reconstruit en SPA, pas d'API REST interrogeable trouvée, mais données publiées en CSV versionné — confirmé 2026-08-01 : lien direct 'Download the latest version' pointant vers un ZIP hébergé sur GitHub (github.com/mammaldiversity/mammaldiversity.github.io/raw/refs/heads/master/assets/data/MDD.zip), même dépôt organisation que mdd_api ; version 2.4 publiée le 2 janvier 2026, également archivée sur Zenodo"}
-        derniere_maj: "2026-08-01"
-        notes: "Réévalué 2026-08-01 : 'ecarte' portait sur l'absence d'API REST, pas sur la piste CSV, jamais vraiment écartée pour de bonnes raisons — même pattern que wsc (export CSV plutôt que scraping/API)."
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "classification complète (rang, auteur, statut) via ChecklistBank, comme col/bryonames"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", synonymes, "sous-taxons", éteint, identifiant]
+        acces: {type: api_rest, detail: "REST checklistbank.org (dataset ChecklistBank 9802, resynchronisé 2025-04-08), même plateforme et même schéma que col/bryonames — pas de scraping/CSV nécessaire, contrairement à la piste CSV GitHub envisagée initialement"}
+        derniere_maj: "2026-09-11"
+        notes: "Module intégré, voir organon/modules/mdd/. Successeur du module msw (retiré, voir ci-dessous) : source la plus à jour, classification-capable contrairement à MSW3."
       - id: msw
         nom: "Mammal Species of the World (MSW)"
         url: "https://www.departments.bucknell.edu/biology/resources/msw3/"
-        statut: disponible
+        statut: retire
         classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: [auteur, identifiant]
+        elements_recoltes: []
         acces: {type: scraping, detail: "scraping HTML (pages .asp statiques, aucune API) : recherche plein texte en GET sur search.asp?s=<nom>, auteur récupéré sur la fiche détail browse.asp?s=y&id=<id>"}
-        derniere_maj: "2026-07-23"
+        derniere_maj: "2026-09-11"
+        notes: "Intégré puis retiré : 3e éd. figée depuis 2005, remplacée par mdd (ci-dessus), activement maintenue par l'ASM et classification-capable. Code conservé dans _archive/msw."
       - id: reptile_database
         nom: "The Reptile Database"
         url: "https://reptile-database.reptarium.cz"

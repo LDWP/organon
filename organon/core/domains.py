@@ -144,7 +144,7 @@ def domaine_couvre(domaine: str, def_: DomainTree) -> bool:
     """Le module (via son arbre de domaines `def_`) couvre-t-il `domaine` ? Vrai si `domaine`
     lui-même est accepté, mais aussi si un de ses sous-domaines l'est (ex. `domaine="animal"`
     face à un module restreint à `["mammifère"]` : le nœud "animal" n'est pas accepté
-    directement, seul son descendant "mammifère" l'est — cas réel de MSW, dont le domaine
+    directement, seul son descendant "mammifère" l'est — cas réel de MDD, dont le domaine
     déclaré est plus fin que le règne grossier stocké dans `struct.regne`, voir
     `organon.core.selectors.coherence.reference_module_coherente`)."""
     if rec_strict_domaine(domaine, def_):
