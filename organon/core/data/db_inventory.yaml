@@ -466,13 +466,14 @@ categories:
         derniere_maj: "2026-07-13"
         notes: "WCVP (listée séparément avant) est retirée ici : wcvp.science.kew.org redirige vers powo.science.kew.org, même données — entrée redondante."
       - id: grin
-        nom: "Germplasm Resources Information Network (GRIN)"
+        nom: "GRIN Taxonomy (Germplasm Resources Information Network)"
         url: "https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomysearch.aspx"
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "déjà une demande de fonctionnalité, pas une classification côté PHP"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "revérifié en direct (2026-07-23) : ce n'est PAS une SPA (contrairement au sondage précédent) mais de l'ASP.NET WebForms classique (GRIN-Global v2.3.12), aucune API JSON/REST documentée, aucun export en masse trouvé. Les pages de détail (genre/famille/espèce) sont en GET simple et stable par id numérique (ex. taxonomygenus.aspx?id=1069), mais la résolution nom→id passe uniquement par le formulaire de recherche en POST avec __VIEWSTATE/__EVENTVALIDATION à renouveler à chaque requête — scraping stateful fragile, exactement le cas à éviter. Écarté sans module."}
-        derniere_maj: "2026-07-23"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "classification des plantes cultivées/ressources génétiques (famille et rangs inférieurs seulement — la chaîne ChecklistBank ne porte aucun rang kingdom/order/class, vérifié en direct sur Poaceae/Zea) — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO/Bryonames"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2018, resynchronisé depuis npgsweb.ars-grin.gov le 2026-08-30) — même plateforme et même schéma que le module col/bryonames"}
+        derniere_maj: "2026-09-11"
+        notes: "Le site npgsweb.ars-grin.gov lui-même reste écarté par scraping direct (ASP.NET WebForms, résolution nom→id par formulaire POST à __VIEWSTATE/__EVENTVALIDATION à renouveler à chaque requête) ; les données sont cependant distribuées sans restriction via ChecklistBank, qui sert le module à la place. render_bioref sélectionne parmi six modèles Bioref dédiés existants sur fr.wikipedia selon le rang ({{GRIN espèce}}/genre/sous-tribu/tribu/sous-famille/famille, wikicode vérifié en direct) ; debug_link reconstruit l'URL GRIN d'origine par rang (name.link de l'API absent au-delà du rang espèce, vérifié en direct)."
       - id: tpl
         nom: "The Plant List (TPL)"
         url: null
