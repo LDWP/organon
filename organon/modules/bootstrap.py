@@ -37,6 +37,7 @@ from organon.modules.telametro import module as _telametro  # noqa: F401
 from organon.modules.tpdb import module as _tpdb  # noqa: F401
 from organon.modules.tropicos import module as _tropicos  # noqa: F401
 from organon.modules.vascan import module as _vascan  # noqa: F401
+from organon.modules.wco import module as _wco  # noqa: F401
 from organon.modules.wfo import module as _wfo  # noqa: F401
 from organon.modules.wikimedia import module as _wikimedia  # noqa: F401
 from organon.modules.wrms import module as _wrms  # noqa: F401

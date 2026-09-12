@@ -826,12 +826,13 @@ categories:
         derniere_maj: "2026-08-01"
       - id: wco
         nom: "World Catalogue of Opiliones (WCO)"
-        url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "hypothèse d'hébergement par le NMBE (comme WSC) invalidée 2026-08-01 : wsc.nmbe.ch/wco → 404, et la page d'accueil wsc.nmbe.ch ne référence aucun site frère Opiliones/Pseudoscorpions/Scorpions dans son menu — vraie URL encore inconnue, à rechercher autrement"}
-        derniere_maj: "2026-08-01"
+        url: "https://wcolite.com"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "taxonomie des opilions (ordre Opiliones) seulement — domaine 'arachnide' faute de sous-domaine dédié dans l'arbre Organon, comme WSC"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2256, alias « WCO », DOI 10.48580/d4pt) — même plateforme et même schéma que les modules col/bryonames"}
+        derniere_maj: "2026-09-11"
+        notes: "L'ancienne hypothèse d'hébergement par le NMBE (comme WSC) était infirmée le 2026-08-01 (wsc.nmbe.ch/wco → 404) ; le catalogue est en réalité distribué via ChecklistBank, resynchronisé le jour même de sa mise à jour source (2026-09-01) — dataset activement maintenu. Licence cc by (pas de restriction NonCommercial contrairement à WSC) : contrairement à WSC, ce module expose un lien de citation public (render_bioref), faute de modèle {{Bioref}} dédié sur Wikipédia fr, via le modèle générique {{Lien web}}, comme Bryonames."
       - id: pseudoscorpions_world
         nom: "Pseudoscorpions of the World"
         url: null
