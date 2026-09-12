@@ -635,12 +635,12 @@ categories:
         derniere_maj: "2026-08-01"
       - id: zoobank
         nom: ZooBank
-        url: null
-        statut: non_sonde
-        classification: {possible: false, estime: false, detail: "registre nomenclatural ICZN — enregistre des actes de nomenclature, pas une hiérarchie"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "non concluant, à creuser avec la documentation officielle"}
-        derniere_maj: null
+        url: "https://zoobank.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "registre nomenclatural ICZN — enregistre des actes de nomenclature, pas une hiérarchie (le champ classification du dataset ChecklistBank n'est pas un avis taxonomique fiable, non exploité)"}
+        elements_recoltes: [auteur, rang, "citation de la publication originale", identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2037, alias « ZooBank DwCA », DOI 10.48580/d4g9) — même plateforme que col/bryonames ; zoobank.org lui-même bloqué par vérification anti-robot (reCAPTCHA)"}
+        derniere_maj: "2026-09-11"
       - id: zoonomen
         nom: Zoonomen
         url: null

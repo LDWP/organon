@@ -40,6 +40,7 @@ from organon.modules.wfo import module as _wfo  # noqa: F401
 from organon.modules.wikimedia import module as _wikimedia  # noqa: F401
 from organon.modules.wrms import module as _wrms  # noqa: F401
 from organon.modules.wsc import module as _wsc  # noqa: F401
+from organon.modules.zoobank import module as _zoobank  # noqa: F401
 
 
 def ensure_modules_registered() -> None:
