@@ -22,31 +22,29 @@ donnée la plus proche de la mission réelle de ZooBank, écrite inconditionnell
 `organon.modules.ipni.module`).
 
 Lien de citation (`render_bioref`/`debug_link`) : le champ `name.link` renvoyé par l'API
-(`http://zoobank.org/<uuid>`) a été vérifié en direct comme non exploitable — redirection 302
-suivie d'un 404 sur le vrai zoobank.org, ce champ étant fabriqué par ChecklistBank à partir de
-l'identifiant interne, pas une véritable LSID ZooBank (`dwc:scientificNameID` du DwCA brut
-n'est lui non plus qu'un UUID interne, pas une LSID `urn:lsid:zoobank.org:...` ; le nom du
-dataset source, "Global Names Usage Bank", confirme qu'il s'agit d'un export retraité, pas d'un
-export natif de zoobank.org). `zoobank.org` lui-même est par ailleurs bloqué par une
-vérification anti-robot (reCAPTCHA sur toute page, vérifié en direct). Le lien utilisé est donc
-systématiquement la fiche ChecklistBank du taxon (`checklistbank.org/dataset/2037/taxon/<id>`),
-comme repli déjà documenté pour `bryonames` — bloqué par un défi anti-robot pour un navigateur
-automatisé (vérifié en direct), mais seul lien qui identifie correctement l'enregistrement pour
-un lecteur humain.
+(`http://zoobank.org/<uuid>`) redirige vers la fiche `/NomenclaturalActs/<uuid>` du vrai
+zoobank.org et y affiche l'enregistrement complet (auteur, publication, renvois BHL/ITIS quand
+disponibles) — vérifié en direct au navigateur réel sur plusieurs taxons. Un sondage initial au
+client HTTP nu avait laissé croire ce lien mort (redirection suivie d'un 404) : c'est en fait le
+bandeau anti-robot de zoobank.org intercepté par un client sans JavaScript, pas une propriété du
+lien lui-même — confirmé en le rechargeant, y compris avec un simple `curl`, une fois le défi
+passé. Repli sur la fiche ChecklistBank du taxon (`checklistbank.org/dataset/2037/taxon/<id>`)
+seulement si `link` est absent, par défense — non rencontré en pratique sur ce dataset, mais
+même posture que `bryonames` face à un champ optionnel de la même plateforme.
 
-Aucun modèle `{{ZooBank}}` dédié n'existe sur Wikipédia en français pour ce module (vérifié en
-direct : 0 résultat sur le titre `Modèle:ZooBank` et sur une recherche dans l'espace de noms
-Modèle) : `render_bioref` utilise le modèle générique `{{Lien web}}`, comme Bryonames/OTL/
-iNaturalist."""
+`render_bioref` utilise le modèle dédié `{{ZooBank}}` (créé sur Wikipédia en français à la
+suite de ce module, sur le modèle de `{{IPNI}}`) : comme `{{IPNI}}`/`{{Tropicos}}`, ce modèle
+met lui-même son paramètre 2 en italique — le nom y est donc passé brut, pas pré-italicisé via
+`wp_met_italiques` contrairement à Bryonames/Index Fungorum (repli `{{Lien web}}`, sans modèle
+dédié)."""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
 from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.modules.common import format_auteur
 from organon.modules.zoobank.adapter import DATASET_ID, ZoobankAdapter
 from organon.modules.zoobank.ranks import zoobank_cherche_rang
 
@@ -78,6 +76,7 @@ class ZoobankModule(TaxonomyModule):
             "nom": name["scientificName"],
             "auteur": format_auteur(name.get("authorship")),
             "rang": zoobank_cherche_rang(name["rank"]),
+            "link": name.get("link"),
         }
 
         struct.originale = usage.get("accordingTo")
@@ -85,21 +84,21 @@ class ZoobankModule(TaxonomyModule):
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
+        """Le nom n'est PAS pré-italicisé ici : `{{ZooBank}}` met lui-même son paramètre 2 en
+        italique (même convention que `{{IPNI}}`)."""
         data = struct.liens.get("zoobank")
         if not data or "id" not in data:
             return None
         cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], data.get("rang") or struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        url = _TAXON_URL.format(id=data["id"])
-        return (
-            f"{{{{Lien web | langue=en | titre={cible} | url={url} "
-            f"| site=ZooBank | consulté le={cdate} }}}}"
-        )
+        auteur = f" | {data['auteur']}" if data.get("auteur") else ""
+        return f"{{{{ZooBank | {data['id']} | {data['nom']}{auteur} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        return simple_debug_link(struct, "zoobank", _TAXON_URL, "ZooBank")
+        data = struct.liens.get("zoobank")
+        if not data or "id" not in data:
+            return None
+        url = data.get("link") or _TAXON_URL.format(id=data["id"])
+        return f"<a href='{url}' target='_blank' rel='noopener noreferrer'>ZooBank</a>"
 
 
 register_module(ZoobankModule)

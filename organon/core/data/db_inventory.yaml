@@ -22,7 +22,7 @@
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 
-derniere_maj: "2026-09-11"
+derniere_maj: "2026-09-12"
 
 categories:
   - id: generalistes
@@ -641,8 +641,8 @@ categories:
         statut: disponible
         classification: {possible: false, estime: false, detail: "registre nomenclatural ICZN — enregistre des actes de nomenclature, pas une hiérarchie (le champ classification du dataset ChecklistBank n'est pas un avis taxonomique fiable, non exploité)"}
         elements_recoltes: [auteur, rang, "citation de la publication originale", identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2037, alias « ZooBank DwCA », DOI 10.48580/d4g9) — même plateforme que col/bryonames ; zoobank.org lui-même bloqué par vérification anti-robot (reCAPTCHA)"}
-        derniere_maj: "2026-09-11"
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2037, alias « ZooBank DwCA », DOI 10.48580/d4g9) — même plateforme que col/bryonames. Citation vers la fiche zoobank.org native (name.link), vérifiée fonctionnelle au navigateur réel"}
+        derniere_maj: "2026-09-12"
       - id: zoonomen
         nom: Zoonomen
         url: null
