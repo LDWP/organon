@@ -8,6 +8,7 @@ de conditions typé (Pydantic), capable d'exprimer exactement ce corpus sans jam
 
 from __future__ import annotations
 
+from functools import cache
 from pathlib import Path
 
 import yaml
@@ -80,10 +81,12 @@ def _evaluate(condition: Condition, struct: Struct) -> bool:
     raise TypeError(f"condition inconnue : {condition!r}")
 
 
+@cache
 def load_ruleset(name: str) -> RuleSet | None:
     """Charge `rules/<name>.local.yaml` s'il existe (permet de surcharger localement les
     règles par défaut sans les modifier), sinon `rules/<name>.yaml`. Retourne None si aucun
-    des deux n'existe."""
+    des deux n'existe. Mis en cache par nom : ces fichiers ne changent jamais en cours de run
+    (appelé 3 fois par requête /generate)."""
     for candidate in (RULES_DIR / f"{name}.local.yaml", RULES_DIR / f"{name}.yaml"):
         if candidate.exists():
             with candidate.open(encoding="utf-8") as fh:
