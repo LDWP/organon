@@ -174,7 +174,7 @@ def rec_prof_classification(def_: DomainTree, domaine: str, prof: int) -> float:
             ret = prof + 1
             ret += cnt / 20.0
         else:
-            ret2 = rec_prof_classification(node.sous, "*", prof + 1)
+            ret2 = rec_prof_classification(node.sous, domaine, prof + 1)
         if ret2 > ret:
             ret = ret2
     return ret
