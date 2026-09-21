@@ -21,8 +21,15 @@
 #     collecté pour une base non intégrée).
 #   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
+#
+# Les sources "hors_perimetre" (nature incompatible avec ce que l'outil interroge — pas une
+# hiérarchie taxonomique interrogeable par nom, ex. un identifiant photo ou une compilation par
+# pays) sont volontairement absentes de ce fichier depuis le 2026-09-21 : la page Sources ne doit
+# pas les proposer, contrairement à un statut bloqué/mort qui peut se lever un jour. Elles restent
+# documentées dans db-inventory.md (§ Écartés) pour ne pas ré-ouvrir le sujet — GISD, CABI, DELTA,
+# Pl@ntNet notamment.
 
-derniere_maj: "2026-09-12"
+derniere_maj: "2026-09-21"
 
 categories:
   - id: generalistes
@@ -161,22 +168,6 @@ categories:
         elements_recoltes: ["identifiant de fiche", "nom vernaculaire"]
         acces: {type: scraping, detail: "aucune API (/Especes/api -> 404) ; recherche HTML (POST /content/action, (name)=requête), filtrage par correspondance exacte du nom scientifique côté client"}
         derniere_maj: "2026-07-29"
-      - id: gisd
-        nom: "Global Invasive Species Database (GISD)"
-        url: null
-        statut: hors_perimetre
-        classification: {possible: false, estime: false, detail: "vérifié dans le PHP lui-même : can_render_external_link=false"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "sans objet — lien externe jamais appelé même côté PHP d'origine, en plus d'une faute de frappe qui le casserait"}
-        derniere_maj: null
-      - id: cabi
-        nom: "Invasive Species Compendium (CABI)"
-        url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "fiches pays/organismes nuisibles, pas une hiérarchie taxonomique"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "/isc/api renvoie 404 ; probablement un service par abonnement institutionnel, non confirmé"}
-        derniere_maj: null
       - id: iucn
         nom: "Liste rouge de l'UICN"
         url: "https://www.iucnredlist.org"
@@ -242,7 +233,8 @@ categories:
         classification: {possible: false, estime: true, detail: "archive d'articles scientifiques, pas une base taxonomique interrogeable par nom"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "page d'accueil atteignable, pas d'API identifiée"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank général : seul un dataset étroit (clé 1037, Vespidae uniquement, construit depuis ZOBODAT) apparaît — insuffisant pour couvrir des taxons arbitraires."
 
   - id: wikimedia
     nom: "Wikimédia"
@@ -297,7 +289,8 @@ categories:
         classification: {possible: true, estime: true, detail: "base de fossiles estonienne"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "page atteignable, API non confirmée"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank dédié (requête « Fossiilid » : deux articles isolés sans rapport)."
       - id: hesperomys
         nom: Hesperomys
         url: "https://hesperomys.com"
@@ -318,7 +311,8 @@ categories:
         classification: {possible: false, estime: true, detail: "index nomenclatural descriptif, pas une hiérarchie interrogeable"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "site académique statique, pas d'API"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Mirroir ChecklistBank trouvé (clé 314595, « Plant Fossil Names Registry », type=nomenclatural, resynchronisé 2026-09-15) mais écarté après vérification : classification vide au-delà de l'espèce elle-même (« parent genus missing » sur les échantillons testés, ex. Lepidodendron) — même piège que mycobank ci-dessus, dataset frais mais sans hiérarchie exploitable."
       - id: palynodata
         nom: Palynodata
         url: null
@@ -376,7 +370,8 @@ categories:
         classification: {possible: false, estime: true, detail: "référentiel de noms français, pas une hiérarchie"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "domaine injoignable au nom testé, à revérifier"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: mycodb
         nom: MycoDB
         url: null
@@ -456,7 +451,7 @@ categories:
         elements_recoltes: []
         acces: {type: inconnu, detail: "fusionné dans WCVP, dont les données sont déjà servies par l'entrée powo ci-dessous (wcvp.science.kew.org redirige vers powo.science.kew.org, même constat que celui documenté sur powo pour l'ancienne entrée WCVP) — doublon exact, pas seulement non sondé"}
         derniere_maj: "2026-09-05"
-        notes: "Reclassé depuis non_sonde : la fusion dans WCVP/POWO (déjà disponible) rend un sondage séparé inutile, même raisonnement que l'ancienne entrée WCVP retirée sur powo."
+        notes: "Reclassé depuis non_sonde : la fusion dans WCVP/POWO (déjà disponible) rend un sondage séparé inutile, même raisonnement que l'ancienne entrée WCVP retirée sur powo. Même conclusion pour The Plant List (tpl ci-dessous) : mirroir ChecklistBank trouvé (clé 2039) mais redondant pour le même motif."
       - id: powo
         nom: "Plants of the World Online (POWO)"
         url: "https://powo.science.kew.org"
@@ -482,7 +477,8 @@ categories:
         classification: {possible: true, estime: true, detail: "figé"}
         elements_recoltes: []
         acces: {type: mort, detail: "domaine injoignable — site officiellement gelé depuis 2013, remplacé par WCVP par son propre éditeur"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Mirroir ChecklistBank trouvé (clé 2039, « The Plant List with literature », type=taxonomic) mais écarté : lignée superficielle (règne→famille→genre→espèce, jamais ordre/classe) et surtout redondant avec powo/WCVP déjà actif — même successeur Kew officiel que wcsp ci-dessus, aucune valeur ajoutée."
       - id: apni
         nom: "Australian Plant Name Index (APNI)"
         url: "https://biodiversity.org.au/nsl"
@@ -490,7 +486,8 @@ categories:
         classification: {possible: false, estime: true, detail: "index nomenclatural, comme IPNI"}
         elements_recoltes: []
         acces: {type: bloque, detail: "revérifié en direct : le National Species List australien est désormais derrière une protection anti-bot AWS WAF (« Human Verification »)"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Confirmation ChecklistBank (clé 133813, alias « APNI-APC Trial », données figées 2022) : statut « Trial » jamais officialisé côté source — double motif d'écarter, en plus du WAF ci-dessus."
       - id: bdpa
         nom: "Base de données des plantes d'Afrique (BDPA)"
         url: null
@@ -498,15 +495,8 @@ categories:
         classification: {possible: true, estime: true, detail: "flore régionale"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "domaine testé injoignable, nom de domaine probablement incorrect"}
-        derniere_maj: null
-      - id: delta_angiospermes
-        nom: "DELTA — Familles Angiospermes"
-        url: null
-        statut: hors_perimetre
-        classification: {possible: false, estime: false, detail: "format descriptif structuré, pas un service interrogeable par taxon"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "hors périmètre technique (pas une « base » au sens API/scraping)"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: florabase
         nom: "Florabase (Australie occidentale)"
         url: null
@@ -522,7 +512,8 @@ categories:
         classification: {possible: true, estime: true, detail: "famille Compositae"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "page atteignable, pas d'API identifiée"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank dédié (requête « Compositae » : seuls des articles isolés sur des espèces individuelles)."
       - id: globaltreesearch
         nom: GlobalTreeSearch
         url: null
@@ -540,15 +531,6 @@ categories:
         elements_recoltes: []
         acces: {type: bloque, detail: "403 — probablement fusionné dans POWO/WCSP"}
         derniere_maj: null
-      - id: plantnet
-        nom: "Pl@ntNet"
-        url: null
-        statut: hors_perimetre
-        classification: {possible: false, estime: false, detail: "outil d'identification par image, pas une hiérarchie interrogeable par nom"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "vraie API confirmée mais l'obstacle n'est pas l'inscription : Pl@ntNet identifie une plante à partir d'une photo, ce n'est pas un référentiel interrogeable par nom de taxon comme les autres sources de cette liste"}
-        derniere_maj: "2026-09-05"
-        notes: "Reclassé depuis contact_requis : la clé sur inscription n'est pas le vrai obstacle ici, la nature de l'outil (image -> identification) l'est, indépendamment de toute clé."
 
   - id: procaryotes
     nom: Procaryotes
@@ -569,7 +551,8 @@ categories:
         classification: {possible: true, estime: true, detail: "taxonomie génomique bactéries/archées"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "non concluant : URLs devinées injoignables/404, la vraie documentation API n'a pas été localisée"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Mirroir ChecklistBank identifié (clé 2214, alias « GTDB r232 », resynchronisé 2026-08-25) : alternative procaryote à lpsn ci-dessous, méthode phylogénomique pouvant diverger du code nomenclatural. Candidat positif, portage non fait ici (un module = une session)."
 
   - id: virus
     nom: Virus
@@ -610,7 +593,8 @@ categories:
         classification: {possible: false, estime: false, detail: "côté PHP"}
         elements_recoltes: []
         acces: {type: mort, detail: "domaine mort : fauna-eu.org ne résout plus du tout (échec DNS)"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Confirmation ChecklistBank (clé 2026, alias « FaEu ») : mirroir figé sur les données 2016 du site mort ci-dessus, aucune resynchronisation en cours — double motif, en plus du DNS mort."
       - id: funet
         nom: FUNET
         url: "https://ftp.funet.fi/pub/sci/bio/life/"
@@ -663,7 +647,8 @@ categories:
         classification: {possible: true, estime: true, detail: "checklist/taxonomie ornithologique"}
         elements_recoltes: []
         acces: {type: bloque, detail: "403 sur l'API devinée — jeton requis"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank (total=0) — confirme l'absence de piste alternative au jeton requis ci-dessus."
       - id: bugguide
         nom: BugGuide
         url: null
@@ -671,7 +656,8 @@ categories:
         classification: {possible: false, estime: true, detail: "identification communautaire, pas d'autorité taxonomique formelle"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "atteignable, pas d'API publique connue"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: moure_bee_catalogue
         nom: "Catalogue d'abeilles de Moure"
         url: null
@@ -679,7 +665,8 @@ categories:
         classification: {possible: true, estime: true, detail: "taxonomie des abeilles, aujourd'hui hébergé par Discover Life"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "interface de recherche HTML, pas d'API confirmée"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank dédié : seuls des articles isolés citant des genres nommés par Moure, plus un catalogue régional distinct (« Catalogue of Afrotropical Bees », clé 2040, Afrique — pas le catalogue de Moure, qui couvre l'hémisphère occidental)."
       - id: coi_ioc
         nom: "Congrès ornithologique international (COI / IOC World Bird Names)"
         url: "https://www.worldbirdnames.org"
@@ -687,8 +674,8 @@ categories:
         classification: {possible: true, estime: true, detail: "classification ornithologique de référence recommandée par Wikipédia fr, modèles {{COI}}/{{Avibase}}"}
         elements_recoltes: []
         acces: {type: scraping, detail: "site live confirmé (worldbirdnames.org) distinct du fichier CSV bundlé précédemment écarté : listes HTML par famille (family-index-2/) et par espèce (classification/species/) scrapables, plus exports XLSX/XML téléchargeables (master-list-2/) — même pattern que msw/reptile_database (scraping HTML ciblé), pas d'API REST connue"}
-        derniere_maj: "2026-08-01"
-        notes: "Réévalué 2026-08-01 : l'ancien statut 'ecarte' ne valait que pour la piste CSV bundlé hors-philosophie ; le site live n'avait pas été sondé."
+        derniere_maj: "2026-09-21"
+        notes: "Réévalué 2026-08-01 : l'ancien statut 'ecarte' ne valait que pour la piste CSV bundlé hors-philosophie ; le site live n'avait pas été sondé. Piste alternative ChecklistBank trouvée 2026-09-21 : IOC World Bird List (clé 2036, resynchronisé 2026-09-09) — les deux pistes (scraping worldbirdnames.org ou mirroir CB) restent ouvertes, à trancher lors du portage effectif."
       - id: ebird
         nom: eBird
         url: null
@@ -704,7 +691,8 @@ categories:
         classification: {possible: false, estime: true, detail: "données d'observation, pas une hiérarchie"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "page atteignable, pas d'API connue"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: lepindex
         nom: LepIndex
         url: null
@@ -712,7 +700,8 @@ categories:
         classification: {possible: false, estime: true, detail: "index nomenclatural pour les lépidoptères"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "écarté (revérifié en direct) : le portail CKAN du Natural History Museum de Londres est réel, mais package_search?q=lepindex renvoie zéro résultat — LepIndex n'y est pas publié"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Successeur actif identifié : Global Lepidoptera Index (ChecklistBank clé 55434, alias GLI, resynchronisé 2026-09-03, même éditeur que LepIndex) — à préférer pour toute nouvelle intégration lépidoptères. LepIndex lui-même reste écarté (0 résultat CKAN ci-dessus), ne pas rouvrir le sujet sous ce nom."
       - id: oiseaux_net
         nom: Oiseaux.net
         url: "https://www.oiseaux.net"
@@ -720,7 +709,8 @@ categories:
         classification: {possible: false, estime: true, detail: "site descriptif français"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "atteignable, pas d'API connue"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank dédié : la requête « oiseaux » ne remonte que des listes régionales (Sénégal, Togo) et des textes historiques d'ornithologie, rien lié à oiseaux.net."
       - id: systema_dipterorum
         nom: "Systema Dipterorum"
         url: null
@@ -728,7 +718,8 @@ categories:
         classification: {possible: true, estime: true, detail: "classification des diptères"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "atteignable, pas d'API confirmée à ce stade"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Mirroir ChecklistBank trouvé (clé 1101, « Systema Dipterorum (7.2) », type=taxonomic, resynchronisé 2026-06-16) : lignée complète vérifiée (Musca, ordre→genre). Candidat positif, le plus frais des sondages 2026-09-21 — portage non fait ici (un module = une session)."
 
   - id: eau
     nom: "Eau — poissons, amphibiens"
@@ -756,7 +747,8 @@ categories:
         classification: {possible: true, estime: true, detail: "autorité nomenclaturale des poissons"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "non concluant, sondage rapide insuffisant"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank dédié trouvé (requêtes « Eschmeyer », « Eschmeyer Catalog of Fishes ») : seuls des articles isolés et le module fishbase déjà actif (clé 1010, sans rapport direct) apparaissent."
       - id: fishbase
         nom: FishBase
         url: "https://www.fishbase.org"
@@ -773,7 +765,8 @@ categories:
         classification: {possible: false, estime: true, detail: "checklist régionale statique"}
         elements_recoltes: []
         acces: {type: scraping, detail: "site académique statique, pas d'API"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank (total=0, requête « MUSSEL project unionid »)."
 
   - id: terre
     nom: "Terre — mammifères, arachnides, autres"
@@ -793,7 +786,8 @@ categories:
         classification: {possible: true, estime: true}
         elements_recoltes: []
         acces: {type: inconnu, detail: "page atteignable, pas d'API connue"}
-        derniere_maj: null
+        derniere_maj: "2026-09-21"
+        notes: "Mirroir ChecklistBank trouvé (clé 2130, alias « Collembola.org », type=taxonomic, licence CC BY, version février 2025, DOI 10.48580/d4kh) : lignée complète vérifiée (Entomobrya, 7 niveaux classe→genre). Candidat positif, portage non fait ici (un module = une session)."
       - id: mdd
         nom: "Mammal Diversity Database (MDD)"
         url: "https://www.mammaldiversity.org"
@@ -844,7 +838,8 @@ categories:
         classification: {possible: true, estime: true, detail: "catalogue taxonomique des pseudoscorpions cité par Wikipédia fr, jamais recensé dans cet inventaire avant 2026-08-01"}
         elements_recoltes: []
         acces: {type: inconnu, detail: "aucune URL confirmée : hypothèse wcp.nmbe.ch testée 2026-08-01 (DNS injoignable), hébergement NMBE probablement erroné (voir wco ci-dessus) — sondage à reprendre depuis zéro"}
-        derniere_maj: "2026-08-01"
+        derniere_maj: "2026-09-21"
+        notes: "Aucun mirroir ChecklistBank dédié (requête « Pseudoscorpions of the World » : seuls des articles isolés sur des genres/espèces individuels, plus GBIF Backbone Taxonomy déjà couvert par ailleurs)."
       - id: wsc
         nom: "World Spider Catalog (WSC)"
         url: "https://wsc.nmbe.ch"
