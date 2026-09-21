@@ -103,6 +103,8 @@ class ItisModule(TaxonomyModule):
                 # inclut aussi ses Direct Children en dessous (ex. espèces d'un genre) : on arrête
                 # la remontée ici pour ne pas les intégrer à la classification.
                 break
+            if not entry.get("taxonName"):
+                continue
             rang_wp = itis_cherche_rang(entry.get("rankName") or "")
             if rang_wp in RANGS_REGNE:
                 continue  # le "règne" est stocké dans struct.regne, pas dans struct.rangs
