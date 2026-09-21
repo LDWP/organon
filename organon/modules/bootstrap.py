@@ -12,6 +12,7 @@ from organon.modules.algaebase import module as _algaebase  # noqa: F401
 from organon.modules.bryonames import module as _bryonames  # noqa: F401
 from organon.modules.ccw import module as _ccw  # noqa: F401
 from organon.modules.cites import module as _cites  # noqa: F401
+from organon.modules.coi_ioc import module as _coi_ioc  # noqa: F401
 from organon.modules.col import module as _col  # noqa: F401
 from organon.modules.doris import module as _doris  # noqa: F401
 from organon.modules.eflora import module as _eflora  # noqa: F401

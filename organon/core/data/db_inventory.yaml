@@ -670,12 +670,12 @@ categories:
       - id: coi_ioc
         nom: "Congrès ornithologique international (COI / IOC World Bird Names)"
         url: "https://www.worldbirdnames.org"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "classification ornithologique de référence recommandée par Wikipédia fr, modèles {{COI}}/{{Avibase}}"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "site live confirmé (worldbirdnames.org) distinct du fichier CSV bundlé précédemment écarté : listes HTML par famille (family-index-2/) et par espèce (classification/species/) scrapables, plus exports XLSX/XML téléchargeables (master-list-2/) — même pattern que msw/reptile_database (scraping HTML ciblé), pas d'API REST connue"}
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "taxonomie des oiseaux (classe Aves) seulement — domaine 'oiseau' (sous-domaine dédié de l'arbre Organon, contrairement à WCO/Bryonames)"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", éteint, identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2036, alias « IOC », DOI 10.48580/d4g8) — même plateforme et même schéma que les modules col/bryonames/wco"}
         derniere_maj: "2026-09-21"
-        notes: "Réévalué 2026-08-01 : l'ancien statut 'ecarte' ne valait que pour la piste CSV bundlé hors-philosophie ; le site live n'avait pas été sondé. Piste alternative ChecklistBank trouvée 2026-09-21 : IOC World Bird List (clé 2036, resynchronisé 2026-09-09) — les deux pistes (scraping worldbirdnames.org ou mirroir CB) restent ouvertes, à trancher lors du portage effectif."
+        notes: "L'ancienne piste de scraping direct (family-index-2/, classification/species/) est abandonnée : le site worldbirdnames.org a lui-même été restructuré (les anciennes pages par famille /Family/<Nom> renvoient 404, vérifié en direct) et ne propose plus de fiche par taxon navigable, seulement du contenu WordPress générique et des exports XLSX/XML bruts. Les données sont distribuées sans restriction via ChecklistBank (resynchronisé le 2026-09-15), qui sert le module à la place. Dataset accepted-only (vérifié en direct : la facette status des 33 722 usages n'expose que « accepted », /taxon/<id>/synonyms toujours vide) — pas de résolution de synonymes, même situation que WSC. Le modèle {{Avibase}} recommandé par Wikipédia fr est écarté : il exige un identifiant Avibase propre (avibaseId) qu'aucun champ de ce dataset ne fournit. render_bioref utilise donc {{COI}} (vérifié en direct sur fr.wikipedia), qui ne nécessite que famille + taxon cité — sans besoin d'identifiant externe, malgré son URL interne ({{COI/url}}) elle-même pointée vers les pages /Family/ aujourd'hui mortes (problème côté modèle Wikipédia, hors périmètre de ce module)."
       - id: ebird
         nom: eBird
         url: null
