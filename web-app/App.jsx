@@ -958,7 +958,7 @@ export default function App() {
           [commonsTaxon]: { status: "error", error: err.message || "Erreur inconnue." },
         }));
       });
-  }, [commonsTaxon, commonsImagesCache]);
+  }, [commonsTaxon, commonsImagesCache[commonsTaxon]]);
 
   // Recommandation automatique, indépendante par facette (taxobox / sous-taxons) : un unique
   // `completeness_score` agrégé masquait le fait qu'une classification peut avoir la meilleure
