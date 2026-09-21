@@ -30,6 +30,8 @@ Aucun nom vernaculaire ni sous-taxon exposé par ce service (pas d'opération de
 
 from __future__ import annotations
 
+import asyncio
+
 from organon.core.config import GenerateOptions
 from organon.core.models import Basionym, RankName, Redirection, Struct, SynonymList, TaxonInfo
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
@@ -150,17 +152,22 @@ class IndexFungorumModule(TaxonomyModule):
             rangs.append(RankName(nom=value, rang=rang_fr))
         struct.rangs = rangs
 
+        # `name_by_key` (basionyme) et `names_by_current_key` (synonymes) ne dépendent que de
+        # `full`, jamais l'un de l'autre : lancés en parallèle via gather plutôt qu'en série.
         basionym_id = full.get("BASIONYM_RECORD_NUMBER")
         if basionym_id and basionym_id != full["RECORD_NUMBER"]:
-            basio = await self._adapter.name_by_key(basionym_id)
+            basio, synonym_records = await asyncio.gather(
+                self._adapter.name_by_key(basionym_id),
+                self._adapter.names_by_current_key(full["RECORD_NUMBER"]),
+            )
             if basio is not None:
                 struct.basionyme = Basionym(
                     nom=basio["NAME_OF_FUNGUS"],
                     auteur=format_auteur(basio.get("AUTHORS")),
                     source="Index Fungorum",
                 )
-
-        synonym_records = await self._adapter.names_by_current_key(full["RECORD_NUMBER"])
+        else:
+            synonym_records = await self._adapter.names_by_current_key(full["RECORD_NUMBER"])
         synonymes = [
             RankName(
                 nom=s["NAME_OF_FUNGUS"],
