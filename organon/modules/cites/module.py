@@ -45,8 +45,8 @@ class CitesModule(TaxonomyModule):
 
         vernaculaire: list[str] = []
         for cn in detail.get("common_names") or []:
-            if cn.get("lang") == "French":
-                vernaculaire.extend(cn.get("names", "").split(", "))
+            if cn.get("lang") == "French" and cn.get("names"):
+                vernaculaire.extend(cn["names"].split(", "))
         if vernaculaire:
             struct.vernaculaire["CITES espèce"] = vernaculaire
 
