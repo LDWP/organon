@@ -66,6 +66,10 @@ def _build_index(path: Path) -> tuple[dict[str, IctvRecord], dict[str, frozenset
         for i, (col, nom) in enumerate(chain):
             key = nom.lower()
             if key not in index:
+                # Homonyme entre deux lignées distinctes -> la première occurrence du TSV
+                # l'emporterait silencieusement. Vérifié absent du VMR actuel (22670 noms,
+                # tous à lignée d'ancêtres unique) ; à surveiller si un futur export en
+                # introduit un.
                 ictv_id = row.get("ICTV_ID") or None if col == "Species" else None
                 index[key] = IctvRecord(ancestors=tuple(chain[: i + 1]), ictv_id=ictv_id)
             if i > 0:
