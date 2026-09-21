@@ -10,6 +10,7 @@ persister l'état d'une génération en cours côté API pour un choix aussi loc
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 from urllib.parse import quote
 
@@ -80,8 +81,9 @@ async def find_images(taxon: str, adapter: CommonsImagesAdapter) -> ImageSearchR
     category_slug = quote(category_title.replace(" ", "_"))
     result.category_url = f"https://commons.wikimedia.org/wiki/{category_slug}"
 
-    infos = await adapter.imageinfo(files)
-    wikidata_file = await adapter.wikidata_image(taxon)
+    infos, wikidata_file = await asyncio.gather(
+        adapter.imageinfo(files), adapter.wikidata_image(taxon)
+    )
 
     suggestions = []
     for title, info in infos.items():
