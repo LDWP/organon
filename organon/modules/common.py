@@ -1,17 +1,20 @@
 """Utilitaires partagés entre les adaptateurs de modules (organon.modules.*), pour éviter de
 dupliquer les mêmes motifs dans chaque module.py : pagination REST avec troncature
 (`limite-listes`), lien de debug vers la fiche source, formatage d'auteur, garde-fou
-anti-boucle de synonymes. Rien ici ne fait d'appel réseau — ce sont des fonctions pures ou des
-wrappers fins au-dessus de callbacks fournis par chaque module."""
+anti-boucle de synonymes. La plupart de ces fonctions sont pures ou de fins wrappers au-dessus de
+callbacks fournis par chaque module ; `checklistbank_children_page`/`checklistbank_synonyms` font
+exception (appel réseau direct), partagés par tous les adaptateurs ChecklistBank."""
 
 from __future__ import annotations
 
 import html as _html
 import re
 from collections.abc import Awaitable, Callable
+from typing import Any
 
 import httpx
 
+from organon.core.http import fetch_json
 from organon.core.models import Struct
 from organon.core.rendering.support import rempl_et_al
 
@@ -182,6 +185,45 @@ async def mediawiki_page_exists(client: httpx.AsyncClient, api_url: str, title: 
     resp.raise_for_status()
     pages = resp.json().get("query", {}).get("pages", {})
     return any("missing" not in page for page in pages.values())
+
+
+async def checklistbank_children_page(
+    client: httpx.AsyncClient, api_base: str, dataset_id: str, taxon_id: str, offset: int = 0
+) -> dict:
+    """Page de sous-taxons ChecklistBank (`/dataset/{dataset_id}/tree/{taxon_id}/children`),
+    partagée par tous les adaptateurs ChecklistBank (voir `checklistbank_synonyms` ci-dessous
+    pour la raison de sa tolérance aux pannes)."""
+    return await _checklistbank_get(
+        client,
+        f"{api_base}/dataset/{dataset_id}/tree/{taxon_id}/children",
+        params={"offset": offset},
+    )
+
+
+async def checklistbank_synonyms(
+    client: httpx.AsyncClient, api_base: str, dataset_id: str, taxon_id: str
+) -> dict:
+    """Synonymes ChecklistBank (`/dataset/{dataset_id}/taxon/{taxon_id}/synonyms`), partagée par
+    tous les adaptateurs ChecklistBank sauf `coi_ioc` (dataset sans synonymes, voir son
+    `adapter.py`). Comme `checklistbank_children_page`, avale les erreurs réseau/HTTP plutôt que
+    de les laisser remonter : ces deux endpoints sont toujours appelés après qu'un `search()`
+    réussi a déjà écrit nom/rang/auteur/classification dans `struct` (voir chaque `module.py`) —
+    les laisser lever ferait perdre tout ce résultat de classification déjà acquis à cause d'une
+    seule panne réseau sur les sous-taxons/synonymes, pas seulement ces derniers
+    (`_attempt_classification`/`collect_one_module` de l'appelant écartent tout le `struct` dès
+    qu'une exception traverse `collect()`)."""
+    return await _checklistbank_get(
+        client, f"{api_base}/dataset/{dataset_id}/taxon/{taxon_id}/synonyms"
+    )
+
+
+async def _checklistbank_get(
+    client: httpx.AsyncClient, url: str, *, params: dict[str, Any] | None = None
+) -> dict:
+    try:
+        return await fetch_json(client, url, params=params, empty_value={})
+    except httpx.HTTPError:
+        return {}
 
 
 def simple_debug_link(struct: Struct, module_id: str, url_template: str, label: str) -> str | None:

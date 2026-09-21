@@ -14,6 +14,7 @@ toujours un objet vide."""
 from __future__ import annotations
 
 from organon.core.http import OwnedClientMixin, fetch_json
+from organon.modules.common import checklistbank_children_page
 
 API_BASE = "https://api.checklistbank.org"
 DATASET_ID = "2036"  # alias "IOC" (DOI 10.48580/d4g8), resynchronisé depuis worldbirdnames.org
@@ -37,8 +38,6 @@ class CoiIocAdapter(OwnedClientMixin):
         return data.get("result", [])
 
     async def children_page(self, taxon_id: str, offset: int = 0) -> dict:
-        resp = await self._client.get(
-            f"{API_BASE}/dataset/{DATASET_ID}/tree/{taxon_id}/children", params={"offset": offset}
+        return await checklistbank_children_page(
+            self._client, API_BASE, DATASET_ID, taxon_id, offset
         )
-        resp.raise_for_status()
-        return resp.json()
