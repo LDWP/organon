@@ -17,6 +17,7 @@ taxons d'autres genres)."""
 
 from __future__ import annotations
 
+import asyncio
 import re
 
 from organon.core.http import OwnedClientMixin
@@ -59,10 +60,10 @@ class TaxonomiconAdapter(OwnedClientMixin):
         words = name.split(" ")
         subjects = _SUBJECTS_BY_WORD_COUNT.get(len(words))
         if subjects is not None:
-            hits: list[tuple[str, int, str]] = []
-            for subject in subjects:
-                hits.extend(await self._search(subject, "ScientificName", name))
-            return hits
+            results = await asyncio.gather(
+                *(self._search(subject, "ScientificName", name) for subject in subjects)
+            )
+            return [hit for group in results for hit in group]
         return await self._search("Entity", "Epithet", words[-1])
 
     async def author_citation(self, taxon_id: int) -> str | None:
