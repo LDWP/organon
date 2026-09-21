@@ -376,6 +376,9 @@ export default function App() {
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const autocompleteTimer = useRef(null);
+  useEffect(() => {
+    return () => clearTimeout(autocompleteTimer.current);
+  }, []);
   const inputRef = useRef(null);
   // Popover d'aide sur les modes de recherche : au clic (et non plus seulement au survol via
   // `title`), pour rester accessible au tactile où il n'existe pas de hover.
