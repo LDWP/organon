@@ -376,6 +376,7 @@ export default function App() {
   const [autocompleteOpen, setAutocompleteOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const autocompleteTimer = useRef(null);
+  const autocompleteGeneration = useRef(0);
   useEffect(() => {
     return () => clearTimeout(autocompleteTimer.current);
   }, []);
@@ -747,6 +748,7 @@ export default function App() {
     setTaxon(value);
     if (searchMode !== "autocomplete") return;
     if (autocompleteTimer.current) clearTimeout(autocompleteTimer.current);
+    const generation = ++autocompleteGeneration.current;
     const query = value.trim();
     if (query.length < 2) {
       setAutocompleteMatches([]);
@@ -756,11 +758,13 @@ export default function App() {
     autocompleteTimer.current = setTimeout(async () => {
       try {
         const result = await searchTaxa(query);
+        if (autocompleteGeneration.current !== generation) return; // remplacée par une saisie plus récente
         const matches = result.matches || [];
         setAutocompleteMatches(matches);
         setAutocompleteOpen(matches.length > 0);
         setHighlightedIndex(-1);
       } catch {
+        if (autocompleteGeneration.current !== generation) return;
         setAutocompleteMatches([]);
         setAutocompleteOpen(false);
       }
