@@ -14,6 +14,8 @@ communauté — voir `AuthSettings.bot_edit_enabled` et `organon.api.routes.taxo
 
 from __future__ import annotations
 
+import asyncio
+
 import httpx
 
 
@@ -37,6 +39,7 @@ class MediaWikiBotClient:
         self._client = client or httpx.AsyncClient(timeout=30.0, headers={"User-Agent": user_agent})
         self._owns_client = client is None
         self._logged_in = False
+        self._login_lock = asyncio.Lock()
 
     async def aclose(self) -> None:
         if self._owns_client:
@@ -60,22 +63,25 @@ class MediaWikiBotClient:
     async def _login(self) -> None:
         if self._logged_in:
             return
-        login_token = await self._get_token("login")
-        resp = await self._client.post(
-            self._api_url,
-            data={
-                "action": "login",
-                "lgname": self._username,
-                "lgpassword": self._password,
-                "lgtoken": login_token,
-                "format": "json",
-            },
-        )
-        resp.raise_for_status()
-        result = resp.json().get("login", {})
-        if result.get("result") != "Success":
-            raise BotEditError(f"Échec de connexion du compte bot : {result}")
-        self._logged_in = True
+        async with self._login_lock:
+            if self._logged_in:
+                return
+            login_token = await self._get_token("login")
+            resp = await self._client.post(
+                self._api_url,
+                data={
+                    "action": "login",
+                    "lgname": self._username,
+                    "lgpassword": self._password,
+                    "lgtoken": login_token,
+                    "format": "json",
+                },
+            )
+            resp.raise_for_status()
+            result = resp.json().get("login", {})
+            if result.get("result") != "Success":
+                raise BotEditError(f"Échec de connexion du compte bot : {result}")
+            self._logged_in = True
 
     async def edit_page(self, *, title: str, text: str, summary: str) -> dict:
         await self._login()
