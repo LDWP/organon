@@ -111,7 +111,7 @@ class ColModule(TaxonomyModule):
             "id": taxon_id,
             "nom": name["scientificName"],
             "auteur": format_auteur(name.get("authorship")),
-            "rang": col_xr_cherche_rang(name["rank"]),
+            "rang": col_xr_cherche_rang(name.get("rank", "")),
             **({"eteint": usage["extinct"]} if "extinct" in usage else {}),
         }
 
@@ -151,7 +151,7 @@ class ColModule(TaxonomyModule):
             return struct
 
         struct.taxon.auteur = format_auteur(name.get("authorship"))
-        struct.taxon.rang = col_xr_cherche_rang(name["rank"])
+        struct.taxon.rang = col_xr_cherche_rang(name.get("rank", ""))
         if "extinct" in usage:
             struct.taxon.eteint = usage["extinct"]
         struct.taxon.nom = name["scientificName"].strip()
@@ -175,7 +175,7 @@ class ColModule(TaxonomyModule):
         struct.rangs = [
             RankName(
                 nom=c["name"],
-                rang=col_xr_cherche_rang(c["rank"]),
+                rang=col_xr_cherche_rang(c.get("rank", "")),
                 auteur=format_auteur(c.get("authorship")),
             )
             for c in reversed(classification[idx + 1 :])
@@ -187,7 +187,9 @@ class ColModule(TaxonomyModule):
             raw = page.get("result", [])
             out = []
             for c in raw:
-                if c.get("rank") == "unranked" or c.get("status") != "accepted":
+                # "rank" absent (fiche ChecklistBank malformée) traité comme "unranked" : même
+                # absence d'information exploitable, même exclusion de la liste des sous-taxons.
+                if c.get("rank", "unranked") == "unranked" or c.get("status") != "accepted":
                     continue
                 out.append(
                     RankName(
