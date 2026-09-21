@@ -37,6 +37,11 @@ class ItisAdapter(OwnedClientMixin):
             params["tsn"] = tsn
         resp = await self._client.get(f"{BASE_URL}/{endpoint}", params=params)
         resp.raise_for_status()
+        if not resp.content:
+            # ITIS renvoie parfois un 200 à corps vide (service historiquement instable) ;
+            # un élément vide fait échouer `_local`/`_local_all` sur None comme sur toute
+            # absence de résultat, cohérent avec le repli `empty_value` de fetch_json.
+            return ET.Element("empty")
         return ET.fromstring(resp.text)
 
     async def search_by_scientific_name(self, name: str) -> list[dict]:
