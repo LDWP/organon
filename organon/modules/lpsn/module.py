@@ -36,6 +36,8 @@ Publication originale (`struct.originale`) : contrairement à WoRMS, LPSN expose
 
 from __future__ import annotations
 
+import asyncio
+
 from organon.core.auth_settings import get_auth_settings
 from organon.core.config import GenerateOptions
 from organon.core.models import (
@@ -181,29 +183,37 @@ class LpsnModule(TaxonomyModule):
 
         struct.originale = await citations.build_citation(adapter, cur)
 
-        basonym_id = cur.get("basonym_id")
-        if basonym_id and basonym_id != lpsn_id:
+        async def fetch_basionyme() -> Basionym | None:
+            basonym_id = cur.get("basonym_id")
+            if not basonym_id or basonym_id == lpsn_id:
+                return None
             basio = await adapter.fetch_one(basonym_id)
-            if basio is not None and basio.get("full_name"):
-                struct.basionyme = Basionym(
-                    nom=basio["full_name"],
-                    auteur=format_auteur(basio.get("authority")),
-                    source="LPSN",
-                )
+            if basio is None or not basio.get("full_name"):
+                return None
+            return Basionym(
+                nom=basio["full_name"],
+                auteur=format_auteur(basio.get("authority")),
+                source="LPSN",
+            )
 
-        type_id = cur.get("nomenclatural_type_id")
-        if type_id:
+        async def fetch_type_taxon() -> TypeTaxon | None:
+            type_id = cur.get("nomenclatural_type_id")
+            if not type_id:
+                return None
             type_rec = await adapter.fetch_one(type_id)
-            if type_rec is not None and type_rec.get("full_name"):
-                struct.type_taxon = TypeTaxon(
-                    nom=type_rec["full_name"],
-                    rang=lpsn_cherche_rang(type_rec.get("category")),
-                    auteur=format_auteur(type_rec.get("authority")),
-                    source="LPSN",
-                )
+            if type_rec is None or not type_rec.get("full_name"):
+                return None
+            return TypeTaxon(
+                nom=type_rec["full_name"],
+                rang=lpsn_cherche_rang(type_rec.get("category")),
+                auteur=format_auteur(type_rec.get("authority")),
+                source="LPSN",
+            )
 
-        child_ids = await adapter.flexible_search({"lpsn_parent_id": lpsn_id})
-        if child_ids:
+        async def fetch_sous_taxons() -> SubTaxonList | None:
+            child_ids = await adapter.flexible_search({"lpsn_parent_id": lpsn_id})
+            if not child_ids:
+                return None
 
             async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
                 page_ids = child_ids[offset : offset + CHILDREN_PAGE_SIZE]
@@ -225,8 +235,16 @@ class LpsnModule(TaxonomyModule):
             sous_taxons, coupe = await collect_pages(
                 fetch_children, limit=as_limit(options.limite_listes)
             )
-            if sous_taxons:
-                struct.sous_taxons = SubTaxonList(liste=sous_taxons, source="LPSN", coupe=coupe)
+            if not sous_taxons:
+                return None
+            return SubTaxonList(liste=sous_taxons, source="LPSN", coupe=coupe)
+
+        # Trois blocs mutuellement indépendants (basonym_id/type_id viennent de `cur`,
+        # flexible_search de `lpsn_id`, déjà connus avant ce point) : lancés en parallèle plutôt
+        # qu'en série pour ne pas payer trois allers-retours réseau l'un après l'autre.
+        struct.basionyme, struct.type_taxon, struct.sous_taxons = await asyncio.gather(
+            fetch_basionyme(), fetch_type_taxon(), fetch_sous_taxons()
+        )
 
         return struct
 
