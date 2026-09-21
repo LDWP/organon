@@ -20,7 +20,7 @@ from __future__ import annotations
 import asyncio
 import re
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import OwnedClientMixin, fetch_text
 
 BASE_URL = "http://taxonomicon.taxonomy.nl"
 
@@ -71,10 +71,10 @@ class TaxonomiconAdapter(OwnedClientMixin):
         1758) Pocock, 1930") depuis la fiche de nomenclature du taxon — absente des résultats de
         recherche, qui ne donnent qu'une citation abrégée (ex. "(Linnaeus, 1758)" sans le
         renvoi de combinaison ultérieure)."""
-        resp = await self._client.get(
-            f"{BASE_URL}/TaxonName.aspx", params={"id": taxon_id, "src": 0}
+        text = await fetch_text(
+            self._client, f"{BASE_URL}/TaxonName.aspx", params={"id": taxon_id, "src": 0}
         )
-        if resp.status_code >= 400:
+        if text is None:
             return None
-        m = _AUTHOR_CITATION_RE.search(resp.text)
+        m = _AUTHOR_CITATION_RE.search(text)
         return m.group("auteur").strip() if m else None

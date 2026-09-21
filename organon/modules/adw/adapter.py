@@ -31,7 +31,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import OwnedClientMixin, fetch_text
 
 BASE_URL = "https://animaldiversity.org"
 
@@ -108,9 +108,9 @@ class AdwAdapter(OwnedClientMixin):
         """Renvoie la citation du taxon `slug` (espaces déjà remplacés par des underscores), ou
         `None` si le taxon n'existe pas sur ADW. Une `AdwCitation` dont `premier_auteur` vaut
         `None` signifie que la page existe mais n'a pas de citation propre à en tirer."""
-        resp = await self._client.get(f"{BASE_URL}/accounts/{slug}/")
-        if resp.status_code >= 400:
+        html_page = await fetch_text(self._client, f"{BASE_URL}/accounts/{slug}/")
+        if html_page is None:
             return None
-        if _NOT_FOUND_RE.search(resp.text):
+        if _NOT_FOUND_RE.search(html_page):
             return None
-        return _parse_citation(resp.text)
+        return _parse_citation(html_page)

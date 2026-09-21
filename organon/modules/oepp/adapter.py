@@ -11,7 +11,7 @@ from __future__ import annotations
 import html
 import re
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import OwnedClientMixin, fetch_text
 
 BASE_URL = "https://gd.eppo.int"
 
@@ -33,10 +33,9 @@ class OeppAdapter(OwnedClientMixin):
         """Renvoie `{"auteur": str | None, "vernaculaire_fr": list[str]}` — jamais None : une
         page introuvable/vide donne simplement des champs vides plutôt que de faire échouer
         tout le module (l'identifiant reste utilisable même sans ces détails)."""
-        resp = await self._client.get(f"{BASE_URL}/taxon/{eppo_code}")
-        if resp.status_code >= 400:
+        text = await fetch_text(self._client, f"{BASE_URL}/taxon/{eppo_code}")
+        if text is None:
             return {"auteur": None, "vernaculaire_fr": []}
-        text = resp.text
 
         auteur = None
         m = _AUTHORITY_RE.search(text)

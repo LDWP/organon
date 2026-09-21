@@ -55,3 +55,24 @@ async def fetch_json(
     if not resp.content:
         return empty_value
     return resp.json()
+
+
+async def fetch_text(
+    client: httpx.AsyncClient,
+    url: str,
+    *,
+    params: dict[str, Any] | None = None,
+    headers: dict[str, str] | None = None,
+    empty_statuses: tuple[int, ...] = (404,),
+    empty_value: Any = None,
+) -> Any:
+    """GET + corps texte brut, pour les adaptateurs de scraping HTML sans API JSON. Même contrat
+    que `fetch_json` : repli sur `empty_value` pour les statuts listés dans `empty_statuses` (ex.
+    404 = ressource absente, pas une erreur), mais tout autre statut >= 400 (500/503/429...) lève
+    via `raise_for_status()` au lieu de se confondre avec une ressource absente — l'appelant
+    (`EnrichmentRunner`) distingue ainsi "absent" d'"erreur transitoire" à logger."""
+    resp = await client.get(url, params=params, headers=headers)
+    if resp.status_code in empty_statuses:
+        return empty_value
+    resp.raise_for_status()
+    return resp.text
