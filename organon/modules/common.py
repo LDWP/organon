@@ -125,6 +125,18 @@ def extract_aphia_original_description(html_page: str) -> str | None:
     return texte or None
 
 
+def flatten_aphia_classification(node: dict) -> list[dict]:
+    """Aplatit l'arbre de classification imbriqué (`{"scientificname": ..., "child": {...}}`)
+    renvoyé par `classification_by_id` en une liste racine -> feuille. Forme partagée par WoRMS
+    et IRMNG (même plateforme Aphia/VLIZ)."""
+    chain = []
+    cur: dict | None = node
+    while cur is not None:
+        chain.append(cur)
+        cur = cur.get("child")
+    return chain
+
+
 def filter_ancestors_above_regne(
     chain: list[dict], regne_nom: str, garder_regne: bool
 ) -> list[dict]:
@@ -133,7 +145,7 @@ def filter_ancestors_above_regne(
     écarté, quel que soit le rang que la source lui déclare (`Superdomain`, `Kingdom`,
     `Clade`...) — seule la position dans l'arbre, repérée par le nom de règne déjà connu
     (`regne_nom`, ex. `cur["kingdom"]`), fait foi. Partagé par WoRMS et IRMNG (même plateforme
-    Aphia, même forme d'arbre imbriqué — voir `_flatten_classification` dans chaque module.py).
+    Aphia, même forme d'arbre imbriqué — voir `flatten_aphia_classification`).
     Si `regne_nom` n'apparaît dans aucun nœud (cas non rencontré en pratique), la chaîne est
     renvoyée telle quelle. `garder_regne` réintroduit le nœud du règne lui-même (algue/protiste,
     voir CHARTES_GARDENT_REGNE)."""

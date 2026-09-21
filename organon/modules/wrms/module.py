@@ -34,6 +34,7 @@ from organon.modules.common import (
     as_limit,
     collect_pages,
     filter_ancestors_above_regne,
+    flatten_aphia_classification,
     format_auteur,
     simple_debug_link,
 )
@@ -43,15 +44,6 @@ from organon.modules.wrms.ranks import CHARTES_GARDENT_REGNE, wrms_charte, wrms_
 
 PAGE_SIZE = 50
 """Taille de page de l'API REST WoRMS (constante documentée par le service, pas configurable)."""
-
-
-def _flatten_classification(node: dict) -> list[dict]:
-    chain = []
-    cur: dict | None = node
-    while cur is not None:
-        chain.append(cur)
-        cur = cur.get("child")
-    return chain
 
 
 class WrmsModule(TaxonomyModule):
@@ -145,7 +137,7 @@ class WrmsModule(TaxonomyModule):
         rangs: list[RankName] = []
         if classification_tree is not None:
             # le dernier est le taxon lui-même
-            chain = _flatten_classification(classification_tree)[:-1]
+            chain = flatten_aphia_classification(classification_tree)[:-1]
             chain = filter_ancestors_above_regne(
                 chain, cur["kingdom"], struct.regne in CHARTES_GARDENT_REGNE
             )
