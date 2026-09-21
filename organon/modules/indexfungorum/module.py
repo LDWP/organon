@@ -202,7 +202,7 @@ class IndexFungorumModule(TaxonomyModule):
             modele = "Fungorum suprafamille"
         auteur = data.get("auteur", "")
         validite = "nv" if data.get("synonyme") else ""
-        champs = [data["id"], data["nom"]]
+        champs = [str(data["id"]), data["nom"]]
         if auteur or validite:
             champs.append(auteur)
         if validite:
