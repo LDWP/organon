@@ -14,6 +14,7 @@ import secrets
 from urllib.parse import urlencode
 
 import httpx
+from authlib.integrations.base_client.errors import OAuthError
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -93,7 +94,10 @@ async def callback(request: Request, code: str, state: str) -> RedirectResponse:
             )
             profile_resp = await client.get(settings.oauth_profile_url)
             profile_resp.raise_for_status()
-        except httpx.HTTPError as exc:
+        except (httpx.HTTPError, OAuthError) as exc:
+            # authlib lève OAuthError (pas httpx.HTTPError) quand le token endpoint répond 200/400
+            # avec un JSON `{"error": ...}` — cas courant d'un code déjà consommé (rechargement de
+            # la page de callback).
             raise HTTPException(
                 502, detail=f"Échec de l'échange OAuth avec Wikimedia : {exc}"
             ) from exc
