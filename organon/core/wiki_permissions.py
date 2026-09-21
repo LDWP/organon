@@ -17,6 +17,7 @@ réelle (prérequis humain, non traité par ce module).
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import time
@@ -43,6 +44,7 @@ class WikiPermissionChecker:
         self._owns_client = client is None
         self._cached_users: frozenset[str] = frozenset()
         self._cached_at: float | None = None
+        self._refresh_lock = asyncio.Lock()
 
     async def aclose(self) -> None:
         if self._owns_client:
@@ -53,13 +55,20 @@ class WikiPermissionChecker:
         return _normalize_username(username) in users
 
     async def _authorized_users(self) -> frozenset[str]:
-        now = time.monotonic()
-        if self._cached_at is not None and (now - self._cached_at) < self._ttl_seconds:
+        if self._cache_valid():
             return self._cached_users
-        users = await self._fetch_authorized_users()
-        self._cached_users = users
-        self._cached_at = now
-        return users
+        async with self._refresh_lock:
+            # Un autre appel a pu rafraîchir le cache pendant l'attente du verrou.
+            if self._cache_valid():
+                return self._cached_users
+            self._cached_users = await self._fetch_authorized_users()
+            self._cached_at = time.monotonic()
+        return self._cached_users
+
+    def _cache_valid(self) -> bool:
+        if self._cached_at is None:
+            return False
+        return (time.monotonic() - self._cached_at) < self._ttl_seconds
 
     async def _fetch_authorized_users(self) -> frozenset[str]:
         try:
