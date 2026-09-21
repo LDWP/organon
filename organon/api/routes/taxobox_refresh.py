@@ -14,9 +14,10 @@ décision de mise en service, pas de code.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from organon.api.deps import require_username
+from organon.api.rate_limit import limiter
 from organon.api.schemas import TaxoboxRefreshRequest, TaxoboxRefreshResponse
 from organon.core.auth_settings import get_auth_settings
 from organon.core.mediawiki_bot import BotEditError, MediaWikiBotClient
@@ -41,8 +42,9 @@ def _get_permission_checker() -> WikiPermissionChecker:
 
 
 @router.post("/taxobox/refresh", response_model=TaxoboxRefreshResponse)
+@limiter.limit("30/minute")
 async def refresh_taxobox(
-    req: TaxoboxRefreshRequest, username: str = Depends(require_username)
+    request: Request, req: TaxoboxRefreshRequest, username: str = Depends(require_username)
 ) -> TaxoboxRefreshResponse:
     settings = get_auth_settings()
 
