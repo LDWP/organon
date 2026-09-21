@@ -42,18 +42,21 @@ class CommonsImagesAdapter(OwnedClientMixin):
         jusqu'à `limit` résultats en une seule page. Fonctionne même si la page de catégorie
         elle-même n'a jamais été créée (catégorie "rouge") : l'appartenance d'un fichier à une
         catégorie ne dépend que de son wikitexte, pas de l'existence de la page de catégorie."""
-        resp = await self._client.get(
-            COMMONS_API_URL,
-            params={
-                "action": "query",
-                "list": "categorymembers",
-                "cmtitle": category_title,
-                "cmtype": "file",
-                "cmlimit": min(limit, 500),
-                "format": "json",
-            },
-        )
-        resp.raise_for_status()
+        try:
+            resp = await self._client.get(
+                COMMONS_API_URL,
+                params={
+                    "action": "query",
+                    "list": "categorymembers",
+                    "cmtitle": category_title,
+                    "cmtype": "file",
+                    "cmlimit": min(limit, 500),
+                    "format": "json",
+                },
+            )
+            resp.raise_for_status()
+        except httpx.HTTPError:
+            return []
         members = resp.json().get("query", {}).get("categorymembers", [])
         return [m["title"] for m in members]
 
@@ -63,18 +66,21 @@ class CommonsImagesAdapter(OwnedClientMixin):
         result: dict[str, dict] = {}
         for i in range(0, len(titles), _IMAGEINFO_BATCH_SIZE):
             batch = titles[i : i + _IMAGEINFO_BATCH_SIZE]
-            resp = await self._client.get(
-                COMMONS_API_URL,
-                params={
-                    "action": "query",
-                    "titles": "|".join(batch),
-                    "prop": "imageinfo",
-                    "iiprop": "url|extmetadata",
-                    "iiurlwidth": 320,
-                    "format": "json",
-                },
-            )
-            resp.raise_for_status()
+            try:
+                resp = await self._client.get(
+                    COMMONS_API_URL,
+                    params={
+                        "action": "query",
+                        "titles": "|".join(batch),
+                        "prop": "imageinfo",
+                        "iiprop": "url|extmetadata",
+                        "iiurlwidth": 320,
+                        "format": "json",
+                    },
+                )
+                resp.raise_for_status()
+            except httpx.HTTPError:
+                continue
             pages = resp.json().get("query", {}).get("pages", {})
             for page in pages.values():
                 title = page.get("title")
@@ -93,12 +99,15 @@ class CommonsImagesAdapter(OwnedClientMixin):
             f'?item wdt:P31 wd:Q16521 ; wdt:P225 "{escaped}" ; wdt:P18 ?image . '
             "}"
         )
-        resp = await self._client.get(
-            WIKIDATA_SPARQL_URL,
-            params={"query": query},
-            headers={"Accept": "application/sparql-results+json"},
-        )
-        resp.raise_for_status()
+        try:
+            resp = await self._client.get(
+                WIKIDATA_SPARQL_URL,
+                params={"query": query},
+                headers={"Accept": "application/sparql-results+json"},
+            )
+            resp.raise_for_status()
+        except httpx.HTTPError:
+            return None
         bindings = resp.json().get("results", {}).get("bindings", [])
         if not bindings:
             return None
