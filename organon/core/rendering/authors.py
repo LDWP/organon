@@ -61,7 +61,7 @@ _SPECIAL_NORMALIZE = {"and": "&", "et al.": "{{et al.}}"}
 _PUNCT_RE = re.compile(r"([,&;:()\[\]])")
 
 
-@lru_cache(maxsize=1)
+@lru_cache(maxsize=3)  # un par fichier d'auteurs (botanistes/procaryotes/zoologistes)
 def _load(name: str) -> dict:
     path = DATA_DIR / name
     if not path.exists():
