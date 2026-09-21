@@ -526,11 +526,12 @@ categories:
       - id: globaltreesearch
         nom: GlobalTreeSearch
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "liste de présence par pays, pas une hiérarchie"}
+        statut: ecarte
+        classification: {possible: true, estime: false, detail: "mirroir ChecklistBank (clé 310690) vérifié en direct : chaque enregistrement du DwC-A source (taxon.txt, publié par BGCI sur ipt.brc.ac.uk) porte règne/embranchement/classe/ordre/famille/genre en colonnes propres (dwc:kingdom…dwc:genus), pas seulement une présence par pays — hiérarchie réelle, contrairement à l'estimation d'origine"}
         elements_recoltes: []
-        acces: {type: inconnu, detail: "outil de recherche atteignable, pas d'API publique documentée"}
-        derniere_maj: null
+        acces: {type: inconnu, detail: "API ChecklistBank réelle (api.checklistbank.org/dataset/310690), aucun compte requis — mais classification strictement redondante avec powo (déjà actif) : mêmes espèces vasculaires, sans synonymes (0 sur 62097 enregistrements, dataset 100% \"accepted\"), sans rang infraspécifique, sans modèle {{Bioref}} dédié sur fr.wikipedia (vérifié en direct, 0 résultat), et distribution en pays bruts plutôt que codes TDWG/WGSRPD comme powo — même raisonnement que wcsp/powo : porter un second module n'ajouterait rien que powo ne fournisse déjà en mieux"}
+        derniere_maj: "2026-09-21"
+        notes: "Audit 2026-09-21 : l'estimation d'origine (\"pas une hiérarchie\") ne valait que pour l'outil de recherche en ligne de BGCI, pas pour le jeu de données qu'il publie — le mirroir ChecklistBank a une vraie classification. Écarté quand même : GlobalTreeSearch n'est qu'une liste d'arbres (sous-ensemble par port de croissance) des mêmes espèces déjà classées par powo, sans synonymes ni gain de précision — pas de session gâchée sur un doublon sans usage additionnel."
       - id: grassbase
         nom: GrassBase
         url: null
