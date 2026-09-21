@@ -12,6 +12,7 @@ Particularité de l'API : certains endpoints de détail renvoient parfois la cha
 
 from __future__ import annotations
 
+import asyncio
 import re
 
 from organon.core.config import GenerateOptions
@@ -185,7 +186,18 @@ async def _collect_species(
     if genus_id is None:
         return struct
 
-    genus_detail = await adapter.genus_detail(key, genus_id)
+    # genus_id (found["genusID"]) et blob["id"] (found["dwc:acceptedNameUsageID"]) sont deux clés
+    # indépendantes du même `found`, déjà résolues : les deux appels de détail peuvent partir en
+    # parallèle. blob["id"] peut être absent (résolution de synonyme sans id accepté) : sauter
+    # l'appel plutôt que taper /taxonomy/None/detail, comme pour species_detail() ci-dessus.
+    page_detail_call = (
+        adapter.taxonomy_page_detail(key, blob["id"])
+        if blob["id"] is not None
+        else asyncio.sleep(0, result=None)
+    )
+    genus_detail, page_detail = await asyncio.gather(
+        adapter.genus_detail(key, genus_id), page_detail_call
+    )
     if genus_detail is None or "classification" not in genus_detail:
         return None
     rank_tbl, phylum, kingdom = _extract_classification(genus_detail["classification"])
@@ -195,7 +207,6 @@ async def _collect_species(
     if struct.regne != "algue":
         struct.cacher_regne = True
 
-    page_detail = await adapter.taxonomy_page_detail(key, blob["id"])
     if isinstance(page_detail, dict):
         _apply_detail_page(struct, page_detail.get("details") or {})
 
