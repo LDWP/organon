@@ -546,13 +546,13 @@ categories:
         notes: "\"en_attente\" plutôt que \"contact_requis\" : le module est déjà écrit et enregistré (TaxonomyModule.is_configured() bascule automatiquement vers \"disponible\" dès que les identifiants sont renseignés), contrairement à MycoBank/Pl@ntNet où l'intégration elle-même reste à faire."
       - id: gtdb
         nom: "Genome Taxonomy Database (GTDB)"
-        url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "taxonomie génomique bactéries/archées"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "non concluant : URLs devinées injoignables/404, la vraie documentation API n'a pas été localisée"}
+        url: "https://gtdb.ecogenomic.org"
+        statut: disponible
+        classification: {possible: false, estime: false, detail: "enrichissement seul (organon.modules.gtdb) : GTDB attribue des noms d'espèces provisoires suffixés (ex. \"Escherichia hormaechei_A\", vérifié en direct) aux génomes non cultivés/groupes cryptiques sans nom latin publié, non disponibles au sens du code de nomenclature — LPSN reste l'unique source de classification pour ce domaine, jamais remplacée ni corrigée par GTDB"}
+        elements_recoltes: [rang, identifiant, "lien vers la fiche source"]
+        acces: {type: api_rest, detail: "URLs d'API directe devinées toujours injoignables/404 (api.gtdb.ecogenomic.org) ; mirroir officiel via ChecklistBank (api.checklistbank.org, dataset 2214, alias GTDB, resynchronisé à chaque release) — même plateforme que Bryonames/GRIN"}
         derniere_maj: "2026-09-21"
-        notes: "Mirroir ChecklistBank identifié (clé 2214, alias « GTDB r232 », resynchronisé 2026-08-25) : alternative procaryote à lpsn ci-dessous, méthode phylogénomique pouvant diverger du code nomenclatural. Candidat positif, portage non fait ici (un module = une session)."
+        notes: "Audit du 2026-09-21 (voir docs/md/db-inventory.md § Sources indisponibles en direct mais mirrorées sur ChecklistBank) : mirroir ChecklistBank vérifié viable (nameusage/search renvoie une chaîne de classification complète, domain->espèce, sur Escherichia/Sulfolobus). Porté en enrichissement seul plutôt qu'en classification à part entière : la doc du dataset confirme que LPSN sert de référence nomenclaturale à GTDB lui-même (« LPSN is used as the primary nomenclatural reference... genome assembly identifiers are now used to create placeholder names for uncultured taxa »)."
 
   - id: virus
     nom: Virus
