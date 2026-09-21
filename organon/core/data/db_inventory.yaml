@@ -781,13 +781,13 @@ categories:
         derniere_maj: null
       - id: ccw
         nom: "Checklist of the Collembola of the World (CCW)"
-        url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, pas d'API connue"}
+        url: "https://www.collembola.org"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "classification complète (rang, auteur, statut) via ChecklistBank, comme wco/bryonames — plafonne à la classe Collembola (dataset entièrement restreint à ce taxon), embranchement/sous-embranchement Arthropoda/Hexapoda injectés en dur au-dessus"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", synonymes, "sous-taxons", éteint, identifiant]
+        acces: {type: api_rest, detail: "REST checklistbank.org (dataset ChecklistBank 2130, alias Collembola.org, DOI 10.48580/d4kh, version Feb 2025), même plateforme et même schéma que wco/bryonames — pas de scraping nécessaire, contrairement à la piste envisagée initialement"}
         derniere_maj: "2026-09-21"
-        notes: "Mirroir ChecklistBank trouvé (clé 2130, alias « Collembola.org », type=taxonomic, licence CC BY, version février 2025, DOI 10.48580/d4kh) : lignée complète vérifiée (Entomobrya, 7 niveaux classe→genre). Candidat positif, portage non fait ici (un module = une session)."
+        notes: "Module intégré, voir organon/modules/ccw/."
       - id: mdd
         nom: "Mammal Diversity Database (MDD)"
         url: "https://www.mammaldiversity.org"
