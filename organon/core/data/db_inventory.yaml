@@ -713,13 +713,13 @@ categories:
         notes: "Aucun mirroir ChecklistBank dédié : la requête « oiseaux » ne remonte que des listes régionales (Sénégal, Togo) et des textes historiques d'ornithologie, rien lié à oiseaux.net."
       - id: systema_dipterorum
         nom: "Systema Dipterorum"
-        url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "classification des diptères"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "atteignable, pas d'API confirmée à ce stade"}
+        url: "http://diptera.org"
+        statut: disponible
+        classification: {possible: true, estime: false, detail: "classification des diptères (ordre Diptera) seulement — domaine 'animal' faute de sous-domaine dédié dans l'arbre Organon, comme ZooBank"}
+        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
+        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 1101, alias « Systema Dipterorum », DOI 10.48580/d3bz, v7.2) — même plateforme et même schéma que les modules col/bryonames/wco"}
         derniere_maj: "2026-09-21"
-        notes: "Mirroir ChecklistBank trouvé (clé 1101, « Systema Dipterorum (7.2) », type=taxonomic, resynchronisé 2026-06-16) : lignée complète vérifiée (Musca, ordre→genre). Candidat positif, le plus frais des sondages 2026-09-21 — portage non fait ici (un module = une session)."
+        notes: "L'interface publique historique (diptera.org) n'expose pas d'API propre ; les données sont distribuées via ChecklistBank, resynchronisé le 2026-06-16 — dataset actif. La chaîne classification de l'API est plafonnée à l'ordre (Diptera comme unique racine, vérifié en direct sur GET .../dataset/1101/tree) : classe/embranchement (Insecta/Arthropoda) injectés en dur, même principe que WCO. Licence cc by : render_bioref expose un lien de citation public, faute de modèle {{Bioref}} dédié sur Wikipédia fr (0 résultat vérifié en direct), via le modèle générique {{Lien web}}, comme WCO/Bryonames."
 
   - id: eau
     nom: "Eau — poissons, amphibiens"
