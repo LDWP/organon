@@ -8,6 +8,7 @@ exception (appel réseau direct), partagés par tous les adaptateurs ChecklistBa
 from __future__ import annotations
 
 import html as _html
+import logging
 import re
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -17,6 +18,8 @@ import httpx
 from organon.core.http import fetch_json
 from organon.core.models import Struct
 from organon.core.rendering.support import rempl_et_al
+
+logger = logging.getLogger(__name__)
 
 MAX_SYNONYM_HOPS = 10
 """Garde-fou contre une boucle infinie si deux taxons se référencent l'un l'autre comme
@@ -222,7 +225,10 @@ async def _checklistbank_get(
 ) -> dict:
     try:
         return await fetch_json(client, url, params=params, empty_value={})
-    except httpx.HTTPError:
+    except httpx.HTTPError as exc:
+        # Avalée par design (voir checklistbank_synonyms ci-dessus) : loggée quand même, sinon
+        # une panne ChecklistBank devient indiscernable d'un taxon sans enfants/synonymes.
+        logger.warning("ChecklistBank injoignable sur %s : %s", url, exc)
         return {}
 
 
