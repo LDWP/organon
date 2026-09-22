@@ -1,0 +1,90 @@
+{
+  "author_candidates": {},
+  "basionym": null,
+  "classification_taxobox": "ICTV",
+  "consolidated_author": "",
+  "data_found": {
+    "ictv": [
+      "Classification"
+    ]
+  },
+  "distribution": {},
+  "distribution_entries": {},
+  "elapsed_seconds": 0,
+  "external_ids": {
+    "ictv": "202201234"
+  },
+  "external_links": [
+    {
+      "html": "<a href='https://ictv.global/id/202201234' target='_blank' rel='noopener noreferrer'>ICTV</a>",
+      "module_id": "ictv"
+    }
+  ],
+  "extinct": false,
+  "habitat": "",
+  "iucn_criterion": "",
+  "iucn_status": "",
+  "kingdom": "virus",
+  "kingdom_inconsistencies": [],
+  "logs": [],
+  "other_names": {},
+  "rank_inconsistencies": [],
+  "rank_lines": [
+    {
+      "line": "{{Taxobox | genre | Betacoronavirus }}",
+      "name": "Betacoronavirus",
+      "rank": "genre"
+    },
+    {
+      "line": "{{Taxobox | sous-famille | Orthocoronavirinae }}",
+      "name": "Orthocoronavirinae",
+      "rank": "sous-famille"
+    },
+    {
+      "line": "{{Taxobox | famille | Coronaviridae }}",
+      "name": "Coronaviridae",
+      "rank": "famille"
+    },
+    {
+      "line": "{{Taxobox | ordre | Nidovirales }}",
+      "name": "Nidovirales",
+      "rank": "ordre"
+    },
+    {
+      "line": "{{Taxobox | classe | Pisoniviricetes }}",
+      "name": "Pisoniviricetes",
+      "rank": "classe"
+    }
+  ],
+  "reference_items": [
+    {
+      "default_checked": true,
+      "module_id": "ictv",
+      "wikitext": "{{ICTV | 202201234 | ''Betacoronavirus pandemicum'' |  | consulté le=<DATE>}}"
+    }
+  ],
+  "references_wikitext": "* {{ICTV | 202201234 | ''Betacoronavirus pandemicum'' |  | consulté le=<DATE>}}\n",
+  "requested_taxon": "Betacoronavirus pandemicum",
+  "resolved_author": "",
+  "resolved_taxon": "Betacoronavirus pandemicum",
+  "see_also_wikitext": "\n== Liens externes ==\n* {{ICTV | 202201234 | ''Betacoronavirus pandemicum'' |  | consulté le=<DATE>}}\n",
+  "subtaxa": [],
+  "subtaxa_completeness_score": 0,
+  "subtaxa_source": "",
+  "subtaxa_wikitext": "",
+  "synonyms": [],
+  "synonyms_source": "",
+  "taxobox_completeness_score": 5,
+  "taxobox_wikitext": "{{ébauche|virus}}\n{{Taxobox début | virus | ''Betacoronavirus pandemicum'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=ICTV}}\n{{Taxobox | classe | Pisoniviricetes }}\n{{Taxobox | ordre | Nidovirales }}\n{{Taxobox | famille | Coronaviridae }}\n{{Taxobox | sous-famille | Orthocoronavirinae }}\n{{Taxobox | genre | Betacoronavirus }}\n{{Taxobox taxon | virus | espèce | Betacoronavirus pandemicum |  }}\n{{Taxobox fin}}\n",
+  "taxon_rank": "espèce",
+  "truncated": {
+    "subtaxa": false,
+    "synonyms": false
+  },
+  "used_classification": "ictv",
+  "used_domain": "*",
+  "vernacular_names": [],
+  "vernacular_names_without_language": {},
+  "warnings": [],
+  "wikitext": "{{ébauche|virus}}\n{{Taxobox début | virus | ''Betacoronavirus pandemicum'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=ICTV}}\n{{Taxobox | classe | Pisoniviricetes }}\n{{Taxobox | ordre | Nidovirales }}\n{{Taxobox | famille | Coronaviridae }}\n{{Taxobox | sous-famille | Orthocoronavirinae }}\n{{Taxobox | genre | Betacoronavirus }}\n{{Taxobox taxon | virus | espèce | Betacoronavirus pandemicum |  }}\n{{Taxobox fin}}\n'''''Betacoronavirus pandemicum''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Coronaviridae]]''.\n\n== Description ==\n{{Section vide ou incomplète}}\n\n== Répartition ==\n{{Section vide ou incomplète}}\n\n== Systématique ==\nLe [[nom valide]] de ce taxon est ''Betacoronavirus pandemicum''{{Bioref|ICTV|<DATE>|ref}}.\n\n== Liens externes ==\n* {{ICTV | 202201234 | ''Betacoronavirus pandemicum'' |  | consulté le=<DATE>}}\n\n== Notes et références ==\n{{références}}\n\n{{Portail|virologie}}\n\n[[Catégorie:Coronaviridae]]"
+}

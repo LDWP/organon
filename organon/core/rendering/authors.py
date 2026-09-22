@@ -1,36 +1,10 @@
-"""Système de wikification de la citation d'auteur du taxon principal : découpage de la
-chaîne brute sur séparateurs/mots-clés, wikification des années, résolution des auteurs
-connus via trois tables générées par `scripts/build_auteurs_yaml.py` (botanistes/champignons,
-procaryotes, zoologistes — voir ce script pour les sources), et enveloppement
-`{{auteur|[[Nom]]}}` pour tout nom non résolu.
+"""Wikification of the main taxon's author citation.
 
-N'est appelé qu'une seule fois par génération, sur `struct.taxon.auteur` uniquement — jamais
-sur les auteurs de synonymes/sous-taxons/basionyme (qui gardent le traitement simple de
-`organon.modules.common.format_auteur`).
-
-Un seul point de rendu affiche ce résultat wikifié : la ligne `{{Taxobox taxon}}`
-(`sections.py::render_taxobox`). La phrase "== Systématique ==" et les autres usages
-secondaires (synonymes, basionyme, sous-taxons) sont indépendants : ils appliquent leur propre
-remplacement "et al." basique directement sur l'auteur brut, sans passer par ce module — les
-deux traitements ne partagent pas leur résultat, à ne pas fusionner par erreur (un
-`{{date à préciser}}` dupliqué dans les deux sections d'un article généré est le symptôme
-caractéristique d'une telle fusion involontaire).
-
-**Botanique/champignons** : résolution par abréviation exacte dans `auteurs_botanistes.yaml`.
-Une entrée marquée `conflit: true` (désaccord entre la liste Wikipédia et Wikidata P428,
-détecté par `scripts/build_auteurs_yaml.py`) n'est **pas** résolue silencieusement : elle reste
-enveloppée dans `{{auteur}}`, avec un avertissement listant les deux cibles — conforme au
-principe WP:Proportion déjà retenu pour la Phase 3.
-
-**Procaryotes** (bactérie/archaea) : résolution par abréviation dans `auteurs_procaryotes.yaml`.
-
-**Zoologie** : la zoologie n'utilise pas d'abréviation d'auteur (contrairement à la
-botanique) ; la résolution se fait par nom de famille complet dans
-`auteurs_zoologistes.yaml`, désambiguïsé par une fenêtre de dates si plusieurs zoologistes
-partagent ce nom.
-
-**Virus** : aucune résolution tentée, mais le reste du traitement (dates, `{{auteur}}`)
-s'applique tout de même."""
+Splits the raw string, links years and known authors from the
+tables built by `scripts/build_auteurs_yaml.py`, and wraps unknown
+names in `{{auteur}}`. Only `struct.taxon.auteur` goes through
+here; synonym, basionym and sub-taxon authors use `format_author`.
+"""
 
 from __future__ import annotations
 
@@ -41,17 +15,22 @@ from pathlib import Path
 import yaml
 
 from organon.core.models import Struct
-from organon.core.rendering.support import est_similaire
+from organon.core.rendering.support import is_similar
+
+__all__ = [
+    "BOTANIST_KINGDOMS",
+    "resolve_main_author",
+]
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
-BOTANIST_REGNES = {"végétal", "champignon"}
-PROCARYOTE_REGNES = {"bactérie", "archaea"}
-NO_RESOLUTION_REGNES = {"virus"}
+BOTANIST_KINGDOMS = {"végétal", "champignon"}
+_PROKARYOTE_KINGDOMS = {"bactérie", "archaea"}
+_NO_RESOLUTION_KINGDOMS = {"virus"}
 
 _YEAR_RE = re.compile(r"^(1[3-9]\d\d|20\d\d)$")
 
-# Reconnaît aussi "et al." déjà wikifié ({{et al.}}) pour ne pas le redécouper.
+# Also matches an already wikified {{et al.}} to avoid resplitting it.
 _SPECIAL_WORD_RE = re.compile(
     r"(?<![\w'])(\{\{et al\.\}\}|et al\.|and|emend\.|et non|nom\. nov\.|nom\. cons\.|corrig\.|"
     r"ex\.|ex|in\.|in)(?![\w'])",
@@ -60,9 +39,16 @@ _SPECIAL_WORD_RE = re.compile(
 _SPECIAL_NORMALIZE = {"and": "&", "et al.": "{{et al.}}"}
 _PUNCT_RE = re.compile(r"([,&;:()\[\]])")
 
+# Surname particles: the zoologist table omits them ("Haan" → "Willem de
+# Haan"), while sources report "De Haan" or "de Haan".
+_PARTICLE_RE = re.compile(
+    r"^(?:(?:de|der|den|van|von|du|da|di|le|la|del|della|dos|d')\s*)+", re.I
+)
+
 
 @lru_cache(maxsize=3)  # un par fichier d'auteurs (botanistes/procaryotes/zoologistes)
 def _load(name: str) -> dict:
+    """Load an authors data file; empty if missing."""
     path = DATA_DIR / name
     if not path.exists():
         return {}
@@ -70,28 +56,32 @@ def _load(name: str) -> dict:
         return yaml.safe_load(fh) or {}
 
 
-def _load_botanistes() -> dict:
+def _load_botanists() -> dict:
+    """Load the botanists table."""
     return _load("auteurs_botanistes.yaml")
 
 
-def _load_procaryotes() -> dict:
+def _load_prokaryotes() -> dict:
+    """Load the prokaryotes table."""
     return _load("auteurs_procaryotes.yaml")
 
 
-def _load_zoologistes() -> dict:
+def _load_zoologists() -> dict:
+    """Load the zoologists table."""
     return _load("auteurs_zoologistes.yaml")
 
 
 def _tokenize(text: str) -> list[tuple[str, str]]:
-    """Découpe en tokens `(type, texte)`, `type` valant `'sep'` (ponctuation ou mot-clé) ou
-    `'cur'` (reste à résoudre) — version pragmatique de `aut_analyse()` : ponctuation *et*
-    mots-clés reconnus deviennent des séparateurs, le reste reste à résoudre."""
+    """Split into `(type, text)` tokens.
+
+    `sep` for punctuation and keywords, `cur` for text to resolve.
+    """
     tokens: list[tuple[str, str]] = []
     parts = _SPECIAL_WORD_RE.split(text)
     for i, part in enumerate(parts):
         if not part:
             continue
-        if i % 2 == 1:  # mot-clé capturé par le groupe de _SPECIAL_WORD_RE
+        if i % 2 == 1:  # keyword captured by the _SPECIAL_WORD_RE group
             tokens.append(("sep", _SPECIAL_NORMALIZE.get(part.lower(), part)))
             continue
         for piece in _PUNCT_RE.split(part):
@@ -105,50 +95,51 @@ def _tokenize(text: str) -> list[tuple[str, str]]:
 
 
 def _dates_window(dates: str) -> tuple[int, int] | None:
-    """Convertit une chaîne de dates (ex. "1707-1778", "fl. 1990", "1950-…", "?-?") en fenêtre
-    de désambiguïsation `(début, fin)`, fidèle à `identifie_auteur()` : naissance+15 -> mort+10
-    si les deux sont connues ; ±10 ans autour d'une date d'activité seule ; naissance+15 ->
-    naissance+70 si seule la naissance est connue ; mort-70 -> mort+10 si seule la mort l'est."""
+    """Convert a dates string into a disambiguation window.
+
+    Birth+15 to death+10 if both are known; +-10 years around an
+    activity date; birth+15 to birth+70 if only birth; death-70 to
+    death+10 if only death. None if unparseable.
+    """
     m = re.match(r"^\s*(\d{4})\s*-\s*(\d{4})\s*$", dates)
     if m:
-        naissance, mort = int(m.group(1)), int(m.group(2))
-        return naissance + 15, mort + 10
+        birth, death = int(m.group(1)), int(m.group(2))
+        return birth + 15, death + 10
     m = re.match(r"^\s*(\d{4})\s*-\s*[…\.]*\s*$", dates)
     if m:
-        naissance = int(m.group(1))
-        return naissance + 15, naissance + 70
+        birth = int(m.group(1))
+        return birth + 15, birth + 70
     m = re.search(r"fl\.\s*(\d{4})", dates)
     if m:
-        activite = int(m.group(1))
-        return activite - 10, activite + 10
+        activity = int(m.group(1))
+        return activity - 10, activity + 10
     m = re.match(r"^\s*\?\s*-\s*(\d{4})\s*$", dates)
     if m:
-        mort = int(m.group(1))
-        return mort - 70, mort + 10
+        death = int(m.group(1))
+        return death - 70, death + 10
     return None
 
 
 def _lookup_normalise(table: dict, token: str) -> dict | None:
-    """Essaie la clé exacte, puis une variante sans espace après un point (ex. "A. DC." vs
-    "A.DC.") et enfin, en dernier repli, une comparaison casse/accent-insensible (voir
-    est_similaire) — utile quand une source (GBIF, ITIS...) rapporte un nom sans diacritique
-    alors que la table n'a que la forme accentuée (ex. "Veron" vs "Véron"). Ce repli ne résout
-    que s'il trouve un candidat unique dans la table : deux homonymes qui ne diffèrent que par
-    l'accent ne doivent pas être devinés."""
-    entry = table.get(token)
+    """Look up a token: exact key, then without space after a dot.
+
+    Last, an accent- and case-insensitive match, accepted only if
+    unique: homonyms differing by an accent are never guessed.
+    """
+    entry: dict | None = table.get(token)
     if entry is not None:
         return entry
-    entry = table.get(re.sub(r"\.\s+", ".", token))
-    if entry is not None:
-        return entry
-    candidats = [valeur for cle, valeur in table.items() if est_similaire(cle, token)]
-    if len(candidats) == 1:
-        return candidats[0]
+    spaced: dict | None = table.get(re.sub(r"\.\s+", ".", token))
+    if spaced is not None:
+        return spaced
+    candidates: list[dict] = [value for key, value in table.items() if is_similar(key, token)]
+    if len(candidates) == 1:
+        return candidates[0]
     return None
 
 
-def _resolve_botaniste(token: str) -> tuple[str | None, dict | None]:
-    entry = _lookup_normalise(_load_botanistes(), token)
+def _resolve_botanist(token: str) -> tuple[str | None, dict | None]:
+    entry = _lookup_normalise(_load_botanists(), token)
     if entry is None:
         return None, None
     if entry.get("conflit"):
@@ -156,101 +147,105 @@ def _resolve_botaniste(token: str) -> tuple[str | None, dict | None]:
     return f"[[{entry['cible']}|{token}]]", None
 
 
-def _resolve_procaryote(token: str) -> str | None:
-    entry = _lookup_normalise(_load_procaryotes(), token)
+def _resolve_prokaryote(token: str) -> str | None:
+    entry = _lookup_normalise(_load_prokaryotes(), token)
     if entry is None:
         return None
     return f"[[{entry['cible']}|{token}]]"
 
 
-def _resolve_zoologiste(token: str, annee: int | None) -> tuple[str | None, list[dict] | None]:
-    """Renvoie `(lien, homonymes)` — `homonymes` n'est peuplé que si plusieurs zoologistes
-    partagent ce nom de famille et que la fenêtre de dates n'a pas permis de trancher (voir
-    discussion Projet:Biologie/Organon #10 : dans ce cas on ne devine pas, on laisse
-    `{{auteur|[[Nom]]}}` et on avertit plutôt que de résoudre vers le mauvais article)."""
-    candidats = _load_zoologistes().get(token)
-    if not candidats:
+def _resolve_zoologist(token: str, year: int | None) -> tuple[str | None, list[dict] | None]:
+    """Return `(link, homonyms)`.
+
+    `homonyms` is set when several zoologists share the surname and
+    the date window cannot decide; nothing is guessed then.
+    """
+    table = _load_zoologists()
+    candidates = table.get(token) or table.get(_PARTICLE_RE.sub("", token))
+    if not candidates:
         return None, None
-    if len(candidats) == 1:
-        return f"[[{candidats[0]['cible']}|{token}]]", None
-    if annee is None:
-        return None, candidats
+    if len(candidates) == 1:
+        return f"[[{candidates[0]['cible']}|{token}]]", None
+    if year is None:
+        return None, candidates
     matches = []
-    for c in candidats:
-        fenetre = _dates_window(c.get("dates", ""))
-        if fenetre is not None and fenetre[0] <= annee <= fenetre[1]:
+    for c in candidates:
+        window = _dates_window(c.get("dates", ""))
+        if window is not None and window[0] <= year <= window[1]:
             matches.append(c)
     if len(matches) == 1:
         return f"[[{matches[0]['cible']}|{token}]]", None
-    return None, candidats
+    return None, candidates
 
 
-def resoudre_auteur_principal(struct: Struct) -> tuple[str, list[str]]:
-    """Point d'entrée unique. Renvoie `(texte_wikifie, avertissements)` — `avertissements` liste
-    les cas de désaccord Wikipédia/Wikidata rencontrés, à ajouter à `GenerateResponse.warnings`
-    par l'appelant plutôt que gérés ici (cette fonction ne connaît pas la réponse API)."""
-    auteur = (struct.taxon.auteur or "").strip()
-    if not auteur:
+def resolve_main_author(struct: Struct) -> tuple[str, list[str]]:
+    """Return `(wikified text, warnings)` for the main author.
+
+    Warnings list botanist conflicts and zoologist homonyms, for the
+    caller to add to the API response.
+    """
+    author = (struct.taxon.author or "").strip()
+    if not author:
         return "", []
 
-    regne = struct.regne
-    tokens = _tokenize(auteur)
+    kingdom = struct.kingdom
+    tokens = _tokenize(author)
 
-    annee: int | None = None
-    resolus: list[tuple[str, str]] = []  # (type, texte) — type: 'sep' | 'nom' | 'date'
-    avertissements: list[str] = []
+    year: int | None = None
+    resolved_tokens: list[tuple[str, str]] = []  # (type, texte) — type: 'sep' | 'nom' | 'date'
+    warnings: list[str] = []
 
-    # première passe : repère l'année (utile à la désambiguïsation zoologiste par date)
-    for kind, texte in tokens:
-        if kind == "cur" and _YEAR_RE.match(texte.strip()):
-            annee = int(texte.strip())
+    # First pass: find the year, used to disambiguate zoologists.
+    for kind, text in tokens:
+        if kind == "cur" and _YEAR_RE.match(text.strip()):
+            year = int(text.strip())
             break
 
-    for kind, texte in tokens:
+    for kind, text in tokens:
         if kind == "sep":
-            resolus.append(("sep", texte))
+            resolved_tokens.append(("sep", text))
             continue
-        stripped = texte.strip()
+        stripped = text.strip()
         if not stripped:
-            if texte:
-                resolus.append(("sep", ""))  # préserve un espace isolé
+            if text:
+                resolved_tokens.append(("sep", ""))  # keep an isolated space
             continue
         if _YEAR_RE.match(stripped):
-            resolus.append(("date", f"[[{stripped} en science|{stripped}]]"))
+            resolved_tokens.append(("date", f"[[{stripped} en science|{stripped}]]"))
             continue
 
-        resolu: str | None = None
-        if regne in BOTANIST_REGNES:
-            resolu, conflit = _resolve_botaniste(stripped)
-            if conflit is not None:
-                avertissements.append(
+        resolved: str | None = None
+        if kingdom in BOTANIST_KINGDOMS:
+            resolved, conflict = _resolve_botanist(stripped)
+            if conflict is not None:
+                warnings.append(
                     f"Auteur « {stripped} » : désaccord entre la liste Wikipédia "
-                    f"({conflit['cible']}) et Wikidata ({conflit.get('wikidata_libelle')}) — "
+                    f"({conflict['cible']}) et Wikidata ({conflict.get('wikidata_libelle')}) — "
                     "non résolu automatiquement, à trancher manuellement."
                 )
-        elif regne in PROCARYOTE_REGNES:
-            resolu = _resolve_procaryote(stripped)
-        elif regne not in NO_RESOLUTION_REGNES:
-            resolu, homonymes = _resolve_zoologiste(stripped, annee)
-            if homonymes is not None:
-                cibles = ", ".join(
+        elif kingdom in _PROKARYOTE_KINGDOMS:
+            resolved = _resolve_prokaryote(stripped)
+        elif kingdom not in _NO_RESOLUTION_KINGDOMS:
+            resolved, homonyms = _resolve_zoologist(stripped, year)
+            if homonyms is not None:
+                targets = ", ".join(
                     f"{c['cible']} ({c['dates']})" if c.get("dates") else c["cible"]
-                    for c in homonymes
+                    for c in homonyms
                 )
-                avertissements.append(
+                warnings.append(
                     f"Auteur « {stripped} » : homonymie entre plusieurs zoologistes "
-                    f"({cibles}) — non résolu automatiquement, à trancher manuellement."
+                    f"({targets}) — non résolu automatiquement, à trancher manuellement."
                 )
 
-        if resolu is not None:
-            resolus.append(("nom", resolu))
+        if resolved is not None:
+            resolved_tokens.append(("nom", resolved))
         else:
-            resolus.append(("nom", f"{{{{auteur|[[{stripped}]]}}}}"))
+            resolved_tokens.append(("nom", f"{{{{auteur|[[{stripped}]]}}}}"))
 
-    texte = _render_tokens(resolus)
-    if annee is None:
-        texte += " {{date à préciser}}"
-    return texte, avertissements
+    text = _render_tokens(resolved_tokens)
+    if year is None:
+        text += " {{date à préciser}}"
+    return text, warnings
 
 
 _NO_SPACE_BEFORE = {",", ";", ":", ")", "]"}
@@ -258,17 +253,18 @@ _NO_SPACE_AFTER = {"(", "["}
 
 
 def _render_tokens(tokens: list[tuple[str, str]]) -> str:
+    """Join resolved tokens with typographic spacing."""
     out = ""
-    for kind, texte in tokens:
-        if not texte:
+    for kind, text in tokens:
+        if not text:
             continue
-        if kind == "sep" and texte in _NO_SPACE_BEFORE:
-            out = out.rstrip() + texte + " "
+        if kind == "sep" and text in _NO_SPACE_BEFORE:
+            out = out.rstrip() + text + " "
             continue
-        if kind == "sep" and texte in _NO_SPACE_AFTER:
-            out = out.rstrip() + " " + texte
+        if kind == "sep" and text in _NO_SPACE_AFTER:
+            out = out.rstrip() + " " + text
             continue
         if out and not out.endswith((" ", "(", "[")):
             out += " "
-        out += texte
+        out += text
     return re.sub(r" {2,}", " ", out).strip()

@@ -1,6 +1,6 @@
-# Généré depuis selecteurs/categories.lst par scripts/migrate_selectors.py.
-# Ne pas éditer à la main sans mettre à jour le fichier source ci-dessus, ou
-# créer un categories.local.yaml pour des règles spécifiques (voir README).
+# Règles évaluées dans l'ordre, la première qui correspond l'emporte.
+# Initialement générées depuis selecteurs/categories.lst (script de migration retiré) :
+# le YAML est désormais la source, à éditer directement.
 
 - when:
     all_of:
@@ -31,3 +31,171 @@
     eq: Uroplatus
   return:
   - Faune endémique de Madagascar
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Bivalvia
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce de bivalves (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Bivalvia
+    - field: rang
+      eq: genre
+  return:
+  - Genre de bivalves (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Bivalvia
+    - field: rang
+      eq: famille
+  return:
+  - Famille de bivalves (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Gastropoda
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce de gastéropodes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Gastropoda
+    - field: rang
+      eq: genre
+  return:
+  - Genre de gastéropodes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Gastropoda
+    - field: rang
+      eq: famille
+  return:
+  - Famille de gastéropodes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Insecta
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce d'insectes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Insecta
+    - field: rang
+      eq: genre
+  return:
+  - Genre d'insectes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Insecta
+    - field: rang
+      eq: famille
+  return:
+  - Famille d'insectes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Arachnida
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce d'arachnides (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Arachnida
+    - field: rang
+      eq: genre
+  return:
+  - Genre d'arachnides (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Arachnida
+    - field: rang
+      eq: famille
+  return:
+  - Famille d'arachnides (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Aves
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce d'oiseaux (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Aves
+    - field: rang
+      eq: genre
+  return:
+  - Genre d'oiseaux (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Aves
+    - field: rang
+      eq: famille
+  return:
+  - Famille d'oiseaux (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Mammalia
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce de mammifères (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Mammalia
+    - field: rang
+      eq: genre
+  return:
+  - Genre de mammifères (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.classe
+      eq: Mammalia
+    - field: rang
+      eq: famille
+  return:
+  - Famille de mammifères (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Echinodermata
+    - field: rang
+      eq: espèce
+  return:
+  - Espèce d'échinodermes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Echinodermata
+    - field: rang
+      eq: genre
+  return:
+  - Genre d'échinodermes (nom scientifique)
+- when:
+    all_of:
+    - field: rangs.embranchement
+      eq: Echinodermata
+    - field: rang
+      eq: famille
+  return:
+  - Famille d'échinodermes (nom scientifique)

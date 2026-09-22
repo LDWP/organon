@@ -1,12 +1,9 @@
-"""Fonctions de grammaire/rendu des noms scientifiques (wp_nom_rang, wp_met_italiques,
-wp_un_rang, wp_le_rang, wp_inf_rang, wp_eteint_rang, wp_est_italique), ainsi que les tables
-associatives par règne (lien vers la page de citation d'auteurs, lien basionyme, catégorie,
-synonyme). Les données de rang viennent de `organon/core/data/ranks.yaml` (voir
-scripts/build_ranks_yaml.py) plutôt que d'être codées en dur : éditable sans toucher au code
-Python.
+"""Grammar and rendering of scientific names and ranks.
 
-`wp_ebauche()`, `lien_pour_categorie()` et `lien_pour_portail()` dépendent du moteur de règles
-(voir `organon.core.selectors`) — leur logique vit là-bas, pas ici.
+Rank data comes from `data/ranks.yaml`, not from code. Per-kingdom
+lookup tables for author pages, basionym links, categories and
+synonyms live here too. Stub, category and portal logic lives in
+`organon.core.selectors`.
 """
 
 from __future__ import annotations
@@ -19,95 +16,127 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel
 
+__all__ = [
+    "AdjectiveEntry",
+    "CATEGORY_BY_KINGDOM",
+    "RankEntry",
+    "RankTable",
+    "STUB_BY_KINGDOM",
+    "link_for_author",
+    "link_for_basionym",
+    "link_for_synonym",
+    "load_rank_table",
+    "wp_agree_adjective",
+    "wp_apply_italics",
+    "wp_definite_rank",
+    "wp_extinct_rank",
+    "wp_indefinite_rank",
+    "wp_is_infraspecific",
+    "wp_is_italic",
+    "wp_is_more_specific_rank",
+    "wp_is_species_or_below",
+    "wp_is_valid_rank",
+    "wp_rank_name",
+]
+
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
-class RankEntry(BaseModel):
-    """Primitives non dérivables d'un rang (voir l'en-tête de ranks.yaml). Le nom minuscule
-    canonique est la clé YAML elle-même (`RankTable.ranks`), pas un champ dupliqué ici."""
+Gender = Literal["masculine", "feminine"]
 
-    genre: Literal["masculin", "féminin"]
-    rang_inferieur_espece: bool
+
+class RankEntry(BaseModel):
+    """Non-derivable primitives of a rank.
+
+    The canonical lowercase name is the YAML key.
+    """
+
+    gender: Gender
+    below_species: bool
     page: str | None = None
-    pluriel: str | None = None
+    plural: str | None = None
     invariant: bool = False
     lang_en: bool = False
 
 
 class AdjectiveEntry(BaseModel):
-    masculin_singulier: str
-    feminin_singulier: str
-    neutre_singulier: str
-    masculin_pluriel: str
-    feminin_pluriel: str
-    neutre_pluriel: str
-    lien_interne: bool
+    """Inflected forms of an adjective and its internal link."""
+
+    masculine_singular: str
+    feminine_singular: str
+    neutral_singular: str
+    masculine_plural: str
+    feminine_plural: str
+    neutral_plural: str
+    internal_link: bool
     page: str
 
 
 class RankTable(BaseModel):
+    """Ranks and adjectives loaded from `ranks.yaml`."""
+
     ranks: dict[str, RankEntry]
     adjectives: dict[str, AdjectiveEntry]
 
 
 @lru_cache(maxsize=1)
 def load_rank_table(path: Path | None = None) -> RankTable:
+    """Load and validate the rank table."""
     target = path or (DATA_DIR / "ranks.yaml")
     with target.open(encoding="utf-8") as fh:
         raw = yaml.safe_load(fh)
     return RankTable.model_validate(raw)
 
 
-# Mots à h muet (élision en l'/d' malgré une initiale consonantique) : liste fermée, tenue à
-# jour à la main faute d'un meilleur signal dans une liste de ~60 rangs. Étendre si un nouveau
-# rang à h muet apparaît dans ranks.yaml.
-_H_MUET: set[str] = {"hybride"}
+# Rank names with a mute h (elision despite the consonant). Extend
+# if a new one appears in ranks.yaml.
+_SILENT_H: set[str] = {"hybride"}
 
-_VOYELLES = set("aeiouyàâäéèêëïîôöùûü")
-
-
-def _commence_par_son_vocalique(nom: str) -> bool:
-    return bool(nom) and (nom[0].lower() in _VOYELLES or nom in _H_MUET)
+_VOWELS = set("aeiouyàâäéèêëïîôöùûü")
 
 
-def _majuscule(nom: str) -> str:
-    return nom[0].upper() + nom[1:] if nom else nom
+def _starts_with_vowel_sound(name: str) -> bool:
+    """Return True if `nom` starts with a vowel sound."""
+    return bool(name) and (name[0].lower() in _VOWELS or name in _SILENT_H)
 
 
-def _forme_nom(nom_minuscule: str, entry: RankEntry, maj: bool, plur: bool) -> str:
-    """Calcule une des quatre formes (min/maj × sing/plur) du nom d'un rang à partir du nom
-    minuscule canonique et des irrégularités éventuelles (pluriel, invariant). Un rang
-    invariant (non-classé) ignore aussi bien le pluriel que la majuscule : les quatre formes
-    sont identiques au nom minuscule. Un rang `lang_en` (ex. ICTV Realm/Subrealm) reste un
-    emprunt anglais non traduit et non pluralisé : toujours capitalisé et en italique via
-    {{lang|en|...}}, quels que soient `maj`/`plur`."""
+def _capitalize(name: str) -> str:
+    """Capitalize the first letter only."""
+    return name[0].upper() + name[1:] if name else name
+
+
+def _name_form(lowercase_name: str, entry: RankEntry, capitalize: bool, plural: bool) -> str:
+    """Compute one of the four forms (case x number) of a rank name.
+
+    Invariant ranks ignore both. `lang_en` ranks stay an untranslated
+    English loan, capitalized and italic through {{lang|en|…}}.
+    """
     if entry.invariant:
-        return nom_minuscule
+        return lowercase_name
     if entry.lang_en:
-        return f"''{{{{lang|en|{_majuscule(nom_minuscule)}}}}}''"
-    base = nom_minuscule
-    if plur:
-        base = entry.pluriel or f"{nom_minuscule}s"
-    return _majuscule(base) if maj else base
+        return f"''{{{{lang|en|{_capitalize(lowercase_name)}}}}}''"
+    base = lowercase_name
+    if plural:
+        base = entry.plural or f"{lowercase_name}s"
+    return _capitalize(base) if capitalize else base
 
 
-def _forme_lien(nom_minuscule: str, entry: RankEntry, maj: bool) -> str:
-    """Calcule un wikilien : bare [[Nom]] par défaut, ou [[Page|Nom]] si `page` diffère du nom
-    (redirection/désambiguïsation). Cas particulier des rangs invariants (non-classé) : pas de
-    page réelle, seulement un texte de substitution entouré de tirets cadratins. Cas particulier
-    des rangs `lang_en` : le texte affiché est l'emprunt anglais en italique ({{lang|en|...}}),
-    toujours lié à `page` (ex. [[Realm (virologie)|''{{lang|en|Realm}}'']])."""
+def _link_form(lowercase_name: str, entry: RankEntry, capitalize: bool) -> str:
+    """Compute a wikilink: [[Nom]], or [[Page|Nom]] if `page` differs.
+
+    Invariant ranks have no page, only placeholder text between dashes.
+    `lang_en` ranks link the italic English loan to `page`.
+    """
     if entry.invariant:
-        return f"— {nom_minuscule} —"
-    affiche = _forme_nom(nom_minuscule, entry, maj, plur=False)
+        return f"— {lowercase_name} —"
+    display = _name_form(lowercase_name, entry, capitalize, plural=False)
     if entry.page is None:
-        return f"[[{affiche}]]"
-    return f"[[{entry.page}|{affiche}]]"
+        return f"[[{display}]]"
+    return f"[[{entry.page}|{display}]]"
 
 
-# Italique systématique True partout SAUF pour les règnes suivants, où l'italique dépend du
-# rang (cf. wp_est_italique).
-DOMAINES_SANS_ITALIQUE_SYSTEMATIQUE: set[str] = {
+# Kingdoms where italics depend on the rank, see wp_is_italic.
+_DOMAINS_WITHOUT_SYSTEMATIC_ITALICS: set[str] = {
     "animal",
     "reptile",
     "amphibien",
@@ -116,209 +145,225 @@ DOMAINES_SANS_ITALIQUE_SYSTEMATIQUE: set[str] = {
 }
 
 
-def wp_rang_valide(rang: str | None, table: RankTable | None = None) -> bool:
+def wp_is_valid_rank(rank: str | None, table: RankTable | None = None) -> bool:
+    """Return True if `rang` is in the rank table."""
     table = table or load_rank_table()
-    return rang in table.ranks
+    return rank in table.ranks
 
 
-def wp_nom_rang(
-    rang: str | None, lien: bool, maj: bool, plur: bool, table: RankTable | None = None
-) -> str:
-    """Retourne le nom d'un rang selon les options : avec/sans wikilien, avec/sans
-    majuscule, au singulier/pluriel. Les formes sont calculées à partir du nom minuscule
-    canonique (clé YAML) et des irrégularités éventuelles, pas stockées telles quelles.
-    `rang=None` (rang non résolu par la source) suit le même repli "NOTFOUND" qu'un rang
-    inconnu de la table : `wp_rang_valide` le rejette via `in table.ranks`, sans distinction."""
+def wp_rank_name(
+    rank: str | None, link: bool, capitalize: bool, plural: bool, table: RankTable | None = None
+) -> str | None:
+    """Return the name of a rank for the given options.
+
+    `link` adds a wikilink, `capitalize` and `plural` do as named.
+    Unknown ranks and None give "NOTFOUND".
+    """
     table = table or load_rank_table()
-    if not wp_rang_valide(rang, table):
-        return "NOTFOUND"
-    assert rang is not None  # garanti par wp_rang_valide (une clé de dict n'est jamais None)
-    entry = table.ranks[rang]
-    if lien:
-        return _forme_lien(rang, entry, maj)
-    return _forme_nom(rang, entry, maj, plur)
+    if rank is None or not wp_is_valid_rank(rank, table):
+        return None
+    entry = table.ranks[rank]
+    if link:
+        return _link_form(rank, entry, capitalize)
+    return _name_form(rank, entry, capitalize, plural)
 
 
-def wp_un_rang(rang: str | None, table: RankTable | None = None) -> str:
+def wp_indefinite_rank(rank: str | None, table: RankTable | None = None) -> str | None:
+    """Return the indefinite article of a rank."""
     table = table or load_rank_table()
-    if not wp_rang_valide(rang, table):
-        return "NOTFOUND"
-    assert rang is not None
-    return "un " if table.ranks[rang].genre == "masculin" else "une "
+    if rank is None or not wp_is_valid_rank(rank, table):
+        return None
+    return "un " if table.ranks[rank].gender == "masculine" else "une "
 
 
-def wp_le_rang(rang: str | None, table: RankTable | None = None) -> str:
+def wp_definite_rank(rank: str | None, table: RankTable | None = None) -> str | None:
+    """Return the definite article of a rank."""
     table = table or load_rank_table()
-    if not wp_rang_valide(rang, table):
-        return "NOTFOUND"
-    assert rang is not None
-    if _commence_par_son_vocalique(rang):
+    if rank is None or not wp_is_valid_rank(rank, table):
+        return None
+    if _starts_with_vowel_sound(rank):
         return "l'"
-    return "le " if table.ranks[rang].genre == "masculin" else "la "
+    return "le " if table.ranks[rank].gender == "masculine" else "la "
 
 
-def wp_inf_rang(rang: str | None, table: RankTable | None = None) -> bool | str:
-    """Indique si le rang est inférieur au genre (au sens de « rang d'espèce ou en dessous »
-    utilisé par wp_est_italique — pas seulement < espèce)."""
+def wp_is_species_or_below(rank: str | None, table: RankTable | None = None) -> bool | None:
+    """Return whether the rank is species level or below.
+
+    Used by `wp_est_italique`. "NOTFOUND" if unknown.
+    """
     table = table or load_rank_table()
-    if not wp_rang_valide(rang, table):
-        return "NOTFOUND"
-    assert rang is not None
-    return table.ranks[rang].rang_inferieur_espece
+    if rank is None or not wp_is_valid_rank(rank, table):
+        return None
+    return table.ranks[rank].below_species
 
 
-def wp_rang_plus_specifique(
-    rang: str | None, reference: str | None, table: RankTable | None = None
+def wp_is_more_specific_rank(
+    rank: str | None, reference: str | None, table: RankTable | None = None
 ) -> bool:
-    """Indique si `rang` est plus spécifique (inférieur, au sens taxonomique) que `reference`,
-    selon l'ordre de `ranks.yaml` (du plus spécifique au plus large — l'ordre d'insertion du
-    dict `table.ranks` reflète l'ordre du fichier). Utilisé pour décider si un sous-taxon mérite
-    un wikilien par comparaison à son propre taxon plutôt qu'à un seuil absolu (voir
-    `sections.render_subtaxon_line`) : un rang absent de la table (donnée malformée ou non
-    résolue par la source, `None` compris) est considéré comme plus spécifique par défaut, pour
-    ne pas priver un sous-taxon légitime de son lien sur un cas qui ne devrait pas se présenter
-    en pratique."""
+    """Return True if `rang` is more specific than `reference`.
+
+    Follows the order of `ranks.yaml`, most specific first. A rank
+    absent from the table counts as more specific, so that no valid
+    sub-taxon loses its link.
+    """
     table = table or load_rank_table()
-    ordre = list(table.ranks)
-    if rang not in ordre or reference not in ordre:
+    order = list(table.ranks)
+    if rank not in order or reference not in order:
         return True
-    return ordre.index(rang) < ordre.index(reference)
+    return order.index(rank) < order.index(reference)
 
 
-def wp_est_infraspecifique(rang: str | None, table: RankTable | None = None) -> bool:
-    """Indique si `rang` est un rang infra-spécifique (sous-espèce, variété, forme, etc. —
-    strictement plus spécifique qu'espèce dans l'ordre de `ranks.yaml`). Ces taxons n'ont
-    presque jamais d'article dédié sur Wikipédia, d'où l'exclusion du wikilien dans
-    `sections.render_subtaxon_line` même quand le rang est plus spécifique que celui de
-    l'article courant. Ne pas confondre avec `rang_inferieur_espece` (utilisé par
-    `wp_est_italique`), qui couvre aussi le genre et en dessous."""
+def wp_is_infraspecific(rank: str | None, table: RankTable | None = None) -> bool:
+    """Return True if `rang` is strictly below species.
+
+    Such taxa rarely have an article, so they are not linked. Unlike
+    `below_species`, genus and above are excluded.
+    """
     table = table or load_rank_table()
-    if not wp_rang_valide(rang, table):
+    if not wp_is_valid_rank(rank, table):
         return False
-    return rang != "espèce" and wp_rang_plus_specifique(rang, "espèce", table)
+    return rank != "espèce" and wp_is_more_specific_rank(rank, "espèce", table)
 
 
-def wp_accorde_adjectif(
-    nom_adjectif: str, genre: Literal["masculin", "féminin"], plur: bool = False,
+def wp_agree_adjective(
+    adjective_name: str,
+    gender: Gender,
+    plural: bool = False,
     table: RankTable | None = None,
-) -> str:
-    """Accorde un adjectif de la table `adjectives` (ranks.yaml) en genre/nombre, et l'entoure
-    de son wikilien interne si `lien_interne` est vrai."""
+) -> str | None:
+    """Inflect an adjective of the table by gender and number.
+
+    Wrap it in its internal link if `internal_link`.
+    """
     table = table or load_rank_table()
-    entry = table.adjectives.get(nom_adjectif)
+    entry = table.adjectives.get(adjective_name)
     if entry is None:
-        return "NOTFOUND"
-    if genre == "masculin":
-        forme = entry.masculin_pluriel if plur else entry.masculin_singulier
+        return None
+    if gender == "masculine":
+        form = entry.masculine_plural if plural else entry.masculine_singular
     else:
-        forme = entry.feminin_pluriel if plur else entry.feminin_singulier
-    if entry.lien_interne:
-        return f"[[{entry.page}|{forme}]]"
-    return forme
+        form = entry.feminine_plural if plural else entry.feminine_singular
+    if entry.internal_link:
+        return f"[[{entry.page}|{form}]]"
+    return form
 
 
-def wp_eteint_rang(rang: str | None, table: RankTable | None = None) -> str:
+def wp_extinct_rank(rank: str | None, table: RankTable | None = None) -> str | None:
+    """Return "éteint" agreed with the rank."""
     table = table or load_rank_table()
-    if not wp_rang_valide(rang, table):
-        return "NOTFOUND"
-    assert rang is not None
-    return wp_accorde_adjectif("éteint", table.ranks[rang].genre, table=table)
+    if rank is None or not wp_is_valid_rank(rank, table):
+        return None
+    return wp_agree_adjective("éteint", table.ranks[rank].gender, table=table)
 
 
-def wp_est_italique(rang: str | None, regne: str, table: RankTable | None = None) -> bool:
-    """Italique systématique pour la plupart des règnes
-    (algue/archaea/bactérie/champignon/végétal/virus/procaryote/neutre), sinon dépend du
-    rang (italique seulement à partir du rang espèce et en dessous, comme en zoologie)."""
-    if regne not in DOMAINES_SANS_ITALIQUE_SYSTEMATIQUE:
+def wp_is_italic(rank: str | None, kingdom: str, table: RankTable | None = None) -> bool:
+    """Return True if the name is italicized.
+
+    Always, except for the kingdoms in
+    `_DOMAINS_WITHOUT_SYSTEMATIC_ITALICS`, where only species and
+    below are.
+    """
+    if kingdom not in _DOMAINS_WITHOUT_SYSTEMATIC_ITALICS:
         return True
-    inf = wp_inf_rang(rang, table)
-    return bool(inf) if inf != "NOTFOUND" else False
+    return bool(wp_is_species_or_below(rank, table))
 
 
-# Segments d'un nom scientifique qui doivent rester (ou passer) en italique séparément du nom
-# lui-même (abréviations de rang infraspécifique, marqueurs d'hybride, etc.). Le motif exclu
-# est remplacé par lui-même entouré de '' '' ; combiné à l'enveloppe '' '' globale posée par
-# `wp_met_italiques` sur tout le nom, ce doublement d'apostrophes bascule l'italique en romain
-# pour ce segment précis (et le réactive juste après).
+# Segments of a name italicized separately (infraspecific rank
+# abbreviations, hybrid markers). Each match is wrapped in two
+# apostrophes, which inside the global italic envelope toggles it to
+# roman for that segment only.
 _EXCLUSIONS: list[tuple[str, str]] = [
-    (r" cl[.]", " ''cl.''"), (r"convar[.]", "''convar.''"), (r"f[.]sp[.]", "''f.sp.''"),
-    (r" f[.]", " ''f.''"), (r" gen[.]", " ''gen.''"), (r"kl[.]", "''kl.''"),
-    (r"nothog[.]", "''nothog.''"), (r"nothosp[.]", "''nothosp.''"),
+    (r" cl[.]", " ''cl.''"),
+    (r"convar[.]", "''convar.''"),
+    (r"f[.]sp[.]", "''f.sp.''"),
+    (r" f[.]", " ''f.''"),
+    (r" gen[.]", " ''gen.''"),
+    (r"kl[.]", "''kl.''"),
+    (r"nothog[.]", "''nothog.''"),
+    (r"nothosp[.]", "''nothosp.''"),
     (r"nothovar[.]", "''nothovar.''"),
-    (r" ord[.]", " ''ord.''"), (r" fam[.]", " ''fam.''"), (r" sect[.]", " ''sect.''"),
-    (r" ser[.]", " ''ser.''"), (r" sp[.]", " ''sp.''"), (r"subg[.]", "''subg.''"),
-    (r"subsp[.]", "''subsp.''"), (r"Groupe", "''Groupe''"), (r" tr[.]", " ''tr.''"),
-    (r" var[.]", " ''var.''"), (r"×", "''×''"),
-    (r"pv", "''pv''"), (r"pathovar", "''pathovar''"), (r"morphovar", "''morphovar''"),
-    (r"phagovar", "''phagovar''"), (r"serovar", "''serovar''"), (r"chemovar", "''chemovar''"),
-    (r"cultivar", "''cultivar''"), (r"chemoform", "''chemoform''"), (r"chemotype", "''chemotype''"),
-    (r"morphotype", "''morphotype''"), (r"pathotype", "''pathotype''"),
+    (r" ord[.]", " ''ord.''"),
+    (r" fam[.]", " ''fam.''"),
+    (r" sect[.]", " ''sect.''"),
+    (r" ser[.]", " ''ser.''"),
+    (r" sp[.]", " ''sp.''"),
+    (r"subg[.]", "''subg.''"),
+    (r"subsp[.]", "''subsp.''"),
+    (r"Groupe", "''Groupe''"),
+    (r" tr[.]", " ''tr.''"),
+    (r" var[.]", " ''var.''"),
+    (r"×", "''×''"),
+    (r"pv", "''pv''"),
+    (r"pathovar", "''pathovar''"),
+    (r"morphovar", "''morphovar''"),
+    (r"phagovar", "''phagovar''"),
+    (r"serovar", "''serovar''"),
+    (r"chemovar", "''chemovar''"),
+    (r"cultivar", "''cultivar''"),
+    (r"chemoform", "''chemoform''"),
+    (r"chemotype", "''chemotype''"),
+    (r"morphotype", "''morphotype''"),
+    (r"pathotype", "''pathotype''"),
     (r"phagotype", "''phagotype''"),
-    (r"lysotype", "''lysotype''"), (r"phase", "''phase''"), (r"serotype", "''serotype''"),
-    (r"state", "''state''"), (r"forma specialis", "''forma specialis''"),
+    (r"lysotype", "''lysotype''"),
+    (r"phase", "''phase''"),
+    (r"serotype", "''serotype''"),
+    (r"state", "''state''"),
+    (r"forma specialis", "''forma specialis''"),
 ]
-# Frontière de fin en lookahead négatif (pas \b) : un point suivi d'un espace n'est pas une
-# frontière de mot ("." et " " sont tous deux non-alphanumériques), ce qui ferait échouer \b
-# sur l'immense majorité des motifs ci-dessus (ex. "var. macrocarpum").
+# Trailing negative lookahead instead of \b: a dot followed by a
+# space is not a word boundary (e.g. "var. macrocarpum").
 _EXCLUSIONS_COMPILED = [
     (re.compile(r"\b" + pattern + r"(?!\w)"), repl) for pattern, repl in _EXCLUSIONS
 ]
-# "(" et ")" n'ont pas de sémantique de mot : \b/(?!\w) échouent systématiquement dessus
-# (ex. "Genre (Sous-genre)" : "(" est précédée d'un espace et suivie d'une lettre, ni l'un
-# ni l'autre n'étant une frontière \b ou une fin (?!\w)), donc regex dédiées sans ce garde.
-_EXCLUSIONS_PARENTHESES_COMPILED = [
-    (re.compile(r"[(]"), "''(''"), (re.compile(r"[)]"), "'')''"),
-]
 
 
-def _sans_italique_vide(wikitexte: str) -> str:
-    """Une exclusion en toute fin de nom (ex. une parenthèse fermante finale) rouvre
-    l'italique juste avant que l'enveloppe globale `''...''` ne le referme aussitôt,
-    produisant une paire vide adjacente ("''''" : 4 apostrophes) que MediaWiki interprète
-    comme gras + apostrophe littérale au lieu d'un italique vide inoffensif. On la
-    supprime (en boucle, au cas où plusieurs paires vides se suivent)."""
-    while "''''" in wikitexte:
-        wikitexte = wikitexte.replace("''''", "")
-    return wikitexte
+def _without_empty_italics(wikitext: str) -> str:
+    """Remove empty italic pairs (four apostrophes) left by exclusions.
+
+    MediaWiki would read them as bold plus a literal apostrophe.
+    """
+    while "''''" in wikitext:
+        wikitext = wikitext.replace("''''", "")
+    return wikitext
 
 
-def wp_met_italiques(
+def wp_apply_italics(
     taxon: str,
-    rang: str | None,
-    regne: str,
-    lien: bool = False,
-    souslien: bool = True,
+    rank: str | None,
+    kingdom: str,
+    link: bool = False,
+    sublink: bool = True,
     table: RankTable | None = None,
 ) -> str:
-    """Génère en wikicode un nom scientifique avec gestion des italiques. Un `taxon` vide/None
-    est une erreur de programmation (ValueError) : ce n'est pas un cas qui peut arriver en
-    usage normal, et une exception explicite est préférable à un message d'erreur rendu
-    silencieusement dans l'article."""
-    if not taxon:
-        raise ValueError("wp_met_italiques() nécessite un 'taxon' non vide.")
+    """Return a scientific name as wikitext with italics handled.
 
-    if not wp_est_italique(rang, regne, table):
-        return f"[[{taxon}]]" if lien else taxon
+    Raise ValueError on an empty `taxon`: a programming error, better
+    than an error message silently rendered in the article.
+    """
+    if not taxon:
+        raise ValueError("wp_apply_italics() nécessite un 'taxon' non vide.")
+
+    if not wp_is_italic(rank, kingdom, table):
+        return f"[[{taxon}]]" if link else taxon
 
     ref = taxon
-    modifie = taxon
+    modified = taxon
     for pattern, repl in _EXCLUSIONS_COMPILED:
-        modifie = pattern.sub(repl, modifie)
-    for pattern, repl in _EXCLUSIONS_PARENTHESES_COMPILED:
-        modifie = pattern.sub(repl, modifie)
+        modified = pattern.sub(repl, modified)
 
-    if modifie == ref:
-        if lien:
+    if modified == ref:
+        if link:
             return f"''[[{taxon}]]''"
-        return f"''{taxon}''" if souslien else taxon
+        return f"''{taxon}''" if sublink else taxon
 
-    if lien:
-        return _sans_italique_vide(f"[[{ref}|''{modifie}'']]")
-    return _sans_italique_vide(f"''{modifie}''") if souslien else modifie
+    if link:
+        return _without_empty_italics(f"[[{ref}|''{modified}'']]")
+    return _without_empty_italics(f"''{modified}''") if sublink else modified
 
 
-# Tables associatives par règne (liens vers les pages de convention Wikipédia).
-LIEN_AUTEURS: dict[str, str] = {
+# Per-kingdom tables (links to Wikipedia convention pages).
+_AUTHOR_LINKS: dict[str, str] = {
     "algue": "Citation d'auteurs en botanique",
     "animal": "Citation d'auteurs en zoologie",
     "reptile": "Citation d'auteurs en zoologie",
@@ -335,11 +380,12 @@ LIEN_AUTEURS: dict[str, str] = {
 }
 
 
-def lien_pour_auteur(regne: str) -> str:
-    return LIEN_AUTEURS.get(regne, "Auteur#Dans les sciences et techniques")
+def link_for_author(kingdom: str) -> str:
+    """Return the author-citation page for a kingdom."""
+    return _AUTHOR_LINKS.get(kingdom, "Auteur#Dans les sciences et techniques")
 
 
-LIEN_BASIONYME: dict[str, str] = {
+_BASIONYM_LINKS: dict[str, str] = {
     "algue": "[[basionyme]]",
     "animal": "[[protonyme]]",
     "reptile": "[[protonyme]]",
@@ -356,11 +402,12 @@ LIEN_BASIONYME: dict[str, str] = {
 }
 
 
-def lien_pour_basionyme(regne: str) -> str:
-    return LIEN_BASIONYME.get(regne, "[[basionyme]]")
+def link_for_basionym(kingdom: str) -> str:
+    """Return the basionym wikilink for a kingdom."""
+    return _BASIONYM_LINKS.get(kingdom, "[[basionyme]]")
 
 
-CATEGORIE_PAR_REGNE: dict[str, str] = {
+CATEGORY_BY_KINGDOM: dict[str, str] = {
     "algue": "Algue (nom scientifique)",
     "animal": "Animal (nom scientifique)",
     "reptile": "Animal (nom scientifique)",
@@ -376,7 +423,7 @@ CATEGORIE_PAR_REGNE: dict[str, str] = {
     "procaryote": "",
 }
 
-SYNONYME_PAR_REGNE: dict[str, str] = {
+_SYNONYM_BY_KINGDOM: dict[str, str] = {
     "algue": "Synonyme (taxinomie)",
     "animal": "Synonyme (zoologie)",
     "reptile": "Synonyme (zoologie)",
@@ -393,11 +440,12 @@ SYNONYME_PAR_REGNE: dict[str, str] = {
 }
 
 
-def lien_pour_synonyme(regne: str) -> str:
-    return SYNONYME_PAR_REGNE.get(regne, "Synonyme (taxinomie)")
+def link_for_synonym(kingdom: str) -> str:
+    """Return the synonym page for a kingdom."""
+    return _SYNONYM_BY_KINGDOM.get(kingdom, "Synonyme (taxinomie)")
 
 
-EBAUCHE_PAR_REGNE: dict[str, str] = {
+STUB_BY_KINGDOM: dict[str, str] = {
     "algue": "algue",
     "animal": "zoologie",
     "reptile": "reptile",

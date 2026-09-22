@@ -1,18 +1,9 @@
-"""Lecture et validation de la page wiki listant les utilisateurs autorisés à déclencher une
-édition par le compte bot dédié.
+"""Read the wiki page listing users allowed to trigger bot edits.
 
-Format de page attendu (JSON, ex. `Wikipédia:Projet:Biologie/Taxobot/user.json` — chemin réel de
-page wiki, pas un identifiant du logiciel : garder « Taxobot » ici tant que la page/décision
-communautaire correspondante n'a pas de nom définitif, voir `AuthSettings.permission_page_title`) :
-
-    {"authorized_users": ["Utilisateur1", "Utilisateur2"]}
-
-Fail-closed strict, sans exception : toute erreur réseau, page manquante, ou contenu qui n'est
-pas un JSON valide de cette forme précise entraîne une liste d'autorisation VIDE, jamais une
-liste héritée d'un cache précédent ni une interprétation permissive (la page de permission est
-elle-même une cible d'escalade de privilège, et une page wiki reste éditable par erreur). Cette
-page elle-même doit être protégée en écriture par un administrateur frwiki avant mise en service
-réelle (prérequis humain, non traité par ce module).
+Page content is JSON: {"authorized_users": ["User1", "User2"]}.
+Strictly fail-closed: any network error, missing page or invalid
+content yields an empty list, never a stale cache. The page itself
+must be write-protected by a frwiki administrator.
 """
 
 from __future__ import annotations
@@ -24,41 +15,42 @@ import time
 
 import httpx
 
+from organon.core.http import USER_AGENT, OwnedClientMixin
+
 logger = logging.getLogger(__name__)
 
 
-class WikiPermissionChecker:
+class WikiPermissionChecker(OwnedClientMixin):
+    """Check usernames against the cached permission page."""
+
     def __init__(
         self,
         *,
         api_url: str,
         page_title: str,
         ttl_seconds: float = 300.0,
-        user_agent: str = "Organon/0.1 (permission-check)",
+        user_agent: str = USER_AGENT,
         client: httpx.AsyncClient | None = None,
     ) -> None:
+        """Configure the page to read and the cache TTL."""
         self._api_url = api_url
         self._page_title = page_title
         self._ttl_seconds = ttl_seconds
-        self._client = client or httpx.AsyncClient(timeout=15.0, headers={"User-Agent": user_agent})
-        self._owns_client = client is None
+        super().__init__(client, timeout=15.0, headers={"User-Agent": user_agent})
         self._cached_users: frozenset[str] = frozenset()
         self._cached_at: float | None = None
         self._refresh_lock = asyncio.Lock()
 
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
-
     async def is_authorized(self, username: str) -> bool:
+        """Return True if `username` is on the permission page."""
         users = await self._authorized_users()
-        return _normalize_username(username) in users
+        return normalize_username(username) in users
 
     async def _authorized_users(self) -> frozenset[str]:
         if self._cache_valid():
             return self._cached_users
         async with self._refresh_lock:
-            # Un autre appel a pu rafraîchir le cache pendant l'attente du verrou.
+            # Another call may have refreshed the cache while waiting.
             if self._cache_valid():
                 return self._cached_users
             self._cached_users = await self._fetch_authorized_users()
@@ -117,11 +109,10 @@ def _parse_authorized_users(payload: dict, *, page_title: str) -> frozenset[str]
         )
         return frozenset()
 
-    return frozenset(_normalize_username(u) for u in users)
+    return frozenset(normalize_username(u) for u in users)
 
 
-def _normalize_username(username: str) -> str:
-    """Normalise selon la convention MediaWiki (première lettre en majuscule, underscores
-    équivalents à des espaces) pour que la comparaison ne dépende pas du format exact saisi."""
+def normalize_username(username: str) -> str:
+    """Normalize per MediaWiki: capitalized, underscores as spaces."""
     username = username.strip().replace("_", " ")
     return username[:1].upper() + username[1:] if username else username

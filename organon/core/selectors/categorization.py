@@ -1,18 +1,19 @@
-"""Calcul de l'ébauche et des portails/catégories, en s'appuyant sur le moteur de règles sûr
-de `organon.core.selectors.engine` plutôt que sur `eval()`. Ce calcul n'appelle aucune API
-tierce — c'est une simple dérivation à partir de `Struct` déjà résolu — donc il vit ici plutôt
-que dans `organon.modules.*` : "fin"/"externe" sont des pseudo-modules internes, pas des
-adaptateurs de base tierce."""
+"""Compute the stub and the portals and categories.
+
+Uses the safe rule engine of `organon.core.selectors.engine`, no
+`eval()`. Pure derivation from a resolved `Struct`, with no
+third-party call, so it lives here and not in `organon.modules`.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
-from organon.core.rendering.grammar import CATEGORIE_PAR_REGNE, EBAUCHE_PAR_REGNE
-from organon.core.rendering.sections import RANGS_CATEGORIE_HOMONYME
+from organon.core.models import LinkEntry, Struct
+from organon.core.rendering.grammar import CATEGORY_BY_KINGDOM
+from organon.core.rendering.sections import selected_homonym_category
 from organon.core.selectors.engine import evaluate_ruleset
 
-_PORTAIL_PAR_REGNE: dict[str, str] = {
+_PORTAL_BY_KINGDOM: dict[str, str] = {
     "animal": "zoologie",
     "végétal": "botanique",
     "champignon": "mycologie",
@@ -24,57 +25,51 @@ _PORTAIL_PAR_REGNE: dict[str, str] = {
     "bactérie": "microbiologie",
     "protiste": "microbiologie",
 }
-_PORTAIL_DEFAUT = "biologie"
+_DEFAULT_PORTAL = "biologie"
 
 
-def wp_ebauche(struct: Struct, options: GenerateOptions) -> list[str]:
-    """Essaie d'abord les règles (ebauches.yaml/.local.yaml), sinon retombe sur la table par
-    règne."""
-    if options.selecteurs:
-        ret = evaluate_ruleset("ebauches", struct)
-        if ret is not None:
-            return ret
-    if struct.regne in EBAUCHE_PAR_REGNE:
-        return [EBAUCHE_PAR_REGNE[struct.regne]]
-    return []
-
-
-def lien_pour_categorie(struct: Struct, options: GenerateOptions) -> list[str] | None:
-    if options.selecteurs:
+def link_for_category(struct: Struct, options: GenerateOptions) -> list[str] | None:
+    """Return the categories from the rules, else the kingdom table."""
+    if options.selectors:
         ret = evaluate_ruleset("categories", struct)
         if ret is not None:
             return ret
-    if struct.regne in CATEGORIE_PAR_REGNE and CATEGORIE_PAR_REGNE[struct.regne]:
-        return [CATEGORIE_PAR_REGNE[struct.regne]]
+    if struct.kingdom in CATEGORY_BY_KINGDOM and CATEGORY_BY_KINGDOM[struct.kingdom]:
+        return [CATEGORY_BY_KINGDOM[struct.kingdom]]
     return None
 
 
-def lien_pour_portail(
-    portail_defaut: str, struct: Struct, options: GenerateOptions
+def link_for_portal(
+    default_portal: str, struct: Struct, options: GenerateOptions
 ) -> list[str] | None:
-    if options.selecteurs:
+    """Return the portals from the rules, else the wikimedia ones."""
+    if options.selectors:
         ret = evaluate_ruleset("portails", struct)
         if ret is not None:
             return ret
-        dynamique = struct.liens.get("wikimedia", {}).get("wikipedia", {}).get("portails")
-        if dynamique:
-            return dynamique
+        dynamic = struct.links.get("wikimedia", {}).get("wikipedia", {}).get("portals")
+        if dynamic:
+            return dynamic
     return None
 
 
-def compute_fin_liens(struct: Struct, options: GenerateOptions) -> dict[str, list[str]]:
-    """Calcule le contenu de struct.liens['fin'] (portails + catégories), sans l'assigner
-    directement : l'appelant (orchestration de génération, voir
-    `organon.api.routes.generate`) est responsable de l'assignation, pour éviter de muter
-    `Struct` par effet de bord caché à travers le pipeline."""
-    portail_defaut = _PORTAIL_PAR_REGNE.get(struct.regne, _PORTAIL_DEFAUT)
-    portails = lien_pour_portail(portail_defaut, struct, options) or [portail_defaut]
+def compute_footer_links(struct: Struct, options: GenerateOptions) -> LinkEntry:
+    """Compute the content of `struct.liens['fin']`.
 
-    categories = [r.nom for r in struct.rangs if r.rang == "famille"]
-    categories.extend(lien_pour_categorie(struct, options) or [])
+    Returns portals and categories without assigning them, so the
+    caller owns the mutation of `Struct`.
+    """
+    default_portal = _PORTAL_BY_KINGDOM.get(struct.kingdom, _DEFAULT_PORTAL)
+    portals = link_for_portal(default_portal, struct, options) or [default_portal]
 
-    if struct.taxon.rang in RANGS_CATEGORIE_HOMONYME:
-        categories.append(f"{struct.taxon.nom}|{options.cle_categorie_homonyme}")
+    categories = [r.name for r in struct.ranks if r.rank == "famille"]
+    categories.extend(link_for_category(struct, options) or [])
+
+    homonym = selected_homonym_category(struct)
+    if homonym == struct.taxon.name:
+        categories.append(f"{homonym}|{options.homonym_category_key}")
+    elif homonym:
+        categories.append(homonym)
     categories.sort()
 
-    return {"portails": portails, "categories": categories}
+    return {"portals": portals, "categories": categories}

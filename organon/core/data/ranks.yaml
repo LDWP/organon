@@ -1,9 +1,9 @@
 # Données grammaticales par rang taxonomique, réduites aux primitives non dérivables :
-# genre (masculin/féminin), rang_inferieur_espece (voir wp_est_italique), et deux
+# gender (masculine/feminine), below_species (voir wp_est_italique), et deux
 # irrégularités explicites quand elles s'écartent des règles par défaut :
 #   - page : titre de la page wiki cible, uniquement si différent du nom capitalisé
 #     (lien auto-généré vers [[Nom]] / [[nom]] sinon) ;
-#   - pluriel : forme irrégulière, uniquement si différente de nom + 's' ;
+#   - plural : forme irrégulière, uniquement si différente de nom + 's' ;
 #   - invariant : rang pseudo-taxonomique (non-classé) sans majuscule/lien/pluriel réels.
 # Tout le reste (majuscule, wikiliens, articles un/une/le/la/l', accord de l'adjectif
 # « éteint ») est calculé par organon/core/rendering/grammar.py à partir de ces primitives
@@ -18,274 +18,274 @@
 
 ranks:
   clade:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   type:
-    genre: masculin
+    gender: masculine
     page: Classification des virus
-    rang_inferieur_espece: false
+    below_species: false
   groupe:
-    genre: masculin
+    gender: masculine
     page: Classification des virus#Classification par type de génome
-    rang_inferieur_espece: false
+    below_species: false
   non-classé:
-    genre: masculin
+    gender: masculine
     invariant: true
-    rang_inferieur_espece: false
+    below_species: false
   sous-forme:
-    genre: féminin
+    gender: feminine
     page: Forme (botanique)
-    rang_inferieur_espece: true
+    below_species: true
   forme:
-    genre: féminin
+    gender: feminine
     page: Forme (botanique)
-    rang_inferieur_espece: true
+    below_species: true
   variété:
-    genre: féminin
+    gender: feminine
     page: Variété (botanique)
-    rang_inferieur_espece: true
+    below_species: true
   pathovar:
-    genre: masculin
-    rang_inferieur_espece: true
+    gender: masculine
+    below_species: true
   cultivar:
-    genre: masculin
-    rang_inferieur_espece: true
+    gender: masculine
+    below_species: true
   sous-espèce:
-    genre: féminin
-    rang_inferieur_espece: true
+    gender: feminine
+    below_species: true
   hybride:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   espèce:
-    genre: féminin
-    rang_inferieur_espece: true
+    gender: feminine
+    below_species: true
   sous-série:
-    genre: féminin
+    gender: feminine
     page: Série (biologie)
-    rang_inferieur_espece: true
+    below_species: true
   série:
-    genre: féminin
+    gender: feminine
     page: Série (biologie)
-    rang_inferieur_espece: true
+    below_species: true
   sous-section:
-    genre: féminin
+    gender: feminine
     page: Section (biologie)
-    rang_inferieur_espece: true
+    below_species: true
   section:
-    genre: féminin
+    gender: feminine
     page: Section (biologie)
-    rang_inferieur_espece: true
+    below_species: true
   sous-genre:
-    genre: masculin
+    gender: masculine
     page: Sous-genre (biologie)
-    rang_inferieur_espece: true
+    below_species: true
   genre:
-    genre: masculin
+    gender: masculine
     page: Genre (biologie)
-    rang_inferieur_espece: true
+    below_species: true
   sous-tribu:
-    genre: féminin
+    gender: feminine
     page: Tribu (biologie)
-    pluriel: Sous-tribus
-    rang_inferieur_espece: false
+    plural: Sous-tribus
+    below_species: false
   tribu:
-    genre: féminin
+    gender: feminine
     page: Tribu (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-tribu:
-    genre: féminin
+    gender: feminine
     page: Tribu (biologie)
-    pluriel: super-tribu
-    rang_inferieur_espece: false
+    plural: super-tribu
+    below_species: false
   infra-tribu:
-    genre: féminin
+    gender: feminine
     page: Tribu (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   sous-famille:
-    genre: féminin
+    gender: feminine
     page: Sous-famille (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   famille:
-    genre: féminin
+    gender: feminine
     page: Famille (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   épifamille:
-    genre: féminin
+    gender: feminine
     page: Famille (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-famille:
-    genre: féminin
+    gender: feminine
     page: Super-famille (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   micro-ordre:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   infra-ordre:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   sous-ordre:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   ordre:
-    genre: masculin
+    gender: masculine
     page: Ordre (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-ordre:
-    genre: masculin
+    gender: masculine
     page: Super-ordre (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   sous-cohorte:
-    genre: féminin
+    gender: feminine
     page: Cohorte (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   cohorte:
-    genre: féminin
+    gender: feminine
     page: Cohorte (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-cohorte:
-    genre: féminin
+    gender: feminine
     page: Cohorte (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   subter-classe:
-    genre: féminin
-    rang_inferieur_espece: false
+    gender: feminine
+    below_species: false
   infra-classe:
-    genre: féminin
-    rang_inferieur_espece: false
+    gender: feminine
+    below_species: false
   sous-classe:
-    genre: féminin
+    gender: feminine
     page: Sous-classe (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   classe:
-    genre: féminin
+    gender: feminine
     page: Classe (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-classe:
-    genre: féminin
+    gender: feminine
     page: Super-classe (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   sous-phylum:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   phylum:
-    genre: masculin
+    gender: masculine
     page: phylum
-    pluriel: phylum
-    rang_inferieur_espece: false
+    plural: phylum
+    below_species: false
   kingdom:
-    genre: masculin
+    gender: masculine
     page: Kingdom (biologie)
-    pluriel: kingdom
-    rang_inferieur_espece: false
+    plural: kingdom
+    below_species: false
   sous-royaume:
-    genre: masculin
+    gender: masculine
     page: Royaume (virologie)
-    rang_inferieur_espece: false
+    below_species: false
   royaume:
-    genre: masculin
+    gender: masculine
     page: Royaume (virologie)
-    rang_inferieur_espece: false
+    below_species: false
   micro-embranchement:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   infra-embranchement:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   sous-embranchement:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   embranchement:
-    genre: masculin
+    gender: masculine
     page: Embranchement (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-embranchement:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   infra-division:
-    genre: féminin
+    gender: feminine
     page: Division (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   sous-division:
-    genre: féminin
-    rang_inferieur_espece: false
+    gender: feminine
+    below_species: false
   division:
-    genre: féminin
+    gender: feminine
     page: Division (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-division:
-    genre: féminin
+    gender: feminine
     page: Division (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   infra-règne:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   rameau:
-    genre: masculin
+    gender: masculine
     page: Rameau (biologie)
-    pluriel: rameaux
-    rang_inferieur_espece: false
+    plural: rameaux
+    below_species: false
   sous-règne:
-    genre: masculin
-    rang_inferieur_espece: false
+    gender: masculine
+    below_species: false
   règne:
-    genre: masculin
+    gender: masculine
     page: Règne (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-règne:
-    genre: masculin
+    gender: masculine
     page: Règne (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   sous-domaine:
-    genre: masculin
+    gender: masculine
     page: Sous-domaine (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   domaine:
-    genre: masculin
+    gender: masculine
     page: Domaine (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   super-domaine:
-    genre: masculin
+    gender: masculine
     page: Domaine (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   empire:
-    genre: masculin
+    gender: masculine
     page: Domaine (biologie)
-    rang_inferieur_espece: false
+    below_species: false
   subrealm:
-    genre: masculin
+    gender: masculine
     page: Realm (virologie)
     lang_en: true
-    rang_inferieur_espece: false
+    below_species: false
   realm:
-    genre: masculin
+    gender: masculine
     page: Realm (virologie)
     lang_en: true
-    rang_inferieur_espece: false
+    below_species: false
 adjectives:
   éteint:
-    masculin_singulier: éteint
-    feminin_singulier: éteinte
-    neutre_singulier: éteint
-    masculin_pluriel: éteints
-    feminin_pluriel: éteintes
-    neutre_pluriel: éteints
-    lien_interne: true
+    masculine_singular: éteint
+    feminine_singular: éteinte
+    neutral_singular: éteint
+    masculine_plural: éteints
+    feminine_plural: éteintes
+    neutral_plural: éteints
+    internal_link: true
     page: Extinction des espèces
   monospécifique:
-    masculin_singulier: monospécifique
-    feminin_singulier: monospécifique
-    neutre_singulier: monospécifique
-    masculin_pluriel: monospécifiques
-    feminin_pluriel: monospécifiques
-    neutre_pluriel: monospécifiques
-    lien_interne: true
+    masculine_singular: monospécifique
+    feminine_singular: monospécifique
+    neutral_singular: monospécifique
+    masculine_plural: monospécifiques
+    feminine_plural: monospécifiques
+    neutral_plural: monospécifiques
+    internal_link: true
     page: Taxon monospécifique
   cosmopolite:
-    masculin_singulier: cosmopolite
-    feminin_singulier: cosmopolite
-    neutre_singulier: cosmopolite
-    masculin_pluriel: cosmopolites
-    feminin_pluriel: cosmopolites
-    neutre_pluriel: cosmopolites
-    lien_interne: true
+    masculine_singular: cosmopolite
+    feminine_singular: cosmopolite
+    neutral_singular: cosmopolite
+    masculine_plural: cosmopolites
+    feminine_plural: cosmopolites
+    neutral_plural: cosmopolites
+    internal_link: true
     page: Répartition cosmopolite

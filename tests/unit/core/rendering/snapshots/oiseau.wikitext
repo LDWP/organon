@@ -1,0 +1,31 @@
+{{ébauche|oiseau}}
+{{Taxobox début | oiseau | ''Turdus merula'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | classe | Aves }}
+{{Taxobox | ordre | Passeriformes }}
+{{Taxobox | famille | Turdidae }}
+{{Taxobox | genre | Turdus }}
+{{Taxobox taxon | oiseau | espèce | Turdus merula | Linnaeus, 1758 }}
+{{Taxobox fin}}
+'''''Turdus merula''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Turdidae]]''.
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+{{Section vide ou incomplète}}
+
+== Systématique ==
+Le [[nom valide]] complet (avec [[Auteur#Dans les sciences et techniques|auteur]]) de ce taxon est ''Turdus merula'' Linnaeus, 1758{{Bioref|coi_ioc|<DATE>|ref}}.
+
+Ce taxon porte en français le [[nom vernaculaire]] ou [[nom normalisé|normalisé]] suivant : Merle noir{{Bioref|coi_ioc|<DATE>|ref}}.
+
+== Liens externes ==
+* {{COI | thrushes | ''Turdus merula'' Linnaeus, 1758 | consulté le=<DATE> }}
+
+== Notes et références ==
+{{références}}
+
+{{Portail|biologie}}
+
+[[Catégorie:Catégorie test]]

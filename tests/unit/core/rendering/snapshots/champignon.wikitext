@@ -1,0 +1,32 @@
+{{ébauche|champignon}}
+{{Taxobox début | champignon | ''Amanita muscaria'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}
+{{Taxobox | division | Basidiomycota }}
+{{Taxobox | classe | Agaricomycetes }}
+{{Taxobox | ordre | Agaricales }}
+{{Taxobox | famille | Amanitaceae }}
+{{Taxobox | genre | Amanita }}
+{{Taxobox taxon | champignon | espèce | Amanita muscaria | (L.) Lam. }}
+{{Taxobox fin}}
+'''''Amanita muscaria''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Amanitaceae]]''.
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+{{Section vide ou incomplète}}
+
+== Systématique ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Amanita muscaria'' (L.) Lam.{{Bioref|indexfungorum|<DATE>|ref}}.
+L'espèce a été initialement classée dans le genre ''[[Agaricus]]'' sous le [[basionyme]] ''Agaricus muscarius'' L.{{Bioref|indexfungorum|<DATE>|ref}}.
+
+Ce taxon porte en français le [[nom vernaculaire]] ou [[nom normalisé|normalisé]] suivant : Amanite tue-mouches{{Bioref|telametro|<DATE>|ref}}.
+
+== Liens externes ==
+* {{Fungorum espèce | 190449 | Amanita muscaria | (L.) Lam. | consulté le=<DATE> }}
+
+== Notes et références ==
+{{références}}
+
+{{Portail|biologie}}
+
+[[Catégorie:Catégorie test]]

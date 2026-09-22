@@ -1,41 +1,24 @@
-"""Options de génération d'un article.
+"""Per-article generation options.
 
-Un seul modèle Pydantic sert de schéma de requête API (`organon.api.schemas`), de base pour
-les options de la CLI (`organon.cli.main`) et de champs du formulaire web — une seule liste
-à maintenir plutôt que trois copies séparées.
-
-`taxon` n'est volontairement pas ici : c'est un paramètre à part de la requête de génération
-(voir `GenerateRequest` dans `organon.api.schemas`), pas une "option". De même, `debug`,
-`debugc`, `liste`, `help`, `version` ne sont pas des options de génération : ce sont des
-préoccupations CLI/endpoints séparées (les logs sont toujours renvoyés dans la réponse,
-`--list-modules`/`GET /api/v1/modules` liste les modules, etc.).
+One Pydantic model serves as the API request schema, the CLI options
+and the web form fields. `taxon` and CLI-only flags are not options.
 """
 
 from __future__ import annotations
 
-from typing import Literal
-
 from pydantic import BaseModel, Field
-
-AuteursMode = Literal["s", "n", "n1"]
 
 
 class GenerateOptions(BaseModel):
+    """Options controlling the generation of one article."""
+
     classification: str = Field(
         default="",
         description="La classification à utiliser (vide pour laisser le programme choisir)",
     )
-    domaine: str = Field(
+    domain: str = Field(
         default="*",
         description="Le domaine du vivant du taxon, utilisé pour filtrer les sources utilisées",
-    )
-    force_regne: str = Field(
-        default="",
-        description="Force le règne (charte). Utile uniquement avec 'juste_ext'.",
-    )
-    force_rang: str = Field(
-        default="",
-        description="Force le rang. Utile uniquement avec 'juste_ext'.",
     )
     gbif_key: int | None = Field(
         default=None,
@@ -46,48 +29,38 @@ class GenerateOptions(BaseModel):
         ),
     )
 
-    auteurs: AuteursMode = Field(
-        default="n",
-        description=(
-            "Mode de traitement des auteurs : s=standard, n=nouveau, n1=nouveau+ajout "
-            "réponse unique"
-        ),
-    )
-    auteur_source: str | None = Field(
+    author_source: str | None = Field(
         default=None,
         description=(
-            "Identifiant du module à retenir pour l'auteur du taxon (ex. \"itis\"), au lieu du "
-            "vote majoritaire entre modules (voir `_auteur_majoritaire`) — utile quand un module "
+            'Identifiant du module à retenir pour l\'auteur du taxon (ex. "itis"), au lieu du '
+            "vote majoritaire entre modules (voir `_majority_author`) — utile quand un module "
             "rapporte une citation d'auteur plus complète que les autres (ex. GBIF/WoRMS tronqués "
             "face à ITIS sur un genre donné). Ignoré si absent des candidats de "
-            "`GenerateResponse.auteur_candidats`."
+            "`GenerateResponse.author_candidates`."
         ),
     )
 
-    liens_synonymes: bool = Field(
+    synonym_links: bool = Field(
         default=True, description="Ajouter des wikiliens autour des synonymes"
     )
-    liens_inf_sp: bool = Field(
+    infraspecific_links: bool = Field(
         default=False, description="Ajouter des wikiliens pour les taxons inférieurs à l'espèce"
     )
-    suivre_synonymes: bool = Field(
+    follow_synonyms: bool = Field(
         default=True,
         description=(
             "Si la classification indique que le taxon demandé est un synonyme, traiter la cible"
         ),
     )
-    trier_synonymes: bool = Field(
+    sort_synonyms: bool = Field(
         default=True,
         description="Trier les synonymes par ordre alphabétique plutôt que l'ordre de la source",
     )
-    inclure_invalides: bool = Field(
-        default=False, description="Inclure dans les liens externes les taxons invalides trouvés"
-    )
-    juste_ext: bool = Field(
+    external_only: bool = Field(
         default=False,
         description="Ne déterminer que les liens externes (les données peuvent être incohérentes)",
     )
-    selecteurs: bool = Field(
+    selectors: bool = Field(
         default=True,
         description=(
             "Autorise l'utilisation des règles de définition des ébauches/catégories/portails"
@@ -96,14 +69,10 @@ class GenerateOptions(BaseModel):
     plan: bool = Field(
         default=False, description="Générer un plan-type même quand il n'y a pas d'information"
     )
-    article: bool = Field(
-        default=False, description="Ne générer que le texte de l'article, rien d'autre"
-    )
-
-    seuil_colonnes: int = Field(
+    column_threshold: int = Field(
         default=25, description="Nombre-seuil d'éléments dans une liste avant mise en colonnes"
     )
-    limite_listes: int = Field(
+    list_limit: int = Field(
         default=-1,
         description=(
             "Nombre maximum d'éléments dans les listes (sous-taxons, synonymes) ; "
@@ -117,7 +86,6 @@ class GenerateOptions(BaseModel):
     off: list[str] = Field(
         default_factory=list, description="Identifiants des modules à désactiver"
     )
-    ua: str = Field(default="", description="User-Agent personnalisé pour les requêtes HTTP")
 
     marine_only: bool = Field(
         default=False,
@@ -127,11 +95,11 @@ class GenerateOptions(BaseModel):
         ),
     )
 
-    cle_categorie_homonyme: str = Field(
+    homonym_category_key: str = Field(
         default="*",
         description=(
             "Clé de tri de la catégorie homonyme ajoutée pour les taxons de rang embranchement/"
             "classe/ordre/famille (ex. [[Catégorie:Bovidae|*]]) — voir "
-            "organon.core.selectors.categorization.compute_fin_liens."
+            "organon.core.selectors.categorization.compute_footer_links."
         ),
     )

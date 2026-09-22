@@ -1,0 +1,182 @@
+{
+  "author_candidates": {
+    "gbif": "(Linnaeus, 1758)",
+    "wrms": "(Linnaeus, 1758)"
+  },
+  "basionym": {
+    "author": "Linnaeus, 1758",
+    "name": "Felis leo",
+    "source": "gbif"
+  },
+  "classification_taxobox": "biologique",
+  "consolidated_author": "(Linnaeus, 1758)",
+  "data_found": {
+    "gbif": [
+      "Classification",
+      "Taxons inférieurs",
+      "Synonymes",
+      "Basionyme",
+      "Taxon type",
+      "Étymologie",
+      "Répartition",
+      "Noms vernaculaires",
+      "Auteur"
+    ],
+    "wrms": [
+      "Auteur"
+    ]
+  },
+  "distribution": {
+    "gbif": [
+      "[[Kenya]]",
+      "[[Tanzanie]]"
+    ]
+  },
+  "distribution_entries": {
+    "gbif": {
+      "certain": {
+        "KE": "KE"
+      },
+      "extinct": {},
+      "introduced": {},
+      "uncertain": {
+        "TZ": "TZ"
+      }
+    }
+  },
+  "elapsed_seconds": 0,
+  "external_ids": {
+    "gbif": "5219404",
+    "gbif_key": "5219404",
+    "iucn": "15951",
+    "wrms": "1"
+  },
+  "external_links": [
+    {
+      "html": "<a href='https://www.gbif.org/taxon/5219404' target='_blank' rel='noopener noreferrer'>GBIF</a>",
+      "module_id": "gbif"
+    },
+    {
+      "html": "<a href='https://iucnredlist.org/15951' target='_blank' rel='noopener noreferrer'>UICN</a>",
+      "module_id": "iucn"
+    },
+    {
+      "html": "<a href='https://www.marinespecies.org/aphia.php?p=taxdetails&id=1' target='_blank' rel='noopener noreferrer'>WRMS</a>",
+      "module_id": "wrms"
+    }
+  ],
+  "extinct": false,
+  "habitat": "terrestre",
+  "iucn_criterion": "A2abcd",
+  "iucn_status": "VU",
+  "kingdom": "animal",
+  "kingdom_inconsistencies": [],
+  "logs": [],
+  "other_names": {
+    "Recommandé ou typique": [
+      "Lion royal"
+    ]
+  },
+  "rank_inconsistencies": [],
+  "rank_lines": [
+    {
+      "line": "{{Taxobox | genre | Panthera }}",
+      "name": "Panthera",
+      "rank": "genre"
+    },
+    {
+      "line": "{{Taxobox | famille | Felidae }}",
+      "name": "Felidae",
+      "rank": "famille"
+    },
+    {
+      "line": "{{Taxobox | ordre | Carnivora }}",
+      "name": "Carnivora",
+      "rank": "ordre"
+    },
+    {
+      "line": "{{Taxobox | classe | Mammalia }}",
+      "name": "Mammalia",
+      "rank": "classe"
+    },
+    {
+      "line": "{{Taxobox | embranchement | Chordata }}",
+      "name": "Chordata",
+      "rank": "embranchement"
+    }
+  ],
+  "reference_items": [
+    {
+      "default_checked": true,
+      "module_id": "gbif",
+      "wikitext": "{{GBIF | 5219404 | ''Panthera leo'' (Linnaeus, 1758) | consulté le=<DATE> }}"
+    },
+    {
+      "default_checked": true,
+      "module_id": "iucn",
+      "wikitext": "{{UICN | 15951 | ''Panthera leo'' | consulté le=<DATE> }}"
+    },
+    {
+      "default_checked": true,
+      "module_id": "wrms",
+      "wikitext": "{{WRMS espèce | 1 | Panthera leo | (Linnaeus, 1758) | consulté le=<DATE>}}"
+    }
+  ],
+  "references_wikitext": "* {{GBIF | 5219404 | ''Panthera leo'' (Linnaeus, 1758) | consulté le=<DATE> }}\n* {{UICN | 15951 | ''Panthera leo'' | consulté le=<DATE> }}\n* {{WRMS espèce | 1 | Panthera leo | (Linnaeus, 1758) | consulté le=<DATE>}}\n",
+  "requested_taxon": "Panthera leo",
+  "resolved_author": "([[Carl von Linné|Linnaeus]], [[1758 en science|1758]])",
+  "resolved_taxon": "Panthera leo",
+  "see_also_wikitext": "\n== Liens externes ==\n* {{GBIF | 5219404 | ''Panthera leo'' (Linnaeus, 1758) | consulté le=<DATE> }}\n* {{UICN | 15951 | ''Panthera leo'' | consulté le=<DATE> }}\n* {{WRMS espèce | 1 | Panthera leo | (Linnaeus, 1758) | consulté le=<DATE>}}\n",
+  "subtaxa": [
+    {
+      "author": "(Linnaeus, 1758)",
+      "extinct": null,
+      "name": "Panthera leo leo",
+      "rank": "sous-espèce"
+    },
+    {
+      "author": "(Smith, 1842)",
+      "extinct": null,
+      "name": "Panthera leo melanochaita",
+      "rank": "sous-espèce"
+    }
+  ],
+  "subtaxa_completeness_score": 2,
+  "subtaxa_source": "gbif",
+  "subtaxa_wikitext": "\n\n== Liste des sous-espèces ==\nSelon {{Bioref|gbif|<DATE>}} :\n* ''Panthera leo leo'' (Linnaeus, 1758)\n* ''Panthera leo melanochaita'' (Smith, 1842)\nATTENTION : liste des sous-taxons tronquée car trop longue. Utilisez '-limite-listes' pour modifier ce comportement.\n",
+  "synonyms": [
+    {
+      "author": "Linnaeus, 1758",
+      "extinct": null,
+      "name": "Felis leo",
+      "rank": "espèce"
+    },
+    {
+      "author": null,
+      "extinct": false,
+      "name": "Leo leo",
+      "rank": "espèce"
+    }
+  ],
+  "synonyms_source": "gbif",
+  "taxobox_completeness_score": 5,
+  "taxobox_wikitext": "{{ébauche|carnivore}}\n{{Taxobox début | animal | ''Panthera leo'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}\n{{Taxobox | embranchement | Chordata }}\n{{Taxobox | classe | Mammalia }}\n{{Taxobox | ordre | Carnivora }}\n{{Taxobox | famille | Felidae }}\n{{Taxobox | genre | Panthera }}\n{{Taxobox taxon | animal | espèce | Panthera leo | ([[Carl von Linné|Linnaeus]], [[1758 en science|1758]]) }}\n{{Taxobox UICN | VU | A2abcd }}\n{{Taxobox CITES | II | 2019 | population }}\n{{Taxobox fin}}\n",
+  "taxon_rank": "espèce",
+  "truncated": {
+    "subtaxa": true,
+    "synonyms": false
+  },
+  "used_classification": "gbif",
+  "used_domain": "*",
+  "vernacular_names": [
+    "Lion",
+    "Lion d'Afrique"
+  ],
+  "vernacular_names_without_language": {
+    "gbif": [
+      "Leo"
+    ]
+  },
+  "warnings": [],
+  "wikitext": "{{ébauche|carnivore}}\n{{Taxobox début | animal | ''Panthera leo'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}\n{{Taxobox | embranchement | Chordata }}\n{{Taxobox | classe | Mammalia }}\n{{Taxobox | ordre | Carnivora }}\n{{Taxobox | famille | Felidae }}\n{{Taxobox | genre | Panthera }}\n{{Taxobox taxon | animal | espèce | Panthera leo | ([[Carl von Linné|Linnaeus]], [[1758 en science|1758]]) }}\n{{Taxobox UICN | VU | A2abcd }}\n{{Taxobox CITES | II | 2019 | population }}\n{{Taxobox fin}}\n'''''Panthera leo''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des [[Felidae]].\n\n== Description ==\n{{Section vide ou incomplète}}\n\n== Répartition ==\nCe taxon est présent dans le pays ou la région suivant{{Bioref|gbif|<DATE>|ref}} : [[Kenya]]; de présence incertaine en [[Tanzanie]].\n\n== Liste des sous-espèces ==\nSelon {{Bioref|gbif|<DATE>}} :\n* ''Panthera leo leo'' (Linnaeus, 1758)\n* ''Panthera leo melanochaita'' (Smith, 1842)\nATTENTION : liste des sous-taxons tronquée car trop longue. Utilisez '-limite-listes' pour modifier ce comportement.\n\n== Systématique ==\nLe [[nom valide]] complet (avec [[Citation d'auteurs en zoologie|auteur]]) de ce taxon est ''Panthera leo'' (Linnaeus, 1758){{Bioref|gbif|<DATE>|ref}}.\nL'espèce a été initialement classée dans le genre ''[[Felis]]'' sous le [[protonyme]] ''Felis leo'' Linnaeus, 1758{{Bioref|gbif|<DATE>|ref}}.\n\n[[espèce type]] est ''[[Panthera leo]]''{{Bioref|gbif|<DATE>|ref}}.\n\nCe taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Lion{{Bioref|gbif|<DATE>|ref}}, Lion d'Afrique{{Bioref|gbif|<DATE>|ref}}. Ce taxon est également nommé Lion royal{{Bioref|telametro|<DATE>|ref}}.\n\n''Panthera leo'' a pour [[Synonyme (zoologie)|synonymes]]{{Bioref|gbif|<DATE>|ref}} :\n* ''Felis leo'' Linnaeus, 1758\n* ''Leo leo''\n\n== Étymologie ==\nDu latin leo, « lion ».{{Bioref|gbif|<DATE>|ref}}.\n\n== Publication originale ==\n* Linnaeus, C. (1758). Systema Naturae.\n\n== Liens externes ==\n* {{GBIF | 5219404 | ''Panthera leo'' (Linnaeus, 1758) | consulté le=<DATE> }}\n* {{UICN | 15951 | ''Panthera leo'' | consulté le=<DATE> }}\n* {{WRMS espèce | 1 | Panthera leo | (Linnaeus, 1758) | consulté le=<DATE>}}\n\n== Notes et références ==\n{{références}}\n\n{{Portail|zoologie}}\n\n[[Catégorie:Espèce de mammifères (nom scientifique)]]\n[[Catégorie:Felidae]]"
+}

@@ -3,7 +3,7 @@
 # des sondages) — sert de source pour GET /api/v1/sources (voir organon/core/db_inventory.py).
 #
 # Chaque source :
-#   - statut : disponible | non_sonde | bloque | bloque_temporaire | mort | contact_requis |
+#   - status : disponible | non_sonde | bloque | bloque_temporaire | mort | contact_requis |
 #     ecarte | hors_perimetre | retire | en_attente. Pour toute source dont l'id correspond à un
 #     module réellement enregistré, ce champ est de toute façon recalculé à la lecture (voir
 #     build_sources_overview) : "disponible" si le module est fonctionnel (TaxonomyModule.
@@ -14,12 +14,12 @@
 #     intégré après cet inventaire). "retire" est réservé à une source qui a eu un module
 #     fonctionnel puis débranché volontairement (voir otl ci-dessous) — à ne pas confondre avec
 #     "ecarte", jamais intégrée.
-#   - classification.estime : false si vérifié dans du code (module Python d'Organon ou
+#   - classification.estimated : false si vérifié dans du code (module Python d'Organon ou
 #     déclaration `declare_module()` de l'ancien PHP), true si c'est une supposition sur la
 #     nature de la base, jamais portée.
-#   - elements_recoltes : uniquement renseigné pour les sources disponibles (rien n'est
+#   - harvested_items : uniquement renseigné pour les sources disponibles (rien n'est
 #     collecté pour une base non intégrée).
-#   - acces.type : api_rest | soap | scraping | verification_http | export | contact_requis |
+#   - access.type : api_rest | soap | scraping | verification_http | export | contact_requis |
 #     bloque | mort | inconnu.
 #
 # Les sources "hors_perimetre" (nature incompatible avec ce que l'outil interroge — pas une
@@ -29,823 +29,822 @@
 # documentées dans db-inventory.md (§ Écartés) pour ne pas ré-ouvrir le sujet — GISD, CABI, DELTA,
 # Pl@ntNet notamment.
 
-derniere_maj: "2026-09-21"
+last_updated: "2026-09-21"
 
 categories:
   - id: generalistes
-    nom: "Données généralistes"
+    name: "Données généralistes"
     sources:
       - id: gbif
-        nom: GBIF
+        name: GBIF
         url: "https://www.gbif.org"
-        statut: disponible
-        classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale", "identifiant INPN secondaire"]
-        acces: {type: api_rest, detail: "API REST/JSON (api.gbif.org)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale", "identifiant INPN secondaire"]
+        access: {type: api_rest, detail: "API REST/JSON (api.gbif.org)"}
+        last_updated: null
       - id: itis
-        nom: ITIS
+        name: ITIS
         url: "https://www.itis.gov"
-        statut: disponible
-        classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", identifiant]
-        acces: {type: api_rest, detail: "API REST (ITISWebService, réponses XML)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", identifiant]
+        access: {type: api_rest, detail: "API REST (ITISWebService, réponses XML)"}
+        last_updated: null
       - id: wrms
-        nom: WoRMS
+        name: WoRMS
         url: "https://www.marinespecies.org"
-        statut: disponible
-        classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale", "milieu (marin/terrestre)"]
-        acces: {type: api_rest, detail: "API REST/JSON (marinespecies.org/rest)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale", "milieu (marin/terrestre)"]
+        access: {type: api_rest, detail: "API REST/JSON (marinespecies.org/rest)"}
+        last_updated: null
       - id: col
-        nom: "Catalogue of Life (CoL)"
+        name: "Catalogue of Life (CoL)"
         url: "https://www.catalogueoflife.org"
-        statut: disponible
-        classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", éteint, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON (checklistbank.org, dataset 3LXR — Extended Release, taxonomie par défaut de GBIF depuis 2024)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", éteint, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON (checklistbank.org, dataset 3LXR — Extended Release, taxonomie par défaut de GBIF depuis 2024)"}
+        last_updated: null
       - id: irmng
-        nom: IRMNG
+        name: IRMNG
         url: "https://www.irmng.org"
-        statut: disponible
-        classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale"]
-        acces: {type: api_rest, detail: "API REST/JSON (irmng.org/rest)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", "noms vernaculaires", synonymes, "sous-taxons", basionyme, éteint, identifiant, "citation de la publication originale"]
+        access: {type: api_rest, detail: "API REST/JSON (irmng.org/rest)"}
+        last_updated: null
       - id: otl
-        nom: "Open Tree of Life (OTL)"
+        name: "Open Tree of Life (OTL)"
         url: "https://opentreeoflife.org"
-        statut: retire
-        classification: {possible: true, estime: false, detail: "pas d'auteur ni de nom vernaculaire — absents de l'API"}
-        elements_recoltes: []
-        acces: {type: api_rest, detail: "API REST/JSON (api.opentreeoflife.org), accessible uniquement par l'API"}
-        derniere_maj: null
-        notes: "Intégré puis retiré : aucune page web consultable, seulement l'API — incompatible avec la vérifiabilité attendue. Code conservé dans _archive/otl."
+        status: retire
+        classification: {can_classify: true, estimated: false, detail: "pas d'auteur ni de nom vernaculaire — absents de l'API"}
+        harvested_items: []
+        access: {type: api_rest, detail: "API REST/JSON (api.opentreeoflife.org), accessible uniquement par l'API"}
+        last_updated: null
+        notes: "Intégré puis retiré : aucune page web consultable, seulement l'API — incompatible avec la vérifiabilité attendue."
       - id: inaturalist
-        nom: iNaturalist
+        name: iNaturalist
         url: "https://www.inaturalist.org"
-        statut: retire
-        classification: {possible: true, estime: false, detail: "pas d'auteur — absent de l'API"}
-        elements_recoltes: []
-        acces: {type: api_rest, detail: "API REST/JSON (api.inaturalist.org)"}
-        derniere_maj: null
-        notes: "Intégré puis retiré : site collaboratif, pas une autorité nomenclaturale. Code conservé dans _archive/inaturalist."
+        status: retire
+        classification: {can_classify: true, estimated: false, detail: "pas d'auteur — absent de l'API"}
+        harvested_items: []
+        access: {type: api_rest, detail: "API REST/JSON (api.inaturalist.org)"}
+        last_updated: null
+        notes: "Intégré puis retiré : site collaboratif, pas une autorité nomenclaturale."
       - id: cites
-        nom: "CITES / Species+"
+        name: "CITES / Species+"
         url: "https://www.speciesplus.net"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, "annexe CITES", "date d'entrée en vigueur", "noms vernaculaires (« CITES espèce »)", identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON (speciesplus.net)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: [auteur, "annexe CITES", "date d'entrée en vigueur", "noms vernaculaires (« CITES espèce »)", identifiant]
+        access: {type: api_rest, detail: "API REST/JSON (speciesplus.net)"}
+        last_updated: null
       - id: ncbi
-        nom: "NCBI Taxonomy"
+        name: "NCBI Taxonomy"
         url: "https://www.ncbi.nlm.nih.gov/taxonomy"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: ["identifiant seul (nom/rang réutilisés de la classification principale)"]
-        acces: {type: api_rest, detail: "API REST/JSON, E-utilities (eutils.ncbi.nlm.nih.gov)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: ["identifiant seul (nom/rang réutilisés de la classification principale)"]
+        access: {type: api_rest, detail: "API REST/JSON, E-utilities (eutils.ncbi.nlm.nih.gov)"}
+        last_updated: null
       - id: mnhn
-        nom: MNHN
+        name: MNHN
         url: "https://www.mnhn.fr"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: ["identifiant seul (existence d'une fiche espèce/genre, aucun champ de données)"]
-        acces: {type: verification_http, detail: "vérification HTTP simple, aucune API"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: ["identifiant seul (existence d'une fiche espèce/genre, aucun champ de données)"]
+        access: {type: verification_http, detail: "vérification HTTP simple, aucune API"}
+        last_updated: null
       - id: oepp
-        nom: "OEPP (base mondiale)"
+        name: "OEPP (base mondiale)"
         url: "https://www.eppo.int"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, "noms vernaculaires français", identifiant]
-        acces: {type: api_rest, detail: "API JSON pour la recherche, puis scraping HTML ciblé de la fiche détail (aucun champ JSON équivalent trouvé)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: [auteur, "noms vernaculaires français", identifiant]
+        access: {type: api_rest, detail: "API JSON pour la recherche, puis scraping HTML ciblé de la fiche détail (aucun champ JSON équivalent trouvé)"}
+        last_updated: null
       - id: eol
-        nom: "Encyclopedia of Life (EOL)"
+        name: "Encyclopedia of Life (EOL)"
         url: "https://eol.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "enrichissement uniquement, réutilise le rang déjà connu"}
-        elements_recoltes: [auteur, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON publique, sans clé (eol.org/api/search/1.0, /api/pages/1.0)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "enrichissement uniquement, réutilise le rang déjà connu"}
+        harvested_items: [auteur, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON publique, sans clé (eol.org/api/search/1.0, /api/pages/1.0)"}
+        last_updated: null
         notes: "Absent de la version précédente par omission ; vérifié dans le code (organon/modules/eol)."
       - id: bhl
-        nom: "Biodiversity Heritage Library (BHL)"
+        name: "Biodiversity Heritage Library (BHL)"
         url: "https://www.biodiversitylibrary.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "enrichissement bibliographique uniquement (citation de la publication originale), jamais une classification"}
-        elements_recoltes: ["citation structurée de la publication originale (auteur, titre, éditeur, année) quand un lien biodiversitylibrary.org est repéré dans le texte de la fiche WoRMS"]
-        acces: {type: api_rest, detail: "API v3 REST/JSON (biodiversitylibrary.org/api3), clé individuelle gratuite requise (biodiversitylibrary.org/getapikey.aspx, ORGANON_BHL_API_KEY) ; absence de clé = enrichissement simplement sauté (repli sur le texte brut), jamais un échec du module appelant"}
-        derniere_maj: "2026-09-05"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "enrichissement bibliographique uniquement (citation de la publication originale), jamais une classification"}
+        harvested_items: ["citation structurée de la publication originale (auteur, titre, éditeur, année) quand un lien biodiversitylibrary.org est repéré dans le texte de la fiche WoRMS"]
+        access: {type: api_rest, detail: "API v3 REST/JSON (biodiversitylibrary.org/api3), clé individuelle gratuite requise (biodiversitylibrary.org/getapikey.aspx, ORGANON_BHL_API_KEY) ; absence de clé = enrichissement simplement sauté (repli sur le texte brut), jamais un échec du module appelant"}
+        last_updated: "2026-09-05"
         notes: "Pas un TaxonomyModule à part entière (aucun id dans le registre) : appelé en interne uniquement par organon/modules/wrms/citations.py::_via_bhl pour enrichir la publication originale de WoRMS — comme \"externe\" ci-dessus, un enrichissement transversal plutôt qu'une base taxonomique. Ajouté suite à une remarque : absent de toutes les versions précédentes de cet inventaire par omission."
       - id: crossref
-        nom: Crossref
+        name: Crossref
         url: "https://www.crossref.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "enrichissement bibliographique uniquement (résolution de DOI vers une citation), jamais une classification"}
-        elements_recoltes: ["citation structurée (auteur, titre, périodique/éditeur, date) résolue depuis un DOI déjà repéré dans la fiche source, utilisée en repli quand la résolution primaire n'aboutit pas"]
-        acces: {type: api_rest, detail: "API REST/JSON publique, sans clé (api.crossref.org/works/{doi}) — voir organon/modules/bibliography.py::resolve_doi_citation (repli après une recherche Wikidata P356 infructueuse), partagé par WoRMS et LPSN"}
-        derniere_maj: "2026-09-05"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "enrichissement bibliographique uniquement (résolution de DOI vers une citation), jamais une classification"}
+        harvested_items: ["citation structurée (auteur, titre, périodique/éditeur, date) résolue depuis un DOI déjà repéré dans la fiche source, utilisée en repli quand la résolution primaire n'aboutit pas"]
+        access: {type: api_rest, detail: "API REST/JSON publique, sans clé (api.crossref.org/works/{doi}) — voir organon/modules/bibliography.py::resolve_doi_citation (repli après une recherche Wikidata P356 infructueuse), partagé par WoRMS et LPSN"}
+        last_updated: "2026-09-05"
         notes: "Même cas que BHL ci-dessus : pas de TaxonomyModule dédié, repéré en cherchant d'autres sites accédés en interne sans figurer comme sources."
       - id: biolib
-        nom: BioLib
+        name: BioLib
         url: null
-        statut: ecarte
-        classification: {possible: true, estime: true, detail: "agrégateur généraliste"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping HTML multi-étapes, aucune API — écarté pour sa complexité au regard de la valeur ajoutée"}
-        derniere_maj: null
+        status: ecarte
+        classification: {can_classify: true, estimated: true, detail: "agrégateur généraliste"}
+        harvested_items: []
+        access: {type: scraping, detail: "scraping HTML multi-étapes, aucune API — écarté pour sa complexité au regard de la valeur ajoutée"}
+        last_updated: null
       - id: doris
-        nom: DORIS
+        name: DORIS
         url: "https://doris.ffessm.fr"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "aucune donnée de classification exploitable, juste un groupe DORIS simplifié"}
-        elements_recoltes: ["identifiant de fiche", "nom vernaculaire"]
-        acces: {type: scraping, detail: "aucune API (/Especes/api -> 404) ; recherche HTML (POST /content/action, (name)=requête), filtrage par correspondance exacte du nom scientifique côté client"}
-        derniere_maj: "2026-07-29"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "aucune donnée de classification exploitable, juste un groupe DORIS simplifié"}
+        harvested_items: ["identifiant de fiche", "nom vernaculaire"]
+        access: {type: scraping, detail: "aucune API (/Especes/api -> 404) ; recherche HTML (POST /content/action, (name)=requête), filtrage par correspondance exacte du nom scientifique côté client"}
+        last_updated: "2026-07-29"
       - id: iucn
-        nom: "Liste rouge de l'UICN"
+        name: "Liste rouge de l'UICN"
         url: "https://www.iucnredlist.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "statut de conservation, pas une classification"}
-        elements_recoltes: [statut de conservation, critères d'évaluation, auteur, identifiant]
-        acces: {type: api_rest, detail: "API v4 REST/JSON (api.iucnredlist.org), jeton individuel gratuit requis"}
-        derniere_maj: "2026-09-05"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "statut de conservation, pas une classification"}
+        harvested_items: [statut de conservation, critères d'évaluation, auteur, identifiant]
+        access: {type: api_rest, detail: "API v4 REST/JSON (api.iucnredlist.org), jeton individuel gratuit requis"}
+        last_updated: "2026-09-05"
       - id: sealifebase
-        nom: SeaLifeBase
+        name: SeaLifeBase
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "même famille que FishBase (Froese/Palomares)"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "domaine testé injoignable, à revérifier (sealifebase.org / .ca)"}
-        derniere_maj: null
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "même famille que FishBase (Froese/Palomares)"}
+        harvested_items: []
+        access: {type: inconnu, detail: "domaine testé injoignable, à revérifier (sealifebase.org / .ca)"}
+        last_updated: null
       - id: inpn
-        nom: "Inventaire national du patrimoine naturel (INPN)"
+        name: "Inventaire national du patrimoine naturel (INPN)"
         url: "https://taxref.mnhn.fr"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "lignée reconstruite ancêtre par ancêtre à partir du fil d'Ariane de la fiche détail (pas d'endpoint renvoyant la hiérarchie complète en un seul appel)"}
-        elements_recoltes: [identifiant, auteur, rang, règne, "chaîne de classification", "noms vernaculaires français"]
-        acces: {type: api_rest, detail: "API JSON pour la recherche (taxa/search), fiche détail en HTML (JSP, taxa/{cdNom}) pour la lignée et les noms vernaculaires ; WAF contourné par un en-tête User-Agent de navigateur (403 sinon, même symptôme que POWO)"}
-        derniere_maj: "2026-09-05"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "lignée reconstruite ancêtre par ancêtre à partir du fil d'Ariane de la fiche détail (pas d'endpoint renvoyant la hiérarchie complète en un seul appel)"}
+        harvested_items: [identifiant, auteur, rang, règne, "chaîne de classification", "noms vernaculaires français"]
+        access: {type: api_rest, detail: "API JSON pour la recherche (taxa/search), fiche détail en HTML (JSP, taxa/{cdNom}) pour la lignée et les noms vernaculaires ; WAF contourné par un en-tête User-Agent de navigateur (403 sinon, même symptôme que POWO)"}
+        last_updated: "2026-09-05"
         notes: "Fiche laissée à l'état 'bloqué' par erreur : le module a en réalité été intégré le 2026-07-23, le blocage du site legacy (migration Angular) ayant été contourné par l'API JSON taxa/search plutôt que par le HTML legacy. Corrigé après lecture du code (organon/modules/inpn)."
       - id: taxref
-        nom: TAXREF
+        name: TAXREF
         url: "https://taxref.mnhn.fr"
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "même service que INPN — jamais eu son propre module"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "doublon exact d'INPN (même site taxref.mnhn.fr), désormais couvert par le module organon/modules/inpn — aucune raison d'en porter un second"}
-        derniere_maj: "2026-09-05"
+        status: ecarte
+        classification: {can_classify: false, estimated: false, detail: "même service que INPN — jamais eu son propre module"}
+        harvested_items: []
+        access: {type: inconnu, detail: "doublon exact d'INPN (même site taxref.mnhn.fr), désormais couvert par le module organon/modules/inpn — aucune raison d'en porter un second"}
+        last_updated: "2026-09-05"
         notes: "Écarté suite au sondage 2026-09-05 : contrairement à INPN, cette entrée n'a jamais eu de module dédié ; maintenant qu'INPN dispose d'un module fonctionnel pour ce même service, TAXREF est redondant."
       - id: taxonomicon
-        nom: "The Taxonomicon"
+        name: "The Taxonomicon"
         url: "http://taxonomicon.taxonomy.nl"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "rang réutilisé de la classification principale, comme d'autres modules"}
-        elements_recoltes: [identifiant, "nom vérifié", auteur]
-        acces: {type: scraping, detail: "scraping HTML ciblé par regex, aucune API trouvée ; recherche scopée par groupe de rang (subject=Genus/Family/High/Species/Low) pour éviter les entités non biologiques homonymes de la recherche générale du site ; auteur complet récupéré par un second appel vers la fiche de nomenclature"}
-        derniere_maj: "2026-07-23"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "rang réutilisé de la classification principale, comme d'autres modules"}
+        harvested_items: [identifiant, "nom vérifié", auteur]
+        access: {type: scraping, detail: "scraping HTML ciblé par regex, aucune API trouvée ; recherche scopée par groupe de rang (subject=Genus/Family/High/Species/Low) pour éviter les entités non biologiques homonymes de la recherche générale du site ; auteur complet récupéré par un second appel vers la fiche de nomenclature"}
+        last_updated: "2026-07-23"
       - id: tolweb
-        nom: "Tree of Life Web Project (ToLWeb)"
+        name: "Tree of Life Web Project (ToLWeb)"
         url: "https://tolweb.org"
-        statut: mort
-        classification: {possible: true, estime: true, detail: "projet de phylogénie historique"}
-        elements_recoltes: []
-        acces: {type: mort, detail: "domaine injoignable — projet académique probablement à l'arrêt"}
-        derniere_maj: null
+        status: mort
+        classification: {can_classify: true, estimated: true, detail: "projet de phylogénie historique"}
+        harvested_items: []
+        access: {type: mort, detail: "domaine injoignable — projet académique probablement à l'arrêt"}
+        last_updated: null
       - id: ubio
-        nom: "Universal Biological Indexer and Organizer (uBio)"
+        name: "Universal Biological Indexer and Organizer (uBio)"
         url: "https://ubio.org"
-        statut: mort
-        classification: {possible: true, estime: true, detail: "registre de noms taxonomiques"}
-        elements_recoltes: []
-        acces: {type: mort, detail: "domaine injoignable — service historiquement fermé"}
-        derniere_maj: null
+        status: mort
+        classification: {can_classify: true, estimated: true, detail: "registre de noms taxonomiques"}
+        harvested_items: []
+        access: {type: mort, detail: "domaine injoignable — service historiquement fermé"}
+        last_updated: null
       - id: zobodat
-        nom: ZOBODAT
+        name: ZOBODAT
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "archive d'articles scientifiques, pas une base taxonomique interrogeable par nom"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page d'accueil atteignable, pas d'API identifiée"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "archive d'articles scientifiques, pas une base taxonomique interrogeable par nom"}
+        harvested_items: []
+        access: {type: inconnu, detail: "page d'accueil atteignable, pas d'API identifiée"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank général : seul un dataset étroit (clé 1037, Vespidae uniquement, construit depuis ZOBODAT) apparaît — insuffisant pour couvrir des taxons arbitraires."
 
   - id: wikimedia
-    nom: "Wikimédia"
+    name: "Wikimédia"
     sources:
       - id: wikimedia
-        nom: "Liens transversaux + ancrage fr.wikipedia.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "module de liens externes, ne fournit aucune classification"}
-        acces: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire/fr.wikipedia.org)"}
-        derniere_maj: "2026-09-06"
+        name: "Liens transversaux + ancrage fr.wikipedia.org"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "module de liens externes, ne fournit aucune classification"}
+        access: {type: api_rest, detail: "SPARQL (query.wikidata.org) + API MediaWiki standard (Commons/Wikispecies/Wiktionnaire/fr.wikipedia.org)"}
+        last_updated: "2026-09-06"
         notes: "Absent de la version précédente par omission ; module technique transversal, pas une base taxonomique. Orchestrateur avec un sous-module par site (organon/modules/wikimedia/{wikidata,commons,species,wiktionnaire,wikipedia}) — un autre wiki ou une autre édition linguistique s'ajoute comme sous-module plutôt qu'en surchargeant un adaptateur unique. Le volet fr.wikipedia.org complète, sans jamais les remplacer, les règles statiques de organon/core/selectors/rules/portails.yaml (n'intervient qu'en repli, voir organon.core.selectors.categorization.lien_pour_portail) ; d'autres usages de fr.wikipedia.org (catégories, ébauches, existence de page...) rejoindront ce même volet au fil de l'eau plutôt qu'un module dédié par usage. La suggestion d'images du volet Commons vient de organon/modules/commons_images (pas un TaxonomyModule enregistré : appelé par la route dédiée GET /api/v1/commons-images, pas par ce module.collect())."
-        volets:
-          - nom: Wikidata
+        facets:
+          - name: Wikidata
             url: "https://www.wikidata.org"
-            elements_recoltes: ["identifiant Wikidata (QID)"]
-          - nom: "Wikimedia Commons"
+            harvested_items: ["identifiant Wikidata (QID)"]
+          - name: "Wikimedia Commons"
             url: "https://commons.wikimedia.org"
-            elements_recoltes: ["Autres projets", "image(s)"]
-          - nom: Wikispecies
+            harvested_items: ["Autres projets", "image(s)"]
+          - name: Wikispecies
             url: "https://species.wikimedia.org"
-            elements_recoltes: ["Autres projets"]
-          - nom: "Wiktionnaire (français)"
+            harvested_items: ["Autres projets"]
+          - name: "Wiktionnaire (français)"
             url: "https://fr.wiktionary.org"
-            elements_recoltes: ["Autres projets"]
-          - nom: "Wikipédia (français)"
+            harvested_items: ["Autres projets"]
+          - name: "Wikipédia (français)"
             url: "https://fr.wikipedia.org"
-            elements_recoltes: ["portail(s)"]
+            harvested_items: ["portail(s)"]
 
   - id: paleo_paleozoologie
-    nom: "Paléontologie — Paléozoologie"
+    name: "Paléontologie — Paléozoologie"
     sources:
       - id: tpdb
-        nom: "Paleobiology Database (PBDB)"
+        name: "Paleobiology Database (PBDB)"
         url: "https://paleobiodb.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "côté PHP également : rang/auteur en enrichissement, jamais utilisés pour la classification"}
-        elements_recoltes: [auteur, rang, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON (paleobiodb.org/data1.2)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "côté PHP également : rang/auteur en enrichissement, jamais utilisés pour la classification"}
+        harvested_items: [auteur, rang, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON (paleobiodb.org/data1.2)"}
+        last_updated: null
       - id: fossilworks
-        nom: Fossilworks
+        name: Fossilworks
         url: null
-        statut: ecarte
-        classification: {possible: false, estime: true, detail: "mêmes données que PBDB, faible valeur d'ajout"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "403 sur son ancien point d'entrée CGI ; partage de toute façon les données déjà couvertes par PBDB"}
-        derniere_maj: null
+        status: ecarte
+        classification: {can_classify: false, estimated: true, detail: "mêmes données que PBDB, faible valeur d'ajout"}
+        harvested_items: []
+        access: {type: bloque, detail: "403 sur son ancien point d'entrée CGI ; partage de toute façon les données déjà couvertes par PBDB"}
+        last_updated: null
       - id: fossiilid
-        nom: Fossiilid.info
+        name: Fossiilid.info
         url: "https://fossiilid.info"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "base de fossiles estonienne"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, API non confirmée"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "base de fossiles estonienne"}
+        harvested_items: []
+        access: {type: inconnu, detail: "page atteignable, API non confirmée"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank dédié (requête « Fossiilid » : deux articles isolés sans rapport)."
       - id: hesperomys
-        nom: Hesperomys
+        name: Hesperomys
         url: "https://hesperomys.com"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "taxonomie mammalienne (extant et fossile), classe Mammalia comme plafond de la chaîne remontée (voir organon/modules/hesperomys/adapter.py)"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", synonymes, éteint, identifiant]
-        acces: {type: api_rest, detail: "API GraphQL non documentée (hesperomys.com/graphql), accès confirmé directement par l'auteur du site en 2024 ; export Zenodo statique en repli (dernier connu : https://zenodo.org/records/10481656) mais non utilisé, l'API en direct couvre les besoins"}
-        derniere_maj: "2026-07-23"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "taxonomie mammalienne (extant et fossile), classe Mammalia comme plafond de la chaîne remontée (voir organon/modules/hesperomys/adapter.py)"}
+        harvested_items: [auteur, rang, "chaîne de classification", synonymes, éteint, identifiant]
+        access: {type: api_rest, detail: "API GraphQL non documentée (hesperomys.com/graphql), accès confirmé directement par l'auteur du site en 2024 ; export Zenodo statique en repli (dernier connu : https://zenodo.org/records/10481656) mais non utilisé, l'API en direct couvre les besoins"}
+        last_updated: "2026-07-23"
         notes: "Déjà demandé comme fonctionnalité (docs/backlog.md)."
 
   - id: paleo_paleobotanique
-    nom: "Paléontologie — Paléobotanique"
+    name: "Paléontologie — Paléobotanique"
     sources:
       - id: plant_fossil_names
-        nom: "Plant Fossil Names"
+        name: "Plant Fossil Names"
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "index nomenclatural descriptif, pas une hiérarchie interrogeable"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "site académique statique, pas d'API"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "index nomenclatural descriptif, pas une hiérarchie interrogeable"}
+        harvested_items: []
+        access: {type: inconnu, detail: "site académique statique, pas d'API"}
+        last_updated: "2026-09-21"
         notes: "Mirroir ChecklistBank trouvé (clé 314595, « Plant Fossil Names Registry », type=nomenclatural, resynchronisé 2026-09-15) mais écarté après vérification : classification vide au-delà de l'espèce elle-même (« parent genus missing » sur les échantillons testés, ex. Lepidodendron) — même piège que mycobank ci-dessus, dataset frais mais sans hiérarchie exploitable."
       - id: palynodata
-        nom: Palynodata
+        name: Palynodata
         url: null
-        statut: mort
-        classification: {possible: false, estime: true, detail: "base bibliographique de palynologie"}
-        elements_recoltes: []
-        acces: {type: mort, detail: "domaine injoignable — probablement disparu ou déplacé"}
-        derniere_maj: null
+        status: mort
+        classification: {can_classify: false, estimated: true, detail: "base bibliographique de palynologie"}
+        harvested_items: []
+        access: {type: mort, detail: "domaine injoignable — probablement disparu ou déplacé"}
+        last_updated: null
       - id: ifpni
-        nom: "The International Fossil Plant Names Index (IFPNI)"
+        name: "The International Fossil Plant Names Index (IFPNI)"
         url: null
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "côté PHP : rang géré séparément, extraction fragile par position dans le tableau"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping positionnel fragile, stub « TODO » inachevé pour tout rang hors genre dans le PHP lui-même"}
-        derniere_maj: null
+        status: ecarte
+        classification: {can_classify: false, estimated: false, detail: "côté PHP : rang géré séparément, extraction fragile par position dans le tableau"}
+        harvested_items: []
+        access: {type: scraping, detail: "scraping positionnel fragile, stub « TODO » inachevé pour tout rang hors genre dans le PHP lui-même"}
+        last_updated: null
 
   - id: algues
-    nom: "Algues et cyanobactéries"
+    name: "Algues et cyanobactéries"
     sources:
       - id: algaebase
-        nom: AlgaeBase
+        name: AlgaeBase
         url: "https://www.algaebase.org"
-        statut: disponible
-        classification: {possible: true, estime: false}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", "sous-taxons", éteint, identifiant, étymologie, "citation de la publication originale", "description (habitat, texte descriptif)"]
-        acces: {type: api_rest, detail: "API REST/JSON (api2.algaebase.org, clé de session)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", "sous-taxons", éteint, identifiant, étymologie, "citation de la publication originale", "description (habitat, texte descriptif)"]
+        access: {type: api_rest, detail: "API REST/JSON (api2.algaebase.org, clé de session)"}
+        last_updated: null
         notes: "Synonymes/basionyme non implémentés (TODO hérité du PHP d'origine)."
 
   - id: champignons
-    nom: Champignons
+    name: Champignons
     sources:
       - id: indexfungorum
-        nom: "Index Fungorum"
+        name: "Index Fungorum"
         url: "https://www.indexfungorum.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "rang genre et en dessous seulement — la jointure de hiérarchie du service ne couvre pas famille et rangs supérieurs"}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification (genre → embranchement)", basionyme, synonymes, identifiant]
-        acces: {type: soap, detail: "webservice .asmx (indexfungorum.org/ixfwebservice), binding HttpGet — requête GET simple par opération, pas d'enveloppe SOAP"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "rang genre et en dessous seulement — la jointure de hiérarchie du service ne couvre pas famille et rangs supérieurs"}
+        harvested_items: [auteur, rang, règne, "chaîne de classification (genre → embranchement)", basionyme, synonymes, identifiant]
+        access: {type: soap, detail: "webservice .asmx (indexfungorum.org/ixfwebservice), binding HttpGet — requête GET simple par opération, pas d'enveloppe SOAP"}
+        last_updated: null
       - id: mycobank
-        nom: MycoBank
+        name: MycoBank
         url: null
-        statut: contact_requis
-        classification: {possible: true, estime: false, detail: "côté PHP : classif=true, priorité 997"}
-        elements_recoltes: []
-        acces: {type: contact_requis, detail: "webservices disponibles sur inscription/contact"}
-        derniere_maj: "2026-09-11"
+        status: contact_requis
+        classification: {can_classify: true, estimated: false, detail: "côté PHP : classif=true, priorité 997"}
+        harvested_items: []
+        access: {type: contact_requis, detail: "webservices disponibles sur inscription/contact"}
+        last_updated: "2026-09-11"
         notes: "Reconsidéré via le mirroir ChecklistBank (clé 2002, voir docs/md/db-inventory.md § Sources indisponibles en direct mais mirrorées sur ChecklistBank) : écarté à nouveau — dataset type=nomenclatural (pas de hiérarchie/enfants/synonymes, classification exclue) et surtout `id`/`verbatimKey` ChecklistBank ≠ vrai numéro MycoBank (vérifié via Wikidata P962 croisé avec organon/modules/indexfungorum, même RECORD_NUMBER que MycoBank) — des citations {{MycoBank}} bâties sur ce dataset seraient fausses."
       - id: fongiref
-        nom: FongiRef
+        name: FongiRef
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "référentiel de noms français, pas une hiérarchie"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "domaine injoignable au nom testé, à revérifier"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "référentiel de noms français, pas une hiérarchie"}
+        harvested_items: []
+        access: {type: inconnu, detail: "domaine injoignable au nom testé, à revérifier"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: mycodb
-        nom: MycoDB
+        name: MycoDB
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "base de photos communautaire"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, pas d'API identifiée"}
-        derniere_maj: null
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "base de photos communautaire"}
+        harvested_items: []
+        access: {type: inconnu, detail: "page atteignable, pas d'API identifiée"}
+        last_updated: null
 
   - id: plantes
-    nom: Plantes
+    name: Plantes
     sources:
       - id: ipni
-        nom: "International Plant Names Index (IPNI)"
+        name: "International Plant Names Index (IPNI)"
         url: "https://www.ipni.org"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, "identifiant (rang réutilisé de la classification principale)", "citation de la publication originale"]
-        acces: {type: api_rest, detail: "API REST/JSON (ipni.org/api/1)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: [auteur, "identifiant (rang réutilisé de la classification principale)", "citation de la publication originale"]
+        access: {type: api_rest, detail: "API REST/JSON (ipni.org/api/1)"}
+        last_updated: null
       - id: telametro
-        nom: "TelaMétro (Tela Botanica, BDTFX)"
+        name: "TelaMétro (Tela Botanica, BDTFX)"
         url: "https://www.tela-botanica.org"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, "noms vernaculaires", identifiant]
-        acces: {type: scraping, detail: "recherche via API JSON (index Algolia, clé « search-only » publique) ; noms vernaculaires typés par scraping HTML de l'onglet Ethnobotanique (aucune API pour ce statut)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: [auteur, "noms vernaculaires", identifiant]
+        access: {type: scraping, detail: "recherche via API JSON (index Algolia, clé « search-only » publique) ; noms vernaculaires typés par scraping HTML de l'onglet Ethnobotanique (aucune API pour ce statut)"}
+        last_updated: null
       - id: vascan
-        nom: "Base de données des plantes vasculaires du Canada (VASCAN)"
+        name: "Base de données des plantes vasculaires du Canada (VASCAN)"
         url: "https://data.canadensys.net/vascan"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, "noms vernaculaires français", "statut synonyme", identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON (data.canadensys.net/vascan/api/0.1)"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: [auteur, "noms vernaculaires français", "statut synonyme", identifiant]
+        access: {type: api_rest, detail: "API REST/JSON (data.canadensys.net/vascan/api/0.1)"}
+        last_updated: null
       - id: eflora
-        nom: "eFlora (efloras.org)"
+        name: "eFlora (efloras.org)"
         url: "https://efloras.org"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: ["identifiant(s) par flore régionale (Amérique du Nord, Chine, Pakistan)", "nom vérifié"]
-        acces: {type: scraping, detail: "scraping HTML ciblé par regex, aucune API trouvée"}
-        derniere_maj: null
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: ["identifiant(s) par flore régionale (Amérique du Nord, Chine, Pakistan)", "nom vérifié"]
+        access: {type: scraping, detail: "scraping HTML ciblé par regex, aucune API trouvée"}
+        last_updated: null
         notes: "Couvre aussi Flora of China et Flora of North America (même site, flora_id 1 et 2)."
       - id: tropicos
-        nom: Tropicos
+        name: Tropicos
         url: "https://www.tropicos.org"
-        statut: disponible
-        classification: {possible: false, estime: false}
-        elements_recoltes: [auteur, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON avec jeton Bearer (jeton public utilisé par le widget de recherche du site lui-même)"}
-        derniere_maj: null
-        notes: "Intégré après cet inventaire (classé « à trancher ») ; corrigé après lecture du code."
+        status: disponible
+        classification: {can_classify: false, estimated: false}
+        harvested_items: [auteur, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON avec jeton Bearer (jeton public utilisé par le widget de recherche du site lui-même)"}
+        last_updated: "2026-09-24"
+        notes: "Intégré après cet inventaire (classé « à trancher ») ; corrigé après lecture du code. Homonymes exacts de fullName : le displayName préfixé « ! » (« !! » = conservé) marque le nom retenu par Tropicos, « * »/« ** » les synonymes — vérifié en direct contre P960 de Wikidata (Quercus robur 13100004, Solanum lycopersicum 29605838, Poaceae 42000357) ; nameKindId non fiable (2 et 4 pour des noms acceptés), correctNameId toujours null."
       - id: bryonames
-        nom: "Bryonames (The Bryophyte Nomenclator)"
+        name: "Bryonames (The Bryophyte Nomenclator)"
         url: "https://www.bryonames.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification des bryophytes (mousses, hépatiques, anthocérotes) seulement — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 170394, alias « Bryonames », DOI 10.48580/d8zmp) — même plateforme et même schéma que le module col"}
-        derniere_maj: "2026-09-11"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "classification des bryophytes (mousses, hépatiques, anthocérotes) seulement — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO"}
+        harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 170394, alias « Bryonames », DOI 10.48580/d8zmp) — même plateforme et même schéma que le module col"}
+        last_updated: "2026-09-11"
         notes: "Le site bryonames.org lui-même est derrière un challenge JS Cloudflare (bloqué même en navigateur automatisé réel, testé en direct) ; les données sont cependant distribuées sans restriction via ChecklistBank, qui sert le module à la place. La page web publique du dataset sur checklistbank.org est elle aussi derrière un contrôle anti-bot (403 même en navigateur automatisé) — render_bioref/debug_link pointent donc vers la fiche Tropicos d'origine (champ name.link de l'API, toujours présent en pratique) plutôt que vers checklistbank.org."
       - id: wfo
-        nom: "World Flora Online (WFO)"
+        name: "World Flora Online (WFO)"
         url: "https://www.worldfloraonline.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "confirmé en sondage direct : la fiche détail affiche une hiérarchie (Angiosperms > ordre > famille > genre > ...) mais elle ne descend pas jusqu'au règne/embranchement et mélange des nœuds génériques sans auteur (ex. « Angiosperms ») avec des rangs réels — jugée insuffisamment fiable, comme déjà tranché côté ancien PHP"}
-        elements_recoltes: [identifiant, auteur]
-        acces: {type: scraping, detail: "scraping HTML de /search par expression régulière ciblée, aucune API trouvée"}
-        derniere_maj: "2026-07-23"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "confirmé en sondage direct : la fiche détail affiche une hiérarchie (Angiosperms > ordre > famille > genre > ...) mais elle ne descend pas jusqu'au règne/embranchement et mélange des nœuds génériques sans auteur (ex. « Angiosperms ») avec des rangs réels — jugée insuffisamment fiable, comme déjà tranché côté ancien PHP"}
+        harvested_items: [identifiant, auteur]
+        access: {type: scraping, detail: "scraping HTML de /search par expression régulière ciblée, aucune API trouvée"}
+        last_updated: "2026-07-23"
       - id: wcsp
-        nom: "World Checklist of Selected Plant Families (WCSP)"
+        name: "World Checklist of Selected Plant Families (WCSP)"
         url: null
-        statut: ecarte
-        classification: {possible: true, estime: true}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "fusionné dans WCVP, dont les données sont déjà servies par l'entrée powo ci-dessous (wcvp.science.kew.org redirige vers powo.science.kew.org, même constat que celui documenté sur powo pour l'ancienne entrée WCVP) — doublon exact, pas seulement non sondé"}
-        derniere_maj: "2026-09-05"
+        status: ecarte
+        classification: {can_classify: true, estimated: true}
+        harvested_items: []
+        access: {type: inconnu, detail: "fusionné dans WCVP, dont les données sont déjà servies par l'entrée powo ci-dessous (wcvp.science.kew.org redirige vers powo.science.kew.org, même constat que celui documenté sur powo pour l'ancienne entrée WCVP) — doublon exact, pas seulement non sondé"}
+        last_updated: "2026-09-05"
         notes: "Reclassé depuis non_sonde : la fusion dans WCVP/POWO (déjà disponible) rend un sondage séparé inutile, même raisonnement que l'ancienne entrée WCVP retirée sur powo. Même conclusion pour The Plant List (tpl ci-dessous) : mirroir ChecklistBank trouvé (clé 2039) mais redondant pour le même motif."
       - id: powo
-        nom: "Plants of the World Online (POWO)"
+        name: "Plants of the World Online (POWO)"
         url: "https://powo.science.kew.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification Kew officielle (WCVP)"}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", synonymes, distribution, "sous-taxons", identifiant]
-        acces: {type: api_rest, detail: "via la bibliothèque pykew (API JSON powo.science.kew.org/api/2) ; l'accès direct par requests nu reste bloqué (403 WAF sans en-tête User-Agent de navigateur, voir organon/modules/powo/adapter.py)"}
-        derniere_maj: "2026-07-13"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "classification Kew officielle (WCVP)"}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", synonymes, distribution, "sous-taxons", identifiant]
+        access: {type: api_rest, detail: "API JSON powo.science.kew.org/api/2 via requests (httpx refusé par le challenge Cloudflare, voir organon/modules/powo/adapter.py)"}
+        last_updated: "2026-07-13"
         notes: "WCVP (listée séparément avant) est retirée ici : wcvp.science.kew.org redirige vers powo.science.kew.org, même données — entrée redondante."
       - id: grin
-        nom: "GRIN Taxonomy (Germplasm Resources Information Network)"
+        name: "GRIN Taxonomy (Germplasm Resources Information Network)"
         url: "https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomysearch.aspx"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification des plantes cultivées/ressources génétiques (famille et rangs inférieurs seulement — la chaîne ChecklistBank ne porte aucun rang kingdom/order/class, vérifié en direct sur Poaceae/Zea) — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO/Bryonames"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2018, resynchronisé depuis npgsweb.ars-grin.gov le 2026-08-30) — même plateforme et même schéma que le module col/bryonames"}
-        derniere_maj: "2026-09-11"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "classification des plantes cultivées/ressources génétiques (famille et rangs inférieurs seulement — la chaîne ChecklistBank ne porte aucun rang kingdom/order/class, vérifié en direct sur Poaceae/Zea) — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO/Bryonames"}
+        harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2018, resynchronisé depuis npgsweb.ars-grin.gov le 2026-08-30) — même plateforme et même schéma que le module col/bryonames"}
+        last_updated: "2026-09-11"
         notes: "Le site npgsweb.ars-grin.gov lui-même reste écarté par scraping direct (ASP.NET WebForms, résolution nom→id par formulaire POST à __VIEWSTATE/__EVENTVALIDATION à renouveler à chaque requête) ; les données sont cependant distribuées sans restriction via ChecklistBank, qui sert le module à la place. render_bioref sélectionne parmi six modèles Bioref dédiés existants sur fr.wikipedia selon le rang ({{GRIN espèce}}/genre/sous-tribu/tribu/sous-famille/famille, wikicode vérifié en direct) ; debug_link reconstruit l'URL GRIN d'origine par rang (name.link de l'API absent au-delà du rang espèce, vérifié en direct)."
       - id: tpl
-        nom: "The Plant List (TPL)"
+        name: "The Plant List (TPL)"
         url: null
-        statut: mort
-        classification: {possible: true, estime: true, detail: "figé"}
-        elements_recoltes: []
-        acces: {type: mort, detail: "domaine injoignable — site officiellement gelé depuis 2013, remplacé par WCVP par son propre éditeur"}
-        derniere_maj: "2026-09-21"
+        status: mort
+        classification: {can_classify: true, estimated: true, detail: "figé"}
+        harvested_items: []
+        access: {type: mort, detail: "domaine injoignable — site officiellement gelé depuis 2013, remplacé par WCVP par son propre éditeur"}
+        last_updated: "2026-09-21"
         notes: "Mirroir ChecklistBank trouvé (clé 2039, « The Plant List with literature », type=taxonomic) mais écarté : lignée superficielle (règne→famille→genre→espèce, jamais ordre/classe) et surtout redondant avec powo/WCVP déjà actif — même successeur Kew officiel que wcsp ci-dessus, aucune valeur ajoutée."
       - id: apni
-        nom: "Australian Plant Name Index (APNI)"
+        name: "Australian Plant Name Index (APNI)"
         url: "https://biodiversity.org.au/nsl"
-        statut: bloque
-        classification: {possible: false, estime: true, detail: "index nomenclatural, comme IPNI"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "revérifié en direct : le National Species List australien est désormais derrière une protection anti-bot AWS WAF (« Human Verification »)"}
-        derniere_maj: "2026-09-21"
+        status: bloque
+        classification: {can_classify: false, estimated: true, detail: "index nomenclatural, comme IPNI"}
+        harvested_items: []
+        access: {type: bloque, detail: "revérifié en direct : le National Species List australien est désormais derrière une protection anti-bot AWS WAF (« Human Verification »)"}
+        last_updated: "2026-09-21"
         notes: "Confirmation ChecklistBank (clé 133813, alias « APNI-APC Trial », données figées 2022) : statut « Trial » jamais officialisé côté source — double motif d'écarter, en plus du WAF ci-dessus."
       - id: bdpa
-        nom: "Base de données des plantes d'Afrique (BDPA)"
+        name: "Base de données des plantes d'Afrique (BDPA)"
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "flore régionale"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "domaine testé injoignable, nom de domaine probablement incorrect"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "flore régionale"}
+        harvested_items: []
+        access: {type: inconnu, detail: "domaine testé injoignable, nom de domaine probablement incorrect"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: florabase
-        nom: "Florabase (Australie occidentale)"
+        name: "Florabase (Australie occidentale)"
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "flore régionale"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, API non confirmée"}
-        derniere_maj: null
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "flore régionale"}
+        harvested_items: []
+        access: {type: inconnu, detail: "page atteignable, API non confirmée"}
+        last_updated: null
       - id: gcd
-        nom: "Global Compositae Database (GCD)"
+        name: "Global Compositae Database (GCD)"
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "famille Compositae"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, pas d'API identifiée"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "famille Compositae"}
+        harvested_items: []
+        access: {type: inconnu, detail: "page atteignable, pas d'API identifiée"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank dédié (requête « Compositae » : seuls des articles isolés sur des espèces individuelles)."
       - id: globaltreesearch
-        nom: GlobalTreeSearch
+        name: GlobalTreeSearch
         url: null
-        statut: ecarte
-        classification: {possible: true, estime: false, detail: "mirroir ChecklistBank (clé 310690) vérifié en direct : chaque enregistrement du DwC-A source (taxon.txt, publié par BGCI sur ipt.brc.ac.uk) porte règne/embranchement/classe/ordre/famille/genre en colonnes propres (dwc:kingdom…dwc:genus), pas seulement une présence par pays — hiérarchie réelle, contrairement à l'estimation d'origine"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "API ChecklistBank réelle (api.checklistbank.org/dataset/310690), aucun compte requis — mais classification strictement redondante avec powo (déjà actif) : mêmes espèces vasculaires, sans synonymes (0 sur 62097 enregistrements, dataset 100% \"accepted\"), sans rang infraspécifique, sans modèle {{Bioref}} dédié sur fr.wikipedia (vérifié en direct, 0 résultat), et distribution en pays bruts plutôt que codes TDWG/WGSRPD comme powo — même raisonnement que wcsp/powo : porter un second module n'ajouterait rien que powo ne fournisse déjà en mieux"}
-        derniere_maj: "2026-09-21"
+        status: ecarte
+        classification: {can_classify: true, estimated: false, detail: "mirroir ChecklistBank (clé 310690) vérifié en direct : chaque enregistrement du DwC-A source (taxon.txt, publié par BGCI sur ipt.brc.ac.uk) porte règne/embranchement/classe/ordre/famille/genre en colonnes propres (dwc:kingdom…dwc:genus), pas seulement une présence par pays — hiérarchie réelle, contrairement à l'estimation d'origine"}
+        harvested_items: []
+        access: {type: inconnu, detail: "API ChecklistBank réelle (api.checklistbank.org/dataset/310690), aucun compte requis — mais classification strictement redondante avec powo (déjà actif) : mêmes espèces vasculaires, sans synonymes (0 sur 62097 enregistrements, dataset 100% \"accepted\"), sans rang infraspécifique, sans modèle {{Bioref}} dédié sur fr.wikipedia (vérifié en direct, 0 résultat), et distribution en pays bruts plutôt que codes TDWG/WGSRPD comme powo — même raisonnement que wcsp/powo : porter un second module n'ajouterait rien que powo ne fournisse déjà en mieux"}
+        last_updated: "2026-09-21"
         notes: "Audit 2026-09-21 : l'estimation d'origine (\"pas une hiérarchie\") ne valait que pour l'outil de recherche en ligne de BGCI, pas pour le jeu de données qu'il publie — le mirroir ChecklistBank a une vraie classification. Écarté quand même : GlobalTreeSearch n'est qu'une liste d'arbres (sous-ensemble par port de croissance) des mêmes espèces déjà classées par powo, sans synonymes ni gain de précision — pas de session gâchée sur un doublon sans usage additionnel."
       - id: grassbase
-        nom: GrassBase
+        name: GrassBase
         url: null
-        statut: bloque
-        classification: {possible: true, estime: true, detail: "classification des graminées, système Kew"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "403 — probablement fusionné dans POWO/WCSP"}
-        derniere_maj: null
+        status: bloque
+        classification: {can_classify: true, estimated: true, detail: "classification des graminées, système Kew"}
+        harvested_items: []
+        access: {type: bloque, detail: "403 — probablement fusionné dans POWO/WCSP"}
+        last_updated: null
 
   - id: procaryotes
-    nom: Procaryotes
+    name: Procaryotes
     sources:
       - id: lpsn
-        nom: "List of Prokaryotic Names with Standing in Nomenclature (LPSN)"
+        name: "List of Prokaryotic Names with Standing in Nomenclature (LPSN)"
         url: "https://api.lpsn.dsmz.de"
-        statut: en_attente
-        classification: {possible: true, estime: false, detail: "organon.modules.lpsn, module complet et enregistré — échoue entièrement tant qu'un compte DSMZ n'est pas configuré (voir acces)"}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", basionyme, "taxon-type", identifiant, "citation de la publication originale (DOI)", "sous-taxons"]
-        acces: {type: contact_requis, detail: "API REST réelle (api.lpsn.dsmz.de, auth Keycloak) ; compte DSMZ requis (ORGANON_LPSN_USERNAME/ORGANON_LPSN_PASSWORD, inscription gratuite sur register.lpsn.dsmz.de)"}
-        derniere_maj: "2026-09-05"
+        status: en_attente
+        classification: {can_classify: true, estimated: false, detail: "organon.modules.lpsn, module complet et enregistré — échoue entièrement tant qu'un compte DSMZ n'est pas configuré (voir acces)"}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", basionyme, "taxon-type", identifiant, "citation de la publication originale (DOI)", "sous-taxons"]
+        access: {type: contact_requis, detail: "API REST réelle (api.lpsn.dsmz.de, auth Keycloak) ; compte DSMZ requis (ORGANON_LPSN_USERNAME/ORGANON_LPSN_PASSWORD, inscription gratuite sur register.lpsn.dsmz.de)"}
+        last_updated: "2026-09-05"
         notes: "\"en_attente\" plutôt que \"contact_requis\" : le module est déjà écrit et enregistré (TaxonomyModule.is_configured() bascule automatiquement vers \"disponible\" dès que les identifiants sont renseignés), contrairement à MycoBank/Pl@ntNet où l'intégration elle-même reste à faire."
       - id: gtdb
-        nom: "Genome Taxonomy Database (GTDB)"
+        name: "Genome Taxonomy Database (GTDB)"
         url: "https://gtdb.ecogenomic.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "enrichissement seul (organon.modules.gtdb) : GTDB attribue des noms d'espèces provisoires suffixés (ex. \"Escherichia hormaechei_A\", vérifié en direct) aux génomes non cultivés/groupes cryptiques sans nom latin publié, non disponibles au sens du code de nomenclature — LPSN reste l'unique source de classification pour ce domaine, jamais remplacée ni corrigée par GTDB"}
-        elements_recoltes: [rang, identifiant, "lien vers la fiche source"]
-        acces: {type: api_rest, detail: "URLs d'API directe devinées toujours injoignables/404 (api.gtdb.ecogenomic.org) ; mirroir officiel via ChecklistBank (api.checklistbank.org, dataset 2214, alias GTDB, resynchronisé à chaque release) — même plateforme que Bryonames/GRIN"}
-        derniere_maj: "2026-09-21"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "enrichissement seul (organon.modules.gtdb) : GTDB attribue des noms d'espèces provisoires suffixés (ex. \"Escherichia hormaechei_A\", vérifié en direct) aux génomes non cultivés/groupes cryptiques sans nom latin publié, non disponibles au sens du code de nomenclature — LPSN reste l'unique source de classification pour ce domaine, jamais remplacée ni corrigée par GTDB"}
+        harvested_items: [rang, identifiant, "lien vers la fiche source"]
+        access: {type: api_rest, detail: "URLs d'API directe devinées toujours injoignables/404 (api.gtdb.ecogenomic.org) ; mirroir officiel via ChecklistBank (api.checklistbank.org, dataset 2214, alias GTDB, resynchronisé à chaque release) — même plateforme que Bryonames/GRIN"}
+        last_updated: "2026-09-21"
         notes: "Audit du 2026-09-21 (voir docs/md/db-inventory.md § Sources indisponibles en direct mais mirrorées sur ChecklistBank) : mirroir ChecklistBank vérifié viable (nameusage/search renvoie une chaîne de classification complète, domain->espèce, sur Escherichia/Sulfolobus). Porté en enrichissement seul plutôt qu'en classification à part entière : la doc du dataset confirme que LPSN sert de référence nomenclaturale à GTDB lui-même (« LPSN is used as the primary nomenclatural reference... genome assembly identifiers are now used to create placeholder names for uncultured taxa »)."
 
   - id: virus
-    nom: Virus
+    name: Virus
     sources:
       - id: ictv
-        nom: "International Committee on Taxonomy of Viruses (ICTV)"
+        name: "International Committee on Taxonomy of Viruses (ICTV)"
         url: "https://ictv.global/msl"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "chaîne de classification et sous-taxons reconstruits depuis le dataset embarqué (VMR) ; pas d'auteur ni de synonymes, l'ICTV n'en publie pas"}
-        elements_recoltes: [rang, règne, "chaîne de classification", "sous-taxons", "identifiant (rang espèce uniquement)"]
-        acces: {type: export, detail: "dataset TSV embarqué (organon/core/data/ictv_taxonomy.tsv), construit hors ligne depuis l'export VMR (Virus Metadata Resource, MSL41/2025) publié par l'ICTV sur GitHub — aucun appel réseau à l'exécution ; pas d'API interrogeable par nom de taxon (Taxonomy Browser limité à la recherche par rang, ontologie OLS/EBI obsolète depuis 2009)"}
-        derniere_maj: "2026-09-05"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "chaîne de classification et sous-taxons reconstruits depuis le dataset embarqué (VMR) ; pas d'auteur ni de synonymes, l'ICTV n'en publie pas"}
+        harvested_items: [rang, règne, "chaîne de classification", "sous-taxons", "identifiant (rang espèce uniquement)"]
+        access: {type: export, detail: "dataset TSV embarqué (organon/core/data/ictv_taxonomy.tsv), construit hors ligne depuis l'export VMR (Virus Metadata Resource, MSL41/2025) publié par l'ICTV sur GitHub — aucun appel réseau à l'exécution ; pas d'API interrogeable par nom de taxon (Taxonomy Browser limité à la recherche par rang, ontologie OLS/EBI obsolète depuis 2009)"}
+        last_updated: "2026-09-05"
         notes: "Fiche laissée à l'état 'écarté' par erreur : le module a en réalité été intégré le 2026-08-02 sur dataset embarqué plutôt que sur API en direct. Corrigé après lecture du code (organon/modules/ictv)."
 
   - id: zoologie
-    nom: "Zoologie générale"
+    name: "Zoologie générale"
     sources:
       - id: adw
-        nom: "Animal Diversity Web (ADW)"
+        name: "Animal Diversity Web (ADW)"
         url: "https://animaldiversity.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: [auteur, date, identifiant]
-        acces: {type: scraping, detail: "scraping HTML de la fiche taxon (accounts/<nom>/), extraction d'auteur[s]/année par regex sur le paragraphe \"To cite this page:\""}
-        derniere_maj: "2026-07-23"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "côté PHP"}
+        harvested_items: [auteur, date, identifiant]
+        access: {type: scraping, detail: "scraping HTML de la fiche taxon (accounts/<nom>/), extraction d'auteur[s]/année par regex sur le paragraphe \"To cite this page:\""}
+        last_updated: "2026-07-23"
       - id: animalbase
-        nom: AnimalBase
+        name: AnimalBase
         url: null
-        statut: mort
-        classification: {possible: false, estime: true, detail: "archive nomenclaturale historique"}
-        elements_recoltes: []
-        acces: {type: mort, detail: "domaine injoignable — probablement à l'arrêt"}
-        derniere_maj: null
+        status: mort
+        classification: {can_classify: false, estimated: true, detail: "archive nomenclaturale historique"}
+        harvested_items: []
+        access: {type: mort, detail: "domaine injoignable — probablement à l'arrêt"}
+        last_updated: null
       - id: fauna_europaea
-        nom: "Fauna Europaea"
+        name: "Fauna Europaea"
         url: "https://fauna-eu.org"
-        statut: mort
-        classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: []
-        acces: {type: mort, detail: "domaine mort : fauna-eu.org ne résout plus du tout (échec DNS)"}
-        derniere_maj: "2026-09-21"
+        status: mort
+        classification: {can_classify: false, estimated: false, detail: "côté PHP"}
+        harvested_items: []
+        access: {type: mort, detail: "domaine mort : fauna-eu.org ne résout plus du tout (échec DNS)"}
+        last_updated: "2026-09-21"
         notes: "Confirmation ChecklistBank (clé 2026, alias « FaEu ») : mirroir figé sur les données 2016 du site mort ci-dessus, aucune resynchronisation en cours — double motif, en plus du DNS mort."
       - id: funet
-        nom: FUNET
+        name: FUNET
         url: "https://ftp.funet.fi/pub/sci/bio/life/"
-        statut: ecarte
-        classification: {possible: false, estime: false, detail: "aucun rang explicite dans le HTML : uniquement déductible de la profondeur de dossiers, laquelle varie par règne (4 niveaux classe→genre chez les mammifères, 5 chez les plantes avec sous-embranchement) — même fragilité que taxonomicon/ifpni, déjà écartés pour ce motif"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "sondage approfondi (pages réelles inspectées, pas seulement la racine) : HTML en réalité bien structuré par classes sémantiques (div.TN/span.CN/ul.SN/div.MENTIONS), recherche par nom fonctionnelle (cgi-bin/life/goto, gère résultat direct/liste d'homonymes inter-règnes/aucun résultat) — auteur+année et synonymes/sous-taxons seraient extractibles proprement, mais écarté : pas de rang exploitable (voir classification), noms vernaculaires seulement fi/en/sv (jamais fr, contrairement à EOL/OEPP/VASCAN/Tela Botanica déjà intégrés), site figé par branches entières (ex. Panthera daté 26.5.2007) malgré une page d'accueil mise à jour 2023, et le site lui-même avertit que « the taxonomic information is copied from various sources, and may include many inaccuracies »"}
-        derniere_maj: "2026-07-23"
+        status: ecarte
+        classification: {can_classify: false, estimated: false, detail: "aucun rang explicite dans le HTML : uniquement déductible de la profondeur de dossiers, laquelle varie par règne (4 niveaux classe→genre chez les mammifères, 5 chez les plantes avec sous-embranchement) — même fragilité que taxonomicon/ifpni, déjà écartés pour ce motif"}
+        harvested_items: []
+        access: {type: scraping, detail: "sondage approfondi (pages réelles inspectées, pas seulement la racine) : HTML en réalité bien structuré par classes sémantiques (div.TN/span.CN/ul.SN/div.MENTIONS), recherche par nom fonctionnelle (cgi-bin/life/goto, gère résultat direct/liste d'homonymes inter-règnes/aucun résultat) — auteur+année et synonymes/sous-taxons seraient extractibles proprement, mais écarté : pas de rang exploitable (voir classification), noms vernaculaires seulement fi/en/sv (jamais fr, contrairement à EOL/OEPP/VASCAN/Tela Botanica déjà intégrés), site figé par branches entières (ex. Panthera daté 26.5.2007) malgré une page d'accueil mise à jour 2023, et le site lui-même avertit que « the taxonomic information is copied from various sources, and may include many inaccuracies »"}
+        last_updated: "2026-07-23"
       - id: ion
-        nom: "Index to Organism Names (ION)"
+        name: "Index to Organism Names (ION)"
         url: null
-        statut: ecarte
-        classification: {possible: false, estime: true, detail: "index nomenclatural, comme IPNI"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "page atteignable, mais service historiquement fermé au public (accès payant institutionnel CAS) — pas une simple inscription gratuite comme MycoBank"}
-        derniere_maj: "2026-09-05"
+        status: ecarte
+        classification: {can_classify: false, estimated: true, detail: "index nomenclatural, comme IPNI"}
+        harvested_items: []
+        access: {type: bloque, detail: "page atteignable, mais service historiquement fermé au public (accès payant institutionnel CAS) — pas une simple inscription gratuite comme MycoBank"}
+        last_updated: "2026-09-05"
         notes: "Reclassé depuis contact_requis : l'accès est payant et réservé aux institutions abonnées (CAS), pas une inscription individuelle gratuite comme les autres sources \"contact_requis\" de cet inventaire."
       - id: sfs
-        nom: "Species File Software (SFS)"
+        name: "Species File Software (SFS)"
         url: "https://orthoptera.speciesfile.org"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "classification par ordre d'insectes (sous-domaine dédié par ordre, ex. orthoptera.speciesfile.org, mantodea.speciesfile.org probable) ; recommandée par Wikipédia fr, modèles {{SpeciesFile}}/{{OrthopteraSF}}/{{MantodeaSF}}"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "domaine correct confirmé 2026-08-01 : orthoptera.speciesfile.org atteignable (infrastructure TaxonWorks/Species File Group, licence CC-BY), recherche filtrée scrapable via /resources/tw/filter/dwc_otus, exports Darwin Core Archive disponibles — piste export DwC-A à privilégier sur le scraping page par page"}
-        derniere_maj: "2026-08-01"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "classification par ordre d'insectes (sous-domaine dédié par ordre, ex. orthoptera.speciesfile.org, mantodea.speciesfile.org probable) ; recommandée par Wikipédia fr, modèles {{SpeciesFile}}/{{OrthopteraSF}}/{{MantodeaSF}}"}
+        harvested_items: []
+        access: {type: scraping, detail: "domaine correct confirmé 2026-08-01 : orthoptera.speciesfile.org atteignable (infrastructure TaxonWorks/Species File Group, licence CC-BY), recherche filtrée scrapable via /resources/tw/filter/dwc_otus, exports Darwin Core Archive disponibles — piste export DwC-A à privilégier sur le scraping page par page"}
+        last_updated: "2026-08-01"
       - id: zoobank
-        nom: ZooBank
+        name: ZooBank
         url: "https://zoobank.org"
-        statut: disponible
-        classification: {possible: false, estime: false, detail: "registre nomenclatural ICZN — enregistre des actes de nomenclature, pas une hiérarchie (le champ classification du dataset ChecklistBank n'est pas un avis taxonomique fiable, non exploité)"}
-        elements_recoltes: [auteur, rang, "citation de la publication originale", identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2037, alias « ZooBank DwCA », DOI 10.48580/d4g9) — même plateforme que col/bryonames. Citation vers la fiche zoobank.org native (name.link), vérifiée fonctionnelle au navigateur réel"}
-        derniere_maj: "2026-09-12"
+        status: disponible
+        classification: {can_classify: false, estimated: false, detail: "registre nomenclatural ICZN — enregistre des actes de nomenclature, pas une hiérarchie (le champ classification du dataset ChecklistBank n'est pas un avis taxonomique fiable, non exploité)"}
+        harvested_items: [auteur, rang, "citation de la publication originale", identifiant]
+        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2037, alias « ZooBank DwCA », DOI 10.48580/d4g9) — même plateforme que col/bryonames. Citation vers la fiche zoobank.org native (name.link), vérifiée fonctionnelle au navigateur réel"}
+        last_updated: "2026-09-12"
       - id: zoonomen
-        nom: Zoonomen
+        name: Zoonomen
         url: null
-        statut: ecarte
-        classification: {possible: false, estime: true, detail: "nomenclature ornithologique statique"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "site statique, pas d'API"}
-        derniere_maj: null
+        status: ecarte
+        classification: {can_classify: false, estimated: true, detail: "nomenclature ornithologique statique"}
+        harvested_items: []
+        access: {type: scraping, detail: "site statique, pas d'API"}
+        last_updated: null
 
   - id: air
-    nom: "Air — oiseaux, insectes"
+    name: "Air — oiseaux, insectes"
     sources:
       - id: avibase
-        nom: Avibase
+        name: Avibase
         url: null
-        statut: bloque
-        classification: {possible: true, estime: true, detail: "checklist/taxonomie ornithologique"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "403 sur l'API devinée — jeton requis"}
-        derniere_maj: "2026-09-21"
+        status: bloque
+        classification: {can_classify: true, estimated: true, detail: "checklist/taxonomie ornithologique"}
+        harvested_items: []
+        access: {type: bloque, detail: "403 sur l'API devinée — jeton requis"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank (total=0) — confirme l'absence de piste alternative au jeton requis ci-dessus."
       - id: bugguide
-        nom: BugGuide
+        name: BugGuide
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "identification communautaire, pas d'autorité taxonomique formelle"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "atteignable, pas d'API publique connue"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "identification communautaire, pas d'autorité taxonomique formelle"}
+        harvested_items: []
+        access: {type: inconnu, detail: "atteignable, pas d'API publique connue"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: moure_bee_catalogue
-        nom: "Catalogue d'abeilles de Moure"
+        name: "Catalogue d'abeilles de Moure"
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "taxonomie des abeilles, aujourd'hui hébergé par Discover Life"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "interface de recherche HTML, pas d'API confirmée"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "taxonomie des abeilles, aujourd'hui hébergé par Discover Life"}
+        harvested_items: []
+        access: {type: inconnu, detail: "interface de recherche HTML, pas d'API confirmée"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank dédié : seuls des articles isolés citant des genres nommés par Moure, plus un catalogue régional distinct (« Catalogue of Afrotropical Bees », clé 2040, Afrique — pas le catalogue de Moure, qui couvre l'hémisphère occidental)."
       - id: coi_ioc
-        nom: "Congrès ornithologique international (COI / IOC World Bird Names)"
+        name: "Congrès ornithologique international (COI / IOC World Bird Names)"
         url: "https://www.worldbirdnames.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "taxonomie des oiseaux (classe Aves) seulement — domaine 'oiseau' (sous-domaine dédié de l'arbre Organon, contrairement à WCO/Bryonames)"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", éteint, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2036, alias « IOC », DOI 10.48580/d4g8) — même plateforme et même schéma que les modules col/bryonames/wco"}
-        derniere_maj: "2026-09-21"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "taxonomie des oiseaux (classe Aves) seulement — domaine 'oiseau' (sous-domaine dédié de l'arbre Organon, contrairement à WCO/Bryonames)"}
+        harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", éteint, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2036, alias « IOC », DOI 10.48580/d4g8) — même plateforme et même schéma que les modules col/bryonames/wco"}
+        last_updated: "2026-09-21"
         notes: "L'ancienne piste de scraping direct (family-index-2/, classification/species/) est abandonnée : le site worldbirdnames.org a lui-même été restructuré (les anciennes pages par famille /Family/<Nom> renvoient 404, vérifié en direct) et ne propose plus de fiche par taxon navigable, seulement du contenu WordPress générique et des exports XLSX/XML bruts. Les données sont distribuées sans restriction via ChecklistBank (resynchronisé le 2026-09-15), qui sert le module à la place. Dataset accepted-only (vérifié en direct : la facette status des 33 722 usages n'expose que « accepted », /taxon/<id>/synonyms toujours vide) — pas de résolution de synonymes, même situation que WSC. Le modèle {{Avibase}} recommandé par Wikipédia fr est écarté : il exige un identifiant Avibase propre (avibaseId) qu'aucun champ de ce dataset ne fournit. render_bioref utilise donc {{COI}} (vérifié en direct sur fr.wikipedia), qui ne nécessite que famille + taxon cité — sans besoin d'identifiant externe, malgré son URL interne ({{COI/url}}) elle-même pointée vers les pages /Family/ aujourd'hui mortes (problème côté modèle Wikipédia, hors périmètre de ce module)."
       - id: ebird
-        nom: eBird
+        name: eBird
         url: null
-        statut: bloque
-        classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: []
-        acces: {type: bloque, detail: "API officielle nécessite une clé enregistrée ; le contournement scrapé du PHP est mort"}
-        derniere_maj: null
+        status: bloque
+        classification: {can_classify: false, estimated: false, detail: "côté PHP"}
+        harvested_items: []
+        access: {type: bloque, detail: "API officielle nécessite une clé enregistrée ; le contournement scrapé du PHP est mort"}
+        last_updated: null
       - id: epoq
-        nom: "Étude des populations d'oiseaux du Québec (ÉPOQ)"
+        name: "Étude des populations d'oiseaux du Québec (ÉPOQ)"
         url: null
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "données d'observation, pas une hiérarchie"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "page atteignable, pas d'API connue"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "données d'observation, pas une hiérarchie"}
+        harvested_items: []
+        access: {type: inconnu, detail: "page atteignable, pas d'API connue"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank (total=0)."
       - id: lepindex
-        nom: LepIndex
+        name: LepIndex
         url: null
-        statut: ecarte
-        classification: {possible: false, estime: true, detail: "index nomenclatural pour les lépidoptères"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "écarté (revérifié en direct) : le portail CKAN du Natural History Museum de Londres est réel, mais package_search?q=lepindex renvoie zéro résultat — LepIndex n'y est pas publié"}
-        derniere_maj: "2026-09-21"
+        status: ecarte
+        classification: {can_classify: false, estimated: true, detail: "index nomenclatural pour les lépidoptères"}
+        harvested_items: []
+        access: {type: inconnu, detail: "écarté (revérifié en direct) : le portail CKAN du Natural History Museum de Londres est réel, mais package_search?q=lepindex renvoie zéro résultat — LepIndex n'y est pas publié"}
+        last_updated: "2026-09-21"
         notes: "Successeur actif identifié : Global Lepidoptera Index (ChecklistBank clé 55434, alias GLI, resynchronisé 2026-09-03, même éditeur que LepIndex) — à préférer pour toute nouvelle intégration lépidoptères. LepIndex lui-même reste écarté (0 résultat CKAN ci-dessus), ne pas rouvrir le sujet sous ce nom."
       - id: oiseaux_net
-        nom: Oiseaux.net
+        name: Oiseaux.net
         url: "https://www.oiseaux.net"
-        statut: non_sonde
-        classification: {possible: false, estime: true, detail: "site descriptif français"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "atteignable, pas d'API connue"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: false, estimated: true, detail: "site descriptif français"}
+        harvested_items: []
+        access: {type: inconnu, detail: "atteignable, pas d'API connue"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank dédié : la requête « oiseaux » ne remonte que des listes régionales (Sénégal, Togo) et des textes historiques d'ornithologie, rien lié à oiseaux.net."
       - id: systema_dipterorum
-        nom: "Systema Dipterorum"
+        name: "Systema Dipterorum"
         url: "http://diptera.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification des diptères (ordre Diptera) seulement — domaine 'animal' faute de sous-domaine dédié dans l'arbre Organon, comme ZooBank"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 1101, alias « Systema Dipterorum », DOI 10.48580/d3bz, v7.2) — même plateforme et même schéma que les modules col/bryonames/wco"}
-        derniere_maj: "2026-09-21"
-        notes: "L'interface publique historique (diptera.org) n'expose pas d'API propre ; les données sont distribuées via ChecklistBank, resynchronisé le 2026-06-16 — dataset actif. La chaîne classification de l'API est plafonnée à l'ordre (Diptera comme unique racine, vérifié en direct sur GET .../dataset/1101/tree) : classe/embranchement (Insecta/Arthropoda) injectés en dur, même principe que WCO. Licence cc by : render_bioref expose un lien de citation public, faute de modèle {{Bioref}} dédié sur Wikipédia fr (0 résultat vérifié en direct), via le modèle générique {{Lien web}}, comme WCO/Bryonames."
-
+        status: retire
+        classification: {can_classify: false, estimated: false, detail: "écarté : aucune page publique par taxon sur diptera.org (les pages /Nomenclator/Details/<id> utilisent un identifiant interne absent de ChecklistBank)"}
+        harvested_items: []
+        access: {type: inconnu, detail: "jeu ChecklistBank 1101 sans lien ni identifiant propre à la source (link, alternativeId, verbatim et archive ColDP vides) : aucune citation vérifiable sur Wikipédia"}
+        last_updated: "2026-10-09"
+        notes: "Règle : un module n'existe que s'il peut citer une page de la source elle-même ; sans bioref vérifiable, il ne classe ni ne fournit de contenu. Module retiré."
   - id: eau
-    nom: "Eau — poissons, amphibiens"
+    name: "Eau — poissons, amphibiens"
     sources:
       - id: asw
-        nom: "Amphibian Species of the World (ASW)"
+        name: "Amphibian Species of the World (ASW)"
         url: "https://amphibiansoftheworld.amnh.org"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "autorité taxonomique batraciens, AMNH"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "403 reconfirmé 2026-08-01 sur le domaine principal — protection anti-bot probable, toujours pas confirmé bloqué définitivement (une autre méthode d'accès reste à essayer)"}
-        derniere_maj: "2026-08-01"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "autorité taxonomique batraciens, AMNH"}
+        harvested_items: []
+        access: {type: inconnu, detail: "403 reconfirmé 2026-08-01 sur le domaine principal — protection anti-bot probable, toujours pas confirmé bloqué définitivement (une autre méthode d'accès reste à essayer)"}
+        last_updated: "2026-08-01"
       - id: amphibiaweb
-        nom: AmphibiaWeb
+        name: AmphibiaWeb
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "403 sur /api/ — le chemin d'API est peut-être différent, à revérifier"}
-        derniere_maj: null
+        status: non_sonde
+        classification: {can_classify: true, estimated: true}
+        harvested_items: []
+        access: {type: inconnu, detail: "403 sur /api/ — le chemin d'API est peut-être différent, à revérifier"}
+        last_updated: null
       - id: ecof
-        nom: "Eschmeyer's Catalog of Fishes (ECoF)"
+        name: "Eschmeyer's Catalog of Fishes (ECoF)"
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "autorité nomenclaturale des poissons"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "non concluant, sondage rapide insuffisant"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "autorité nomenclaturale des poissons"}
+        harvested_items: []
+        access: {type: inconnu, detail: "non concluant, sondage rapide insuffisant"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank dédié trouvé (requêtes « Eschmeyer », « Eschmeyer Catalog of Fishes ») : seuls des articles isolés et le module fishbase déjà actif (clé 1010, sans rapport direct) apparaissent."
       - id: fishbase
-        nom: FishBase
+        name: FishBase
         url: "https://www.fishbase.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification des poissons — domaine 'poisson', sous-domaine réel de l'arbre Organon"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 1010, alias « WoRMS FishBase »), même plateforme et même schéma que le module col/bryonames. Depuis le 2025-05-01 l'export est généré depuis la plateforme Aphia/VLIZ : identifiants LSID WoRMS, plus de code numérique natif FishBase (SpecCode/FamCode)"}
-        derniere_maj: "2026-09-11"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "classification des poissons — domaine 'poisson', sous-domaine réel de l'arbre Organon"}
+        harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
+        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 1010, alias « WoRMS FishBase »), même plateforme et même schéma que le module col/bryonames. Depuis le 2025-05-01 l'export est généré depuis la plateforme Aphia/VLIZ : identifiants LSID WoRMS, plus de code numérique natif FishBase (SpecCode/FamCode)"}
+        last_updated: "2026-09-11"
         notes: "Remplace la piste rfishbase (données figées 2021, jamais utilisée en pratique) par le mirror ChecklistBank, activement resynchronisé. La bascule Aphia/WoRMS de la source prive le module du code FishBase numérique exigé par {{FishBase espèce}}/{{FishBase famille}} (vérifié en direct dans le code des modèles, aucun mode de repli par nom) : ces deux rangs utilisent {{Lien web}} vers la fiche WoRMS d'origine plutôt que le modèle FishBase dédié. {{FishBase genre}}/{{FishBase ordre}}, qui n'exigent qu'un nom, sont en revanche utilisés tels quels."
       - id: mussel_project
-        nom: "The MUSSEL project"
+        name: "The MUSSEL project"
         url: null
-        statut: ecarte
-        classification: {possible: false, estime: true, detail: "checklist régionale statique"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "site académique statique, pas d'API"}
-        derniere_maj: "2026-09-21"
+        status: ecarte
+        classification: {can_classify: false, estimated: true, detail: "checklist régionale statique"}
+        harvested_items: []
+        access: {type: scraping, detail: "site académique statique, pas d'API"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank (total=0, requête « MUSSEL project unionid »)."
 
   - id: terre
-    nom: "Terre — mammifères, arachnides, autres"
+    name: "Terre — mammifères, arachnides, autres"
     sources:
       - id: antweb
-        nom: AntWeb
+        name: AntWeb
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "base de spécimens de fourmis avec taxonomie"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "403 même avec en-tête user-agent navigateur — à revérifier avec la documentation officielle (distinct d'AntCat, aussi bloqué)"}
-        derniere_maj: null
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "base de spécimens de fourmis avec taxonomie"}
+        harvested_items: []
+        access: {type: inconnu, detail: "403 même avec en-tête user-agent navigateur — à revérifier avec la documentation officielle (distinct d'AntCat, aussi bloqué)"}
+        last_updated: null
       - id: ccw
-        nom: "Checklist of the Collembola of the World (CCW)"
+        name: "Checklist of the Collembola of the World (CCW)"
         url: "https://www.collembola.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification complète (rang, auteur, statut) via ChecklistBank, comme wco/bryonames — plafonne à la classe Collembola (dataset entièrement restreint à ce taxon), embranchement/sous-embranchement Arthropoda/Hexapoda injectés en dur au-dessus"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", synonymes, "sous-taxons", éteint, identifiant]
-        acces: {type: api_rest, detail: "REST checklistbank.org (dataset ChecklistBank 2130, alias Collembola.org, DOI 10.48580/d4kh, version Feb 2025), même plateforme et même schéma que wco/bryonames — pas de scraping nécessaire, contrairement à la piste envisagée initialement"}
-        derniere_maj: "2026-09-21"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "classification complète (rang, auteur, statut) via ChecklistBank, comme bryonames — plafonne à la classe Collembola (dataset entièrement restreint à ce taxon), embranchement/sous-embranchement Arthropoda/Hexapoda injectés en dur au-dessus"}
+        harvested_items: [auteur, rang, "chaîne de classification", synonymes, "sous-taxons", éteint, identifiant]
+        access: {type: api_rest, detail: "REST checklistbank.org (dataset ChecklistBank 2130, alias Collembola.org, DOI 10.48580/d4kh, version Feb 2025), même plateforme et même schéma que wco/bryonames — pas de scraping nécessaire, contrairement à la piste envisagée initialement"}
+        last_updated: "2026-09-21"
         notes: "Module intégré, voir organon/modules/ccw/."
       - id: mdd
-        nom: "Mammal Diversity Database (MDD)"
+        name: "Mammal Diversity Database (MDD)"
         url: "https://www.mammaldiversity.org"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "classification complète (rang, auteur, statut) via ChecklistBank, comme col/bryonames"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", synonymes, "sous-taxons", éteint, identifiant]
-        acces: {type: api_rest, detail: "REST checklistbank.org (dataset ChecklistBank 9802, resynchronisé 2025-04-08), même plateforme et même schéma que col/bryonames — pas de scraping/CSV nécessaire, contrairement à la piste CSV GitHub envisagée initialement"}
-        derniere_maj: "2026-09-11"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "classification complète (rang, auteur, statut) via ChecklistBank, comme col/bryonames"}
+        harvested_items: [auteur, rang, "chaîne de classification", synonymes, "sous-taxons", éteint, identifiant]
+        access: {type: api_rest, detail: "REST checklistbank.org (dataset ChecklistBank 9802, resynchronisé 2025-04-08), même plateforme et même schéma que col/bryonames — pas de scraping/CSV nécessaire, contrairement à la piste CSV GitHub envisagée initialement"}
+        last_updated: "2026-09-11"
         notes: "Module intégré, voir organon/modules/mdd/. Successeur du module msw (retiré, voir ci-dessous) : source la plus à jour, classification-capable contrairement à MSW3."
       - id: msw
-        nom: "Mammal Species of the World (MSW)"
+        name: "Mammal Species of the World (MSW)"
         url: "https://www.departments.bucknell.edu/biology/resources/msw3/"
-        statut: retire
-        classification: {possible: false, estime: false, detail: "côté PHP"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "scraping HTML (pages .asp statiques, aucune API) : recherche plein texte en GET sur search.asp?s=<nom>, auteur récupéré sur la fiche détail browse.asp?s=y&id=<id>"}
-        derniere_maj: "2026-09-11"
-        notes: "Intégré puis retiré : 3e éd. figée depuis 2005, remplacée par mdd (ci-dessus), activement maintenue par l'ASM et classification-capable. Code conservé dans _archive/msw."
+        status: retire
+        classification: {can_classify: false, estimated: false, detail: "côté PHP"}
+        harvested_items: []
+        access: {type: scraping, detail: "scraping HTML (pages .asp statiques, aucune API) : recherche plein texte en GET sur search.asp?s=<nom>, auteur récupéré sur la fiche détail browse.asp?s=y&id=<id>"}
+        last_updated: "2026-09-11"
+        notes: "Intégré puis retiré : 3e éd. figée depuis 2005, remplacée par mdd (ci-dessus), activement maintenue par l'ASM et classification-capable."
       - id: reptile_database
-        nom: "The Reptile Database"
+        name: "The Reptile Database"
         url: "https://reptile-database.reptarium.cz"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "champ « Higher Taxa » de la fiche espèce exploité pour famille + ordre uniquement (aucun rang explicite dans le HTML, clades intermédiaires sous-famille/super-famille/sous-ordre à position incohérente d'une fiche à l'autre — ordre repéré par vocabulaire fermé des 4 ordres de reptiles vivants plutôt que par position)"}
-        elements_recoltes: ["confirmation du nom binomial accepté", "auteur/année (si présents)", rang, "chaîne de classification (genre → famille → ordre)", "identifiant (couple genre + épithète spécifique, le site n'utilise pas d'identifiant numérique)", "confirmation de présence d'un genre ou d'une famille (citation seule, pas de classification à ces rangs)"]
-        acces: {type: scraping, detail: "scraping HTML ciblé par regex sur le <h1> (confirmation du nom) et le champ « Higher Taxa » (/species?genus=&species=), aucune API trouvée ; ne classifie jamais au rang sous-espèce (le site n'indexe que le nom binomial) ; genre/famille n'ont pas de fiche dédiée, seulement un formulaire de recherche (/advanced_search?genus=|taxon=) utilisé pour confirmer leur présence une fois leur rang déjà résolu par un autre module"}
-        derniere_maj: "2026-09-06"
+        status: disponible
+        classification: {can_classify: true, estimated: false, detail: "champ « Higher Taxa » de la fiche espèce exploité pour famille + ordre uniquement (aucun rang explicite dans le HTML, clades intermédiaires sous-famille/super-famille/sous-ordre à position incohérente d'une fiche à l'autre — ordre repéré par vocabulaire fermé des 4 ordres de reptiles vivants plutôt que par position)"}
+        harvested_items: ["confirmation du nom binomial accepté", "auteur/année (si présents)", rang, "chaîne de classification (genre → famille → ordre)", "identifiant (couple genre + épithète spécifique, le site n'utilise pas d'identifiant numérique)", "confirmation de présence d'un genre ou d'une famille (citation seule, pas de classification à ces rangs)"]
+        access: {type: scraping, detail: "scraping HTML ciblé par regex sur le <h1> (confirmation du nom) et le champ « Higher Taxa » (/species?genus=&species=), aucune API trouvée ; ne classifie jamais au rang sous-espèce (le site n'indexe que le nom binomial) ; genre/famille n'ont pas de fiche dédiée, seulement un formulaire de recherche (/advanced_search?genus=|taxon=) utilisé pour confirmer leur présence une fois leur rang déjà résolu par un autre module"}
+        last_updated: "2026-09-06"
       - id: tsf
-        nom: "The Scorpion Files (TSF)"
+        name: "The Scorpion Files (TSF)"
         url: "https://www.ntnu.no/ub/scorpion-files"
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "taxonomie des scorpions"}
-        elements_recoltes: []
-        acces: {type: scraping, detail: "page d'accueil atteignable (2941 espèces annoncées), sections 'Species List' (intro.php) et 'Species Biographies' (specieslist.php) identifiées 2026-08-01, mais structure exacte des URLs de fiche espèce et présence d'une hiérarchie famille/genre pas encore confirmées — à approfondir page par page"}
-        derniere_maj: "2026-08-01"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "taxonomie des scorpions"}
+        harvested_items: []
+        access: {type: scraping, detail: "page d'accueil atteignable (2941 espèces annoncées), sections 'Species List' (intro.php) et 'Species Biographies' (specieslist.php) identifiées 2026-08-01, mais structure exacte des URLs de fiche espèce et présence d'une hiérarchie famille/genre pas encore confirmées — à approfondir page par page"}
+        last_updated: "2026-08-01"
       - id: wco
-        nom: "World Catalogue of Opiliones (WCO)"
+        name: "World Catalogue of Opiliones (WCO)"
         url: "https://wcolite.com"
-        statut: disponible
-        classification: {possible: true, estime: false, detail: "taxonomie des opilions (ordre Opiliones) seulement — domaine 'arachnide' faute de sous-domaine dédié dans l'arbre Organon, comme WSC"}
-        elements_recoltes: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
-        acces: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 2256, alias « WCO », DOI 10.48580/d4pt) — même plateforme et même schéma que les modules col/bryonames"}
-        derniere_maj: "2026-09-11"
-        notes: "L'ancienne hypothèse d'hébergement par le NMBE (comme WSC) était infirmée le 2026-08-01 (wsc.nmbe.ch/wco → 404) ; le catalogue est en réalité distribué via ChecklistBank, resynchronisé le jour même de sa mise à jour source (2026-09-01) — dataset activement maintenu. Licence cc by (pas de restriction NonCommercial contrairement à WSC) : contrairement à WSC, ce module expose un lien de citation public (render_bioref), faute de modèle {{Bioref}} dédié sur Wikipédia fr, via le modèle générique {{Lien web}}, comme Bryonames."
+        status: retire
+        classification: {can_classify: false, estimated: false, detail: "écarté : aucune page publique par taxon sur wcolite.com (application monopage, URL toujours remise à /)"}
+        harvested_items: []
+        access: {type: inconnu, detail: "jeu ChecklistBank 2256 sans lien ni identifiant propre à la source (link, alternativeId, verbatim et archive ColDP vides) : aucune citation vérifiable sur Wikipédia"}
+        last_updated: "2026-10-09"
+        notes: "Règle : un module n'existe que s'il peut citer une page de la source elle-même ; sans bioref vérifiable, il ne classe ni ne fournit de contenu. Module retiré."
       - id: pseudoscorpions_world
-        nom: "Pseudoscorpions of the World"
+        name: "Pseudoscorpions of the World"
         url: null
-        statut: non_sonde
-        classification: {possible: true, estime: true, detail: "catalogue taxonomique des pseudoscorpions cité par Wikipédia fr, jamais recensé dans cet inventaire avant 2026-08-01"}
-        elements_recoltes: []
-        acces: {type: inconnu, detail: "aucune URL confirmée : hypothèse wcp.nmbe.ch testée 2026-08-01 (DNS injoignable), hébergement NMBE probablement erroné (voir wco ci-dessus) — sondage à reprendre depuis zéro"}
-        derniere_maj: "2026-09-21"
+        status: non_sonde
+        classification: {can_classify: true, estimated: true, detail: "catalogue taxonomique des pseudoscorpions cité par Wikipédia fr, jamais recensé dans cet inventaire avant 2026-08-01"}
+        harvested_items: []
+        access: {type: inconnu, detail: "aucune URL confirmée : hypothèse wcp.nmbe.ch testée 2026-08-01 (DNS injoignable), hébergement NMBE probablement erroné (voir wco ci-dessus) — sondage à reprendre depuis zéro"}
+        last_updated: "2026-09-21"
         notes: "Aucun mirroir ChecklistBank dédié (requête « Pseudoscorpions of the World » : seuls des articles isolés sur des genres/espèces individuels, plus GBIF Backbone Taxonomy déjà couvert par ailleurs)."
       - id: wsc
-        nom: "World Spider Catalog (WSC)"
+        name: "World Spider Catalog (WSC)"
         url: "https://wsc.nmbe.ch"
-        statut: disponible
-        classification: {possible: true, estime: true, detail: "taxonomie des araignées (famille/genre/espèce/sous-espèce) ; aucun synonyme résolu, l'export ne couvre que les espèces valides"}
-        elements_recoltes: [auteur, rang, règne, "chaîne de classification", identifiant]
-        acces: {type: export, detail: "export CSV quotidien public sans clé (https://wsc.nmbe.ch/resources/species_export_YYYYMMDD.csv, ~6,2 Mo, colonnes speciesId/species_legacy_id/species_lsid/family/genus/species/subspecies/author/year/parentheses/distribution) — confirmé accessible en direct (HTTP 200, Last-Modified du jour). Ne couvre que les espèces actuellement valides (page dataresources : \"all currently valid species included\") : pas de colonne de statut ni d'identifiant vers un nom accepté, contrairement à ce qui était documenté ici avant le 2026-09-05. Une API REST/JSON existe aussi (api/lsid/<LSID>, api/updates, avec un lien validTaxon pour les synonymes) mais nécessite inscription WSCA + clé API, donc écartée au profit du CSV. Licence CC BY-NC-SA 4.0 : attribution requise, usage non-commercial."}
-        derniere_maj: "2026-09-05 (colonnes et couverture re-vérifiées en direct, fiche précédente obsolète depuis un changement de schéma de l'export)"
+        status: disponible
+        classification: {can_classify: true, estimated: true, detail: "taxonomie des araignées (famille/genre/espèce/sous-espèce) ; aucun synonyme résolu, l'export ne couvre que les espèces valides"}
+        harvested_items: [auteur, rang, règne, "chaîne de classification", identifiant]
+        access: {type: export, detail: "export CSV quotidien public sans clé (https://wsc.nmbe.ch/resources/species_export_YYYYMMDD.csv, ~6,2 Mo, colonnes speciesId/species_legacy_id/species_lsid/family/genus/species/subspecies/author/year/parentheses/distribution) — confirmé accessible en direct (HTTP 200, Last-Modified du jour). Ne couvre que les espèces actuellement valides (page dataresources : \"all currently valid species included\") : pas de colonne de statut ni d'identifiant vers un nom accepté, contrairement à ce qui était documenté ici avant le 2026-09-05. Une API REST/JSON existe aussi (api/lsid/<LSID>, api/updates, avec un lien validTaxon pour les synonymes) mais nécessite inscription WSCA + clé API, donc écartée au profit du CSV. Licence CC BY-NC-SA 4.0 : attribution requise, usage non-commercial."}
+        last_updated: "2026-09-05 (colonnes et couverture re-vérifiées en direct, fiche précédente obsolète depuis un changement de schéma de l'export)"
         notes: "Déjà demandé (docs/backlog.md). Ancien sondage 'non concluant' invalidé : l'export CSV n'avait alors pas été trouvé."

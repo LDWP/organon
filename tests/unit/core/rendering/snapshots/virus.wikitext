@@ -1,0 +1,29 @@
+{{ébauche|virus}}
+{{Taxobox début | virus | ''Betacoronavirus pandemicum'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=ICTV}}
+{{Taxobox | classe | Pisoniviricetes }}
+{{Taxobox | ordre | Nidovirales }}
+{{Taxobox | famille | Coronaviridae }}
+{{Taxobox | sous-famille | Orthocoronavirinae }}
+{{Taxobox | genre | Betacoronavirus }}
+{{Taxobox taxon | virus | espèce | Betacoronavirus pandemicum |  }}
+{{Taxobox fin}}
+'''''Betacoronavirus pandemicum''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Coronaviridae]]''.
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+{{Section vide ou incomplète}}
+
+== Systématique ==
+Le [[nom valide]] de ce taxon est ''Betacoronavirus pandemicum''{{Bioref|ICTV|<DATE>|ref}}.
+
+== Liens externes ==
+* {{ICTV | 202201234 | ''Betacoronavirus pandemicum'' |  | consulté le=<DATE>}}
+
+== Notes et références ==
+{{références}}
+
+{{Portail|biologie}}
+
+[[Catégorie:Catégorie test]]

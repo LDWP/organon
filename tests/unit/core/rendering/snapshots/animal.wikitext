@@ -1,0 +1,54 @@
+{{ébauche|carnivore}}
+{{Taxobox début | animal | ''Panthera leo'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | famille | Felidae }}
+{{Taxobox | genre | Panthera }}
+{{Taxobox taxon | animal | espèce | Panthera leo | (Linnaeus, 1758) }}
+{{Taxobox UICN | VU | A2abcd }}
+{{Taxobox CITES | II | 2019 | population }}
+{{Taxobox fin}}
+'''''Panthera leo''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des [[Felidae]].
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+Ce taxon est présent dans le pays ou la région suivant{{Bioref|gbif|<DATE>|ref}} : [[Kenya]]; de présence incertaine en [[Tanzanie]].
+
+== Liste des sous-espèces ==
+Selon {{Bioref|gbif|<DATE>}} :
+* ''Panthera leo leo'' (Linnaeus, 1758)
+* ''Panthera leo melanochaita'' (Smith, 1842)
+ATTENTION : liste des sous-taxons tronquée car trop longue. Utilisez '-limite-listes' pour modifier ce comportement.
+
+== Systématique ==
+Le [[nom valide]] complet (avec [[Citation d'auteurs en zoologie|auteur]]) de ce taxon est ''Panthera leo'' (Linnaeus, 1758){{Bioref|gbif|<DATE>|ref}}.
+L'espèce a été initialement classée dans le genre ''[[Felis]]'' sous le [[protonyme]] ''Felis leo'' Linnaeus, 1758{{Bioref|gbif|<DATE>|ref}}.
+
+[[espèce type]] est ''[[Panthera leo]]''{{Bioref|gbif|<DATE>|ref}}.
+
+Ce taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Lion{{Bioref|gbif|<DATE>|ref}}, Lion d'Afrique{{Bioref|gbif|<DATE>|ref}}. Ce taxon est également nommé Lion royal{{Bioref|telametro|<DATE>|ref}}.
+
+''Panthera leo'' a pour [[Synonyme (zoologie)|synonymes]]{{Bioref|gbif|<DATE>|ref}} :
+* ''Felis leo'' Linnaeus, 1758
+* ''Leo leo''
+
+== Étymologie ==
+Du latin leo, « lion ».{{Bioref|gbif|<DATE>|ref}}.
+
+== Publication originale ==
+* Linnaeus, C. (1758). Systema Naturae.
+
+== Liens externes ==
+* {{GBIF | 5219404 | ''Panthera leo'' (Linnaeus, 1758) | consulté le=<DATE> }}
+* {{UICN | 15951 | ''Panthera leo'' | consulté le=<DATE> }}
+* {{WRMS espèce | 1 | Panthera leo | (Linnaeus, 1758) | consulté le=<DATE>}}
+
+== Notes et références ==
+{{références}}
+
+{{Portail|biologie}}
+
+[[Catégorie:Catégorie test]]

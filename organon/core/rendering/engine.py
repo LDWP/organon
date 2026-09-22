@@ -1,48 +1,66 @@
-"""Orchestrateur de rendu : assemble les sections de l'article dans l'ordre attendu."""
+"""Rendering orchestrator: assembles the article sections in order."""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.rendering import sections
+from organon.core.rendering.grammar import STUB_BY_KINGDOM
+from organon.core.selectors.engine import evaluate_ruleset
+
+__all__ = [
+    "render",
+    "render_references_items_block",
+    "render_subtaxa_block",
+    "render_taxobox_block",
+    "wp_stub",
+]
 
 
-def _compute_ebauche(struct: Struct, options: GenerateOptions) -> list[str]:
-    """Tente d'abord les règles (categories/ebauches/portails, voir organon.core.selectors),
-    puis retombe sur la table par règne. Import différé pour éviter un cycle (selectors ->
-    models, jamais rendering -> selectors au niveau module)."""
-    from organon.core.selectors.categorization import wp_ebauche
+def wp_stub(struct: Struct, options: GenerateOptions) -> list[str]:
+    """Compute the stub templates, rules first, then the kingdom table.
 
-    return wp_ebauche(struct, options)
+    Imported lazily to avoid a cycle with selectors.
+    """
+    if options.selectors:
+        ret = evaluate_ruleset("ebauches", struct)
+        if ret is not None:
+            return ret
+    if struct.kingdom in STUB_BY_KINGDOM:
+        return [STUB_BY_KINGDOM[struct.kingdom]]
+    return []
 
 
 def render_taxobox_block(struct: Struct, options: GenerateOptions) -> str:
-    """Rendu isolé du bloc `{{ébauche}}` → `{{Taxobox fin}}`, réutilisé par `render()` et par
-    l'API pour permettre d'échanger ce bloc seul (changer de source de classification) sans
-    regénérer tout l'article."""
-    ebauche = _compute_ebauche(struct, options)
-    return sections.render_taxobox(struct, options, ebauche)
+    """Render the `{{ébauche}}` to `{{Taxobox fin}}` block alone.
+
+    Lets the API swap this block without regenerating the article.
+    """
+    stub = wp_stub(struct, options)
+    return sections.render_taxobox(struct, options, stub)
 
 
 def render_subtaxa_block(struct: Struct, options: GenerateOptions) -> str:
-    """Rendu isolé de la section "Liste des taxons de rang inférieur", réutilisé par `render()`
-    et par l'API selon le même principe que `render_taxobox_block` : permet d'échanger cette
-    section seule (changer de source pour les sous-taxons) sans regénérer tout l'article."""
-    return sections.render_inf(struct, options)
+    """Render the sub-taxa section alone.
+
+    Lets the API swap this section without regenerating the article.
+    """
+    return sections.render_lower_taxa(struct, options)
 
 
 def render_references_items_block(struct: Struct) -> list[tuple[str, str]]:
-    """Rendu isolé des références taxonomiques en paires (module_id, wikitext), réutilisé par
-    l'API selon le même principe que `render_taxobox_block`/`render_subtaxa_block` : n'est pas
-    appelé par `render()` (ce bloc reste inclus dans la section "Liens externes" de l'article
-    complet via `sections.render_voir_aussi`), seulement exposé séparément pour le frontend
-    (voir `organon.api.schemas.ReferenceItem`)."""
+    """Render taxonomic references as (module_id, wikitext) pairs.
+
+    Not used by `render()`; exposed separately for the frontend.
+    """
     return sections.render_references_items(struct)
 
 
 def render(struct: Struct, options: GenerateOptions, ext_only: bool = False) -> str:
-    """Assemble l'article complet. `ext_only=True` ne génère que la zone "Voir aussi" / liens
-    externes, sans le reste de l'article."""
+    """Assemble the full article.
+
+    `ext_only` renders only the "Voir aussi" and external links area.
+    """
     ret = ""
 
     if not ext_only:
@@ -51,14 +69,14 @@ def render(struct: Struct, options: GenerateOptions, ext_only: bool = False) -> 
         ret += sections.render_description(struct, options)
         ret += sections.render_distribution(struct, options)
         ret += render_subtaxa_block(struct, options)
-        ret += sections.render_supp(struct, options)
-        ret += sections.render_etymologie(struct, options)
-        ret += sections.render_originale(struct, options)
+        ret += sections.render_systematics(struct, options)
+        ret += sections.render_etymology(struct, options)
+        ret += sections.render_original(struct, options)
 
-    ret += sections.render_voir_aussi(struct, options)
+    ret += sections.render_see_also(struct, options)
 
     if not ext_only:
-        ret += sections.render_fin(struct, notes='group="note"' in ret)
+        ret += sections.render_footer(struct, notes='group="note"' in ret)
 
     while "\n\n\n" in ret:
         ret = ret.replace("\n\n\n", "\n\n")

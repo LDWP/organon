@@ -1,5 +1,5 @@
 # Règles de correspondance rang taxonomique -> {{ébauche|...}}, évaluées dans l'ordre (la
-# première qui matche l'emporte) — voir organon.core.selectors.categorization.wp_ebauche.
+# première qui matche l'emporte) — voir organon.core.rendering.engine.wp_ebauche.
 # Fichier maintenu à la main : créer un ebauches.local.yaml pour des règles spécifiques
 # plutôt que d'éditer celui-ci si la surcharge est locale/temporaire.
 #

@@ -1,0 +1,145 @@
+{
+  "author_candidates": {
+    "ipni": "L.",
+    "powo": "L."
+  },
+  "basionym": null,
+  "classification_taxobox": "biologique",
+  "consolidated_author": "L.",
+  "data_found": {
+    "ipni": [
+      "Auteur"
+    ],
+    "powo": [
+      "Classification",
+      "Synonymes",
+      "Répartition",
+      "Auteur"
+    ],
+    "telametro": [
+      "Noms vernaculaires"
+    ]
+  },
+  "distribution": {
+    "powo": [
+      "FRA",
+      "ITA"
+    ]
+  },
+  "distribution_entries": {
+    "powo": {
+      "certain": {
+        "FRA": "FRA"
+      },
+      "extinct": {},
+      "introduced": {
+        "CAN": "CAN"
+      },
+      "uncertain": {
+        "ITA": "ITA"
+      }
+    }
+  },
+  "elapsed_seconds": 0,
+  "external_ids": {
+    "ipni": "295374-1",
+    "iucn": "63532",
+    "powo": "295374-1"
+  },
+  "external_links": [
+    {
+      "html": "<a href='https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:295374-1' target='_blank' rel='noopener noreferrer'>POWO</a>",
+      "module_id": "powo"
+    },
+    {
+      "html": "<a href='https://www.ipni.org/n/295374-1' target='_blank' rel='noopener noreferrer'>IPNI</a>",
+      "module_id": "ipni"
+    },
+    {
+      "html": "<a href='https://iucnredlist.org/63532' target='_blank' rel='noopener noreferrer'>UICN</a>",
+      "module_id": "iucn"
+    }
+  ],
+  "extinct": false,
+  "habitat": "terrestre",
+  "iucn_criterion": "",
+  "iucn_status": "LC",
+  "kingdom": "plante",
+  "kingdom_inconsistencies": [],
+  "logs": [],
+  "other_names": {},
+  "rank_inconsistencies": [],
+  "rank_lines": [
+    {
+      "line": "{{Taxobox | genre | Quercus }}",
+      "name": "Quercus",
+      "rank": "genre"
+    },
+    {
+      "line": "{{Taxobox | famille | Fagaceae }}",
+      "name": "Fagaceae",
+      "rank": "famille"
+    },
+    {
+      "line": "{{Taxobox | ordre | Fagales }}",
+      "name": "Fagales",
+      "rank": "ordre"
+    },
+    {
+      "line": "{{Taxobox | classe | Magnoliopsida }}",
+      "name": "Magnoliopsida",
+      "rank": "classe"
+    }
+  ],
+  "reference_items": [
+    {
+      "default_checked": false,
+      "module_id": "ipni",
+      "wikitext": "{{IPNI | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}"
+    },
+    {
+      "default_checked": false,
+      "module_id": "powo",
+      "wikitext": "{{POWO | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}"
+    },
+    {
+      "default_checked": false,
+      "module_id": "iucn",
+      "wikitext": "{{UICN | 63532 | ''Quercus robur'' | consulté le=<DATE> }}"
+    }
+  ],
+  "references_wikitext": "* {{IPNI | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}\n* {{POWO | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}\n* {{UICN | 63532 | ''Quercus robur'' | consulté le=<DATE> }}\n",
+  "requested_taxon": "Quercus robur",
+  "resolved_author": "{{auteur|[[L.]]}} {{date à préciser}}",
+  "resolved_taxon": "Quercus robur",
+  "see_also_wikitext": "\n== Liens externes ==\n* {{IPNI | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}\n* {{POWO | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}\n* {{UICN | 63532 | ''Quercus robur'' | consulté le=<DATE> }}\n",
+  "subtaxa": [],
+  "subtaxa_completeness_score": 0,
+  "subtaxa_source": "",
+  "subtaxa_wikitext": "",
+  "synonyms": [
+    {
+      "author": "Ehrh.",
+      "extinct": null,
+      "name": "Quercus pedunculata",
+      "rank": "espèce"
+    }
+  ],
+  "synonyms_source": "powo",
+  "taxobox_completeness_score": 4,
+  "taxobox_wikitext": "{{ébauche|Fagaceae}}\n{{Taxobox début | plante | ''Quercus robur'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}\n{{Taxobox | classe | Magnoliopsida }}\n{{Taxobox | ordre | Fagales }}\n{{Taxobox | famille | Fagaceae }}\n{{Taxobox | genre | Quercus }}\n{{Taxobox taxon | plante | espèce | Quercus robur | {{auteur|[[L.]]}} {{date à préciser}} }}\n{{Taxobox UICN | LC }}\n{{Taxobox fin}}\n",
+  "taxon_rank": "espèce",
+  "truncated": {
+    "subtaxa": false,
+    "synonyms": false
+  },
+  "used_classification": "powo",
+  "used_domain": "*",
+  "vernacular_names": [
+    "Chêne pédonculé",
+    "Chêne commun"
+  ],
+  "vernacular_names_without_language": {},
+  "warnings": [],
+  "wikitext": "{{ébauche|Fagaceae}}\n{{Taxobox début | plante | ''Quercus robur'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}\n{{Taxobox | classe | Magnoliopsida }}\n{{Taxobox | ordre | Fagales }}\n{{Taxobox | famille | Fagaceae }}\n{{Taxobox | genre | Quercus }}\n{{Taxobox taxon | plante | espèce | Quercus robur | {{auteur|[[L.]]}} {{date à préciser}} }}\n{{Taxobox UICN | LC }}\n{{Taxobox fin}}\n'''''Quercus robur''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Fagaceae]]''.\n\n== Description ==\n{{Section vide ou incomplète}}\n\n== Répartition ==\n{{WGSRPD|certain=FRA|incertain=ITA|introduit=CAN|source=[[Plants of the World Online|POWO]]{{Bioref|powo|<DATE>|ref}}}}\nCe taxon est présent dans le pays ou la région suivant{{Bioref|powo|<DATE>|ref}} : [[France]]; introduit en CAN; de présence incertaine en [[Italie]].\n\n== Systématique ==\nLe [[nom valide]] complet (avec [[Auteur#Dans les sciences et techniques|auteur]]) de ce taxon est ''Quercus robur'' L.{{Bioref|powo|<DATE>|ref}}.\n\nCe taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Chêne pédonculé{{Bioref|telametro|<DATE>|ref}}, Chêne commun{{Bioref|telametro|<DATE>|ref}}.\n\n''Quercus robur'' a pour [[Synonyme (taxinomie)|synonyme]]{{Bioref|powo|<DATE>|ref}} :\n* ''Quercus pedunculata'' Ehrh.\n\n== Liens externes ==\n* {{IPNI | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}\n* {{POWO | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}\n* {{UICN | 63532 | ''Quercus robur'' | consulté le=<DATE> }}\n\n== Notes et références ==\n{{références}}\n\n{{Portail|biologie}}\n\n[[Catégorie:Fagaceae]]"
+}

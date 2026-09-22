@@ -1,11 +1,8 @@
-"""Inventaire des bases de données biologiques considérées pour Organon — intégrées ou non.
+"""Inventory of the biological databases considered for Organon.
 
-Charge `organon/core/data/db_inventory.yaml` (transcription de l'inventaire de sondage tenu à
-jour hors dépôt) et le fusionne avec `organon.core.registry` : pour toute source dont l'id
-correspond à un module réellement enregistré, le statut affiché vient du registre (vérité
-vivante) plutôt que du fichier de données, qui n'est qu'un instantané pouvant dater d'avant une
-intégration récente (voir `tropicos` dans le YAML, marqué non intégré à sa rédaction mais
-disponible en pratique aujourd'hui).
+Loads `data/db_inventory.yaml` and merges it with the registry. For
+a registered module the registry status wins over the file, which
+is only a snapshot.
 """
 
 from __future__ import annotations
@@ -17,11 +14,15 @@ from typing import Literal
 import yaml
 from pydantic import BaseModel
 
-from organon.core.registry import all_modules, default_classification_module
+from organon.core.registry import (
+    TaxonomyModule,
+    all_modules,
+    default_classification_module,
+)
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
-AccesType = Literal[
+AccessType = Literal[
     "api_rest",
     "soap",
     "scraping",
@@ -33,7 +34,10 @@ AccesType = Literal[
     "inconnu",
 ]
 
-Statut = Literal[
+# `ecarte`: never integrated. `retire`: integrated then removed.
+# `en_attente`: registered but unconfigured (account or key missing);
+# recomputed as `disponible` once configured.
+Status = Literal[
     "disponible",
     "non_sonde",
     "bloque",
@@ -45,76 +49,76 @@ Statut = Literal[
     "retire",
     "en_attente",
 ]
-"""`ecarte` désigne une base jamais intégrée (candidate rejetée avant tout portage) ; `retire`
-désigne une base qui a été intégrée puis débranchée après coup pour un motif éditorial (le module
-existait et fonctionnait, mais son maintien ne convenait plus) — ne pas confondre les deux, le
-second implique un travail d'intégration déjà fait et volontairement retiré. `en_attente` est un
-troisième cas distinct : le module est écrit et enregistré, mais reste non fonctionnel tant qu'une
-configuration tierce (compte/clé) n'est pas renseignée (voir `TaxonomyModule.is_configured` et
-`lpsn`, qui échoue entièrement sans compte DSMZ) — recalculé comme `disponible` dès que cette
-configuration est fournie, sans toucher au yaml."""
 
 
 class ClassificationInfo(BaseModel):
-    """`estime=True` signifie que la capacité de classification n'a jamais été vérifiée dans du
-    code (ni ce dépôt ni l'ancien PHP) : une supposition sur la nature de la base, à confirmer
-    si elle est portée un jour. `detail` porte la justification associée (ex. « côté PHP »,
-    « défaut », rangs couverts)."""
+    """Classification capability of a source.
 
-    possible: bool
-    estime: bool = False
+    `estimated=True` means it was never verified in code, only guessed.
+    `detail` carries the justification.
+    """
+
+    can_classify: bool
+    estimated: bool = False
     detail: str | None = None
 
 
-class AccesInfo(BaseModel):
-    type: AccesType
+class AccessInfo(BaseModel):
+    """How a source is accessed."""
+
+    type: AccessType
     detail: str
 
 
-class SourceVolet(BaseModel):
-    """Un site/usage distinct couvert par un même module (même id, même statut/accès) mais
-    affiché comme sa propre ligne sur la page Sources — ex. le module `externe` couvre Wikidata,
-    Commons, Wikispecies, Wiktionnaire et fr.wikipedia.org sous un seul id de registre. Décrit
-    explicitement ici plutôt que déduit côté frontend par correspondance de texte sur
-    `elements_recoltes` (fragile, et hors de propos pour le fichier de données)."""
+class SourceFacet(BaseModel):
+    """One site covered by a module, shown as its own row.
 
-    nom: str
+    E.g. `externe` covers Wikidata, Commons and Wikispecies.
+    """
+
+    name: str
     url: str | None = None
-    elements_recoltes: list[str] = []
+    harvested_items: list[str] = []
 
 
 class SourceEntry(BaseModel):
-    """Une base de données, intégrée ou non. `elements_recoltes` ne prend sens que pour une
-    source `disponible` (rien n'est collecté pour une base non intégrée). Une source avec
-    `volets` non vide délègue le détail par site à ceux-ci ; `elements_recoltes` reste alors
-    vide au niveau de la source elle-même."""
+    """A database, integrated or not.
+
+    `harvested_items` only matters for an available source. With
+    non-empty `facets`, per-site details live there instead.
+    """
 
     id: str
-    nom: str
+    name: str
     url: str | None = None
-    statut: Statut
+    status: Status
     classification: ClassificationInfo
-    elements_recoltes: list[str] = []
-    volets: list[SourceVolet] = []
-    acces: AccesInfo
-    derniere_maj: str | None = None
+    harvested_items: list[str] = []
+    facets: list[SourceFacet] = []
+    access: AccessInfo
+    last_updated: str | None = None
     notes: str | None = None
     is_default: bool = False
 
 
 class SourceCategory(BaseModel):
+    """A named group of sources."""
+
     id: str
-    nom: str
+    name: str
     sources: list[SourceEntry]
 
 
 class DbInventory(BaseModel):
-    derniere_maj: str
+    """The full inventory of sources."""
+
+    last_updated: str
     categories: list[SourceCategory]
 
 
 @lru_cache(maxsize=1)
 def load_db_inventory(path: Path | None = None) -> DbInventory:
+    """Load the inventory from `path` or the bundled YAML."""
     target = path or (DATA_DIR / "db_inventory.yaml")
     with target.open(encoding="utf-8") as fh:
         raw = yaml.safe_load(fh)
@@ -122,12 +126,11 @@ def load_db_inventory(path: Path | None = None) -> DbInventory:
 
 
 def build_sources_overview(inventory: DbInventory | None = None) -> DbInventory:
-    """Vue fusionnée pour GET /api/v1/sources : le fichier de données statique complété par
-    l'état réel du registre de modules. Suppose que `ensure_modules_registered()` a déjà été
-    appelé par l'appelant (comme pour `organon.api.routes.modules`).
+    """Merge the static inventory with the live module registry.
 
-    `inventory` est surtout là pour les tests (fusion contre un inventaire synthétique plutôt
-    que contre le fichier YAML réel) ; le paramètre par défaut (`None`) recharge celui-ci."""
+    Assumes `ensure_modules_registered()` was already called.
+    `inventory` defaults to the bundled file; tests pass their own.
+    """
     inventory = inventory or load_db_inventory()
     live = all_modules()
     default_id = default_classification_module()
@@ -139,31 +142,33 @@ def build_sources_overview(inventory: DbInventory | None = None) -> DbInventory:
         seen.update(entry.id for entry in category.sources)
         categories.append(category.model_copy(update={"sources": sources}))
 
-    # Modules enregistrés après la dernière mise à jour du fichier de données : ajoutés dans une
-    # catégorie de repli plutôt que rendus invisibles sur la page.
+    # Modules registered after the data file was last updated go in a
+    # fallback category instead of being hidden.
     extra = [module for module_id, module in live.items() if module_id not in seen]
     if extra:
         categories.append(
             SourceCategory(
                 id="autres_modules_actifs",
-                nom="Autres modules actifs (non encore répertoriés)",
+                name="Autres modules actifs (non encore répertoriés)",
                 sources=[_from_live_only(module, default_id) for module in extra],
             )
         )
 
-    return DbInventory(derniere_maj=inventory.derniere_maj, categories=categories)
+    return DbInventory(last_updated=inventory.last_updated, categories=categories)
 
 
-def _reconcile(entry: SourceEntry, module, default_id: str | None) -> SourceEntry:
+def _reconcile(
+    entry: SourceEntry, module: TaxonomyModule | None, default_id: str | None
+) -> SourceEntry:
     if module is None:
         return entry
-    statut = "disponible" if module.is_configured() else "en_attente"
+    status = "disponible" if module.is_configured() else "en_attente"
     return entry.model_copy(
         update={
-            "statut": statut,
+            "status": status,
             "classification": ClassificationInfo(
-                possible=module.meta.can_classify,
-                estime=False,
+                can_classify=module.meta.can_classify,
+                estimated=False,
                 detail=entry.classification.detail,
             ),
             "is_default": module.meta.id == default_id,
@@ -171,7 +176,7 @@ def _reconcile(entry: SourceEntry, module, default_id: str | None) -> SourceEntr
     )
 
 
-def _from_live_only(module, default_id: str | None) -> SourceEntry:
+def _from_live_only(module: TaxonomyModule, default_id: str | None) -> SourceEntry:
     domains = (
         module.meta.domains
         if isinstance(module.meta.domains, str)
@@ -179,9 +184,9 @@ def _from_live_only(module, default_id: str | None) -> SourceEntry:
     )
     return SourceEntry(
         id=module.meta.id,
-        nom=module.meta.id.upper(),
-        statut="disponible",
-        classification=ClassificationInfo(possible=module.meta.can_classify, estime=False),
-        acces=AccesInfo(type="inconnu", detail=f"Domaines : {domains}"),
+        name=module.meta.id.upper(),
+        status="disponible",
+        classification=ClassificationInfo(can_classify=module.meta.can_classify, estimated=False),
+        access=AccessInfo(type="inconnu", detail=f"Domaines : {domains}"),
         is_default=module.meta.id == default_id,
     )

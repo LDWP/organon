@@ -1,105 +1,195 @@
-"""Modèle de données typé décrivant l'état accumulé pendant la génération d'un article : le
-taxon demandé, sa classification, les données brutes par module, et tout ce que le rendu
-final consomme.
+"""Typed state accumulated while generating one article.
 
-Pydantic plutôt que des dicts non typés : toute donnée mal formée lève une `ValidationError`
-explicite à la collecte, au lieu d'une conversion silencieuse ou d'un plantage tardif au
-rendu. `liens` garde volontairement un format libre par module (chaque module type sa propre
-écriture avec son propre sous-modèle Pydantic — voir `organon.modules.*`) plutôt qu'un schéma
-unique qui devrait anticiper les champs des ~37 modules à l'avance.
+Pydantic rejects malformed data at collection time. The keys of
+`links` are fixed by `LinkEntry`: a misspelled name is a type
+error, not a silent `None`.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Final
 
-from pydantic import BaseModel, Field
-
-
-class TaxonInfo(BaseModel):
-    """struct['taxon'] — nom/rang/auteur du taxon demandé, tel que résolu par le module de
-    classification (peut différer du nom initialement demandé si un synonyme a été suivi)."""
-
-    nom: str
-    rang: str | None = None
-    auteur: str | None = None
-    eteint: bool | None = None
-    auteur_resolu: str | None = None
-    """Texte d'auteur wikifié (auteurs connus liés, années liées, {{auteur}} pour le reste) —
-    calculé une seule fois pendant l'orchestration par
-    `organon.core.rendering.authors.resoudre_auteur_principal` (l'appel de résolution botanique/
-    zoologique/procaryote nécessite de connaître `regne`, déjà résolu à ce stade). `None` tant
-    que non calculé ; les deux points de rendu affichant l'auteur du taxon principal
-    (`sections.py`) lisent ce champ plutôt que `auteur` brut."""
+from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import TypedDict
 
 
-class RankName(BaseModel):
-    """Un élément de struct['rangs'] (taxons parents, pour la taxobox) ou de
-    struct['sous-taxons']['liste'] / struct['synonymes']['liste'] (mêmes champs)."""
+class _Model(BaseModel):
+    """Base model: unknown fields raise instead of being ignored.
 
-    nom: str
-    rang: str | None = None
-    auteur: str | None = None
-    eteint: bool | None = None
+    An obsolete or misspelled field name must fail loudly.
+    """
 
-
-class Redirection(BaseModel):
-    """struct['redirection'] — nom d'origine si un synonyme a été suivi."""
-
-    nom: str
+    model_config = ConfigDict(extra="forbid")
 
 
-class Basionym(BaseModel):
-    """struct['basionyme'] — informations sur le basionyme. `source` = nom technique du module
-    qui a fourni l'info (pour sourçage Bioref)."""
+# Key of `Struct.links` for the footer pseudo-module (portals and
+# categories), written by the generation, not a `organon.modules`
+# module; see `compute_footer_links`.
+FOOTER_LINK: Final = "footer"
 
-    nom: str
-    auteur: str | None = None
+
+class _LinkDict(TypedDict, total=False):
+    """Base of the `Struct.links` dicts.
+
+    Unknown keys raise when `Struct` is built.
+    """
+
+    __pydantic_config__ = ConfigDict(extra="forbid")  # type: ignore[misc]
+
+
+class ColXrLink(_LinkDict):
+    """COL XR record linked to the GBIF link (`LinkEntry.col_xr`)."""
+
+    name: str
+    author: str | None
+    rank: str | None
+    extinct: bool | None
+
+
+class WikipediaPortals(_LinkDict):
+    """Portals of the retained parent article."""
+
+    portals: list[str]
+    rank: str
+    name: str
+
+
+class PageRef(_LinkDict):
+    """Page of a Wikipedia sister project (`LinkEntry.commons`…)."""
+
+    page: str
+
+
+class WikidataRef(_LinkDict):
+    """Reference to a Wikidata item."""
+
+    id: str
+
+
+class LinkEntry(_LinkDict, total=False):
+    """Entry of `Struct.links[<module-id>]`.
+
+    Every key is optional: each module writes only its own. A
+    TypedDict, not `dict[str, Any]`, so a misspelled key is a type
+    error. Shared keys: `id`, `name`, `rank`, `author`, `extinct`,
+    `synonym`, `detected_status`; the others belong to one module or to
+    the `wikimedia` and `footer` pseudo-modules.
+    """
+
+    id: str | int | None
+    name: str
+    rank: str | None
+    author: str | None
+    extinct: bool | None
+    synonym: bool | None
+    invalid: bool
+    # "synonyme" or "accepté", as reported by the module; see
+    # `RankInconsistency`.
+    detected_status: str
+    detected_kingdom: str
+    detected_family: str
+    detected_order: str
+    synonym_name: str
+    synonym_id: str | int | None
+    url: str | None
+    link: str | None
+    key: int
+    inpn_id: str | int
+    col_xr: ColXrLink
+    probable_year: int
+    common_name: str
+    ids: list[Any]
+    genus: str | None
+    epithet: str | None
+    species: str
+    family: str | None
+    date: str
+    citation: str
+    risk: str
+    criterion: str
+    appendix: str
+    precision: str
+    wikidata: WikidataRef
+    commons: PageRef
+    commons_category: PageRef
+    wikispecies: PageRef
+    frwiktionary: PageRef
+    wikipedia: WikipediaPortals
+    existing_categories: dict[str, bool]
+    portals: list[str]
+    categories: list[str]
+
+
+class TaxonInfo(_Model):
+    """Name, rank and author of the requested taxon, as resolved."""
+
+    name: str
+    rank: str | None = None
+    author: str | None = None
+    extinct: bool | None = None
+    # Wikified author text (known authors and years linked, {{auteur}}
+    # for the rest), computed once during orchestration by
+    # `resolve_main_author`, which needs `kingdom`. None until then;
+    # rendering reads it instead of the raw `author`.
+    resolved_author: str | None = None
+
+
+class RankName(_Model):
+    """Taxon entry in a parent, sub-taxon or synonym list."""
+
+    name: str
+    rank: str | None = None
+    author: str | None = None
+    extinct: bool | None = None
+
+
+class Basionym(_Model):
+    """Basionym; `source` is the module that supplied it."""
+
+    name: str
+    author: str | None = None
     source: str
 
 
-class TypeTaxon(BaseModel):
-    """struct['type'] — taxon-type (rang inférieur qui constitue la création du taxon)."""
+class TypeTaxon(_Model):
+    """Type taxon, the lower-rank taxon that created this one."""
 
-    nom: str
-    rang: str | None = None
-    auteur: str | None = None
+    name: str
+    rank: str | None = None
+    author: str | None = None
     source: str
 
 
-class SubTaxonList(BaseModel):
-    """struct['sous-taxons'] — liste des taxons de rang inférieur."""
+class SubTaxonList(_Model):
+    """Lower-rank taxa."""
 
-    liste: list[RankName] = Field(default_factory=list)
+    items: list[RankName] = Field(default_factory=list)
     source: str | None = None
-    coupe: bool = False
-    """True si la liste a été tronquée par l'option 'limite-listes'."""
+    # True if the list was cut by the `limite-listes` option.
+    truncated: bool = False
 
 
-class SynonymList(BaseModel):
-    """struct['synonymes'] — liste des synonymes du taxon."""
+class SynonymList(_Model):
+    """Synonyms of the taxon."""
 
-    liste: list[RankName] = Field(default_factory=list)
+    items: list[RankName] = Field(default_factory=list)
     source: str | None = None
-    coupe: bool = False
+    truncated: bool = False
 
 
-class Etymology(BaseModel):
-    """struct['etymologie']."""
+class Etymology(_Model):
+    """Etymology text and its source module."""
 
-    texte: str
+    text: str
     source: str
 
 
-class DistributionEntry(BaseModel):
-    """Un élément de struct['distribution'][module_id]. Les valeurs sont des codes pays ; le
-    dict conserve le code comme clé ET valeur (ex. `{"MG": "MG"}`), ce qui permet de tester
-    l'appartenance d'un code par simple présence de clé sans construire un `set` séparé.
+class DistributionEntry(_Model):
+    """Country codes of one module's distribution.
 
-    `introduced`/`extinct` sont des sous-ensembles de `certain`/`uncertain` respectivement (pas
-    des codes en plus) : ils isolent, parmi les codes déjà classés présence certaine/incertaine,
-    ceux qu'un statut POWO plus précis ("Introduced"/"Extinct") permet de colorer différemment
-    sur la carte {{WGSRPD}} (voir `organon.core.rendering.sections.render_distribution`)."""
+    Each dict maps a code to itself, so membership is a key lookup.
+    `introduced` and `extinct` are subsets of the other two.
+    """
 
     certain: dict[str, str] = Field(default_factory=dict)
     uncertain: dict[str, str] = Field(default_factory=dict)
@@ -107,97 +197,85 @@ class DistributionEntry(BaseModel):
     extinct: dict[str, str] = Field(default_factory=dict)
 
 
-class RegneIncoherence(BaseModel):
-    """Signale qu'un module d'enrichissement (`is_classification=False`) a trouvé un règne
-    différent de `struct.regne` retenu par le module de classification — signe possible d'une
-    homonymie inter-règnes (ex. "Morus" = mûrier chez les botanistes vs fou de Bassan chez les
-    zoologistes) plutôt que d'un enrichissement du même taxon.
+class KingdomInconsistency(_Model):
+    """Enrichment module whose kingdom differs from the retained one.
 
-    Détecté uniquement quand le module expose déjà ce signal sans appel réseau supplémentaire
-    (le règne était déjà présent dans la réponse utilisée pour la recherche du nom) : ce n'est
-    donc pas une détection exhaustive, seulement honnête sur ce qu'elle couvre.
+    Possible cross-kingdom homonym. Only detected when the module
+    exposes the kingdom without an extra network call.
     """
 
     module: str
-    regne_suggere: str
-    regne_retenu: str
+    suggested_kingdom: str
+    retained_kingdom: str
 
 
-class RangIncoherence(BaseModel):
-    """Signale qu'un module de classification concurrent (actif dans le run mais pas retenu comme
-    gagnant — ex. CoL XR quand GBIF gagne, ou l'inverse) rapporte, pour le même taxon, une valeur
-    différente de celle retenue pour la famille, l'ordre ou le statut nomenclatural (accepté/
-    synonyme). Contrairement à un simple trou de données (une source qui n'a rien à dire), c'est
-    un VRAI désaccord : les deux sources ont chacune une valeur, mais différente (ex. Anolis
-    carolinensis : famille Dactyloidae chez GBIF, Anolidae chez CoL XR — placement débattu en
-    herpétologie). Un choix éditorial qui appartient au contributeur Wikipédia, jamais tranché
-    automatiquement ici — voir `organon.core.selectors.coherence.detect_rang_incoherences`.
+class RankInconsistency(_Model):
+    """Competing classification module disagreeing on a value.
 
-    Détecté uniquement quand le module expose déjà ce signal sans appel réseau supplémentaire
-    (même principe que `RegneIncoherence` : la donnée est déjà présente dans la réponse utilisée
-    pour la classification/recherche) — pas une détection exhaustive, seulement honnête sur ce
-    qu'elle couvre."""
+    Both sources have a value for the family, order or status, and
+    the values differ. Never resolved automatically.
+    """
 
     module: str
-    rang: str
-    """Le rang comparé : "famille", "ordre" ou "statut"."""
-    valeur_suggeree: str
-    valeur_retenue: str
+    # Compared field: "famille", "ordre" or "statut".
+    compared_field: str
+    suggested_value: str
+    retained_value: str
 
 
-class Struct(BaseModel):
-    """Objet mutable unique passé par référence tout au long du pipeline (résolution de la
-    classification -> enrichissement par les modules -> rendu) — un choix pragmatique adapté
-    à ce flux séquentiel, pas une réécriture en style event-sourcing/immuable qui
-    n'apporterait rien ici.
+class Struct(_Model):
+    """Mutable state passed through the whole pipeline.
 
-    `liens` garde volontairement un format libre par module : chaque module écrit sa propre
-    forme sous `liens[<id-module>]`. Les modules "spéciaux" `externe` (liens hors Wikipédia :
-    Wikidata, Commons, Species) et `fin` (portails/catégories) suivent la même convention.
-    Chaque module type sa propre écriture avec un sous-modèle Pydantic (voir
-    organon.modules.*) avant de l'assigner ici ; Struct lui-même reste générique pour ne pas
-    devoir connaître à l'avance la liste des ~37 modules.
+    Classification resolution, module enrichment, then rendering.
+    `links[<module-id>]` is typed by `LinkEntry`.
     """
 
     taxon: TaxonInfo
     classification: str = ""
     classification_taxobox: str = ""
-    domaine: str = "*"
-    regne: str = ""
-    redirection: Redirection | None = None
-    rangs: list[RankName] = Field(default_factory=list)
-    """Taxons supérieurs, triés dans l'ordre croissant des rangs (du plus proche au plus
-    éloigné du taxon demandé) — l'ordre est sémantiquement significatif pour la taxobox."""
+    domain: str = "*"
+    kingdom: str = ""
+    # Higher taxa, nearest first; the order matters for the taxobox.
+    ranks: list[RankName] = Field(default_factory=list)
 
-    liens: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    links: dict[str, LinkEntry] = Field(default_factory=dict)
 
-    basionyme: Basionym | None = None
-    sous_taxons: SubTaxonList | None = None
-    vernaculaire: dict[str, list[str]] = Field(default_factory=dict)
-    """struct['vernaculaire'][nom-technique-module] -> liste de noms vernaculaires."""
+    basionym: Basionym | None = None
+    subtaxa: SubTaxonList | None = None
+    # module -> language code -> names (see `langues.code_langue`).
+    # Only "fr" is rendered; see `vernacular_names`.
+    vernacular: dict[str, dict[str, list[str]]] = Field(default_factory=dict)
 
-    autres_noms: dict[str, dict[str, list[str]]] = Field(default_factory=dict)
-    """struct['autres_noms'][nom-technique-module][statut] -> liste de noms. Distinct de
-    `vernaculaire` : des noms qu'une source qualifie elle-même d'un statut explicite (ex. la
-    BDTFX de TelaMétro distingue « Recommandé ou typique » de « Secondaire ou régional »),
-    rendus séparément (voir `organon.core.rendering.sections.render_supp`) plutôt que fondus
-    dans la liste `vernaculaire` qui ne porte aucune notion de statut."""
+    # module -> status -> names, for names a source labels itself (e.g.
+    # TelaMétro's "Recommandé ou typique"), rendered apart; see
+    # `sections.render_systematics`.
+    other_names: dict[str, dict[str, list[str]]] = Field(default_factory=dict)
 
-    etymologie: Etymology | None = None
-    originale: str | list[str] | None = None
-    synonymes: SynonymList | None = None
+    # source -> sentences of the "Description" section, rendered with
+    # one {{Bioref}} per source; see `sections.render_description`.
+    description: dict[str, list[str]] = Field(default_factory=dict)
+
+    etymology: Etymology | None = None
+    original_publication: str | list[str] | None = None
+    synonyms: SynonymList | None = None
     type_taxon: TypeTaxon | None = None
     distribution: dict[str, DistributionEntry] = Field(default_factory=dict)
 
-    cacher_regne: bool = False
-    """Certains modules (ex. lorsqu'un synonyme change de règne) peuvent demander à masquer
-    le champ 'règne' de la taxobox plutôt que d'afficher une valeur incohérente."""
+    # Lets a module hide the taxobox kingdom field instead of showing
+    # an inconsistent value (e.g. when a synonym changes kingdom).
+    hide_kingdom: bool = False
 
+    # Taxobox 'image' and 'legende' keys, when a source provides them.
     image: dict[str, str] | None = None
-    """struct['image'] — clés 'image'/'legende' pour la taxobox, si une source en fournit."""
 
-    milieu: str | None = None
-    """Milieu écologique du taxon ('marin' / 'terrestre'), quand une source le fournit (ex.
-    WoRMS via isMarine/isTerrestrial) ; None si inconnu. Utilisé par le sélecteur de portails
-    pour décider de l'ajout de {{Portail biologie marine}} (voir
-    `organon.core.selectors.rules.portails`)."""
+    # 'marin' or 'terrestre' when a source says so, else None. Used by
+    # the portal selector; see `selectors.rules.portails`.
+    habitat: str | None = None
+
+    def vernacular_names(self, language: str) -> dict[str, list[str]]:
+        """Return `vernacular` restricted to `language`."""
+        return {
+            module: languages[language]
+            for module, languages in self.vernacular.items()
+            if languages.get(language)
+        }

@@ -1,15 +1,9 @@
-"""Client du compte bot dédié : authentification par Bot Password (`Special:BotPasswords`) puis
-édition de pages via `action=edit`.
+"""Client for the dedicated bot account.
 
-Séquence conforme à [API:Login](https://www.mediawiki.org/wiki/API:Login) et
-[API:Edit](https://www.mediawiki.org/wiki/API:Edit) : `action=login` reste la méthode valide
-pour les comptes Bot Password (contrairement aux comptes normaux, pour qui elle est dépréciée au
-profit de `clientlogin`). Les cookies de session sont conservés automatiquement par
-`httpx.AsyncClient` d'une requête à l'autre (comme `requests.Session`), ce qui est indispensable
-au bon fonctionnement du login.
-
-Ce client n'est PAS branché en production tant que le statut du bot n'a pas été tranché par la
-communauté — voir `AuthSettings.bot_edit_enabled` et `organon.api.routes.taxobox_refresh`.
+Bot Password login (`action=login`, still valid for bot passwords)
+then page edits through `action=edit`. Session cookies persist on
+the `httpx.AsyncClient`, which login requires. Not wired in
+production; see `AuthSettings.bot_edit_enabled`.
 """
 
 from __future__ import annotations
@@ -18,12 +12,29 @@ import asyncio
 
 import httpx
 
+from organon.core.http import OwnedClientMixin
+
 
 class BotEditError(RuntimeError):
-    """Levée quand l'API MediaWiki refuse la connexion ou l'édition du compte bot."""
+    """MediaWiki refused the bot login or edit."""
 
 
-class MediaWikiBotClient:
+class BotEditConflictError(BotEditError):
+    """The page changed since the base revision."""
+
+
+class BotMaxLagError(BotEditError):
+    """Replication lag; retry after `retry_after` seconds."""
+
+    def __init__(self, message: str, retry_after: float = 5.0) -> None:
+        """Store the suggested retry delay."""
+        super().__init__(message)
+        self.retry_after = retry_after
+
+
+class MediaWikiBotClient(OwnedClientMixin):
+    """Logged-in MediaWiki client for the bot account."""
+
     def __init__(
         self,
         *,
@@ -33,17 +44,13 @@ class MediaWikiBotClient:
         user_agent: str,
         client: httpx.AsyncClient | None = None,
     ) -> None:
+        """Store credentials; use `client` if given."""
         self._api_url = api_url
         self._username = username
         self._password = password
-        self._client = client or httpx.AsyncClient(timeout=30.0, headers={"User-Agent": user_agent})
-        self._owns_client = client is None
+        super().__init__(client, timeout=30.0, headers={"User-Agent": user_agent})
         self._logged_in = False
         self._login_lock = asyncio.Lock()
-
-    async def aclose(self) -> None:
-        if self._owns_client:
-            await self._client.aclose()
 
     async def _get_token(self, token_type: str) -> str:
         resp = await self._client.get(
@@ -53,7 +60,8 @@ class MediaWikiBotClient:
         resp.raise_for_status()
         payload = resp.json()
         try:
-            return payload["query"]["tokens"][f"{token_type}token"]
+            token: str = payload["query"]["tokens"][f"{token_type}token"]
+            return token
         except KeyError as exc:
             raise BotEditError(
                 f"Réponse inattendue de l'API lors de la récupération du jeton "
@@ -83,26 +91,56 @@ class MediaWikiBotClient:
                 raise BotEditError(f"Échec de connexion du compte bot : {result}")
             self._logged_in = True
 
-    async def edit_page(self, *, title: str, text: str, summary: str) -> dict:
+    async def edit_page(
+        self,
+        *,
+        title: str,
+        text: str,
+        summary: str,
+        baserevid: int | None = None,
+        basetimestamp: str | None = None,
+        nocreate: bool = False,
+        bot: bool = False,
+    ) -> dict:
+        """Edit a page, logging in first if needed.
+
+        Raise `BotEditConflictError` on edit conflicts and
+        `BotMaxLagError` on replication lag. Return the API `edit`
+        result.
+        """
         await self._login()
         csrf_token = await self._get_token("csrf")
-        resp = await self._client.post(
-            self._api_url,
-            data={
-                "action": "edit",
-                "title": title,
-                "text": text,
-                "summary": summary,
-                "token": csrf_token,
-                "maxlag": "5",
-                "format": "json",
-            },
-        )
+        data = {
+            "action": "edit",
+            "title": title,
+            "text": text,
+            "summary": summary,
+            "token": csrf_token,
+            "maxlag": "5",
+            "assert": "user",
+            "format": "json",
+        }
+        if baserevid is not None:
+            data["baserevid"] = str(baserevid)
+        if basetimestamp is not None:
+            data["basetimestamp"] = basetimestamp
+        if nocreate:
+            data["nocreate"] = "1"
+        if bot:
+            data["bot"] = "1"
+        resp = await self._client.post(self._api_url, data=data)
         resp.raise_for_status()
         payload = resp.json()
         if "error" in payload:
-            raise BotEditError(f"Erreur API MediaWiki lors de l'édition : {payload['error']}")
+            erreur = payload["error"]
+            message = f"Erreur API MediaWiki lors de l'édition : {erreur}"
+            if erreur.get("code") == "editconflict":
+                raise BotEditConflictError(message)
+            if erreur.get("code") == "maxlag":
+                raise BotMaxLagError(message, float(resp.headers.get("Retry-After", 5)))
+            raise BotEditError(message)
         edit_result = payload.get("edit", {})
         if edit_result.get("result") != "Success":
             raise BotEditError(f"Édition refusée par MediaWiki : {edit_result}")
-        return edit_result
+        result: dict = edit_result
+        return result

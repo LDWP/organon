@@ -1,24 +1,25 @@
-"""Configuration du mécanisme OAuth + compte bot dédié. Toutes les valeurs sensibles viennent de
-l'environnement (service `envvars` Toolforge en production, jamais codées en dur), avec le
-préfixe `ORGANON_`.
+"""Deployment secrets and settings, read from `ORGANON_*` variables.
 
-Distinct de `organon.core.config.GenerateOptions` : ce fichier couvre les secrets/paramètres de
-déploiement de l'outil, pas les options de génération d'un article.
+Unrelated to `organon.core.config.GenerateOptions`, which holds the
+per-article generation options.
 """
 
 from __future__ import annotations
 
+from functools import cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from organon.core.http import USER_AGENT
 
 
 class AuthSettings(BaseSettings):
+    """OAuth, bot account and API-key settings."""
+
     model_config = SettingsConfigDict(env_prefix="ORGANON_", extra="ignore")
 
-    # OAuth 2.0 utilisateur (identification seule) — consumer public enregistré sur
-    # meta.wikimedia.org, revue communautaire requise avant activation. Le consumer approuvé est
-    # restreint à frwiki (« limited project » côté admin) : les endpoints doivent donc pointer sur
-    # fr.wikipedia.org, pas meta.wikimedia.org, sous peine de 403 sur resource/profile (le jeton
-    # n'est valide que pour le wiki auquel le consumer est restreint).
+    # OAuth 2.0 identification only. The consumer is limited to frwiki,
+    # so the endpoints must point to fr.wikipedia.org.
     oauth_client_id: str = ""
     oauth_client_secret: str = ""
     oauth_redirect_uri: str = ""
@@ -26,77 +27,51 @@ class AuthSettings(BaseSettings):
     oauth_token_url: str = "https://fr.wikipedia.org/w/rest.php/oauth2/access_token"
     oauth_profile_url: str = "https://fr.wikipedia.org/w/rest.php/oauth2/resource/profile"
 
-    # Cookies signés (identifiants du flux + session utilisateur).
+    # Signed cookies (OAuth flow state and user session).
     session_secret_key: str = ""
     oauth_state_max_age_seconds: int = 600
     session_max_age_seconds: int = 28800  # 8h
-    # Toolforge sert toujours en HTTPS ; à mettre à False uniquement pour du développement local
-    # en http:// (jamais en production).
+    # Set to False only for local development over plain http.
     cookie_secure: bool = True
 
-    # Frontend à rejoindre après le callback OAuth (page d'accueil de l'outil en développement
-    # par défaut, cf. organon/api/app.py pour l'origine CORS équivalente).
+    # Where to send the browser after the OAuth callback (Vite in
+    # development by default). A navigation redirect, so no CORS.
     frontend_post_login_url: str = "http://localhost:5173/"
 
-    # Compte bot dédié (Bot Password) — jamais l'utilisateur qui déclenche l'action, toujours ce
-    # compte technique séparé.
+    # Dedicated bot account (Bot Password), never the acting user.
     bot_username: str = ""
     bot_password: str = ""
     wiki_api_url: str = "https://fr.wikipedia.org/w/api.php"
-    user_agent: str = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Organon)"
+    user_agent: str = USER_AGENT
 
-    # Page de permission — lecture fail-closed, cache TTL court. Le nom `.../Taxobot/user.json`
-    # n'est pas un identifiant interne oublié : c'est un chemin de page wiki réel (sous l'espace
-    # du projet, pas du logiciel), dont le nom définitif dépend d'une décision communautaire pas
-    # encore prise — renommer cette chaîne isolément déciderait à la place de la communauté et
-    # désynchroniserait ce champ de la même chaîne dans wiki_permissions.py et des tests.
+    # Permission page, read fail-closed with a short TTL cache. A real
+    # wiki page path; keep in sync with wiki_permissions.py and tests.
     permission_page_title: str = "Wikipédia:Projet:Biologie/Taxobot/user.json"
     permission_cache_ttl_seconds: float = 300.0
 
-    # Verrou explicite : reste à False tant que (a) le statut du bot n'a pas été tranché par la
-    # communauté (question posée sur Discussion Projet:Biologie/Organon) et (b) la page de
-    # permission n'est pas protégée en écriture par un administrateur frwiki. La partie
-    # identification (OAuth seul, sans édition) fonctionne indépendamment de ce flag.
+    # Bot edits stay off until the community approves the bot and the
+    # permission page is write-protected. OAuth login is independent.
     bot_edit_enabled: bool = False
 
-    # Correction Wikidata assistée (organon.modules.wikidata ne fait pour l'instant que lire et
-    # diagnostiquer des écarts, jamais écrire) — contrairement au bot Taxobot ci-dessus, une
-    # correction Wikidata doit être attribuée au compte de l'utilisateur lui-même (norme des
-    # outils d'assistance comme QuickStatements, pas un compte bot séparé). Deux décisions
-    # restent ouvertes avant toute implémentation d'écriture, volontairement non tranchées ici :
-    # (1) enregistrer un consumer OAuth distinct de `oauth_client_id` ci-dessus, avec les droits
-    # d'édition Wikibase (le consumer actuel n'a que le scope profil/identification) ; (2) le
-    # mode de conservation du jeton d'accès entre le callback OAuth et l'action de correction —
-    # `sign_session` ci-dessous ne fait que signer, jamais chiffrer, donc pas un stockage sûr
-    # pour un jeton capable d'écrire sur Wikidata.
-    wikidata_api_url: str = "https://www.wikidata.org/w/api.php"
-    wikidata_edit_enabled: bool = False
+    # LPSN requires an individual free DSMZ account. Empty values make
+    # the module fail authentication cleanly.
+    lpsn_username: str = ""  # envvars ORGANON_LPSN_USERNAME
+    lpsn_password: str = ""  # envvars ORGANON_LPSN_PASSWORD
 
-    # LPSN (organon.modules.lpsn, classification bactéries/archées) — contrairement aux autres
-    # sources REST du projet, LPSN exige un compte DSMZ enregistré individuellement (gratuit,
-    # https://register.lpsn.dsmz.de/) : pas de jeton public partageable comme pour Tropicos.
-    # Vides par défaut -> le module échoue proprement (échec d'authentification) tant que ces
-    # deux variables ne sont pas positionnées, plutôt que d'embarquer un identifiant en dur.
-    lpsn_username: str = "" #envvars ORGANON_LPSN_USERNAME
-    lpsn_password: str = "" #envvars ORGANON_LPSN_PASSWORD
+    # BHL needs a free individual key. Empty skips BHL enrichment.
+    bhl_api_key: str = ""  # envvars ORGANON_BHL_API_KEY
 
-    # BHL (organon.modules.wrms, enrichissement de la publication originale via l'API v3) exige
-    # une clé individuelle gratuite (https://www.biodiversitylibrary.org/getapikey.aspx). Vide
-    # par défaut -> l'enrichissement BHL est simplement sauté (repli sur le texte brut), pas
-    # d'échec du module WoRMS pour autant.
-    bhl_api_key: str = "" #envvars ORGANON_BHL_API_KEY
+    # Tropicos: public token of the site's own search widget (not a
+    # personal secret); override it if Tropicos rotates it.
+    tropicos_token: str = (
+        "RjRGNDA4RDgtOEY2NS00NzVGLUI3NDktRjk4MjE2Q0NCRTQ1"  # envvars ORGANON_TROPICOS_TOKEN
+    )
 
-    # IUCN Red List (organon.modules.iucn, statut de conservation) exige un jeton individuel
-    # gratuit (https://api.iucnredlist.org/users/sign_up, usage non commercial uniquement). Vide
-    # par défaut -> même principe que bhl_api_key ci-dessus, le module est simplement sauté.
-    iucn_api_token: str = "" #envvars ORGANON_IUCN_API_TOKEN
+    # IUCN Red List needs a free non-commercial token. Empty skips it.
+    iucn_api_token: str = ""  # envvars ORGANON_IUCN_API_TOKEN
 
 
-_settings: AuthSettings | None = None
-
-
+@cache
 def get_auth_settings() -> AuthSettings:
-    global _settings
-    if _settings is None:
-        _settings = AuthSettings()
-    return _settings
+    """Return the process-wide `AuthSettings`, created on first use."""
+    return AuthSettings()

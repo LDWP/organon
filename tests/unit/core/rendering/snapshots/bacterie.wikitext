@@ -1,0 +1,34 @@
+{{ébauche|bactérie}}
+{{Taxobox début | bactérie | ''Escherichia coli'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}
+{{Taxobox | embranchement | Pseudomonadota }}
+{{Taxobox | classe | Gammaproteobacteria }}
+{{Taxobox | ordre | Enterobacterales }}
+{{Taxobox | famille | Enterobacteriaceae }}
+{{Taxobox | genre | Escherichia }}
+{{Taxobox taxon | bactérie | espèce | Escherichia coli | (Migula 1895) Castellani & Chalmers 1919 }}
+{{Taxobox fin}}
+'''''Escherichia coli''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Enterobacteriaceae]]''.
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+{{Section vide ou incomplète}}
+
+== Systématique ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en bactériologie|auteur]]) de ce taxon est ''Escherichia coli'' (Migula 1895) Castellani & Chalmers 1919{{Bioref|lpsn|<DATE>|ref}}.
+L'espèce a été initialement classée dans le genre ''[[Bacillus]]'' sous le [[basonyme]] ''Bacillus coli'' Migula 1895{{Bioref|lpsn|<DATE>|ref}}.
+
+== Étymologie ==
+Du nom de Theodor Escherich.{{Bioref|lpsn|<DATE>|ref}}.
+
+== Liens externes ==
+* {{LPSN | espèce | escherichia-coli | ''Escherichia coli'' (Migula 1895) Castellani & Chalmers 1919 | consulté le=<DATE> }}
+* {{NCBI | 562 | ''Escherichia coli'' | consulté le=<DATE> }}
+
+== Notes et références ==
+{{références}}
+
+{{Portail|biologie}}
+
+[[Catégorie:Catégorie test]]

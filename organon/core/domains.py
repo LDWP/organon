@@ -1,13 +1,8 @@
-"""Arbre des domaines (règne / sous-groupe) et logique de correspondance module/domaine.
+"""Domain tree (kingdom / subgroup) and module-domain matching.
 
-Note sur `meilleure_classification`/`rec_prof_classification` : le score de profondeur
-additionne un bonus `cnt/20` (nombre de domaines frères acceptés par le module), puis
-`meilleure_classification` retient le score le PLUS PETIT. Au sein d'une même requête de
-domaine, le terme de profondeur de base est identique pour tous les modules comparés (même
-topologie d'arbre) — seul ce bonus diffère selon le module. Prendre le score minimal revient
-donc à préférer le module ayant le moins de domaines frères acceptés, donc le plus spécialisé.
-Contre-intuitif à première lecture (on pourrait s'attendre à maximiser un score de
-spécialisation), mais le comportement est correct et testé : ne pas "corriger" ce sens de tri.
+`best_classification` keeps the LOWEST depth score. Within one
+query only the sibling bonus `cnt/20` differs between modules, so
+the minimum prefers the most specialized module. Do not flip it.
 """
 
 from __future__ import annotations
@@ -15,198 +10,199 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
+# Domains a module covers: 'all', 'none' or an explicit list of names.
 DomainSpec = Literal["all", "none"] | list[str]
-"""Domaines couverts par un module : 'all' (tous), 'none' (aucun), ou une liste explicite de
-noms de domaines."""
 
 
 @dataclass
 class DomainNode:
-    accepte: bool
-    sous: dict[str, DomainNode] = field(default_factory=dict)
+    """Domain tree node; `accepted` tells if the module covers it."""
+
+    accepted: bool
+    children: dict[str, DomainNode] = field(default_factory=dict)
 
     def copy(self) -> DomainNode:
-        return DomainNode(accepte=self.accepte, sous={k: v.copy() for k, v in self.sous.items()})
+        """Return a deep copy of the subtree."""
+        return DomainNode(
+            accepted=self.accepted, children={k: v.copy() for k, v in self.children.items()}
+        )
 
 
 DomainTree = dict[str, DomainNode]
 
 
-def _base_tree(accepte: bool) -> DomainTree:
-    """Construit un arbre de domaines entièrement accepté ou entièrement refusé."""
+def _base_tree(accepted: bool) -> DomainTree:
+    """Build a domain tree with every domain accepted or rejected."""
     return {
-        "algue": DomainNode(accepte),
+        "algue": DomainNode(accepted),
         "animal": DomainNode(
-            accepte,
-            sous={
-                "oiseau": DomainNode(accepte),
-                "reptile": DomainNode(accepte),
-                "poisson": DomainNode(accepte),
-                "mammifère": DomainNode(accepte),
-                "amphibien": DomainNode(accepte),
-                "arachnide": DomainNode(accepte),
+            accepted,
+            children={
+                "oiseau": DomainNode(accepted),
+                "reptile": DomainNode(accepted),
+                "poisson": DomainNode(accepted),
+                "mammifère": DomainNode(accepted),
+                "amphibien": DomainNode(accepted),
+                "arachnide": DomainNode(accepted),
             },
         ),
-        "archaea": DomainNode(accepte),
-        "bactérie": DomainNode(accepte),
-        "champignon": DomainNode(accepte),
-        "protiste": DomainNode(accepte),
-        "végétal": DomainNode(accepte),
-        "virus": DomainNode(accepte),
-        "neutre": DomainNode(accepte),
-        "eucaryote": DomainNode(accepte),
-        "procaryote": DomainNode(accepte),
+        "archaea": DomainNode(accepted),
+        "bactérie": DomainNode(accepted),
+        "champignon": DomainNode(accepted),
+        "protiste": DomainNode(accepted),
+        "végétal": DomainNode(accepted),
+        "virus": DomainNode(accepted),
+        "neutre": DomainNode(accepted),
+        "eucaryote": DomainNode(accepted),
+        "procaryote": DomainNode(accepted),
     }
 
 
-DOMAINES_TRUE: DomainTree = _base_tree(True)
-DOMAINES_FALSE: DomainTree = _base_tree(False)
+ALL_ACCEPTED_TREE: DomainTree = _base_tree(True)
+_NONE_ACCEPTED_TREE: DomainTree = _base_tree(False)
 
 
 def _collect_all_domains(tree: DomainTree, out: set[str]) -> None:
     for name, node in tree.items():
         out.add(name)
-        _collect_all_domains(node.sous, out)
+        _collect_all_domains(node.children, out)
 
 
-TOUS_DOMAINES: set[str] = set()
-_collect_all_domains(DOMAINES_TRUE, TOUS_DOMAINES)
+_ALL_DOMAIN_NAMES: set[str] = set()
+_collect_all_domains(ALL_ACCEPTED_TREE, _ALL_DOMAIN_NAMES)
 
 
-def rec_domaines(domaine: DomainTree, nom: str, val: bool) -> None:
-    """Porte rec_domaines() : positionne `val` sur l'entrée `nom` (ou toutes si nom == '*')
-    et propage récursivement à tous ses descendants."""
-    for id_, node in domaine.items():
-        if nom == "*" or id_ == nom:
-            node.accepte = val
-            if node.sous:
-                rec_domaines(node.sous, "*", val)
+def _set_domain(domain: DomainTree, name: str, val: bool) -> None:
+    """Set `val` on entry `nom` (all if '*') and its descendants."""
+    for id_, node in domain.items():
+        if name == "*" or id_ == name:
+            node.accepted = val
+            if node.children:
+                _set_domain(node.children, "*", val)
         else:
-            rec_domaines(node.sous, nom, val)
+            _set_domain(node.children, name, val)
 
 
-def creer_domaines(par_defaut_tous: bool, liste: list[str]) -> DomainTree:
-    """Porte creer_domaines(). Si par_defaut_tous est True, tous les domaines sont acceptés
-    sauf ceux listés (qui sont refusés) ; si False (cas d'usage réel de declare_module),
-    tous les domaines sont refusés sauf ceux listés (qui sont acceptés, avec leurs
-    descendants)."""
-    if par_defaut_tous:
-        tree = {k: v.copy() for k, v in DOMAINES_TRUE.items()}
+def _create_domains(all_by_default: bool, listed: list[str]) -> DomainTree:
+    """Build a tree from a list of domains.
+
+    If `all_by_default`, all domains are accepted except the listed
+    ones; otherwise all are rejected except the listed ones and their
+    descendants.
+    """
+    if all_by_default:
+        tree = {k: v.copy() for k, v in ALL_ACCEPTED_TREE.items()}
         val = False
     else:
-        tree = {k: v.copy() for k, v in DOMAINES_FALSE.items()}
+        tree = {k: v.copy() for k, v in _NONE_ACCEPTED_TREE.items()}
         val = True
-    for d in liste:
-        rec_domaines(tree, d, val)
+    for d in listed:
+        _set_domain(tree, d, val)
     return tree
 
 
 def build_module_domain_tree(domains: DomainSpec) -> DomainTree:
-    """Équivalent du calcul de `$blob['domaines']` dans declare_module()."""
+    """Build the domain tree of a module from its `domains`."""
     if domains == "all":
-        return {k: v.copy() for k, v in DOMAINES_TRUE.items()}
+        return {k: v.copy() for k, v in ALL_ACCEPTED_TREE.items()}
     if domains == "none":
-        return {k: v.copy() for k, v in DOMAINES_FALSE.items()}
-    return creer_domaines(False, domains)
+        return {k: v.copy() for k, v in _NONE_ACCEPTED_TREE.items()}
+    return _create_domains(False, domains)
 
 
-def vrai_dans_domaine(def_: DomainTree) -> bool:
-    if not def_:
+def _any_accepted(domain_tree: DomainTree) -> bool:
+    """Return True if any node of the tree is accepted."""
+    if not domain_tree:
         return False
-    for node in def_.values():
-        if node.accepte:
+    for node in domain_tree.values():
+        if node.accepted:
             return True
-        if vrai_dans_domaine(node.sous):
+        if _any_accepted(node.children):
             return True
     return False
 
 
-def rec_contenu_domaine(domaine: str, def_: DomainTree) -> DomainNode | None:
-    for nom, node in def_.items():
-        if nom == domaine:
+def _find_domain_node(domain: str, domain_tree: DomainTree) -> DomainNode | None:
+    """Return the node named `domaine`, or None."""
+    for name, node in domain_tree.items():
+        if name == domain:
             return node
-        found = rec_contenu_domaine(domaine, node.sous)
+        found = _find_domain_node(domain, node.children)
         if found is not None:
             return found
     return None
 
 
-def rec_strict_domaine(domaine: str, def_: DomainTree) -> bool:
-    for nom, node in def_.items():
-        if nom == domaine and node.accepte:
+def _is_strictly_accepted(domain: str, domain_tree: DomainTree) -> bool:
+    """Return True if `domaine` itself is accepted."""
+    for name, node in domain_tree.items():
+        if name == domain and node.accepted:
             return True
-        if rec_strict_domaine(domaine, node.sous):
+        if _is_strictly_accepted(domain, node.children):
             return True
     return False
 
 
-def domaine_couvre(domaine: str, def_: DomainTree) -> bool:
-    """Le module (via son arbre de domaines `def_`) couvre-t-il `domaine` ? Vrai si `domaine`
-    lui-même est accepté, mais aussi si un de ses sous-domaines l'est (ex. `domaine="animal"`
-    face à un module restreint à `["mammifère"]` : le nœud "animal" n'est pas accepté
-    directement, seul son descendant "mammifère" l'est — cas réel de MDD, dont le domaine
-    déclaré est plus fin que le règne grossier stocké dans `struct.regne`, voir
-    `organon.core.selectors.coherence.reference_module_coherente`)."""
-    if rec_strict_domaine(domaine, def_):
+def domain_covers(domain: str, domain_tree: DomainTree) -> bool:
+    """Return True if the tree covers `domaine`.
+
+    True when `domaine` or one of its sub-domains is accepted, e.g.
+    "animal" for a module restricted to "mammifère".
+    """
+    if _is_strictly_accepted(domain, domain_tree):
         return True
-    base = rec_contenu_domaine(domaine, def_)
-    return base is not None and vrai_dans_domaine({"anonymous": base})
+    base = _find_domain_node(domain, domain_tree)
+    return base is not None and _any_accepted({"anonymous": base})
 
 
-def modules_possibles(domaine: str, module_trees: dict[str, DomainTree]) -> list[str] | None:
-    """`module_trees` associe id-module -> son arbre de domaines. Retourne None si le domaine
-    demandé n'existe pas du tout dans `TOUS_DOMAINES`."""
-    if domaine != "*" and domaine not in TOUS_DOMAINES:
+def possible_modules(domain: str, module_trees: dict[str, DomainTree]) -> list[str] | None:
+    """Return the ids of modules covering `domaine`.
+
+    `module_trees` maps module id to its tree. None if `domaine` is
+    unknown.
+    """
+    if domain != "*" and domain not in _ALL_DOMAIN_NAMES:
         return None
 
-    if domaine == "*":
+    if domain == "*":
         return list(module_trees.keys())
 
-    return [nom for nom, tree in module_trees.items() if domaine_couvre(domaine, tree)]
+    return [name for name, tree in module_trees.items() if domain_covers(domain, tree)]
 
 
-def rec_prof_classification(def_: DomainTree, domaine: str, prof: int) -> float:
+def _classification_depth_from(domain_tree: DomainTree, domain: str, depth: int) -> float:
+    """Return the depth score of `domaine` in the tree."""
     ret = 0.0
-    cnt = sum(1 for node in def_.values() if node.accepte)
-    for id_, node in def_.items():
+    count = sum(1 for node in domain_tree.values() if node.accepted)
+    for id_, node in domain_tree.items():
         ret2 = 0.0
-        if (domaine == "*" or id_ == domaine) and node.accepte:
-            ret = prof + 1
-            ret += cnt / 20.0
+        if (domain == "*" or id_ == domain) and node.accepted:
+            ret = depth + 1
+            ret += count / 20.0
         else:
-            ret2 = rec_prof_classification(node.sous, domaine, prof + 1)
+            ret2 = _classification_depth_from(node.children, domain, depth + 1)
         if ret2 > ret:
             ret = ret2
     return ret
 
 
-def profondeur_classification(module_tree: DomainTree, domaine: str) -> float:
-    return rec_prof_classification(module_tree, domaine, 0)
+def _classification_depth(module_tree: DomainTree, domain: str) -> float:
+    """Return the depth score of `domaine` for one module."""
+    return _classification_depth_from(module_tree, domain, 0)
 
 
-def profondeur_domaine(def_: DomainTree, domaine: str, prof: int) -> int:
-    for nom, node in def_.items():
-        if nom == domaine:
-            return prof + 1
-        ret = profondeur_domaine(node.sous, domaine, prof + 1)
-        if ret == 0:
-            continue
-        if ret > prof:
-            return ret
-    return 0
-
-
-def meilleure_classification(
-    domaine: str,
+def best_classification(
+    domain: str,
     classification_module_ids: list[str],
     module_trees: dict[str, DomainTree],
     module_priorities: dict[str, int],
     default_module: str | None,
 ) -> str | None:
-    """`classification_module_ids` = modules pouvant servir de source de classification ;
-    `module_trees` = arbre de domaines par module ; `module_priorities` = niveau de priorité
-    par module ; `default_module` = module de classification par défaut."""
-    if domaine == "*":
+    """Pick the classification module best suited to `domaine`.
+
+    Ties go to `default_module`, then to the highest priority.
+    """
+    if domain == "*":
         return default_module
 
     if not classification_module_ids:
@@ -214,11 +210,9 @@ def meilleure_classification(
     if len(classification_module_ids) == 1:
         return classification_module_ids[0]
 
-    prof = profondeur_domaine(DOMAINES_TRUE, domaine, 0)  # noqa: F841 (calculé pour l'invariant ci-dessus, jamais réutilisé ensuite)
-
     scored: dict[str, float] = {}
     for c in classification_module_ids:
-        val = profondeur_classification(module_trees[c], domaine)
+        val = _classification_depth(module_trees[c], domain)
         if val > 0:
             scored[c] = val
 
@@ -228,22 +222,19 @@ def meilleure_classification(
         return next(iter(scored))
 
     min_val = min(scored.values())
-    tied = [nom for nom, val in scored.items() if val == min_val]
+    tied = [name for name, val in scored.items() if val == min_val]
     if len(tied) == 1:
         return tied[0]
 
     if default_module in tied:
         return default_module
 
-    # tri par niveau de préférence décroissant, on prend le plus haut
-    tied_by_priority = sorted(tied, key=lambda nom: module_priorities.get(nom, 0), reverse=True)
+    # highest priority first
+    tied_by_priority = sorted(tied, key=lambda name: module_priorities.get(name, 0), reverse=True)
     return tied_by_priority[0]
 
 
-# Correspondance règne (tiers) -> domaine Organon, partagée par tous les modules plutôt que
-# dupliquée par module : une table explicite et facile à éditer. "Chromista" -> "protiste"
-# (et non "algue") reflète la correction appliquée en 2023 suite au bug remonté sur les
-# ciliés/foraminifères.
+# Third-party kingdom -> Organon domain, shared by all modules.
 KINGDOM_MAP: dict[str, str] = {
     "Animalia": "animal",
     "Plantae": "végétal",
@@ -259,24 +250,24 @@ KINGDOM_MAP: dict[str, str] = {
     "Viruses": "virus",
 }
 
-# Rang `domain` (tel qu'exposé par ChecklistBank/CoL XR) -> domaine Organon. Contrairement au
-# rang `kingdom`, resté stable pour les eucaryotes mais remplacé par des clades GTDB renommés et
-# multiples chez les procaryotes ("Bacillati", "Pseudomonadati", "Thermoproteati"... au lieu de
-# "Bacteria"/"Archaea" selon la source du checklist), `domain` reste unique et non affecté par ces
-# renommages. Voir `regne_depuis_classification`.
+# ChecklistBank `domain` rank -> Organon domain. `kingdom` is unstable
+# for prokaryotes (renamed GTDB clades), `domain` is not.
 DOMAIN_MAP: dict[str, str] = {
     "Bacteria": "bactérie",
     "Archaea": "archaea",
 }
 
 
-def regne_depuis_classification(classification: list[dict]) -> str:
-    """Résout le domaine Organon (règne) à partir d'une chaîne `classification` ChecklistBank
-    (CoL XR) : rang `domain` d'abord pour les procaryotes (stable), repli sur `kingdom` pour tout
-    le reste (Animalia/Plantae/Fungi/Chromista/Protozoa, où il reste fiable). Chaîne vide si ni
-    l'un ni l'autre n'est reconnu."""
+def kingdom_from_classification(classification: list[dict]) -> str:
+    """Resolve the Organon kingdom from a ChecklistBank chain.
+
+    Use the stable `domain` rank for prokaryotes, else `kingdom`.
+    Return "" if neither is recognized.
+    """
     domain_name = next((c.get("name") for c in classification if c.get("rank") == "domain"), None)
     if domain_name in DOMAIN_MAP:
         return DOMAIN_MAP[domain_name]
-    kingdom_name = next((c.get("name") for c in classification if c.get("rank") == "kingdom"), None)
+    kingdom_name = next(
+        (c.get("name") for c in classification if c.get("rank") == "kingdom"), None
+    )
     return KINGDOM_MAP.get(kingdom_name, "") if kingdom_name else ""

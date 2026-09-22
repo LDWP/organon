@@ -1,0 +1,103 @@
+{
+  "author_candidates": {
+    "indexfungorum": "(L.) Lam."
+  },
+  "basionym": {
+    "author": "L.",
+    "name": "Agaricus muscarius",
+    "source": "indexfungorum"
+  },
+  "classification_taxobox": "biologique",
+  "consolidated_author": "(L.) Lam.",
+  "data_found": {
+    "indexfungorum": [
+      "Classification",
+      "Basionyme",
+      "Auteur"
+    ],
+    "telametro": [
+      "Noms vernaculaires"
+    ]
+  },
+  "distribution": {},
+  "distribution_entries": {},
+  "elapsed_seconds": 0,
+  "external_ids": {
+    "indexfungorum": "190449"
+  },
+  "external_links": [
+    {
+      "html": "<a href='http://www.indexfungorum.org/names/NamesRecord.asp?RecordID=190449' target='_blank' rel='noopener noreferrer'>Index Fungorum</a>",
+      "module_id": "indexfungorum"
+    }
+  ],
+  "extinct": false,
+  "habitat": "terrestre",
+  "iucn_criterion": "",
+  "iucn_status": "",
+  "kingdom": "champignon",
+  "kingdom_inconsistencies": [],
+  "logs": [],
+  "other_names": {},
+  "rank_inconsistencies": [],
+  "rank_lines": [
+    {
+      "line": "{{Taxobox | genre | Amanita }}",
+      "name": "Amanita",
+      "rank": "genre"
+    },
+    {
+      "line": "{{Taxobox | famille | Amanitaceae }}",
+      "name": "Amanitaceae",
+      "rank": "famille"
+    },
+    {
+      "line": "{{Taxobox | ordre | Agaricales }}",
+      "name": "Agaricales",
+      "rank": "ordre"
+    },
+    {
+      "line": "{{Taxobox | classe | Agaricomycetes }}",
+      "name": "Agaricomycetes",
+      "rank": "classe"
+    },
+    {
+      "line": "{{Taxobox | division | Basidiomycota }}",
+      "name": "Basidiomycota",
+      "rank": "division"
+    }
+  ],
+  "reference_items": [
+    {
+      "default_checked": true,
+      "module_id": "indexfungorum",
+      "wikitext": "{{Fungorum espèce | 190449 | Amanita muscaria | (L.) Lam. | consulté le=<DATE> }}"
+    }
+  ],
+  "references_wikitext": "* {{Fungorum espèce | 190449 | Amanita muscaria | (L.) Lam. | consulté le=<DATE> }}\n",
+  "requested_taxon": "Amanita muscaria",
+  "resolved_author": "([[Carl von Linné|L.]]) [[Jean-Baptiste de Lamarck|Lam.]] {{date à préciser}}",
+  "resolved_taxon": "Amanita muscaria",
+  "see_also_wikitext": "\n== Liens externes ==\n* {{Fungorum espèce | 190449 | Amanita muscaria | (L.) Lam. | consulté le=<DATE> }}\n",
+  "subtaxa": [],
+  "subtaxa_completeness_score": 0,
+  "subtaxa_source": "",
+  "subtaxa_wikitext": "",
+  "synonyms": [],
+  "synonyms_source": "",
+  "taxobox_completeness_score": 5,
+  "taxobox_wikitext": "{{ébauche|champignon}}\n{{Taxobox début | champignon | ''Amanita muscaria'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}\n{{Taxobox | division | Basidiomycota }}\n{{Taxobox | classe | Agaricomycetes }}\n{{Taxobox | ordre | Agaricales }}\n{{Taxobox | famille | Amanitaceae }}\n{{Taxobox | genre | Amanita }}\n{{Taxobox taxon | champignon | espèce | Amanita muscaria | ([[Carl von Linné|L.]]) [[Jean-Baptiste de Lamarck|Lam.]] {{date à préciser}} }}\n{{Taxobox fin}}\n",
+  "taxon_rank": "espèce",
+  "truncated": {
+    "subtaxa": false,
+    "synonyms": false
+  },
+  "used_classification": "indexfungorum",
+  "used_domain": "*",
+  "vernacular_names": [
+    "Amanite tue-mouches"
+  ],
+  "vernacular_names_without_language": {},
+  "warnings": [],
+  "wikitext": "{{ébauche|champignon}}\n{{Taxobox début | champignon | ''Amanita muscaria'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}\n{{Taxobox | division | Basidiomycota }}\n{{Taxobox | classe | Agaricomycetes }}\n{{Taxobox | ordre | Agaricales }}\n{{Taxobox | famille | Amanitaceae }}\n{{Taxobox | genre | Amanita }}\n{{Taxobox taxon | champignon | espèce | Amanita muscaria | ([[Carl von Linné|L.]]) [[Jean-Baptiste de Lamarck|Lam.]] {{date à préciser}} }}\n{{Taxobox fin}}\n'''''Amanita muscaria''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Amanitaceae]]''.\n\n== Description ==\n{{Section vide ou incomplète}}\n\n== Répartition ==\n{{Section vide ou incomplète}}\n\n== Systématique ==\nLe [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Amanita muscaria'' (L.) Lam.{{Bioref|indexfungorum|<DATE>|ref}}.\nL'espèce a été initialement classée dans le genre ''[[Agaricus]]'' sous le [[basionyme]] ''Agaricus muscarius'' L.{{Bioref|indexfungorum|<DATE>|ref}}.\n\nCe taxon porte en français le [[nom vernaculaire]] ou [[nom normalisé|normalisé]] suivant : Amanite tue-mouches{{Bioref|telametro|<DATE>|ref}}.\n\n== Liens externes ==\n* {{Fungorum espèce | 190449 | Amanita muscaria | (L.) Lam. | consulté le=<DATE> }}\n\n== Notes et références ==\n{{références}}\n\n{{Portail|mycologie}}\n\n[[Catégorie:Amanitaceae]]\n[[Catégorie:Champignon (nom scientifique)]]"
+}

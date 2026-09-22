@@ -1,11 +1,8 @@
-"""Petites fonctions utilitaires de rendu : date du jour en français ("consulté le"), mise en
-colonnes des longues listes, dédoublonnage/mise en forme des noms vernaculaires, formatage
-« et al. », table des pays, désambiguïsation d'homonymes.
+"""Small rendering helpers.
 
-`format_auteur` reste une version simplifiée (et al. uniquement), utilisée pour les auteurs de
-synonymes/sous-taxons/basionyme ; le système complet de résolution par listes de
-botanistes/zoologistes/procaryotes connus, appliqué uniquement à l'auteur du taxon principal,
-vit dans `organon.core.rendering.authors`.
+Current French date, columns, vernacular names, "et al.", country
+tables and homonym disambiguation. `format_author` is the simple
+author format; the full one is in `organon.core.rendering.authors`.
 """
 
 from __future__ import annotations
@@ -20,165 +17,202 @@ import yaml
 
 from organon.core.config import GenerateOptions
 
+__all__ = [
+    "DATA_DIR",
+    "add_if_needed",
+    "condition_names",
+    "country_data_by_code",
+    "find_homonym",
+    "format_author",
+    "is_similar",
+    "replace_et_al",
+    "retrieval_dates",
+    "use_columns",
+    "wgsrpd_continents_for_codes",
+    "wgsrpd_data_by_code",
+    "wrap_in_columns",
+]
+
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
-MOIS_FR = {
-    1: "janvier", 2: "février", 3: "mars", 4: "avril", 5: "mai", 6: "juin",
-    7: "juillet", 8: "août", 9: "septembre", 10: "octobre", 11: "novembre", 12: "décembre",
+_FRENCH_MONTHS = {
+    1: "janvier",
+    2: "février",
+    3: "mars",
+    4: "avril",
+    5: "mai",
+    6: "juin",
+    7: "juillet",
+    8: "août",
+    9: "septembre",
+    10: "octobre",
+    11: "novembre",
+    12: "décembre",
 }
 
 
-def dates_recupere(today: datetime.date | None = None) -> str:
-    """Date du jour formatée en français, ex. "9 juillet 2026"."""
-    jour = today or datetime.date.today()
-    return f"{jour.day} {MOIS_FR[jour.month]} {jour.year}"
+def retrieval_dates(today: datetime.date | None = None) -> str:
+    """Return the date in French, e.g. "9 juillet 2026"."""
+    day = today or datetime.date.today()
+    return f"{day.day} {_FRENCH_MONTHS[day.month]} {day.year}"
 
 
 _ET_AL_RE = re.compile(r"([^{])et al[.]")
 
 
-def rempl_et_al(txt: str) -> str:
-    """Remplace "et al." par le modèle {{et al.}}, sans doubler si déjà fait."""
-    if "{{et al.}}" in txt:
-        return txt
-    return _ET_AL_RE.sub(r"\1{{et al.}}", txt)
+def replace_et_al(text: str) -> str:
+    """Replace "et al." with {{et al.}} unless already done."""
+    if "{{et al.}}" in text:
+        return text
+    return _ET_AL_RE.sub(r"\1{{et al.}}", text)
 
 
-def format_auteur(auteur: str | None) -> str:
-    """Traitement simplifié d'une citation d'auteur : uniquement le remplacement
-    "et al." -> {{et al.}} (voir docstring du module pour le système complet)."""
-    if not auteur:
+def format_author(author: str | None) -> str:
+    """Return an author citation with "et al." templated."""
+    if not author:
         return ""
-    return rempl_et_al(auteur)
+    return replace_et_al(author)
 
 
 @lru_cache(maxsize=1)
-def load_homonymes() -> dict[str, dict[str, str]]:
+def _load_homonyms() -> dict[str, dict[str, str]]:
+    """Load the homonym table."""
     with (DATA_DIR / "homonymes.yaml").open(encoding="utf-8") as fh:
         return yaml.safe_load(fh) or {}
 
 
-def cherche_homonyme(nom: str, regne: str) -> tuple[bool, str | None]:
-    """Cherche `nom` dans la table d'homonymes, d'abord par règne, puis par la clé générique
-    `*`, puis par `hom` (page d'homonymie à corriger manuellement — indique alors
-    `page_est_homonymie=True`). Renvoie `(False, None)` si `nom` n'est pas dans la table."""
-    entree = load_homonymes().get(nom)
-    if entree is None:
+def find_homonym(name: str, kingdom: str) -> tuple[bool, str | None]:
+    """Look up `nom` in the homonym table.
+
+    Try the kingdom, then the generic `*` key, then `hom` (a
+    disambiguation page to fix by hand, returned as
+    `(True, target)`). Return `(False, None)` if absent.
+    """
+    entry = _load_homonyms().get(name)
+    if entry is None:
         return False, None
-    if regne in entree:
-        return False, entree[regne]
-    if regne != "*" and "*" in entree:
-        return False, entree["*"]
-    if "hom" in entree:
-        return True, entree["hom"]
+    if kingdom in entry:
+        return False, entry[kingdom]
+    if kingdom != "*" and "*" in entry:
+        return False, entry["*"]
+    if "hom" in entry:
+        return True, entry["hom"]
     return False, None
 
 
-def est_colonnes(nombre: int, options: GenerateOptions) -> bool:
-    """seuil_colonnes == -1 -> jamais, == 0 -> toujours, sinon active la mise en colonnes
-    au-delà du seuil."""
-    if options.seuil_colonnes == -1:
+def use_columns(count: int, options: GenerateOptions) -> bool:
+    """Return True if a list of `count` items goes in columns.
+
+    `column_threshold` -1 means never, 0 always.
+    """
+    if options.column_threshold == -1:
         return False
-    if options.seuil_colonnes == 0:
+    if options.column_threshold == 0:
         return True
-    return nombre > options.seuil_colonnes
+    return count > options.column_threshold
 
 
-def colonnes_contenu(contenu: str) -> str:
-    return "{{colonnes|taille=25|1=\n" + contenu + "}}\n"
+def wrap_in_columns(content: str) -> str:
+    """Wrap `contenu` in a {{colonnes}} template."""
+    return "{{colonnes|taille=25|1=\n" + content + "}}\n"
 
 
-def _sans_accents(mot: str) -> str:
-    return "".join(c for c in unicodedata.normalize("NFD", mot) if not unicodedata.combining(c))
+def _without_accents(word: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFD", word) if not unicodedata.combining(c))
 
 
-def _nb_accents(mot: str) -> int:
-    """Nombre de diacritiques portés par `mot`, pour départager deux graphies "similaires"
-    (voir est_similaire) qui ne diffèrent que par l'accentuation, ex. "Eléphant d'Afrique" vs
-    "Éléphant d'Afrique" — certaines sources n'accentuent pas les majuscules alors que l'usage
-    français les accentue."""
-    return sum(1 for c in unicodedata.normalize("NFD", mot) if unicodedata.combining(c))
+def _accent_count(word: str) -> int:
+    """Count diacritics in `mot`.
+
+    Breaks ties between spellings differing only by accents.
+    """
+    return sum(1 for c in unicodedata.normalize("NFD", word) if unicodedata.combining(c))
 
 
-def est_similaire(mot_1: str, mot_2: str) -> bool:
-    """Compare deux mots en ignorant la casse, les tirets et les accents."""
+def is_similar(word_1: str, word_2: str) -> bool:
+    """Compare two words ignoring case, hyphens and accents."""
+
     def normalise(m: str) -> str:
-        return _sans_accents(m.lower().replace("-", " "))
+        return _without_accents(m.lower().replace("-", " "))
 
-    return normalise(mot_1) == normalise(mot_2)
-
-
-def _decoupe_nom(nom: str) -> list[str]:
-    """Scinde un nom vernaculaire sur les virgules internes : certaines sources (ex. EOL)
-    renvoient parfois plusieurs noms concaténés dans un seul champ, ex. "cabillaud, morue"."""
-    return [n.strip() for n in nom.split(",") if n.strip()]
+    return normalise(word_1) == normalise(word_2)
 
 
-def _renomme_cle(liste: dict[str, list[str]], ancienne: str, nouvelle: str) -> None:
-    """Remplace la clé `ancienne` par `nouvelle` dans `liste` en conservant sa position et son
-    contenu (un simple pop/réassignation déplacerait l'entrée en fin de dict)."""
-    reconstruit = {nouvelle if k == ancienne else k: v for k, v in liste.items()}
-    liste.clear()
-    liste.update(reconstruit)
+def _split_name(name: str) -> list[str]:
+    """Split a name on inner commas, as EOL concatenates names."""
+    return [n.strip() for n in name.split(",") if n.strip()]
 
 
-def ajoute_si_besoin(liste: dict[str, list[str]], el: str, src: str) -> None:
-    """Ajoute `el` (avec sa source `src`) à `liste` en dédupliquant les entrées "similaires"
-    (voir est_similaire) et en accumulant les sources pour un même nom déjà présent. `el` est
-    d'abord scindé sur les virgules internes (voir _decoupe_nom). Entre deux graphies
-    similaires, la plus accentuée est conservée comme forme d'affichage."""
-    for nom in _decoupe_nom(el):
-        _ajoute_nom_unique(liste, nom, src)
+def _rename_key(items: dict[str, list[str]], old: str, new: str) -> None:
+    """Rename a key in place, keeping its position."""
+    rebuilt = {new if k == old else k: v for k, v in items.items()}
+    items.clear()
+    items.update(rebuilt)
 
 
-def _ajoute_nom_unique(liste: dict[str, list[str]], el: str, src: str) -> None:
-    trouve = None
-    for nom in liste:
-        if est_similaire(el, nom):
-            trouve = nom
+def add_if_needed(items: dict[str, list[str]], element: str, src: str) -> None:
+    """Add `el` with source `src`, merging similar entries.
+
+    `el` is split on inner commas. Of two similar spellings the more
+    accented is kept for display; sources accumulate.
+    """
+    for name in _split_name(element):
+        _add_unique_name(items, name, src)
+
+
+def _add_unique_name(items: dict[str, list[str]], element: str, src: str) -> None:
+    found = None
+    for name in items:
+        if is_similar(element, name):
+            found = name
             break
-    if trouve is None:
-        liste[el] = [src]
+    if found is None:
+        items[element] = [src]
         return
-    if _nb_accents(el) > _nb_accents(trouve):
-        _renomme_cle(liste, trouve, el)
-        trouve = el
-    if src in liste[trouve]:
+    if _accent_count(element) > _accent_count(found):
+        _rename_key(items, found, element)
+        found = element
+    if src in items[found]:
         return
-    liste[trouve].append(src)
+    items[found].append(src)
 
 
-def conditionne_noms(vernaculaire: dict[str, list[str]], cdate: str) -> tuple[str, int]:
-    """Fusionne/déduplique les noms vernaculaires toutes sources confondues et les met en
-    forme avec sourçage Bioref par nom. Retourne (texte, nombre de noms distincts)."""
-    if not vernaculaire:
+def condition_names(vernacular: dict[str, list[str]], cdate: str) -> tuple[str, int]:
+    """Merge vernacular names across sources and format them.
+
+    Each name carries its Bioref citations. Return (text, count).
+    """
+    if not vernacular:
         return "", 0
 
-    liste: dict[str, list[str]] = {}
-    for src, noms in vernaculaire.items():
-        for nom in noms:
-            ajoute_si_besoin(liste, nom, src)
+    items: dict[str, list[str]] = {}
+    for src, names in vernacular.items():
+        for name in names:
+            add_if_needed(items, name, src)
 
-    cnt = len(liste)
+    count = len(items)
     out = []
-    for nom, refs in liste.items():
-        refs_txt = "{{,}}".join(f"{{{{Bioref|{r}|{cdate}|ref}}}}" for r in refs)
-        out.append(nom + refs_txt)
-    return ", ".join(out), cnt
+    for name, refs in items.items():
+        refs_text = "{{,}}".join(f"{{{{Bioref|{r}|{cdate}|ref}}}}" for r in refs)
+        out.append(name + refs_text)
+    return ", ".join(out), count
 
 
 @lru_cache(maxsize=1)
-def load_countries() -> dict[str, dict[str, str]]:
+def _load_countries() -> dict[str, dict[str, str]]:
+    """Load the country table."""
     with (DATA_DIR / "countries.yaml").open(encoding="utf-8") as fh:
-        return yaml.safe_load(fh)
+        data: dict[str, dict[str, str]] = yaml.safe_load(fh)
+        return data
 
 
-def data_pays_code(code: str) -> str:
-    """Renvoie un wikilien [[nom réel]] ou [[nom réel|texte affiché]] pour un code pays ISO.
-    Retourne le code tel quel (non lié) si inconnu, plutôt que planter, puisque certaines
-    sources tierces renvoient des codes hors-ISO-3166 (régions, eaux internationales, etc.)
-    qui n'ont pas de page Wikipédia correspondante."""
-    countries = load_countries()
+def country_data_by_code(code: str) -> str:
+    """Return a wikilink for an ISO country code.
+
+    Return the code unlinked if unknown: some sources emit non
+    ISO 3166 codes with no Wikipedia page.
+    """
+    countries = _load_countries()
     entry = countries.get(code)
     if entry is None:
         return code
@@ -188,31 +222,29 @@ def data_pays_code(code: str) -> str:
 
 
 @lru_cache(maxsize=1)
-def load_wgsrpd() -> dict[str, dict[str, str]]:
+def _load_wgsrpd() -> dict[str, dict[str, str]]:
+    """Load the WGSRPD table."""
     with (DATA_DIR / "wgsrpd.yaml").open(encoding="utf-8") as fh:
-        return yaml.safe_load(fh)
+        data: dict[str, dict[str, str]] = yaml.safe_load(fh)
+        return data
 
 
-def data_wgsrpd_code(code: str) -> str:
-    """Renvoie un wikilien pour un code WGSRPD (niveau 3, ex. "FRA"), même principe que
-    `data_pays_code` mais sur le référentiel TDWG/WGSRPD plutôt qu'ISO 3166 (voir
-    `organon.modules.powo.module` pour l'origine de ces codes). Retourne le code tel quel
-    (non lié) si totalement inconnu. Pour les codes sans article Wikipédia en français
-    (`entry["lien"]`), utilise {{Lien}} vers l'article anglais plutôt qu'un wikilien direct
-    inexistant — avec une proposition de titre français (`fr`) seulement quand
-    scripts/build_wgsrpd_yaml.py a pu en établir une de façon fiable, sinon le paramètre `fr`
-    est simplement omis (convention {{Lien}}). Pour les codes sans article ni anglais ni
-    français (ex. subdivisions de la Russie d'Europe RUC/RUE/RUN/RUS/RUW), l'entrée ne porte
-    que `texte_affiche` : traduction en texte brut, sans lien."""
-    wgsrpd = load_wgsrpd()
+def wgsrpd_data_by_code(code: str) -> str:
+    """Return a wikilink for a WGSRPD level-3 code.
+
+    Without a French article, use {{Lien}} to the English one, with
+    `fr` only if known. With no article at all, return the plain
+    translation. Unknown codes are returned unlinked.
+    """
+    wgsrpd = _load_wgsrpd()
     entry = wgsrpd.get(code)
     if entry is None:
         return code
     if entry.get("lien"):
-        resu = f"{{{{Lien|langue={entry['langue']}|trad={entry['trad']}"
+        result = f"{{{{Lien|langue={entry['langue']}|trad={entry['trad']}"
         if entry.get("fr"):
-            resu += f"|fr={entry['fr']}"
-        return resu + "}}"
+            result += f"|fr={entry['fr']}"
+        return result + "}}"
     if "nom_page" not in entry:
         return entry["texte_affiche"]
     if entry["texte_affiche"] == entry["nom_page"]:
@@ -221,15 +253,18 @@ def data_wgsrpd_code(code: str) -> str:
 
 
 @lru_cache(maxsize=1)
-def load_wgsrpd_continents() -> dict[str, str]:
+def _load_wgsrpd_continents() -> dict[str, str]:
+    """Load the level-3 to level-1 WGSRPD mapping."""
     with (DATA_DIR / "wgsrpd_continents.yaml").open(encoding="utf-8") as fh:
-        return yaml.safe_load(fh)
+        data: dict[str, str] = yaml.safe_load(fh)
+        return data
 
 
-def continents_codes_wgsrpd(codes: list[str]) -> list[str]:
-    """Codes continentaux WGSRPD niveau 1 (ex. "1" = Europe) couverts par une liste de codes
-    niveau 3, triés par nom traduit (`data_wgsrpd_code`, ces codes L1 y figurent aussi). Ignore
-    les codes L3 inconnus de `wgsrpd_continents.yaml` plutôt que planter."""
-    mapping = load_wgsrpd_continents()
+def wgsrpd_continents_for_codes(codes: list[str]) -> list[str]:
+    """Return the level-1 codes covering a list of level-3 codes.
+
+    Sorted by translated name. Unknown codes are ignored.
+    """
+    mapping = _load_wgsrpd_continents()
     continents = {mapping[code] for code in codes if code in mapping}
-    return sorted(continents, key=data_wgsrpd_code)
+    return sorted(continents, key=wgsrpd_data_by_code)

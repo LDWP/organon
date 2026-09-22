@@ -1,0 +1,37 @@
+{{ébauche|Fagaceae}}
+{{Taxobox début | plante | ''Quercus robur'' | <!-- insérez une image --> | <!-- insérez légende descriptive de l'image --> | classification=biologique}}
+{{Taxobox | classe | Magnoliopsida }}
+{{Taxobox | ordre | Fagales }}
+{{Taxobox | famille | Fagaceae }}
+{{Taxobox | genre | Quercus }}
+{{Taxobox taxon | plante | espèce | Quercus robur | L. }}
+{{Taxobox UICN | LC }}
+{{Taxobox fin}}
+'''''Quercus robur''''' est une [[espèce]] de la [[Famille (biologie)|famille]] des ''[[Fagaceae]]''.
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+{{WGSRPD|certain=FRA|incertain=ITA|introduit=CAN|source=[[Plants of the World Online|POWO]]{{Bioref|powo|<DATE>|ref}}}}
+Ce taxon est présent dans le pays ou la région suivant{{Bioref|powo|<DATE>|ref}} : [[France]]; introduit en CAN; de présence incertaine en [[Italie]].
+
+== Systématique ==
+Le [[nom valide]] complet (avec [[Auteur#Dans les sciences et techniques|auteur]]) de ce taxon est ''Quercus robur'' L.{{Bioref|powo|<DATE>|ref}}.
+
+Ce taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Chêne pédonculé{{Bioref|telametro|<DATE>|ref}}, Chêne commun{{Bioref|telametro|<DATE>|ref}}.
+
+''Quercus robur'' a pour [[Synonyme (taxinomie)|synonyme]]{{Bioref|powo|<DATE>|ref}} :
+* ''Quercus pedunculata'' Ehrh.
+
+== Liens externes ==
+* {{IPNI | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}
+* {{POWO | 295374-1 | Quercus robur | L. | consulté le=<DATE> }}
+* {{UICN | 63532 | ''Quercus robur'' | consulté le=<DATE> }}
+
+== Notes et références ==
+{{références}}
+
+{{Portail|biologie}}
+
+[[Catégorie:Catégorie test]]
