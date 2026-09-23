@@ -1,9 +1,7 @@
-"""Point d'import unique qui enregistre tous les modules disponibles dans le registre (voir
-organon.core.registry).
+"""Single import point registering every available module.
 
-Les modules sous `organon.modules._archive` ne sont volontairement pas importés ici : leur code
-reste dans le dépôt mais ils ne s'enregistrent plus (voir le docstring de chacun pour le motif
-du retrait)."""
+See `organon.core.registry`.
+"""
 
 from __future__ import annotations
 
@@ -36,13 +34,11 @@ from organon.modules.ncbi import module as _ncbi  # noqa: F401
 from organon.modules.oepp import module as _oepp  # noqa: F401
 from organon.modules.powo import module as _powo  # noqa: F401
 from organon.modules.reptile_database import module as _reptile_database  # noqa: F401
-from organon.modules.systema_dipterorum import module as _systema_dipterorum  # noqa: F401
 from organon.modules.taxonomicon import module as _taxonomicon  # noqa: F401
 from organon.modules.telametro import module as _telametro  # noqa: F401
 from organon.modules.tpdb import module as _tpdb  # noqa: F401
 from organon.modules.tropicos import module as _tropicos  # noqa: F401
 from organon.modules.vascan import module as _vascan  # noqa: F401
-from organon.modules.wco import module as _wco  # noqa: F401
 from organon.modules.wfo import module as _wfo  # noqa: F401
 from organon.modules.wikimedia import module as _wikimedia  # noqa: F401
 from organon.modules.wrms import module as _wrms  # noqa: F401
@@ -51,6 +47,8 @@ from organon.modules.zoobank import module as _zoobank  # noqa: F401
 
 
 def ensure_modules_registered() -> None:
-    """No-op explicite : le simple fait d'importer ce module suffit (les modules
-    s'enregistrent via le décorateur @register_module au moment de l'import), cette fonction
-    existe pour donner un point d'appel explicite et lisible côté appelant."""
+    """Do nothing: importing this module registers the modules.
+
+    They register through `@register_module` at import time; this
+    function is an explicit call site for callers.
+    """

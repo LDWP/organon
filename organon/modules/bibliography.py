@@ -1,17 +1,16 @@
-"""Résolution partagée d'un DOI déjà repéré vers une citation wikitexte structurée : Wikidata
-(P356) en priorité, pour produire `{{Bibliographie|Qxxx}}` quand l'ouvrage/article y est déjà
-répertorié ; sinon Crossref, pour construire `{{Article}}`/`{{Ouvrage}}` à la main selon
-`message["type"]`.
+"""Shared resolution of a DOI into a structured wikitext citation.
 
-Partagé par tout module capable de repérer un DOI dans ses propres données — WoRMS (DOI scrapé
-depuis la page de détail Aphia) et LPSN (DOI structuré, champ `publication_doi`) à ce jour : la
-résolution DOI -> citation est identique une fois le DOI en main, seule la façon de le repérer
-diffère d'un module à l'autre et reste dans le module correspondant (`wrms/citations.py`,
-`lpsn/citations.py`)."""
+Wikidata (P356) first, giving `{{Bibliographie|Qxxx}}` when the work is
+already listed; else Crossref, to build `{{Article}}` or `{{Ouvrage}}`
+by hand from `message["type"]`. Shared by every module that can find a
+DOI in its data (WoRMS, LPSN); only how the DOI is found differs, and
+stays in the module (`citations.py`).
+"""
 
 from __future__ import annotations
 
 import re
+from collections.abc import Awaitable, Callable
 
 import httpx
 
@@ -23,20 +22,22 @@ CROSSREF_URL = "https://api.crossref.org/works"
 
 DOI_RE = re.compile(r"10\.\d{4,9}/[^\s\"'<>]+", re.IGNORECASE)
 
-# Ce que les appelants (`*/citations.py::build_citation`) attrapent pour retomber sur leur texte
-# brut : n'importe quelle étape réseau/JSON ci-dessous peut échouer sans que ce soit une erreur
-# du module appelant.
+# What callers (`*/citations.py::build_citation`) catch to fall back on
+# their raw text: any network or JSON step may fail without it being an
+# error of the calling module.
 LOOKUP_ERRORS = (httpx.HTTPError, ValueError, KeyError, TypeError, IndexError)
 
-# Title/type identifiant un livre côté Crossref (voir `message["type"]`) — un article resterait
-# construit via {{Article}} plutôt que mal étiqueté {{Ouvrage}}.
+# Crossref types identifying a book; an article stays an {{Article}}
+# rather than a mislabeled {{Ouvrage}}.
 _CROSSREF_BOOK_TYPES = {"book", "monograph", "edited-book", "reference-book"}
 
 
 async def _wikidata_qid_for_doi(client: httpx.AsyncClient, doi: str) -> str | None:
-    """Cherche l'item Wikidata portant ce DOI (P356). Comparaison insensible à la casse via
-    `UCASE` plutôt qu'une égalité stricte : Wikidata normalise les valeurs P356 en majuscules
-    par convention, mais ce n'est pas garanti pour toutes les entrées."""
+    """Return the QID of the Wikidata item holding this DOI (P356).
+
+    Case-insensitive through `UCASE`: Wikidata uppercases P356 by
+    convention, not for every entry.
+    """
     query = (
         "SELECT ?item WHERE "
         f'{{ ?item wdt:P356 ?doi . FILTER(UCASE(STR(?doi)) = UCASE("{sparql_escape(doi)}")) }}'
@@ -54,6 +55,7 @@ async def _wikidata_qid_for_doi(client: httpx.AsyncClient, doi: str) -> str | No
 
 
 async def _crossref_work(client: httpx.AsyncClient, doi: str) -> dict | None:
+    """Return the Crossref metadata of a DOI, or None if unknown."""
     resp = await client.get(f"{CROSSREF_URL}/{doi}")
     if resp.status_code == 404:
         return None
@@ -61,39 +63,43 @@ async def _crossref_work(client: httpx.AsyncClient, doi: str) -> dict | None:
     return resp.json().get("message")
 
 
-def build_template(nom: str, champs: list[tuple[str, str]], obligatoires: set[str]) -> str | None:
-    """Construit `{{nom | ...}}` à partir des champs non vides, ou `None` si l'un des paramètres
-    listés dans `obligatoires` (voir Modèle:Article/Modèle:Ouvrage sur frwiki — `titre` seul pour
-    Ouvrage ; `titre`/`périodique`/`date` pour Article) manque : mieux vaut renoncer à
-    l'enrichissement que produire une citation qui s'afficherait cassée sur l'article. Public :
-    réutilisé par `wrms/citations.py::_via_bhl` pour le même modèle `{{Ouvrage}}` construit à la
-    main depuis des métadonnées BHL plutôt que Crossref."""
-    presents = {cle for cle, valeur in champs if valeur}
-    if not obligatoires <= presents:
+def build_template(name: str, fields: list[tuple[str, str]], required: set[str]) -> str | None:
+    """Build `{{name | ...}}` from the non-empty fields.
+
+    Return None if a parameter of `required` is missing (see
+    Modèle:Article and Modèle:Ouvrage on frwiki): better to skip the
+    enrichment than show a broken citation. Public: reused by
+    `wrms/citations.py` for BHL metadata.
+    """
+    presents = {key for key, value in fields if value}
+    if not required <= presents:
         return None
-    parametres = " | ".join(f"{cle}={valeur}" for cle, valeur in champs if valeur)
-    return f"{{{{{nom} | {parametres}}}}}"
+    params = " | ".join(f"{key}={value}" for key, value in fields if value)
+    return f"{{{{{name} | {params}}}}}"
 
 
 def _crossref_authors(message: dict) -> list[str]:
+    """Return the "Given Family" author names of a Crossref work."""
     return [
-        " ".join(part for part in (auteur.get("given"), auteur.get("family")) if part)
-        for auteur in message.get("author", [])
-        if auteur.get("family")
+        " ".join(part for part in (author.get("given"), author.get("family")) if part)
+        for author in message.get("author", [])
+        if author.get("family")
     ]
 
 
 def _crossref_year(message: dict) -> str:
-    for cle in ("published-print", "published", "issued"):
-        parts = message.get(cle, {}).get("date-parts", [[None]])
+    """Return the publication year of a Crossref work, or ""."""
+    for key in ("published-print", "published", "issued"):
+        parts = message.get(key, {}).get("date-parts", [[None]])
         if parts and parts[0] and parts[0][0]:
             return str(parts[0][0])
     return ""
 
 
 def _build_article_from_crossref(doi: str, message: dict) -> str | None:
-    champs = [(f"auteur{i}", a) for i, a in enumerate(_crossref_authors(message), start=1)]
-    champs += [
+    """Build an `{{Article}}` from Crossref metadata."""
+    fields = [(f"auteur{i}", a) for i, a in enumerate(_crossref_authors(message), start=1)]
+    fields += [
         ("titre", (message.get("title") or [""])[0]),
         ("périodique", (message.get("container-title") or [""])[0]),
         ("volume", message.get("volume", "")),
@@ -102,25 +108,27 @@ def _build_article_from_crossref(doi: str, message: dict) -> str | None:
         ("pages", message.get("page", "")),
         ("doi", doi),
     ]
-    return build_template("Article", champs, {"titre", "périodique", "date"})
+    return build_template("Article", fields, {"titre", "périodique", "date"})
 
 
-def _build_ouvrage_from_crossref(doi: str, message: dict) -> str | None:
-    champs = [(f"auteur{i}", a) for i, a in enumerate(_crossref_authors(message), start=1)]
-    champs += [
+def _build_book_from_crossref(doi: str, message: dict) -> str | None:
+    """Build an `{{Ouvrage}}` from Crossref metadata."""
+    fields = [(f"auteur{i}", a) for i, a in enumerate(_crossref_authors(message), start=1)]
+    fields += [
         ("titre", (message.get("title") or [""])[0]),
         ("éditeur", message.get("publisher", "")),
         ("année", _crossref_year(message)),
     ]
-    return build_template("Ouvrage", champs, {"titre"})
+    return build_template("Ouvrage", fields, {"titre"})
 
 
 async def resolve_doi_citation(client: httpx.AsyncClient, doi: str) -> str | None:
-    """Résout un DOI déjà repéré vers une citation wikitexte : Wikidata (P356) d'abord pour
-    `{{Bibliographie|Qxxx}}`, sinon Crossref pour `{{Article}}`/`{{Ouvrage}}` (selon
-    `message["type"]`). Renvoie `None` si ni l'une ni l'autre n'aboutit (DOI absent des deux
-    sources, ou métadonnées Crossref insuffisantes pour les paramètres obligatoires du modèle) —
-    à l'appelant de décider du repli (texte brut, autre méthode)."""
+    """Resolve a DOI into a wikitext citation.
+
+    Wikidata first, giving `{{Bibliographie|Qxxx}}`, else Crossref for
+    `{{Article}}` or `{{Ouvrage}}` by `message["type"]`. Return None if
+    neither works; the caller picks the fallback.
+    """
     qid = await _wikidata_qid_for_doi(client, doi)
     if qid:
         return f"{{{{Bibliographie|{qid}}}}}"
@@ -128,5 +136,36 @@ async def resolve_doi_citation(client: httpx.AsyncClient, doi: str) -> str | Non
     if not message:
         return None
     if message.get("type") in _CROSSREF_BOOK_TYPES:
-        return _build_ouvrage_from_crossref(doi, message)
+        return _build_book_from_crossref(doi, message)
     return _build_article_from_crossref(doi, message)
+
+
+def extract_doi(text: str) -> str | None:
+    """Return the DOI found in a text, without trailing punctuation."""
+    match = DOI_RE.search(text)
+    if match is None:
+        return None
+    # The surrounding prose may leave a trailing punctuation mark that
+    # is not part of the DOI.
+    return match.group(0).rstrip(".,;)]")
+
+
+async def citation_or_text(
+    resolve: Callable[[str], Awaitable[str | None]], text: str | None
+) -> str | None:
+    """Return the structured citation of the DOI in `text`, else `text`.
+
+    `resolve` is an adapter's `resolve_doi_citation`. A bonus, never a
+    condition of success: any lookup failure keeps the source text.
+    """
+    if not text:
+        return text
+    doi = extract_doi(text)
+    if doi:
+        try:
+            enriched = await resolve(doi)
+        except LOOKUP_ERRORS:
+            return text
+        if enriched:
+            return enriched
+    return text

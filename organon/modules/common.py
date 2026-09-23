@@ -1,9 +1,10 @@
-"""Utilitaires partagés entre les adaptateurs de modules (organon.modules.*), pour éviter de
-dupliquer les mêmes motifs dans chaque module.py : pagination REST avec troncature
-(`limite-listes`), lien de debug vers la fiche source, formatage d'auteur, garde-fou
-anti-boucle de synonymes. La plupart de ces fonctions sont pures ou de fins wrappers au-dessus de
-callbacks fournis par chaque module ; `checklistbank_children_page`/`checklistbank_synonyms` font
-exception (appel réseau direct), partagés par tous les adaptateurs ChecklistBank."""
+"""Utilities shared by the module adapters.
+
+REST pagination with truncation (`limite-listes`), debug link to the
+source record, author formatting, synonym-loop guard. Most are pure or
+thin wrappers over module callbacks; the ChecklistBank functions make
+network calls, shared by all ChecklistBank adapters.
+"""
 
 from __future__ import annotations
 
@@ -15,16 +16,71 @@ from typing import Any
 
 import httpx
 
+from organon.core.config import GenerateOptions
 from organon.core.http import fetch_json
-from organon.core.models import Struct
-from organon.core.rendering.support import rempl_et_al
+from organon.core.models import Struct, TaxonInfo
+from organon.core.rendering.support import replace_et_al
+
+__all__ = [
+    "MAX_SYNONYM_HOPS",
+    "as_limit",
+    "checklistbank_accepted_name",
+    "checklistbank_children_page",
+    "checklistbank_synonyms",
+    "collect_pages",
+    "extract_aphia_original_description",
+    "filter_ancestors_above_kingdom",
+    "flatten_aphia_classification",
+    "follow_synonym",
+    "format_author",
+    "format_author_year",
+    "mediawiki_page_exists",
+    "simple_debug_link",
+    "sparql_escape",
+]
 
 logger = logging.getLogger(__name__)
 
+# Guard against an endless loop when two taxa name each other as the
+# accepted synonym; applied by every module that follows synonyms
+# (see `hop` in each `collect()`).
 MAX_SYNONYM_HOPS = 10
-"""Garde-fou contre une boucle infinie si deux taxons se référencent l'un l'autre comme
-synonyme accepté, appliqué par tous les modules qui suivent des synonymes (voir `hop` dans
-chaque `collect()`)."""
+
+
+async def follow_synonym(
+    struct: Struct,
+    module_id: str,
+    is_classification: bool,
+    options: GenerateOptions,
+    hop: int,
+    resolve_accepted: Callable[[], Awaitable[str | None]],
+    recurse: Callable[[int], Awaitable[Struct | None]],
+) -> tuple[bool, Struct | None]:
+    """Handle a synonym hit; return `(handled, result)`.
+
+    When `handled` is false the caller keeps processing the synonym's
+    own data (`follow_synonyms` off). Otherwise `result` is the value
+    `collect()` must return. `resolve_accepted` yields the accepted
+    name, or None; `recurse` re-runs the collection with a hop count.
+    """
+    if not is_classification:
+        struct.links[module_id]["synonym"] = True
+        return True, struct
+    if not options.follow_synonyms:
+        return False, None
+    if hop >= MAX_SYNONYM_HOPS:
+        return True, None
+    accepted_name = await resolve_accepted()
+    if accepted_name is None:
+        return True, None
+    struct.taxon = TaxonInfo(name=accepted_name)
+    return True, await recurse(hop + 1)
+
+
+async def checklistbank_accepted_name(usage: dict) -> str | None:
+    """Return the accepted name of a ChecklistBank synonym usage."""
+    accepted = usage.get("accepted")
+    return accepted["name"]["scientificName"] if accepted is not None else None
 
 
 async def collect_pages(
@@ -32,20 +88,18 @@ async def collect_pages(
     start_offset: int = 0,
     limit: int | None = None,
 ) -> tuple[list, bool]:
-    """Agrège toutes les pages d'un endpoint paginé. `fetch_page(offset)` doit renvoyer
-    `(éléments retenus de cette page, taille brute de la page lue côté source, est-ce la
-    dernière page ?)`. La taille brute est distincte du nombre d'éléments retenus dès qu'un
-    appelant filtre certains enregistrements avant de les renvoyer (ex. rang non pertinent,
-    statut non accepté) : avancer l'offset sur le compte filtré ferait rechevaucher la page
-    suivante avec la fin de celle-ci côté source, dupliquant les enregistrements de la zone de
-    chevauchement. `start_offset` s'adapte aux deux conventions rencontrées : 0 (GBIF, index du
-    premier élément) ou 1 (WoRMS, numéro du premier enregistrement) ; le pas suivant est déduit
-    de la taille brute reçue.
+    """Aggregate all pages of a paginated endpoint.
 
-    `limit` porte l'option `limite-listes` : si fourni, la pagination s'arrête dès que ce
-    nombre est dépassé plutôt que de récupérer des pages inutiles pour une liste tronquée de
-    toute façon (un genre à des centaines d'espèces peut nécessiter un appel réseau par
-    espèce — s'arrêter tôt évite un ralentissement inutile). Renvoie `(éléments, coupée ?)`."""
+    `fetch_page(offset)` returns (kept items, raw page size, last
+    page?). The raw size is distinct from the kept count when the caller
+    filters records: advancing by the filtered count would overlap the
+    next page and duplicate records. `start_offset` is 0 (GBIF) or 1
+    (WoRMS); the next step comes from the raw size received.
+
+    `limit` carries the `limite-listes` option: pagination stops once it
+    is exceeded, to skip pages of a list truncated anyway. Return
+    (items, truncated?).
+    """
     items: list = []
     offset = start_offset
     while True:
@@ -60,34 +114,32 @@ async def collect_pages(
 
 
 def as_limit(options_value: int) -> int | None:
-    """Convertit `GenerateOptions.limite_listes` (convention : <=0 signifie "pas de limite")
-    vers le paramètre `limit` de `collect_pages` (convention : `None` signifie "pas de
-    limite"). Piège évité : `options_value or None` renverrait `-1` telle quelle (`-1` est
-    vraie en Python), pas `None`."""
+    """Convert `GenerateOptions.list_limit` to `collect_pages` `limit`.
+
+    <=0 means no limit there, None here. `value or None` would keep -1.
+    """
     return options_value if options_value > 0 else None
 
 
-def format_auteur(auteur: str | None) -> str | None:
-    """Applique le remplacement `et al.` -> `{{et al.}}` à une chaîne d'auteur (voir
-    `core.rendering.support.rempl_et_al`), à appliquer systématiquement partout où un module
-    écrit un auteur dans `Struct` (taxon, rangs, synonymes, basionyme…). Renvoie `None` pour
-    une entrée vide plutôt qu'une chaîne vide, pour rester compatible avec les champs
-    optionnels des modèles Pydantic."""
-    if not auteur:
+def format_author(author: str | None) -> str | None:
+    """Decode HTML entities and rewrite "et al." in an author string.
+
+    "et al." becomes `{{et al.}}`. Apply wherever a module writes an
+    author into `Struct`. Return None for an empty input, to fit the
+    optional Pydantic fields.
+    """
+    if not author:
         return None
-    return rempl_et_al(auteur)
+    return replace_et_al(_html.unescape(author))
 
 
-def format_auteur_annee(authors: str | None, year: str | int | None) -> str | None:
-    """Concatène auteur + année en `"Auteur, Année"`, pour les sources dont l'API expose
-    l'année de publication dans un champ séparé de la citation d'auteur — le cas des codes de
-    nomenclature qui ne l'incluent pas par convention (ICN botanique/champignons ; à distinguer
-    de l'ICZN zoologique et de l'ICNP bactérien, qui l'incluent déjà nativement dans la chaîne
-    d'auteur). `resoudre_auteur_principal` (`core/rendering/authors.py`) sait déjà extraire un
-    token année terminal quel que soit le règne — seule l'absence de ce suffixe empêchait la
-    date d'apparaître dans la taxobox botanique (discussion Projet:Biologie/Organon #33).
-    N'applique aucun remplacement `et al.` : passer le résultat à `format_auteur` comme pour
-    tout autre auteur brut."""
+def format_author_year(authors: str | None, year: str | int | None) -> str | None:
+    """Join author and year as "Author, Year".
+
+    For sources exposing the year apart from the author citation (codes
+    that omit it by convention, e.g. ICN). Apply no "et al."
+    replacement: pass the result through `format_author`.
+    """
     authors = authors or ""
     if year:
         authors = f"{authors}, {year}" if authors else str(year)
@@ -102,39 +154,33 @@ _TAG_RE = re.compile(r"<[^>]+>")
 
 
 def extract_aphia_original_description(html_page: str) -> str | None:
-    """Extrait le champ « Original description » d'une page de détail Aphia/VLIZ
-    (`aphia.php?p=taxdetails&id=...`), plateforme partagée par WoRMS et IRMNG. Aucun champ REST
-    équivalent n'existe (voir `wrms/module.py`/`irmng/module.py`) — seul ce champ précis reste
-    scrapé, le reste des deux modules utilise l'API REST.
+    """Extract the "Original description" of an Aphia detail page.
 
-    Le motif ciblé (`id="OriginalDescription"`, contenu dans un `<span class='correctHTML'>`)
-    est le même sur les deux sites (vérifié en direct). Aucun marqueur de fin de bloc fiable
-    n'existe dans le HTML actuel des deux plateformes : la zone est donc bornée par le `for="`
-    du champ suivant (`DescriptiveNotes` ou équivalent), présent des deux côtés. Seule la
-    première citation trouvée est gardée (une seconde entrée "(of <nom> ...)" peut suivre pour
-    un renvoi de sous-taxon/synonyme, hors-sujet ici). Renvoie `None` si le champ est absent ou
-    vide (ex. "Not documented", cas réel observé sur IRMNG)."""
+    Aphia is shared by WoRMS and IRMNG and has no REST field for it. The
+    area is bounded by the next field's `for="`, as the HTML has no
+    reliable end marker. Only the first citation is kept. Return None if
+    the field is absent or empty.
+    """
     field_match = _ORIGINAL_DESCRIPTION_FIELD_RE.search(html_page)
     if field_match is None:
         return None
     span_match = _CORRECT_HTML_SPAN_RE.search(field_match.group("block"))
     if span_match is None:
         return None
-    texte = _TAG_RE.sub("", span_match.group("texte"))
-    # Le titre d'ouvrage est stocké échappé (ex. "&lt;i&gt;Systema Naturae...&lt;/i&gt;" ou
-    # "&lt;em&gt;...&lt;/em&gt;", les deux formes observées en direct) : une fois décodé, ce sont
-    # des balises <i>/<em> réelles à convertir en italique wikitexte plutôt que laissées en HTML
-    # brut (même convention que le champ "originale" d'AlgaeBase, voir
-    # `organon/modules/algaebase/module.py`).
-    texte = _html.unescape(texte)
-    texte = re.sub(r"</?(?:i|em)>", "''", texte).strip()
-    return texte or None
+    text = _TAG_RE.sub("", span_match.group("texte"))
+    # The work title is stored escaped (&lt;i&gt; or &lt;em&gt;): once
+    # decoded, real tags to convert to wikitext italics rather than
+    # leave as raw HTML (same as AlgaeBase's original publication).
+    text = _html.unescape(text)
+    text = re.sub(r"</?(?:i|em)>", "''", text).strip()
+    return text or None
 
 
 def flatten_aphia_classification(node: dict) -> list[dict]:
-    """Aplatit l'arbre de classification imbriqué (`{"scientificname": ..., "child": {...}}`)
-    renvoyé par `classification_by_id` en une liste racine -> feuille. Forme partagée par WoRMS
-    et IRMNG (même plateforme Aphia/VLIZ)."""
+    """Flatten the nested Aphia classification tree to a list.
+
+    Root first, leaf last. Shared by WoRMS and IRMNG.
+    """
     chain = []
     cur: dict | None = node
     while cur is not None:
@@ -143,47 +189,43 @@ def flatten_aphia_classification(node: dict) -> list[dict]:
     return chain
 
 
-def filter_ancestors_above_regne(
-    chain: list[dict], regne_nom: str, garder_regne: bool
+def filter_ancestors_above_kingdom(
+    chain: list[dict], kingdom_name: str, keep_kingdom: bool
 ) -> list[dict]:
-    """Coupe une chaîne d'ancêtres (racine -> feuille, nom sous la clé `scientificname`) à
-    hauteur du règne : tout nœud au règne ou au-dessus (domaine, super-domaine, `Biota`...) est
-    écarté, quel que soit le rang que la source lui déclare (`Superdomain`, `Kingdom`,
-    `Clade`...) — seule la position dans l'arbre, repérée par le nom de règne déjà connu
-    (`regne_nom`, ex. `cur["kingdom"]`), fait foi. Partagé par WoRMS et IRMNG (même plateforme
-    Aphia, même forme d'arbre imbriqué — voir `flatten_aphia_classification`).
-    Si `regne_nom` n'apparaît dans aucun nœud (cas non rencontré en pratique), la chaîne est
-    renvoyée telle quelle. `garder_regne` réintroduit le nœud du règne lui-même (algue/protiste,
-    voir CHARTES_GARDENT_REGNE)."""
+    """Cut an ancestor chain at the kingdom.
+
+    Any node at or above the kingdom is dropped, whatever rank the
+    source declares: only the position of `kingdom_name` counts. If it
+    is in no node, return the chain unchanged. `keep_kingdom` keeps the
+    kingdom node itself (algae, protists; see KINGDOMS_KEPT_IN_CHAIN).
+    """
     boundary = next(
-        (i for i, node in enumerate(chain) if node.get("scientificname") == regne_nom), None
+        (i for i, node in enumerate(chain) if node.get("scientificname") == kingdom_name), None
     )
     if boundary is None:
         return chain
-    reste = chain[boundary + 1 :]
-    return [chain[boundary], *reste] if garder_regne else reste
+    rest = chain[boundary + 1 :]
+    return [chain[boundary], *rest] if keep_kingdom else rest
 
 
 def sparql_escape(value: str) -> str:
-    """Échappe une chaîne pour l'insérer dans un littéral SPARQL entre guillemets doubles
-    (`"..."`). Backslash d'abord : sinon le remplacement du guillemet ajouté à l'étape suivante
-    serait lui-même ré-échappé, laissant un backslash final non échappé capable de faire fusionner
-    le guillemet fermant du littéral avec le premier caractère de `value` (injection — un `taxon`
-    terminé par `\\` casse la chaîne). Saut de ligne/retour chariot ensuite : un littéral SPARQL
-    sur une ligne ne peut pas contenir de saut de ligne brut, qui le terminerait prématurément."""
+    """Escape a string for a double-quoted SPARQL literal.
+
+    Backslash first, else the escaped quote would be re-escaped and a
+    trailing backslash could merge with the closing quote (injection).
+    Then newline and carriage return, which cannot appear raw.
+    """
     return (
-        value.replace("\\", "\\\\")
-        .replace('"', '\\"')
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
+        value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\r", "\\r")
     )
 
 
 async def mediawiki_page_exists(client: httpx.AsyncClient, api_url: str, title: str) -> bool:
-    """Existence d'une page via l'API MediaWiki standard (`action=query`) : une page manquante
-    renvoie `pageid: -1` avec une clé `missing`, une page existante un `pageid` positif sans
-    cette clé (vérifié en direct sur les deux cas). Partagé par les adaptateurs Commons,
-    Wikispecies et Wiktionnaire (organon/modules/wikimedia/*), chacun sur son propre domaine."""
+    """Return True if a page exists, via the MediaWiki `action=query`.
+
+    A missing page has `pageid: -1` and a `missing` key. Shared by the
+    Commons, Wikispecies and Wiktionary adapters.
+    """
     resp = await client.get(api_url, params={"action": "query", "titles": title, "format": "json"})
     resp.raise_for_status()
     pages = resp.json().get("query", {}).get("pages", {})
@@ -193,9 +235,11 @@ async def mediawiki_page_exists(client: httpx.AsyncClient, api_url: str, title: 
 async def checklistbank_children_page(
     client: httpx.AsyncClient, api_base: str, dataset_id: str, taxon_id: str, offset: int = 0
 ) -> dict:
-    """Page de sous-taxons ChecklistBank (`/dataset/{dataset_id}/tree/{taxon_id}/children`),
-    partagée par tous les adaptateurs ChecklistBank (voir `checklistbank_synonyms` ci-dessous
-    pour la raison de sa tolérance aux pannes)."""
+    """Return a page of ChecklistBank sub-taxa.
+
+    Shared by all ChecklistBank adapters; failure-tolerant, see
+    `checklistbank_synonyms`.
+    """
     return await _checklistbank_get(
         client,
         f"{api_base}/dataset/{dataset_id}/tree/{taxon_id}/children",
@@ -206,15 +250,13 @@ async def checklistbank_children_page(
 async def checklistbank_synonyms(
     client: httpx.AsyncClient, api_base: str, dataset_id: str, taxon_id: str
 ) -> dict:
-    """Synonymes ChecklistBank (`/dataset/{dataset_id}/taxon/{taxon_id}/synonyms`), partagée par
-    tous les adaptateurs ChecklistBank sauf `coi_ioc` (dataset sans synonymes, voir son
-    `adapter.py`). Comme `checklistbank_children_page`, avale les erreurs réseau/HTTP plutôt que
-    de les laisser remonter : ces deux endpoints sont toujours appelés après qu'un `search()`
-    réussi a déjà écrit nom/rang/auteur/classification dans `struct` (voir chaque `module.py`) —
-    les laisser lever ferait perdre tout ce résultat de classification déjà acquis à cause d'une
-    seule panne réseau sur les sous-taxons/synonymes, pas seulement ces derniers
-    (`_attempt_classification`/`collect_one_module` de l'appelant écartent tout le `struct` dès
-    qu'une exception traverse `collect()`)."""
+    """Return the ChecklistBank synonyms of a taxon.
+
+    Shared by all ChecklistBank adapters except `coi_ioc`. Like
+    `checklistbank_children_page`, it swallows network and HTTP errors:
+    both run after a successful `search()` already wrote the
+    classification, and an exception would discard it all.
+    """
     return await _checklistbank_get(
         client, f"{api_base}/dataset/{dataset_id}/taxon/{taxon_id}/synonyms"
     )
@@ -223,20 +265,24 @@ async def checklistbank_synonyms(
 async def _checklistbank_get(
     client: httpx.AsyncClient, url: str, *, params: dict[str, Any] | None = None
 ) -> dict:
+    """GET a ChecklistBank URL, returning {} on a network error."""
     try:
         return await fetch_json(client, url, params=params, empty_value={})
     except httpx.HTTPError as exc:
-        # Avalée par design (voir checklistbank_synonyms ci-dessus) : loggée quand même, sinon
-        # une panne ChecklistBank devient indiscernable d'un taxon sans enfants/synonymes.
+        # Swallowed by design (see checklistbank_synonyms) but still
+        # logged, or an outage would look like a taxon with no children
+        # or synonyms.
         logger.warning("ChecklistBank injoignable sur %s : %s", url, exc)
         return {}
 
 
 def simple_debug_link(struct: Struct, module_id: str, url_template: str, label: str) -> str | None:
-    """Lien brut vers la fiche du taxon sur le site source, construit à partir de
-    l'identifiant stocké dans `struct.liens[module_id]['id']`. `url_template` utilise `{id}`
-    comme point d'insertion, ex. `"https://www.gbif.org/species/{id}"`."""
-    data = struct.liens.get(module_id)
+    """Return a raw link to the taxon's page on the source site.
+
+    Built from `struct.links[module_id]['id']`; `url_template` uses
+    `{id}`, e.g. "https://www.gbif.org/species/{id}".
+    """
+    data = struct.links.get(module_id)
     if not data or "id" not in data:
         return None
     url = url_template.format(id=data["id"])
