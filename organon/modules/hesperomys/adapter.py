@@ -1,46 +1,43 @@
-"""Couche d'accès réseau pour Hesperomys (https://hesperomys.com) : appels HTTP et décodage
-JSON bruts uniquement, aucune logique métier (voir module.py).
+"""Network access to Hesperomys (https://hesperomys.com).
 
-L'API GraphQL (`/graphql`) n'est pas documentée publiquement, mais son usage a été confirmé
-directement par l'auteur du site en 2024 (voir organon/core/data/db_inventory.yaml, entrée
-`hesperomys`) — un export Zenodo statique (dernier connu :
-https://zenodo.org/records/10481656) existe en repli, mais l'API en direct est retenue ici :
-données à jour, comme les autres modules HTTP directs du dépôt (GBIF, ITIS...). Le schéma exact
-des champs utilisés ci-dessous a été retrouvé par introspection GraphQL standard
-(`{ __schema { types { ... } } }`), le endpoint l'autorisant.
+Raw HTTP and JSON only; see module.py.
 
-`taxonByLabel(label: <nom scientifique exact, espace, casse d'origine>)` est le seul point
-d'entrée fiable trouvé pour résoudre un nom vers un `Taxon` : il ne matche que les taxons
-valides (un nom de synonyme, ex. "Felis leo", renvoie une liste vide — vérifié en direct), donc
-aucune logique de suivi de synonyme n'est possible côté Hesperomys (contrairement à
-GBIF/ITIS/POWO) - `search()` (plein texte) existe mais indexe surtout les articles
-bibliographiques, pas les taxons, et n'est pas utilisé ici.
+The GraphQL API (`/graphql`) is not publicly documented, but its use was
+confirmed by the site's author in 2024 (see `db_inventory.yaml`). The
+live API is preferred to the static Zenodo export: up-to-date data. The
+fields used were found by standard GraphQL introspection.
 
-La chaîne de classification n'est pas exposée en un seul appel : `parent` sur `Taxon` ne
-renvoie qu'un niveau. `ancestors()` remonte donc la chaîne par appels successifs (un par rang),
-bornée par `_MAX_ANCESTOR_HOPS` pour éviter une boucle si l'API renvoyait un cycle inattendu."""
+`taxonByLabel(label: <exact scientific name>)` is the only reliable
+entry point to resolve a name to a `Taxon`. It matches only valid taxa
+(a synonym returns an empty list), so synonyms cannot be followed.
+`search()` mostly indexes bibliographic articles, not taxa.
+
+The chain is not exposed in one call: `parent` returns one level, so
+`ancestors()` climbs by successive calls, bounded by
+`_MAX_ANCESTOR_HOPS` against an unexpected cycle.
+"""
 
 from __future__ import annotations
 
-import asyncio
-import time
+import logging
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import MinIntervalThrottle, OwnedClientMixin
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = "https://hesperomys.com/graphql"
 
-_MIN_INTERVAL = 0.2  # ~5 requêtes/s, prudence par défaut pour une API tierce non documentée
+_MIN_INTERVAL = 0.2  # ~5 requests/s, cautious for an undocumented third-party API
 _MAX_ANCESTOR_HOPS = 30
+# Never included in the chain: the kingdom is stored in struct.kingdom.
 _EXCLUDE_RANKS = {"domain", "superkingdom", "kingdom", "subkingdom", "infrakingdom", "root"}
-"""Jamais inclus dans la chaîne : le "règne" est stocké séparément dans struct.regne."""
+# Hesperomys is a cladistic paleontology database: above the class the
+# chain goes on into pre-mammalian synapsid clades, useless for a mammal
+# taxobox. The climb stops right after the class ancestor (for Panthera
+# leo it would otherwise go ~30 levels up to the Triassic).
 _CEILING_RANK = "class_"
-"""Hesperomys est une base cladistique de paléontologie : au-delà de la classe, la chaîne des
-parents continue dans des clades synapsides pré-mammaliens (ex. "Eucynodontia",
-"Theriimorpha") sans intérêt pour une taxobox d'espèce actuelle/fossile de mammifère — la
-remontée s'arrête donc juste après avoir inclus l'ancêtre de rang "classe" (vérifié en direct
-sur Panthera leo : sans cette borne, la chaîne remonte sur ~30 niveaux jusqu'au Trias)."""
 
 _AUTHOR_TAG_FRAGMENT = """
 authorTags {
@@ -106,48 +103,47 @@ query($oid: Int!) {{
 }}
 """
 
-_last_call = 0.0
-_lock = asyncio.Lock()
-
-
-async def _throttle() -> None:
-    global _last_call
-    async with _lock:
-        wait = _last_call + _MIN_INTERVAL - time.monotonic()
-        if wait > 0:
-            await asyncio.sleep(wait)
-        _last_call = time.monotonic()
+_throttle = MinIntervalThrottle(_MIN_INTERVAL).wait
 
 
 class HesperomysAdapter(OwnedClientMixin):
+    """Raw Hesperomys GraphQL client."""
+
     async def _query(self, query: str, variables: dict) -> dict | None:
+        """Run a GraphQL query; return its data, or None on error."""
         await _throttle()
         try:
             resp = await self._client.post(BASE_URL, json={"query": query, "variables": variables})
             resp.raise_for_status()
-        except httpx.HTTPError:
+        except httpx.HTTPError as exc:
+            logger.warning("Hesperomys injoignable (%s)", exc)
             return None
         payload = resp.json()
         if "errors" in payload:
+            logger.warning("Hesperomys : erreurs GraphQL (%s)", payload["errors"])
             return None
         return payload.get("data")
 
     async def taxon_by_label(self, label: str) -> list[dict]:
+        """Return the taxa whose label matches."""
         data = await self._query(_TAXON_BY_LABEL_QUERY, {"label": label})
         if data is None:
             return []
         return data.get("taxonByLabel") or []
 
     async def taxon_detail(self, oid: int) -> dict | None:
+        """Return the detail of a taxon id, or None."""
         data = await self._query(_TAXON_DETAIL_QUERY, {"oid": oid})
         if data is None:
             return None
         return data.get("taxon")
 
     async def ancestors(self, first_parent: dict | None) -> list[dict]:
-        """Remonte la chaîne des taxons parents à partir du premier parent déjà connu (issu de
-        `taxon_detail()`), un appel réseau par niveau supplémentaire. S'arrête faute de parent,
-        sur `_EXCLUDE_RANKS`, ou juste après avoir inclus `_CEILING_RANK` (voir sa docstring)."""
+        """Climb the parent chain from the first known parent.
+
+        One network call per extra level. Stops without parent, on
+        `_EXCLUDE_RANKS`, or right after including `_CEILING_RANK`.
+        """
         chain: list[dict] = []
         current = first_parent
         hops = 0

@@ -1,167 +1,193 @@
-"""Logique métier du module WoRMS : classification, synonymes, sous-taxons, noms vernaculaires,
-via l'API REST (voir adapter.py).
+"""WoRMS module: classification, synonyms, sub-taxa, vernacular names.
 
-Le suivi de synonyme utilise `valid_AphiaID` (renvoyé directement par AphiaRecordsByName/
-AphiaRecordByAphiaID) pour récupérer directement la fiche du taxon accepté par ID, sans
-repasser par une recherche textuelle.
+Through the REST API (see adapter.py).
 
-La « publication originale » (struct.originale) n'a aucun champ REST structuré équivalent : le
-seul champ disponible est scrapé depuis la page HTML de détail
-(`WrmsAdapter.original_description`, voir `organon.modules.common.
-extract_aphia_original_description`) — la seule exception à "REST uniquement" dans ce module.
-`organon.modules.wrms.citations.build_citation` tente ensuite de remplacer ce texte brut par une
-citation structurée ({{Bibliographie}}/{{Article}}/{{Ouvrage}}) quand un DOI ou un lien BHL y
-est repérable, avec repli silencieux sur le texte brut en cas d'échec.
+Synonym following uses `valid_AphiaID` to fetch the accepted taxon
+record directly by id, with no new text search.
+
+The original publication has no structured REST field: it is scraped
+from the HTML detail page, the one exception to "REST only".
+`citations.build_citation` then tries to replace that raw text with a
+structured citation when a DOI or BHL link is found, silently falling
+back on the raw text.
 """
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
+from organon.core.langues import groupe_par_langue
 from organon.core.models import (
     Basionym,
+    LinkEntry,
     RankName,
-    Redirection,
     Struct,
     SubTaxonList,
     SynonymList,
-    TaxonInfo,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.common import (
-    MAX_SYNONYM_HOPS,
     as_limit,
     collect_pages,
-    filter_ancestors_above_regne,
+    filter_ancestors_above_kingdom,
     flatten_aphia_classification,
-    format_auteur,
+    follow_synonym,
+    format_author,
     simple_debug_link,
 )
 from organon.modules.wrms.adapter import WrmsAdapter
 from organon.modules.wrms.citations import build_citation
-from organon.modules.wrms.ranks import CHARTES_GARDENT_REGNE, wrms_charte, wrms_rang
+from organon.modules.wrms.ranks import (
+    KINGDOMS_KEPT_IN_CHAIN,
+    wrms_charter_kingdom,
+    wrms_to_wp_rank,
+)
 
+# Page size of the WoRMS REST API (fixed by the service).
 PAGE_SIZE = 50
-"""Taille de page de l'API REST WoRMS (constante documentée par le service, pas configurable)."""
 
 
 class WrmsModule(TaxonomyModule):
+    """WoRMS module."""
+
     meta = ModuleMeta(
         id="wrms", can_classify=True, can_render_external_link=True, domains="all", priority=996
     )
 
     def __init__(self, adapter: WrmsAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or WrmsAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from WoRMS."""
         results = await self._adapter.records_by_name(
-            struct.taxon.nom, marine_only=options.marine_only
+            struct.taxon.name, marine_only=options.marine_only
         )
         if not results:
             return None
         cur = next((r for r in results if r.get("status") == "accepted"), None)
         if cur is None:
-            if not options.suivre_synonymes:
+            if not options.follow_synonyms:
                 return None
             cur = results[0]
         return await self._process(struct, cur, is_classification, options, hop=0)
 
     async def _process(
-        self, struct: Struct, cur: dict, is_classification: bool, options: GenerateOptions, hop: int
+        self,
+        struct: Struct,
+        cur: dict,
+        is_classification: bool,
+        options: GenerateOptions,
+        hop: int,
     ) -> Struct | None:
+        """Process the chosen record, following a synonym if needed."""
         adapter = self._adapter
         aphia_id = cur["AphiaID"]
 
-        wrms_link: dict = {
+        wrms_link: LinkEntry = {
             "id": aphia_id,
-            "nom": cur["scientificname"],
-            "rang": wrms_rang(cur["rank"]),
+            "name": cur["scientificname"],
+            "rank": wrms_to_wp_rank(cur["rank"]),
         }
         if cur.get("authority"):
-            wrms_link["auteur"] = format_auteur(cur["authority"])
+            wrms_link["author"] = format_author(cur["authority"])
         if cur.get("isExtinct"):
-            wrms_link["eteint"] = True
+            wrms_link["extinct"] = True
         if not is_classification and cur.get("kingdom"):
-            # Signal de règne détecté sans appel réseau supplémentaire : "kingdom" est déjà
-            # présent dans la réponse records_by_name utilisée ci-dessus. Voir RegneIncoherence.
-            regne_detecte = wrms_charte(cur["kingdom"])
-            if regne_detecte:
-                wrms_link["regne_detecte"] = regne_detecte
-        struct.liens["wrms"] = wrms_link
+            # Kingdom signal detected with no extra call: "kingdom" is
+            # already in the `records_by_name` response. See
+            # KingdomInconsistency.
+            detected_kingdom = wrms_charter_kingdom(cur["kingdom"])
+            if detected_kingdom:
+                wrms_link["detected_kingdom"] = detected_kingdom
+        struct.links["wrms"] = wrms_link
 
         if cur.get("isTerrestrial"):
-            # Prioritaire sur isMarine : un taxon amphibie/côtier n'est pas "uniquement marin",
-            # donc ne doit pas recevoir {{Portail biologie marine}} (voir portails.yaml).
-            struct.milieu = "terrestre"
+            # Takes precedence over isMarine: an amphibious or coastal
+            # taxon is not "marine only", so it must not get {{Portail
+            # biologie marine}} (see portails.yaml).
+            struct.habitat = "terrestre"
         elif cur.get("isMarine"):
-            struct.milieu = "marin"
+            struct.habitat = "marin"
 
         is_synonym = cur.get("valid_AphiaID") is not None and cur["valid_AphiaID"] != aphia_id
         if is_synonym:
-            if not is_classification:
-                wrms_link["synonyme"] = True
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
+            accepted: dict | None = None
+
+            async def resolve_accepted() -> str | None:
+                nonlocal accepted
                 accepted = await adapter.record_by_id(cur["valid_AphiaID"])
-                if accepted is None:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=accepted["scientificname"])
+                return accepted["scientificname"] if accepted is not None else None
+
+            async def recurse_accepted(next_hop: int) -> Struct | None:
+                assert accepted is not None  # follow_synonym recurses only once resolved
                 return await self._process(
-                    struct, accepted, is_classification, options, hop=hop + 1
+                    struct, accepted, is_classification, options, hop=next_hop
                 )
-            # suivre_synonymes désactivé : on continue avec les données du synonyme tel quel
+
+            handled, result = await follow_synonym(
+                struct,
+                "wrms",
+                is_classification,
+                options,
+                hop,
+                resolve_accepted,
+                recurse_accepted,
+            )
+            if handled:
+                return result
+            # follow_synonyms is off: keep going with the synonym as is
 
         if not is_classification:
             return struct
 
         if not cur.get("kingdom"):
             return None
-        struct.regne = wrms_charte(cur["kingdom"])
+        struct.kingdom = wrms_charter_kingdom(cur["kingdom"])
 
-        struct.taxon.nom = cur["scientificname"]
-        struct.taxon.rang = wrms_rang(cur["rank"])
-        struct.taxon.auteur = format_auteur(cur.get("authority"))
+        struct.taxon.name = cur["scientificname"]
+        struct.taxon.rank = wrms_to_wp_rank(cur["rank"])
+        struct.taxon.author = format_author(cur.get("authority"))
         if cur.get("isExtinct"):
-            struct.taxon.eteint = True
+            struct.taxon.extinct = True
 
         struct.classification = "WRMS"
         struct.classification_taxobox = "WoRMS"
 
         classification_tree = await adapter.classification_by_id(aphia_id)
-        rangs: list[RankName] = []
+        ranks: list[RankName] = []
         if classification_tree is not None:
-            # le dernier est le taxon lui-même
+            # the last one is the taxon itself
             chain = flatten_aphia_classification(classification_tree)[:-1]
-            chain = filter_ancestors_above_regne(
-                chain, cur["kingdom"], struct.regne in CHARTES_GARDENT_REGNE
+            chain = filter_ancestors_above_kingdom(
+                chain, cur["kingdom"], struct.kingdom in KINGDOMS_KEPT_IN_CHAIN
             )
             for node in chain:
-                rang_wp = wrms_rang(node.get("rank") or "")
-                rangs.append(RankName(nom=node["scientificname"], rang=rang_wp))
-            rangs.reverse()
-        struct.rangs = rangs
+                wp_rank = wrms_to_wp_rank(node.get("rank") or "")
+                ranks.append(RankName(name=node["scientificname"], rank=wp_rank))
+            ranks.reverse()
+        struct.ranks = ranks
 
         vernaculars = await adapter.vernaculars_by_id(aphia_id)
-        vernaculaire = [v["vernacular"] for v in vernaculars if v.get("language") == "French"]
-        if vernaculaire:
-            struct.vernaculaire["WRMS"] = vernaculaire
+        vernacular = groupe_par_langue(
+            (v.get("language_code") or v.get("language"), v.get("vernacular")) for v in vernaculars
+        )
+        if vernacular:
+            struct.vernacular["WRMS"] = vernacular
 
-        raw_originale = await adapter.original_description(aphia_id)
-        struct.originale = await build_citation(adapter, raw_originale)
+        raw_original = await adapter.original_description(aphia_id)
+        struct.original_publication = await build_citation(adapter, raw_original)
 
         original_id = cur.get("originalNameUsageID")
         if original_id and original_id != aphia_id:
-            basio_record = await adapter.record_by_id(original_id)
-            if basio_record is not None:
-                struct.basionyme = Basionym(
-                    nom=basio_record["scientificname"],
-                    auteur=format_auteur(basio_record.get("authority")),
+            basionym_record = await adapter.record_by_id(original_id)
+            if basionym_record is not None:
+                struct.basionym = Basionym(
+                    name=basionym_record["scientificname"],
+                    author=format_author(basionym_record.get("authority")),
                     source="WRMS",
                 )
 
@@ -169,19 +195,19 @@ class WrmsModule(TaxonomyModule):
             page = await adapter.synonyms_by_id(aphia_id, offset=offset)
             items = [
                 RankName(
-                    nom=s["scientificname"],
-                    auteur=format_auteur(s.get("authority")),
-                    rang=wrms_rang(s["rank"]),
+                    name=s["scientificname"],
+                    author=format_author(s.get("authority")),
+                    rank=wrms_to_wp_rank(s["rank"]),
                 )
                 for s in page
             ]
             return items, len(page), len(page) < PAGE_SIZE
 
         synonyms, _ = await collect_pages(
-            fetch_synonyms, start_offset=1, limit=as_limit(options.limite_listes)
+            fetch_synonyms, start_offset=1, limit=as_limit(options.list_limit)
         )
         if synonyms:
-            struct.synonymes = SynonymList(liste=synonyms, source="WRMS")
+            struct.synonyms = SynonymList(items=synonyms, source="WRMS")
 
         async def fetch_children(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.children_by_id(
@@ -189,41 +215,48 @@ class WrmsModule(TaxonomyModule):
             )
             items = [
                 RankName(
-                    nom=c["scientificname"],
-                    auteur=format_auteur(c.get("authority")),
-                    rang=wrms_rang(c["rank"]),
-                    eteint=bool(c.get("isExtinct")) or None,
+                    name=c["scientificname"],
+                    author=format_author(c.get("authority")),
+                    rank=wrms_to_wp_rank(c["rank"]),
+                    extinct=bool(c.get("isExtinct")) or None,
                 )
                 for c in page
-                # synonymes/incertain/nomen dubium exclus — filtre REST explicite
+                # synonyms, uncertain and nomen dubium excluded:
+                # explicit REST filter
                 if c.get("status") == "accepted"
             ]
             return items, len(page), len(page) < PAGE_SIZE
 
-        sous_taxons, _ = await collect_pages(
-            fetch_children, start_offset=1, limit=as_limit(options.limite_listes)
+        subtaxa, _ = await collect_pages(
+            fetch_children, start_offset=1, limit=as_limit(options.list_limit)
         )
-        if sous_taxons:
-            struct.sous_taxons = SubTaxonList(liste=sous_taxons, source="WRMS")
+        if subtaxa:
+            struct.subtaxa = SubTaxonList(items=subtaxa, source="WRMS")
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("wrms")
+        """Render the {{WRMS}} or {{WRMS espèce}} template."""
+        data = struct.links.get("wrms")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        if struct.taxon.rang in ("espèce", "sous-espèce"):
+        cdate = retrieval_dates()
+        if struct.taxon.rank in ("espèce", "sous-espèce"):
             template = "WRMS espèce"
-            nom = data["nom"]
+            name = data["name"]
         else:
             template = "WRMS"
-            nom = wp_met_italiques(data["nom"], data.get("rang", struct.taxon.rang), struct.regne)
-        eteint = "éteint=oui | " if data.get("eteint") else ""
-        auteur = data.get("auteur", "")
-        return f"{{{{{template} | {data['id']} | {nom} | {auteur} | {eteint}consulté le={cdate}}}}}"
+            name = wp_apply_italics(
+                data["name"], data.get("rank", struct.taxon.rank), struct.kingdom
+            )
+        extinct = "éteint=oui | " if data.get("extinct") else ""
+        author = data.get("author", "")
+        return (
+            f"{{{{{template} | {data['id']} | {name} | {author} | {extinct}consulté le={cdate}}}}}"
+        )
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the WoRMS page."""
         return simple_debug_link(
             struct, "wrms", "https://www.marinespecies.org/aphia.php?p=taxdetails&id={id}", "WRMS"
         )

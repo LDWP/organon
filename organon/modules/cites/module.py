@@ -1,32 +1,39 @@
-"""Logique métier du module CITES. Module d'enrichissement uniquement (pas de classification) :
-alimente `{{Taxobox CITES}}` (voir `organon.core.rendering.sections.render_taxobox`) et les
-noms vernaculaires français."""
+"""CITES module: enrichment only (no classification).
+
+It feeds `{{Taxobox CITES}}` (see `sections.render_taxobox`) and the
+French vernacular names.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
+from organon.core.langues import groupe_par_langue
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.cites.adapter import CitesAdapter
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.modules.common import format_author, simple_debug_link
 
 
 class CitesModule(TaxonomyModule):
+    """CITES module."""
+
     meta = ModuleMeta(id="cites", can_classify=False, can_render_external_link=True, domains="all")
 
     def __init__(self, adapter: CitesAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or CitesAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the CITES listing of the taxon."""
         if is_classification:
-            return None  # CITES ne fournit jamais de classification
+            return None  # CITES never provides a classification
 
-        candidates = await self._adapter.autocomplete(struct.taxon.nom)
-        match = next((c for c in candidates if c.get("full_name") == struct.taxon.nom), None)
+        candidates = await self._adapter.autocomplete(struct.taxon.name)
+        match = next((c for c in candidates if c.get("full_name") == struct.taxon.name), None)
         if match is None:
             return None
 
@@ -35,33 +42,38 @@ class CitesModule(TaxonomyModule):
             return None
 
         listing = detail["cites_listings"][0]
-        struct.liens["cites"] = {
+        struct.links["cites"] = {
             "id": match["id"],
-            "nom": detail["full_name"],
-            "auteur": format_auteur(detail.get("author_year")),
-            "annexe": listing.get("species_listing_name"),
+            "name": detail["full_name"],
+            "author": format_author(detail.get("author_year")),
+            "appendix": listing.get("species_listing_name"),
             "date": listing.get("effective_at_formatted"),
         }
 
-        vernaculaire: list[str] = []
-        for cn in detail.get("common_names") or []:
-            if cn.get("lang") == "French" and cn.get("names"):
-                vernaculaire.extend(cn["names"].split(", "))
-        if vernaculaire:
-            struct.vernaculaire["CITES espèce"] = vernaculaire
+        vernacular = groupe_par_langue(
+            (cn.get("lang"), name)
+            for cn in detail.get("common_names") or []
+            for name in (cn.get("names") or "").split(", ")
+        )
+        if vernacular:
+            struct.vernacular["CITES espèce"] = vernacular
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("cites")
+        """Render the {{CITES species+}} template."""
+        data = struct.links.get("cites")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        auteur = data.get("auteur") or ""
-        return f"{{{{CITES species+ | {data['id']} | {cible} | {auteur} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        target = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        author = data.get("author") or ""
+        return (
+            f"{{{{CITES species+ | {data['id']} | {target} | {author} | consulté le={cdate} }}}}"
+        )
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the Species+ page."""
         return simple_debug_link(
             struct,
             "cites",

@@ -1,54 +1,54 @@
-"""Logique métier du module IPNI (International Plant Names Index) : enrichissement botanique
-pur (auteur, identifiant), domaine `['végétal']`. Aucune classification — IPNI est un index de
-noms publiés (nomenclature), pas un référentiel taxonomique hiérarchique ; comme CITES/NCBI/
-TelaMétro, ce module réutilise `struct.taxon.rang` déjà connu plutôt que de traduire un rang
-propre (les marqueurs abrégés observés en direct, ex. "spec."/"gen.", ne sont pas assez
-documentés pour justifier une table de correspondance dédiée).
+"""IPNI module (International Plant Names Index): botanical enrichment.
 
-`search()` de l'API IPNI mélange dans une même réponse des enregistrements de nom, de
-publication et d'auteur ; seul un enregistrement de nom porte un champ `name`, ce qui suffit à
-filtrer sans dépendre d'un paramètre de requête IPNI dédié (aucun trouvé de façon fiable en
-sondage direct pour restreindre aux seuls noms).
+Author and id only, domain `végétal`. No classification: IPNI is an
+index of published names, not a hierarchical taxonomy. Like CITES, NCBI
+and TelaMétro, it reuses the known `struct.taxon.rank` rather than
+translating its own abbreviated markers.
 
-IPNI indexe TOUTE publication d'une combinaison de noms, y compris des homonymes tardifs
-n'ayant plus cours : vérifié en direct que "Quercus robur" a trois enregistrements distincts
-(Linnaeus 1753, Asso 1779, Pallas 1789) partageant la même chaîne de caractères. Le champ
-`inPowo` (`true` uniquement sur l'enregistrement de 1753 dans ce cas) sert de signal fiable
-pour préférer la combinaison actuellement reconnue par Plants of the World Online plutôt que de
-prendre la première réponse de l'API dans un ordre non garanti.
+`search()` mixes name, publication and author records; only a name
+record has a `name` field, which is enough to filter.
 
-Publication originale (`struct.originale`) : voir `citations.build_citation`. Écrit
-inconditionnellement (IPNI ne classifie jamais, `is_classification` est toujours `False` ici) —
-comme tout champ mono-valeur (`organon.api.routes.generate._MONOVALUE_FIELDS`), la valeur
-retenue en cas d'écriture concurrente par un autre module d'enrichissement dépend de
-`ModuleMeta.priority` (IPNI reste au défaut 0, comme tous les modules `can_classify=False` du
-projet) — limitation pré-existante à cette fonctionnalité, pas introduite par elle (déjà vraie
-ex. entre GBIF et AlgaeBase)."""
+IPNI indexes EVERY publication of a name combination, including late
+homonyms: "Quercus robur" has three records (Linnaeus 1753, Asso 1779,
+Pallas 1789). `inPowo` (true only on the 1753 record) is a reliable
+signal to prefer the combination Plants of the World Online currently
+recognizes, rather than the first answer in an unguaranteed order.
+
+Original publication: see `citations.build_citation`. Written
+unconditionally (IPNI never classifies). As any single-value field
+(`_MONOVALUE_FIELDS`), the value kept on a concurrent write by another
+enrichment module depends on `ModuleMeta.priority` (IPNI keeps the
+default 0), a limitation that predates this feature.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur, format_auteur_annee, simple_debug_link
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import format_author, format_author_year, simple_debug_link
 from organon.modules.ipni import citations
 from organon.modules.ipni.adapter import IpniAdapter
 
 
 class IpniModule(TaxonomyModule):
+    """IPNI module."""
+
     meta = ModuleMeta(
         id="ipni", can_classify=False, can_render_external_link=True, domains=["végétal"]
     )
 
     def __init__(self, adapter: IpniAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or IpniAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        results = await self._adapter.search(struct.taxon.nom)
-        exact = [r for r in results if r.get("name") == struct.taxon.nom]
+        """Collect the taxon from IPNI."""
+        results = await self._adapter.search(struct.taxon.name)
+        exact = [r for r in results if r.get("name") == struct.taxon.name]
         match = next((r for r in exact if r.get("inPowo")), exact[0] if exact else None)
         if match is None:
             return None
@@ -58,28 +58,32 @@ class IpniModule(TaxonomyModule):
         if not ipni_id:
             return None
 
-        auteur_brut = match.get("authors") or match.get("publishingAuthor")
-        struct.liens["ipni"] = {
+        raw_author = match.get("authors") or match.get("publishingAuthor")
+        struct.links["ipni"] = {
             "id": ipni_id,
-            "nom": match["name"],
-            "auteur": format_auteur(format_auteur_annee(auteur_brut, match.get("publicationYear"))),
+            "name": match["name"],
+            "author": format_author(format_author_year(raw_author, match.get("publicationYear"))),
         }
-        struct.originale = await citations.build_citation(self._adapter, match)
+        struct.original_publication = await citations.build_citation(self._adapter, match)
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        """Le modèle {{IPNI}} met lui-même le paramètre 2 en italique (vérifié sur son
-        wikicode : `''{{{2}}}''`, sans condition contrairement à {{GBIF}}) — le nom est donc
-        passé tel quel ici, pas pré-italicisé par `wp_met_italiques`. L'auteur va dans le
-        paramètre 3, affiché après le nom mais hors de l'italique."""
-        data = struct.liens.get("ipni")
+        """Render the {{IPNI}} template.
+
+        The template italicizes parameter 2 itself, unconditionally, so
+        the name is passed as is, not through `wp_apply_italics`. The
+        author goes in parameter 3, after the name and outside the
+        italics.
+        """
+        data = struct.links.get("ipni")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        auteur = f" | {data['auteur']}" if data.get("auteur") else ""
-        return f"{{{{IPNI | {data['id']} | {data['nom']}{auteur} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        author = f" | {data['author']}" if data.get("author") else ""
+        return f"{{{{IPNI | {data['id']} | {data['name']}{author} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the IPNI page."""
         return simple_debug_link(struct, "ipni", "https://www.ipni.org/n/{id}", "IPNI")
 
 

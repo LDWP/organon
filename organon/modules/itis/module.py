@@ -1,46 +1,54 @@
-"""Logique métier du module ITIS : classification, synonymes, sous-taxons, noms vernaculaires.
-Le suivi de synonyme relance la collecte sur le taxon cible en conservant le même mode
-(classification complète ou liens seulement).
+"""ITIS module: classification, synonyms, sub-taxa, vernacular names.
+
+Synonym following reruns the collection on the target taxon in the same
+mode (full classification or links only).
 """
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import RankName, Redirection, Struct, SubTaxonList, SynonymList, TaxonInfo
+from organon.core.langues import groupe_par_langue
+from organon.core.models import RankName, Struct, SubTaxonList, SynonymList
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, format_auteur, simple_debug_link
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import follow_synonym, format_author, simple_debug_link
 from organon.modules.itis.adapter import ItisAdapter
-from organon.modules.itis.ranks import RANGS_REGNE, itis_cherche_rang, itis_cherche_regne
+from organon.modules.itis.ranks import KINGDOM_RANKS, itis_lookup_kingdom, itis_to_wp_rank
 
 
 class ItisModule(TaxonomyModule):
+    """ITIS module."""
+
     meta = ModuleMeta(
         id="itis", can_classify=True, can_render_external_link=True, domains="all", priority=998
     )
 
     def __init__(self, adapter: ItisAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or ItisAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from ITIS."""
         return await self._collect(struct, is_classification, options, hop=0)
 
     async def _collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions, hop: int
     ) -> Struct | None:
+        """Collect with a synonym hop count."""
         adapter = self._adapter
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
 
         results = await adapter.search_by_scientific_name(taxon)
         if not results:
             return None
 
-        # searchByScientificName fait une recherche floue (ex. "Boletus" retourne des espèces
-        # dont l'épithète est "boletus" dans d'autres genres, toutes règnes confondus) : sans ce
-        # filtre, `results[0]` peut être un taxon homonyme sans rapport avec un règne erroné.
+        # `searchByScientificName` is fuzzy (e.g. "Boletus" returns
+        # species whose epithet is "boletus" in other genera, across
+        # kingdoms): without this filter `results[0]` may be an
+        # unrelated homonym with a wrong kingdom.
         candidates = [sn for sn in results if sn.get("combinedName") == taxon]
         if not candidates:
             return None
@@ -50,17 +58,17 @@ class ItisModule(TaxonomyModule):
         tsn = match["tsn"]
 
         if is_classification and match.get("kingdom"):
-            struct.regne = itis_cherche_regne(match["kingdom"])
+            struct.kingdom = itis_lookup_kingdom(match["kingdom"])
 
-        struct.liens["itis"] = {"id": tsn, "nom": match.get("combinedName") or taxon}
+        struct.links["itis"] = {"id": tsn, "name": match.get("combinedName") or taxon}
         if match.get("author"):
-            struct.liens["itis"]["auteur"] = format_auteur(match["author"])
+            struct.links["itis"]["author"] = format_author(match["author"])
         if not is_classification and match.get("kingdom"):
-            # Signal de règne détecté sans appel réseau supplémentaire : "kingdom" est déjà
-            # présent dans la réponse de recherche utilisée ci-dessus. Voir RegneIncoherence.
-            regne_detecte = itis_cherche_regne(match["kingdom"])
-            if regne_detecte:
-                struct.liens["itis"]["regne_detecte"] = regne_detecte
+            # Kingdom signal detected with no extra call: "kingdom" is
+            # already in the search response. See KingdomInconsistency.
+            detected_kingdom = itis_lookup_kingdom(match["kingdom"])
+            if detected_kingdom:
+                struct.links["itis"]["detected_kingdom"] = detected_kingdom
 
         if accepted_prefetched is not None:
             accepted = accepted_prefetched
@@ -69,79 +77,87 @@ class ItisModule(TaxonomyModule):
         accepted_entry = next((a for a in accepted if a.get("acceptedName")), None)
         if accepted_entry is not None:
             if not is_classification:
-                struct.liens["itis"]["synonyme"] = True
-                struct.liens["itis"]["nom-synonyme"] = accepted_entry["acceptedName"]
-                struct.liens["itis"]["id-synonyme"] = accepted_entry.get("acceptedTsn")
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=accepted_entry["acceptedName"])
-                return await self._collect(struct, is_classification, options, hop=hop + 1)
-            # suivre_synonymes désactivé : on continue avec les données du synonyme tel quel
+                struct.links["itis"]["synonym_name"] = accepted_entry["acceptedName"]
+                struct.links["itis"]["synonym_id"] = accepted_entry.get("acceptedTsn")
+
+            async def resolve_accepted() -> str | None:
+                return accepted_entry["acceptedName"]
+
+            handled, result = await follow_synonym(
+                struct,
+                "itis",
+                is_classification,
+                options,
+                hop,
+                resolve_accepted,
+                lambda next_hop: self._collect(struct, is_classification, options, hop=next_hop),
+            )
+            if handled:
+                return result
+            # follow_synonyms is off: keep going with the synonym as is
 
         if not is_classification:
             return struct
 
-        rang = await adapter.rank_name(tsn)
-        if rang is None:
+        rank = await adapter.rank_name(tsn)
+        if rank is None:
             return None
-        auteur = await adapter.authorship(tsn)
+        author = await adapter.authorship(tsn)
 
-        if auteur:
-            struct.taxon.auteur = format_auteur(auteur)
-        struct.taxon.rang = itis_cherche_rang(rang)
+        if author:
+            struct.taxon.author = format_author(author)
+        struct.taxon.rank = itis_to_wp_rank(rank)
         struct.classification = "ITIS"
         struct.classification_taxobox = "itis"
 
         hierarchy = await adapter.full_hierarchy(tsn)
-        rangs: list[RankName] = []
+        ranks: list[RankName] = []
         for entry in hierarchy:
             if entry.get("tsn") == tsn:
-                # Le taxon demandé marque la fin de la chaîne des ancêtres. getFullHierarchyFromTSN
-                # inclut aussi ses Direct Children en dessous (ex. espèces d'un genre) : on arrête
-                # la remontée ici pour ne pas les intégrer à la classification.
+                # The requested taxon ends the ancestor chain.
+                # `getFullHierarchyFromTSN` also includes its direct
+                # children below it: stop here so they stay out of the
+                # classification.
                 break
             if not entry.get("taxonName"):
                 continue
-            rang_wp = itis_cherche_rang(entry.get("rankName") or "")
-            if rang_wp in RANGS_REGNE:
-                continue  # le "règne" est stocké dans struct.regne, pas dans struct.rangs
-            rangs.append(
+            wp_rank = itis_to_wp_rank(entry.get("rankName") or "")
+            if wp_rank in KINGDOM_RANKS:
+                continue  # the kingdom is stored in struct.kingdom, not struct.ranks
+            ranks.append(
                 RankName(
-                    nom=entry["taxonName"], rang=rang_wp, auteur=format_auteur(entry.get("author"))
+                    name=entry["taxonName"],
+                    rank=wp_rank,
+                    author=format_author(entry.get("author")),
                 )
             )
-        rangs.reverse()  # racine->feuille dans la réponse ITIS ; on veut proche->lointain
-        struct.rangs = rangs
+        ranks.reverse()  # ITIS answers root to leaf; we want nearest first
+        struct.ranks = ranks
 
         children = await adapter.hierarchy_down(tsn)
-        sous_taxons_liste = [
+        subtaxa_list = [
             RankName(
-                nom=c["taxonName"],
-                auteur=format_auteur(c.get("author")),
-                rang=itis_cherche_rang(c["rankName"]) if c.get("rankName") else None,
+                name=c["taxonName"],
+                author=format_author(c.get("author")),
+                rank=itis_to_wp_rank(c["rankName"]) if c.get("rankName") else None,
             )
             for c in children
             if c.get("taxonName")
         ]
-        if sous_taxons_liste:
-            struct.sous_taxons = SubTaxonList(liste=sous_taxons_liste, source="ITIS")
+        if subtaxa_list:
+            struct.subtaxa = SubTaxonList(items=subtaxa_list, source="ITIS")
 
         synonyms = await adapter.synonym_names(tsn)
-        synonym_liste = [
-            RankName(nom=s["sciName"], auteur=format_auteur(s.get("author"))) for s in synonyms
+        synonym_list = [
+            RankName(name=s["sciName"], author=format_author(s.get("author"))) for s in synonyms
         ]
-        if synonym_liste:
-            struct.synonymes = SynonymList(liste=synonym_liste, source="ITIS")
+        if synonym_list:
+            struct.synonyms = SynonymList(items=synonym_list, source="ITIS")
 
         common = await adapter.common_names(tsn)
-        vernaculaire = [
-            c["commonName"] for c in common if c.get("language") == "French" and c.get("commonName")
-        ]
-        if vernaculaire:
-            struct.vernaculaire["ITIS"] = vernaculaire
+        vernacular = groupe_par_langue((c.get("language"), c.get("commonName")) for c in common)
+        if vernacular:
+            struct.vernacular["ITIS"] = vernacular
 
         return struct
 
@@ -149,13 +165,15 @@ class ItisModule(TaxonomyModule):
     async def _resolve_homonym(
         candidates: list[dict], adapter: ItisAdapter
     ) -> tuple[dict, list[dict] | None]:
-        """ITIS peut renvoyer plusieurs entrées avec le même `combinedName` (ex. "Aegilops
-        tauschii" existe à la fois comme nom valide et comme nom rejeté/mal appliqué sous des
-        auteurs différents). Sans arbitrage, un homonyme invalide arrivé en premier dans les
-        résultats de recherche serait pris pour le taxon, entraînant classification ou
-        redirection de synonyme vers une autre espèce. On préfère le premier homonyme qui est
-        lui-même le nom accepté (pas de redirection via getAcceptedNamesFromTSN) ; si tous sont
-        des synonymes, on retombe sur le premier résultat comme avant ce correctif."""
+        """Pick one among entries with the same `combinedName`.
+
+        E.g. "Aegilops tauschii" exists as a valid name and as a
+        rejected or misapplied one under other authors. Without
+        arbitration, an invalid homonym first in the results would be
+        taken for the taxon. Prefer the first homonym that is itself the
+        accepted name; if all are synonyms, take the first result.
+        Return (entry, its accepted names or None).
+        """
         if len(candidates) == 1:
             return candidates[0], None
         first_accepted: list[dict] | None = None
@@ -171,18 +189,20 @@ class ItisModule(TaxonomyModule):
         return candidates[0], first_accepted
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("itis")
+        """Render the {{ITIS}} template."""
+        data = struct.links.get("itis")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        if data.get("synonyme"):
-            return f"{{{{ITIS | {data['id']} | {cible} | nv | consulté le={cdate} }}}}"
-        return f"{{{{ITIS | {data['id']} | {cible} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        target = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        if author := data.get("author"):
+            target += " " + author
+        if data.get("synonym"):
+            return f"{{{{ITIS | {data['id']} | {target} | nv | consulté le={cdate} }}}}"
+        return f"{{{{ITIS | {data['id']} | {target} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the ITIS page."""
         return simple_debug_link(
             struct,
             "itis",

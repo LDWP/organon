@@ -1,38 +1,28 @@
-"""Logique métier du module LPSN (List of Prokaryotic names with Standing in Nomenclature),
-classification de référence pour les domaines bactérie/archaea/procaryote (voir
-https://fr.wikipedia.org/wiki/Projet:Biologie/Bases_de_donn%C3%A9es_suivies).
+"""LPSN (List of Prokaryotic names with Standing in Nomenclature).
 
-Suivi de synonyme : `lpsn_correct_name_id` (renvoyé directement dans chaque fiche) pointe vers
-l'identifiant LPSN du nom accepté, sur le même principe que `valid_AphiaID` pour WoRMS — sans
-repasser par une recherche textuelle.
+Reference classification for the bacteria, archaea and prokaryote
+domains.
 
-Classification : l'API LPSN n'a pas d'équivalent à `AphiaClassificationByAphiaID` (WoRMS) qui
-renverrait la chaîne des parents en un seul appel ; chaque fiche ne porte que `lpsn_parent_id`
-(son parent immédiat), donc `_walk_ancestors` remonte la chaîne un niveau à la fois jusqu'au
-domaine (Bacteria/Archaea), qui joue ici le rôle que "Kingdom" joue pour ITIS/GBIF : le niveau
-d'où provient `struct.regne`, exclu de `struct.rangs` pour ne pas le dupliquer (voir
-`ranks.lpsn_cherche_regne`).
+Synonym following: `lpsn_correct_name_id` in each record points to the
+accepted name's id.
 
-Type nomenclatural (`nomenclatural_type_id`, ex. l'espèce-type d'un genre) alimente
-`struct.type_taxon` : le seul module actuellement capable de remplir ce champ (côté PHP historique,
-seul `mod_lpsn.php` le faisait — voir `docs/md/comparaison-php-python.md`).
+Classification: each record carries only its immediate parent
+(`lpsn_parent_id`), so `_walk_ancestors` climbs one level at a time up
+to the domain (Bacteria or Archaea), which gives `struct.kingdom` and is
+excluded from `struct.ranks`.
 
-Sous-taxons (`struct.sous_taxons`) : pas de route dédiée à la hiérarchie descendante, mais
-`flexible_search({"lpsn_parent_id": id})` (voir `adapter.py`) retrouve les enfants directs d'un
-taxon, les fiches sont ensuite récupérées par lots via `fetch`. Les synonymes parmi les enfants
-sont exclus (même test que `is_synonym` ci-dessous) : un sous-taxon liste des noms acceptés, pas
-leurs synonymes.
+The nomenclatural type (`nomenclatural_type_id`) feeds
+`struct.type_taxon`: this is the only module filling that field.
 
-Hors périmètre (limitation de l'API LPSN, pas un oubli) : `struct.synonymes`, l'API n'exposant
-aucune route pour lister les synonymes d'un identifiant donné (seul le sens inverse,
-`lpsn_correct_name_id`, est exploitable — voir `adapter.py`). Idem pour un nom historique jamais
-enregistré sous ce genre dans LPSN (ex. "Treponema vincentii", jamais tracé ni par LPSN ni par
-CoL XR, seul le backbone GBIF le liste — à tort, en désaccord avec les deux premiers) : pas de
-correction inter-source (voir `organon.modules.gbif.module`), et `flexible_search` sur la seule
-épithète renvoie des homonymes d'autres genres sans lien exploitable pour désambiguïser.
+Sub-taxa: `flexible_search({"lpsn_parent_id": id})` finds the direct
+children, fetched in batches; synonyms among them are excluded.
 
-Publication originale (`struct.originale`) : contrairement à WoRMS, LPSN expose un DOI structuré
-(`publication_doi`) directement dans la fiche, sans scraping — voir `citations.build_citation`."""
+Out of scope, an API limit: `struct.synonyms`, and historical names
+never recorded under their genus; no cross-source correction (see
+`organon.modules.gbif.module`).
+
+Original publication: see `citations.build_citation`.
+"""
 
 from __future__ import annotations
 
@@ -42,31 +32,31 @@ from organon.core.auth_settings import get_auth_settings
 from organon.core.config import GenerateOptions
 from organon.core.models import (
     Basionym,
+    LinkEntry,
     RankName,
-    Redirection,
     Struct,
     SubTaxonList,
-    TaxonInfo,
     TypeTaxon,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, collect_pages, format_auteur
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import as_limit, collect_pages, follow_synonym, format_author
 from organon.modules.lpsn import citations
 from organon.modules.lpsn.adapter import LpsnAdapter
-from organon.modules.lpsn.ranks import lpsn_cherche_rang, lpsn_cherche_regne
+from organon.modules.lpsn.ranks import lpsn_lookup_kingdom, lpsn_to_wp_rank
 
 LPSN_WEBSITE_BASE = "https://lpsn.dsmz.de"
+# `fetch` batch size when paging children: small enough to keep
+# `fetch/id1;id2;...` under URL length limits.
 CHILDREN_PAGE_SIZE = 50
-"""Taille des lots `fetch` lors de la pagination des enfants directs (voir `_process`) : assez
-petit pour rester sous les limites de longueur d'URL de `fetch/id1;id2;...`."""
 
 
 def _slug_from_record(cur: dict) -> str | None:
-    """Identifiant du modèle Wikipédia {{LPSN}} (ex. "dichelobacter", "hyphomonas-rosenbergii") :
-    `lpsn_address` ne convient pas, ce champ contient le DOI permanent de la fiche, pas l'URL
-    conviviale du site (voir docstring de tête de `adapter.py`)."""
+    """Return the {{LPSN}} template id (e.g. "hyphomonas-rosenbergii").
+
+    `lpsn_address` holds the permanent DOI link, so it does not do.
+    """
     monomial = cur.get("monomial")
     if not monomial:
         return None
@@ -79,6 +69,8 @@ def _slug_from_record(cur: dict) -> str | None:
 
 
 class LpsnModule(TaxonomyModule):
+    """LPSN module."""
+
     meta = ModuleMeta(
         id="lpsn",
         can_classify=True,
@@ -87,112 +79,136 @@ class LpsnModule(TaxonomyModule):
     )
 
     def __init__(self, adapter: LpsnAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or LpsnAdapter()
 
     def is_configured(self) -> bool:
+        """Return True if the LPSN credentials are set."""
         settings = get_auth_settings()
         return bool(settings.lpsn_username and settings.lpsn_password)
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        ids = await self._adapter.advanced_search(taxon_name=struct.taxon.nom)
+        """Collect the taxon from LPSN."""
+        ids = await self._adapter.advanced_search(taxon_name=struct.taxon.name)
         if not ids:
             return None
         records = await self._adapter.fetch(ids)
-        exact = [r for r in records if r.get("full_name") == struct.taxon.nom]
+        exact = [r for r in records if r.get("full_name") == struct.taxon.name]
         if not exact:
             return None
-        # Priorité au nom accepté s'il y a plusieurs correspondances exactes (rare, ex. homonymie
-        # de combinaison) : `lpsn_correct_name_id` absent ou égal à son propre id = nom accepté.
+        # Prefer the accepted name among several exact matches (rare,
+        # e.g. a combination homonym): a missing `lpsn_correct_name_id`,
+        # or one equal to its own id, means accepted.
         cur = next(
             (r for r in exact if r.get("lpsn_correct_name_id") in (None, r.get("id"))), exact[0]
         )
         return await self._process(struct, cur, is_classification, options, hop=0)
 
     async def _process(
-        self, struct: Struct, cur: dict, is_classification: bool, options: GenerateOptions, hop: int
+        self,
+        struct: Struct,
+        cur: dict,
+        is_classification: bool,
+        options: GenerateOptions,
+        hop: int,
     ) -> Struct | None:
+        """Process the chosen record, following a synonym if needed."""
         adapter = self._adapter
         lpsn_id = cur["id"]
-        rang = lpsn_cherche_rang(cur.get("category"))
+        rank = lpsn_to_wp_rank(cur.get("category"))
 
-        entry: dict = {"nom": cur.get("full_name") or struct.taxon.nom, "rang": rang}
+        entry: LinkEntry = {"name": cur.get("full_name") or struct.taxon.name, "rank": rank}
         category = cur.get("category")
         slug = _slug_from_record(cur)
         if slug and category:
             entry["id"] = slug
             entry["url"] = f"{LPSN_WEBSITE_BASE}/{category}/{slug}"
         else:
-            # Repli sur le record number LPSN (toujours présent) quand la fiche ne fournit pas de
-            # quoi reconstruire le slug conviviale (monomial absent) ou de catégorie pour l'URL :
-            # `/taxon/{id}` ne dépend pas du rang, contrairement à `/{category}/{slug}`.
+            # Fall back on the LPSN record number (always present) when
+            # the record lacks what is needed for the friendly slug or
+            # the URL category: `/taxon/{id}` does not depend on the
+            # rank.
             entry["id"] = lpsn_id
             entry["url"] = f"{LPSN_WEBSITE_BASE}/taxon/{lpsn_id}"
         if cur.get("authority"):
-            entry["auteur"] = format_auteur(cur["authority"])
-        struct.liens["lpsn"] = entry
+            entry["author"] = format_author(cur["authority"])
+        struct.links["lpsn"] = entry
 
         correct_id = cur.get("lpsn_correct_name_id")
         is_synonym = correct_id is not None and correct_id != lpsn_id
         if is_synonym:
-            if not is_classification:
-                entry["synonyme"] = True
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
-                assert correct_id is not None  # garanti par `is_synonym` ci-dessus
+            accepted: dict | None = None
+
+            async def resolve_accepted() -> str | None:
+                nonlocal accepted
+                assert correct_id is not None  # guaranteed by `is_synonym` above
                 accepted = await adapter.fetch_one(correct_id)
-                if accepted is None:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=accepted.get("full_name") or struct.taxon.nom)
-                return await self._process(
-                    struct, accepted, is_classification, options, hop=hop + 1
+                return (
+                    accepted.get("full_name") or struct.taxon.name
+                    if accepted is not None
+                    else None
                 )
-            # suivre_synonymes désactivé : on continue avec les données du synonyme tel quel
+
+            async def recurse_accepted(next_hop: int) -> Struct | None:
+                assert accepted is not None  # follow_synonym recurses only once resolved
+                return await self._process(
+                    struct, accepted, is_classification, options, hop=next_hop
+                )
+
+            handled, result = await follow_synonym(
+                struct,
+                "lpsn",
+                is_classification,
+                options,
+                hop,
+                resolve_accepted,
+                recurse_accepted,
+            )
+            if handled:
+                return result
+            # follow_synonyms is off: keep going with the synonym as is
 
         if not is_classification:
             return struct
 
-        chain, domaine_nom = await self._walk_ancestors(cur)
-        struct.regne = lpsn_cherche_regne(domaine_nom)
-        if not struct.regne:
+        chain, domain_name = await self._walk_ancestors(cur)
+        struct.kingdom = lpsn_lookup_kingdom(domain_name)
+        if not struct.kingdom:
             return None
 
-        struct.taxon.nom = cur.get("full_name") or struct.taxon.nom
-        struct.taxon.rang = rang
-        struct.taxon.auteur = format_auteur(cur.get("authority"))
+        struct.taxon.name = cur.get("full_name") or struct.taxon.name
+        struct.taxon.rank = rank
+        struct.taxon.author = format_author(cur.get("authority"))
 
         struct.classification = "LPSN"
         struct.classification_taxobox = "LPSN"
 
-        # `_walk_ancestors` remonte depuis le taxon demandé : `chain` est donc déjà dans l'ordre
-        # proche -> lointain attendu par struct.rangs, sans inversion à faire ici (contrairement
-        # à WRMS, dont la chaîne brute part de la racine).
-        struct.rangs = [
+        # `_walk_ancestors` climbs from the requested taxon, so `chain`
+        # is already nearest first, as struct.ranks expects.
+        struct.ranks = [
             RankName(
-                nom=n["full_name"],
-                rang=lpsn_cherche_rang(n.get("category")),
-                auteur=format_auteur(n.get("authority")),
+                name=n["full_name"],
+                rank=lpsn_to_wp_rank(n.get("category")),
+                author=format_author(n.get("authority")),
             )
             for n in chain
             if n.get("full_name")
         ]
 
-        struct.originale = await citations.build_citation(adapter, cur)
+        struct.original_publication = await citations.build_citation(adapter, cur)
 
         async def fetch_basionyme() -> Basionym | None:
             basonym_id = cur.get("basonym_id")
             if not basonym_id or basonym_id == lpsn_id:
                 return None
-            basio = await adapter.fetch_one(basonym_id)
-            if basio is None or not basio.get("full_name"):
+            basionym = await adapter.fetch_one(basonym_id)
+            if basionym is None or not basionym.get("full_name"):
                 return None
             return Basionym(
-                nom=basio["full_name"],
-                auteur=format_auteur(basio.get("authority")),
+                name=basionym["full_name"],
+                author=format_author(basionym.get("authority")),
                 source="LPSN",
             )
 
@@ -204,13 +220,13 @@ class LpsnModule(TaxonomyModule):
             if type_rec is None or not type_rec.get("full_name"):
                 return None
             return TypeTaxon(
-                nom=type_rec["full_name"],
-                rang=lpsn_cherche_rang(type_rec.get("category")),
-                auteur=format_auteur(type_rec.get("authority")),
+                name=type_rec["full_name"],
+                rank=lpsn_to_wp_rank(type_rec.get("category")),
+                author=format_author(type_rec.get("authority")),
                 source="LPSN",
             )
 
-        async def fetch_sous_taxons() -> SubTaxonList | None:
+        async def fetch_subtaxa() -> SubTaxonList | None:
             child_ids = await adapter.flexible_search({"lpsn_parent_id": lpsn_id})
             if not child_ids:
                 return None
@@ -220,38 +236,40 @@ class LpsnModule(TaxonomyModule):
                 records = await adapter.fetch(page_ids)
                 items = [
                     RankName(
-                        nom=r["full_name"],
-                        rang=lpsn_cherche_rang(r.get("category")),
-                        auteur=format_auteur(r.get("authority")),
+                        name=r["full_name"],
+                        rank=lpsn_to_wp_rank(r.get("category")),
+                        author=format_author(r.get("authority")),
                     )
                     for r in records
-                    # même test d'acceptation que `is_synonym` ci-dessus : un sous-taxon liste
-                    # des noms acceptés, pas leurs synonymes.
+                    # Same acceptance test as `is_synonym`: a sub-taxon
+                    # lists accepted names, not their synonyms.
                     if r.get("full_name") and r.get("lpsn_correct_name_id") in (None, r.get("id"))
                 ]
                 done = offset + CHILDREN_PAGE_SIZE >= len(child_ids)
                 return items, len(page_ids), done
 
-            sous_taxons, coupe = await collect_pages(
-                fetch_children, limit=as_limit(options.limite_listes)
+            subtaxa, truncated = await collect_pages(
+                fetch_children, limit=as_limit(options.list_limit)
             )
-            if not sous_taxons:
+            if not subtaxa:
                 return None
-            return SubTaxonList(liste=sous_taxons, source="LPSN", coupe=coupe)
+            return SubTaxonList(items=subtaxa, source="LPSN", truncated=truncated)
 
-        # Trois blocs mutuellement indépendants (basonym_id/type_id viennent de `cur`,
-        # flexible_search de `lpsn_id`, déjà connus avant ce point) : lancés en parallèle plutôt
-        # qu'en série pour ne pas payer trois allers-retours réseau l'un après l'autre.
-        struct.basionyme, struct.type_taxon, struct.sous_taxons = await asyncio.gather(
-            fetch_basionyme(), fetch_type_taxon(), fetch_sous_taxons()
+        # Three independent blocks (basonym_id and type_id come from
+        # `cur`, flexible_search from `lpsn_id`): run in parallel to
+        # save round trips.
+        struct.basionym, struct.type_taxon, struct.subtaxa = await asyncio.gather(
+            fetch_basionyme(), fetch_type_taxon(), fetch_subtaxa()
         )
 
         return struct
 
     async def _walk_ancestors(self, cur: dict) -> tuple[list[dict], str | None]:
-        """Remonte `lpsn_parent_id` un niveau à la fois jusqu'au domaine (Bacteria/Archaea),
-        exclu de la chaîne retournée (voir docstring de tête). Renvoie `(chaîne proche->lointain
-        du taxon demandé, exclue du domaine, nom du domaine ou None si jamais atteint)`."""
+        """Climb `lpsn_parent_id` up to the domain, which is excluded.
+
+        Return (chain nearest first, domain name or None if not
+        reached).
+        """
         chain: list[dict] = []
         node = cur
         while node.get("lpsn_parent_id"):
@@ -265,20 +283,22 @@ class LpsnModule(TaxonomyModule):
         return chain, None
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("lpsn")
-        if not data or "id" not in data or not data.get("rang"):
+        """Render the {{LPSN}} template."""
+        data = struct.links.get("lpsn")
+        if not data or "id" not in data or not data.get("rank"):
             return None
-        cdate = dates_recupere()
-        nom = wp_met_italiques(data["nom"], data["rang"], struct.regne)
-        if data.get("auteur"):
-            nom = f"{nom} {data['auteur']}"
-        # Le rang reste toujours passé en paramètre 1, identifiant numérique ou alphabétique :
-        # c'est {{{2}}} seul (voir modèle wikitexte révisé) qui distingue les deux formes pour
-        # construire l'URL (/{rang-anglais}/{slug} vs /taxon/{id}).
-        return f"{{{{LPSN | {data['rang']} | {data['id']} | {nom} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        name = wp_apply_italics(data["name"], data["rank"], struct.kingdom)
+        if data.get("author"):
+            name = f"{name} {data['author']}"
+        # The rank is always parameter 1; only {{{2}}} tells the numeric
+        # id from the alphabetic slug, to build the URL
+        # (/{english-rank}/{slug} or /taxon/{id}).
+        return f"{{{{LPSN | {data['rank']} | {data['id']} | {name} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("lpsn")
+        """Return the debug link to the LPSN page."""
+        data = struct.links.get("lpsn")
         if not data or not data.get("url"):
             return None
         return f"<a href='{data['url']}' target='_blank' rel='noopener noreferrer'>LPSN</a>"

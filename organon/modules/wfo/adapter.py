@@ -1,26 +1,21 @@
-"""Couche d'accès réseau pour World Flora Online : l'API GraphQL qui alimente wfoplantlist.org
-(`https://list.worldfloraonline.org/gql.php`, introspection ouverte, endpoint découvert dans le
-bundle JS du site — CORS bloque l'appel direct depuis un navigateur sur cette origine, sans
-incidence ici puisque l'appel se fait côté serveur) — pas le scraping HTML de
-`worldfloraonline.org` (portail historique, sans schéma exposé, utilisé par la première version
-de ce module). Mêmes identifiants `wfo-<n>` des deux côtés (vérifié : Cyperaceae = wfo-7000000170
-sur les deux sites) : seuls les liens externes/citations restent pointés vers
-`worldfloraonline.org` (voir `module.py`), l'API ne servant qu'à la recherche et à la
-classification.
+"""Network access to World Flora Online, through its GraphQL API.
 
-`taxonNameSuggestion` fait de l'auto-complétion par terme : le champ `nameString` d'un résultat
-ne renvoie que son dernier épithète (ex. "robur" pour "Quercus robur" — inutilisable pour un
-filtre de correspondance exacte), et la réponse mélange les homonymes du nom demandé avec des
-taxons non apparentés partageant seulement un terme (vérifié sur "Quercus robur" : les deux
-homonymes attendus, mais aussi des variétés sans rapport comme "Quercus robur var. brevipes").
-`fullNameStringNoAuthorsPlain` donne le nom complet correct à tout rang (y compris les rangs
-infragénériques comme "Quercus sect. Quercus", vérifié en direct) et sert ici de filtre exact,
-laissé à `module.py` comme avant.
+The API (`https://list.worldfloraonline.org/gql.php`, open
+introspection) feeds wfoplantlist.org; it is not an HTML scraping of
+`worldfloraonline.org`. Ids (`wfo-<n>`) are the same on both sites:
+external links and citations still point to `worldfloraonline.org` (see
+`module.py`), the API only serves search and classification.
 
-`taxonNameById(id).currentPreferredUsage.path` donne la chaîne complète et non tronquée du
-taxon accepté jusqu'à la racine technique (rang `code`, pas un vrai rang taxonomique — voir
-`organon.modules.wfo.ranks`), avec le rang exact de chaque ancêtre (enum GraphQL `Rank`) : plus
-besoin de le déduire par terminaison latine comme la première version de ce module."""
+`taxonNameSuggestion` is a term autocomplete: `nameString` returns only
+the last epithet, and the answer mixes homonyms with unrelated taxa
+sharing a term. `fullNameStringNoAuthorsPlain` gives the full name at
+any rank and serves as the exact filter, left to `module.py`.
+
+`taxonNameById(id).currentPreferredUsage.path` gives the full chain of
+the accepted taxon up to the technical root (rank `code`, not a real
+rank; see `organon.modules.wfo.ranks`), with each ancestor's exact rank
+(GraphQL `Rank` enum).
+"""
 
 from __future__ import annotations
 
@@ -50,13 +45,16 @@ query($id: String!) {
 }
 """
 
+# Wide enough to cover the homonyms of the name despite the autocomplete
+# noise of `taxonNameSuggestion`, without paginating.
 SEARCH_LIMIT = 50
-"""Assez large pour couvrir les homonymes du nom demandé malgré le bruit d'auto-complétion
-propre à `taxonNameSuggestion` (voir docstring du module), sans avoir à paginer."""
 
 
 class WfoAdapter(OwnedClientMixin):
+    """Raw WFO GraphQL client."""
+
     async def _graphql(self, query: str, variables: dict) -> dict | None:
+        """Run a GraphQL query; return its data, or None on error."""
         resp = await self._client.post(GRAPHQL_URL, json={"query": query, "variables": variables})
         resp.raise_for_status()
         payload = resp.json()
@@ -65,8 +63,10 @@ class WfoAdapter(OwnedClientMixin):
         return payload.get("data")
 
     async def search(self, name: str) -> list[dict]:
-        """Renvoie une liste de `{id, nom, auteur, statut, rang_brut}` — pas encore filtrée au
-        nom recherché (laissé à module.py)."""
+        """Return `{id, nom, auteur, statut, rang_brut}` per result.
+
+        Not yet filtered to the searched name (left to module.py).
+        """
         data = await self._graphql(_SEARCH_QUERY, {"terms": name, "limit": SEARCH_LIMIT})
         if not data:
             return []
@@ -82,10 +82,12 @@ class WfoAdapter(OwnedClientMixin):
         ]
 
     async def ancestors(self, wfo_id: str) -> list[dict]:
-        """Renvoie la chaîne des ancêtres `{nom, auteur, rang_brut}`, triée du parent le plus
-        proche vers le nœud racine (rang technique `code`, voir docstring du module) — sans le
-        taxon lui-même. `path` est déjà dans cet ordre côté GraphQL (le taxon lui-même en
-        premier élément, exclu ici) : aucun tri à refaire."""
+        """Return the ancestors, nearest first.
+
+        Each is `{nom, auteur, rang_brut}`, up to the root node (rank
+        `code`), without the taxon itself. `path` already comes in that
+        order, its first element being the taxon, excluded here.
+        """
         data = await self._graphql(_ANCESTORS_QUERY, {"id": wfo_id})
         if not data or not data.get("taxonNameById"):
             return []

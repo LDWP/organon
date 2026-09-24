@@ -1,7 +1,9 @@
-"""Couche d'accès réseau pour science.mnhn.fr (Muséum national d'Histoire naturelle) : simple
-vérification d'existence d'une fiche taxon par code HTTP, aucune extraction de données —
-science.mnhn.fr n'expose aucune API structurée pour ces fiches, seulement des pages HTML dont
-seule l'existence (200 vs 404) est exploitée ici."""
+"""Network access to science.mnhn.fr (Muséum national).
+
+A simple existence check of a taxon page by HTTP code, with no data
+extraction: the site has no structured API for these pages, only HTML
+pages of which only the existence (200 vs 404) is used.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +13,9 @@ BASE_URL = "https://science.mnhn.fr/taxon"
 
 
 class MnhnAdapter(OwnedClientMixin):
+    """Raw MNHN client."""
+
     async def exists(self, path: str) -> bool:
+        """Return True if the taxon page exists."""
         resp = await self._client.get(f"{BASE_URL}/{path}")
         return resp.status_code == 200

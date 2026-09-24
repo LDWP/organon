@@ -1,18 +1,21 @@
-"""Couche d'accès réseau pour DORIS (doris.ffessm.fr, fédération française d'études et de sports
-sous-marins) : aucune API publique (`/Especes/api` -> 404, voir organon/core/data/db_inventory.yaml,
-id: doris), mais une recherche HTML fonctionnelle par nom.
+"""Network access to DORIS (doris.ffessm.fr).
 
-Le formulaire de recherche du site POST `(name)=<requête>` et `DestinationURL=find/species` vers
-`/content/action`, qui redirige (302, POST->GET suivi automatiquement par httpx) vers la page de
-résultats `/find/species/(name)/<requête>` — recherche plein texte classée par pertinence, pas un
-filtrage exact côté serveur : le filtrage exact sur le nom scientifique se fait donc côté client,
-sur la première page de résultats seulement (pas de pagination suivie, la correspondance exacte
-apparaît systématiquement en tête des résultats en pratique).
+No public API (`/Especes/api` is a 404; see `db_inventory.yaml`, id:
+doris), but a working HTML name search.
 
-La fiche espèce elle-même n'est pas récupérée ici (pas d'auteur collecté) : son URL nécessite un
-slug complet (`/Especes/Genre-espece-Nom-commun-ID`, un ID nu comme `/Especes/344` renvoie 404),
-contrairement à l'ancienne URL `fiche2.asp?fiche_numero=ID` conservée en redirection permanente et
-utilisée par `organon.modules.doris.module` pour le lien de debug."""
+The site's search form POSTs `(name)=<query>` and
+`DestinationURL=find/species` to `/content/action`, which redirects
+(302, followed by httpx) to `/find/species/(name)/<query>`: a
+relevance-ranked full-text search, not an exact server-side filter. The
+exact filter on the scientific name is client-side, on the first page of
+results only; in practice the exact match is always first.
+
+The species page itself is not fetched (no author collected): its URL
+needs a full slug (`/Especes/Genre-espece-Nom-commun-ID`; a bare ID is a
+404), unlike the legacy `fiche2.asp?fiche_numero=ID`, kept as a
+permanent redirect and used by `organon.modules.doris.module` for the
+debug link.
+"""
 
 from __future__ import annotations
 
@@ -32,17 +35,22 @@ _RESULT_RE = re.compile(
 
 
 class DorisAdapter(OwnedClientMixin):
+    """Raw DORIS client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client, follow_redirects=True)
 
-    async def search(self, nom: str) -> tuple[str, str] | None:
-        """Renvoie `(id_fiche, nom_commun)` pour la première correspondance dont le nom
-        scientifique est exactement `nom`, ou `None` si aucune ne correspond."""
+    async def search(self, found_name: str) -> tuple[str, str] | None:
+        """Return (page id, common name) of the exact match, or None.
+
+        The first result whose scientific name is exactly `found_name`.
+        """
         resp = await self._client.post(
-            SEARCH_URL, data={"DestinationURL": "find/species", "(name)": nom}
+            SEARCH_URL, data={"DestinationURL": "find/species", "(name)": found_name}
         )
         resp.raise_for_status()
         for match in _RESULT_RE.finditer(resp.text):
-            if match.group("nom_scientifique").strip() == nom:
+            if match.group("nom_scientifique").strip() == found_name:
                 return match.group("id"), match.group("nom_commun").strip()
         return None

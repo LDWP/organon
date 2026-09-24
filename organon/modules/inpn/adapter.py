@@ -1,23 +1,20 @@
-"""Couche d'accès réseau pour TAXREF/INPN.
+"""Network access to TAXREF/INPN.
 
-Recherche par nom (`GET .../api/taxa/search?nomComplet=...`) : JSON, mais la correspondance
-côté serveur est floue (substring/pertinence, pas une égalité stricte) — un nom courant comme
-« Theria » ou « Carnivora » peut renvoyer des dizaines d'homonymes/substrings sans rapport
-avant l'entrée exacte recherchée (vérifié en direct : « Vulpes » seul remonte d'abord
-`Albula vulpes`, un poisson). `nb_rows` volontairement large (500 par défaut) pour maximiser
-la chance que l'entrée exacte soit présente ; la sélection stricte par `cdNom` + `lbNom` reste
-à la charge de `module.py`, jamais de cet adaptateur.
+Name search (`GET .../api/taxa/search?nomComplet=...`) is JSON, but the
+server-side match is fuzzy (substring, relevance): a common name may
+return dozens of unrelated homonyms before the exact entry (a search for
+"Vulpes" first returns `Albula vulpes`, a fish). `nb_rows` is
+deliberately wide (500) to make the exact entry likely present; the
+strict selection by `cdNom` and `lbNom` is left to `module.py`.
 
-Fiche détail (`GET .../taxa/{cdNom}`) : page HTML (JSP), pas de JSON. Aucun endpoint
-équivalent à `getFullHierarchyFromTSN` (ITIS, un seul appel pour toute la lignée) n'a été
-trouvé : le fil d'Ariane de cette page donne les ancêtres (nom, id) en un seul appel, mais pas
-leur rang — resolu ancêtre par ancêtre via `search()` côté module.py.
+The detail page (`GET .../taxa/{cdNom}`) is HTML (JSP), not JSON. No
+endpoint like ITIS's `getFullHierarchyFromTSN` exists: the page
+breadcrumb gives the ancestors (name, id) in one call but not their
+rank, resolved ancestor by ancestor through `search()` in module.py.
 
-WAF côté taxref.mnhn.fr : renvoie 403 sur l'IP Toolforge avec le `User-Agent` par défaut de
-httpx (`python-httpx/...`), alors que le même appel passe sans problème depuis un poste de
-développement classique (vérifié en direct) — même symptôme que POWO (voir
-`organon.modules.powo.adapter`), un WAF qui cible les signatures de client HTTP non-navigateur
-plutôt que l'IP seule. `_BROWSER_HEADERS` imite un navigateur pour contourner ce filtrage."""
+The taxref.mnhn.fr WAF answered 403 to the Toolforge IP with httpx's
+default `User-Agent`; requests carry the honest Organon one.
+"""
 
 from __future__ import annotations
 
@@ -26,50 +23,57 @@ import re
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.http import MinIntervalThrottle, OwnedClientMixin
 
 API_BASE = "https://taxref.mnhn.fr/taxref-web/api"
 WEB_BASE = "https://taxref.mnhn.fr/taxref-web"
 
-_BROWSER_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/138 Safari/537.36"
-    ),
+_throttle = MinIntervalThrottle(0.2).wait
+
+_HEADERS = {
     "Accept": "application/json, text/html, */*",
 }
 
-_BREADCRUMB_RE = re.compile(r'<a href="/taxref-web/taxa/(?P<id>\d+)">(?P<nom>[^<]+)</a>\s*&rsaquo;')
-_VERNACULAR_BLOCK_RE = re.compile(
-    r"<legend>NOMS VERNACULAIRES</legend>(?P<block>.*?)</fieldset>", re.S
+_BREADCRUMB_RE = re.compile(
+    r'<a href="/taxref-web/taxa/(?P<id>\d+)">(?P<nom>[^<]+)</a>\s*&rsaquo;'
 )
-# Plusieurs noms peuvent partager un seul <span> séparés par des virgules (ex. observé en
-# direct sur Vulpes vulpes : "Renard roux, Renard, Goupil") — scindés par l'appelant.
+_VERNACULAR_BLOCK_RE = re.compile(
+    r"<legend>NOMS VERNACULAIRES</legend>(?P<block>.*?)</fieldset>", re.DOTALL
+)
+# Several names may share one <span>, comma-separated (e.g. "Renard
+# roux, Renard, Goupil" for Vulpes vulpes): split by the caller.
 _VERNACULAR_ENTRY_RE = re.compile(
-    r"<span>(?P<noms>[^<]+)</span>\s*\(<a[^>]*>(?P<langue>[^<]+)</a>", re.S
+    r"<span>(?P<noms>[^<]+)</span>\s*\(<a[^>]*>(?P<langue>[^<]+)</a>", re.DOTALL
 )
 
 
 class InpnAdapter(OwnedClientMixin):
-    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
-        super().__init__(client, headers=_BROWSER_HEADERS)
+    """Raw TAXREF client."""
 
-    async def search(self, nom_complet: str, nb_rows: int = 500) -> list[dict]:
+    def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
+        super().__init__(client, headers=_HEADERS, throttle=_throttle)
+
+    async def search(self, full_name: str, nb_rows: int = 500) -> list[dict]:
+        """Return the TAXREF search results for a full name."""
         resp = await self._client.get(
-            f"{API_BASE}/taxa/search", params={"nomComplet": nom_complet, "nbRows": nb_rows}
+            f"{API_BASE}/taxa/search", params={"nomComplet": full_name, "nbRows": nb_rows}
         )
         resp.raise_for_status()
         return resp.json()
 
     async def detail_html(self, cd_nom: int) -> str:
+        """Return the HTML detail page of a `cdNom`."""
         resp = await self._client.get(f"{WEB_BASE}/taxa/{cd_nom}")
         resp.raise_for_status()
         return resp.text
 
     @staticmethod
     def parse_breadcrumb(html_page: str) -> list[tuple[int, str]]:
-        """Lignée complète racine -> parent immédiat (le taxon lui-même n'apparaît pas dans
-        son propre fil d'Ariane, qui ne montre que les ancêtres)."""
+        """Return the full lineage, root first, up to the parent.
+
+        The taxon itself is not in its own breadcrumb.
+        """
         return [
             (int(m.group("id")), html.unescape(m.group("nom")).strip())
             for m in _BREADCRUMB_RE.finditer(html_page)
@@ -77,6 +81,7 @@ class InpnAdapter(OwnedClientMixin):
 
     @staticmethod
     def parse_vernacular_french(html_page: str) -> list[str]:
+        """Return the French vernacular names of a detail page."""
         block_match = _VERNACULAR_BLOCK_RE.search(html_page)
         if block_match is None:
             return []
@@ -85,6 +90,6 @@ class InpnAdapter(OwnedClientMixin):
             if m.group("langue").strip() != "Français":
                 continue
             out.extend(
-                html.unescape(nom).strip() for nom in m.group("noms").split(",") if nom.strip()
+                html.unescape(name).strip() for name in m.group("noms").split(",") if name.strip()
             )
         return out

@@ -1,14 +1,12 @@
-"""Table de rangs pour WFO. Alimentée par l'enum GraphQL `Rank` de
-`https://list.worldfloraonline.org/gql.php` (voir `adapter.py`) : contrairement à
-worldfloraonline.org (aucun rang exposé par ancêtre), chaque nœud de la chaîne de classification
-porte directement son rang exact — aucune déduction nécessaire.
+"""Rank table for WFO, from the GraphQL `Rank` enum.
 
-`code` (nœud technique racine de toute chaîne, au-dessus du règne) et `unranked` sont
-délibérément absents de cette table plutôt que mappés vers un rang français inexistant :
-`wfo_cherche_rang` renvoie `None`, que `module.py` traite comme "à exclure de la classification"
-plutôt que comme une erreur. Idem pour `prole`/`convar`/`lusus` (rangs infraspécifiques rares,
-absents de `core/data/ranks.yaml`) : laissés non traduits plutôt que d'inventer un libellé
-français qu'aucune autre source du dépôt n'utilise."""
+Each node of the chain carries its exact rank, so nothing is deduced.
+`code` (the technical root above the kingdom) and `unranked` are
+deliberately absent: `wfo_to_wp_rank` returns None, which `module.py`
+excludes from the classification. Likewise `prole`, `convar` and `lusus`
+(rare infraspecific ranks absent from `ranks.yaml`), rather than
+inventing a French label.
+"""
 
 from __future__ import annotations
 
@@ -41,7 +39,8 @@ WFO_RANKS: dict[str, str] = {
 }
 
 
-def wfo_cherche_rang(rang: str | None) -> str | None:
-    if not rang:
+def wfo_to_wp_rank(rank: str | None) -> str | None:
+    """Return the Wikipedia rank of a WFO rank, or None."""
+    if not rank:
         return None
-    return WFO_RANKS.get(rang.lower())
+    return WFO_RANKS.get(rank.lower())

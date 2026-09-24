@@ -1,19 +1,22 @@
-"""Couche d'accès réseau pour The Taxonomicon (taxonomicon.taxonomy.nl, alias Systema Naturae
-2000) : aucune API trouvée (sondé en direct). Le site est un formulaire ASP.NET WebForms
-classique dont la recherche rapide déclenche un postback, mais celui-ci se termine par une
-redirection GET exploitable directement : `TaxonList.aspx?subject=...&by=...&search=...`. Le
-site ne répond qu'en HTTP (pas de HTTPS, vérifié en direct).
+"""Network access to The Taxonomicon (taxonomicon.taxonomy.nl).
 
-La recherche générale ("Entity by Scientific Name") mélange taxons et entités non biologiques
-homonymes (ex. la planète mineure "Quercus" pour le genre végétal du même nom) : on utilise donc
-les recherches scopées par groupe de rang du site (`subject=Genus/Family/High/Species`), qui ne
-renvoient que des taxons ("N taxa found" plutôt que "N entities found"). Exception : le groupe
-« below species » (`subject=Low`) s'est révélé ne renvoyer aucun résultat en `by=ScientificName`
-même pour un trinôme exact connu du site (sondé en direct, ex. « Vulpes vulpes crucigera »,
-pourtant bien présent) ; les taxons infraspécifiques n'y sont retrouvables que par
-`subject=Entity&by=Epithet` sur le dernier mot du nom, d'où le filtrage par nom complet exact
-laissé à module.py qui reste indispensable dans ce cas précis (l'épithète seule remonte aussi des
-taxons d'autres genres)."""
+Also known as Systema Naturae 2000. No API was found. The site is a
+classic ASP.NET WebForms form whose quick search posts back, then ends
+with a GET redirect usable directly:
+`TaxonList.aspx?subject=...&by=...&search=...`. The site answers over
+HTTP only (no HTTPS).
+
+The general search ("Entity by Scientific Name") mixes taxa with
+homonymous non-biological entities (e.g. the minor planet "Quercus"), so
+the rank-group searches are used instead
+(`subject=Genus/Family/High/Species`), which return only taxa.
+Exception: the "below species" group (`subject=Low`) returns nothing for
+`by=ScientificName`, even for a trinomial known to the site;
+infraspecific taxa are only found through `subject=Entity&by=Epithet` on
+the last word, hence the exact full-name filter left to module.py,
+indispensable there (the epithet alone also returns taxa of other
+genera).
+"""
 
 from __future__ import annotations
 
@@ -24,9 +27,9 @@ from organon.core.http import OwnedClientMixin, fetch_text
 
 BASE_URL = "http://taxonomicon.taxonomy.nl"
 
-# Groupes de rang de la recherche scopée du site. Un nom d'un seul mot peut être un genre, une
-# famille ou un rang supérieur (ordre, classe...) : les trois groupes sont essayés et leurs
-# résultats combinés, le filtrage par nom exact étant laissé à module.py.
+# Rank groups of the site's scoped search. A one-word name may be a
+# genus, a family or a higher rank: the three groups are tried and
+# combined, the exact-name filter being left to module.py.
 _SUBJECTS_BY_WORD_COUNT: dict[int, tuple[str, ...]] = {
     1: ("Genus", "Family", "High"),
     2: ("Species",),
@@ -43,7 +46,10 @@ _AUTHOR_CITATION_RE = re.compile(
 
 
 class TaxonomiconAdapter(OwnedClientMixin):
+    """Raw Taxonomicon client."""
+
     async def _search(self, subject: str, by: str, term: str) -> list[tuple[str, int, str]]:
+        """Return (validity, id, name) rows of one scoped search."""
         resp = await self._client.get(
             f"{BASE_URL}/TaxonList.aspx", params={"subject": subject, "by": by, "search": term}
         )
@@ -54,9 +60,12 @@ class TaxonomiconAdapter(OwnedClientMixin):
         ]
 
     async def search(self, name: str) -> list[tuple[str, int, str]]:
-        """Renvoie une liste de `(validité, id, nom)`, en combinant tous les groupes de rang
-        pertinents pour le nombre de mots de `name` — pas encore filtrée par nom exact ni par
-        validité (laissé à module.py, comme `organon.modules.eflora`)."""
+        """Return (validity, id, name) rows of all relevant rank groups.
+
+        Combines the groups fitting the word count of `name`. Not yet
+        filtered by exact name or validity (left to module.py, as
+        `organon.modules.eflora`).
+        """
         words = name.split(" ")
         subjects = _SUBJECTS_BY_WORD_COUNT.get(len(words))
         if subjects is not None:
@@ -67,10 +76,12 @@ class TaxonomiconAdapter(OwnedClientMixin):
         return await self._search("Entity", "Epithet", words[-1])
 
     async def author_citation(self, taxon_id: int) -> str | None:
-        """Renvoie la citation d'auteur complète ("SN2000 author citation", ex. "(C. Linnaeus,
-        1758) Pocock, 1930") depuis la fiche de nomenclature du taxon — absente des résultats de
-        recherche, qui ne donnent qu'une citation abrégée (ex. "(Linnaeus, 1758)" sans le
-        renvoi de combinaison ultérieure)."""
+        """Return the full author citation of a taxon, or None.
+
+        The "SN2000 author citation" (e.g. "(C. Linnaeus, 1758) Pocock,
+        1930") from the nomenclature page: search results only give an
+        abbreviated one, without the later combination.
+        """
         text = await fetch_text(
             self._client, f"{BASE_URL}/TaxonName.aspx", params={"id": taxon_id, "src": 0}
         )

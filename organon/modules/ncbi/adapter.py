@@ -1,6 +1,9 @@
-"""Couche d'accès réseau pour NCBI Taxonomy (E-utilities, eutils.ncbi.nlm.nih.gov) : appels
-HTTP et décodage JSON bruts uniquement. Public, sans clé — NCBI recommande un paramètre
-`api_key` au-delà de 3 requêtes/seconde, non nécessaire pour l'usage ponctuel de ce module."""
+"""Network access to NCBI Taxonomy (E-utilities).
+
+Raw HTTP and JSON only. Public, no key: NCBI recommends an `api_key`
+beyond 3 requests per second, unnecessary for this module's occasional
+use.
+"""
 
 from __future__ import annotations
 
@@ -10,7 +13,10 @@ BASE_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils"
 
 
 class NcbiAdapter(OwnedClientMixin):
+    """Raw NCBI E-utilities client."""
+
     async def search_taxid(self, name: str) -> str | None:
+        """Return the first taxonomy id matching a scientific name."""
         resp = await self._client.get(
             f"{BASE_URL}/esearch.fcgi",
             params={"db": "taxonomy", "term": f"{name}[Scientific Name]", "retmode": "json"},

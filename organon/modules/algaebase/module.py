@@ -1,72 +1,89 @@
-"""Logique métier du module AlgaeBase : classification, sous-taxons, étymologie, publication
-originale. Ne fait aucun appel HTTP directement, voir adapter.py.
+"""AlgaeBase module: classification, sub-taxa, etymology, publication.
 
-Trois formes de recherche selon le nombre de "mots" du taxon demandé : espèce (>=2 mots), puis
-genre, avec repli sur "rang supérieur" si la recherche de genre échoue.
+Makes no HTTP call itself; see adapter.py.
 
-Particularité de l'API : certains endpoints de détail renvoient parfois la chaîne JSON
-`"Nothing Found"` plutôt qu'un objet vide en cas d'absence de données pour un id donné (ex.
-`/genus/{id}/detail` sur un id sans page de détail) — d'où les vérifications
-`isinstance(..., dict)` avant tout `.get()` sur ces réponses ci-dessous.
+Three searches depending on the number of words of the taxon: species
+(>= 2 words), then genus, falling back on "higher rank" if the genus
+search fails.
+
+API quirk: some detail endpoints sometimes return the JSON string
+`"Nothing Found"` rather than an empty object when an id has no data
+(e.g. `/genus/{id}/detail` with no detail page), hence the
+`isinstance(..., dict)` checks before any `.get()`.
 """
 
 from __future__ import annotations
 
 import asyncio
 import re
+from typing import cast
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Etymology, RankName, Struct, SubTaxonList, TaxonInfo
+from organon.core.models import Etymology, LinkEntry, RankName, Struct, SubTaxonList, TaxonInfo
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.algaebase.adapter import AlgaeBaseAdapter
-from organon.modules.algaebase.ranks import algaebase_charte, algaebase_cherche_rang
-from organon.modules.common import format_auteur, format_auteur_annee, simple_debug_link
+from organon.modules.algaebase.ranks import algaebase_charter_kingdom, algaebase_to_wp_rank
+from organon.modules.bibliography import citation_or_text
+from organon.modules.common import format_author, format_author_year, simple_debug_link
 
 PAGE_SIZE = 50
 
 
-def _format_auteur_year(found: dict) -> str:
-    return format_auteur_annee(
-        found.get("dwc:scientificNameAuthorship"), found.get("dwc:namePublishedInYear")
-    ) or ""
+def _format_author_year(found: dict) -> str:
+    """Return the author and year of a record, or ""."""
+    return (
+        format_author_year(
+            found.get("dwc:scientificNameAuthorship"), found.get("dwc:namePublishedInYear")
+        )
+        or ""
+    )
 
 
-def _base_blob(found: dict, taxon_name: str, id_field: str) -> dict:
-    blob: dict = {
-        "rang": algaebase_cherche_rang(found.get("dwc:taxonRank", "")),
-        "nom": taxon_name,
+def _base_blob(found: dict, taxon_name: str, id_field: str) -> LinkEntry:
+    """Build the `links` entry of a found record."""
+    blob: LinkEntry = {
+        "rank": algaebase_to_wp_rank(found.get("dwc:taxonRank", "")),
+        "name": taxon_name,
         "id": found.get(id_field),
     }
-    auteur = _format_auteur_year(found)
-    if auteur:
-        blob["auteur"] = format_auteur(auteur)
+    author = _format_author_year(found)
+    if author:
+        blob["author"] = format_author(author)
     if found.get("isFossil") == "Y" or found.get("dwc:isFossil") == "Y":
-        blob["eteint"] = True
+        blob["extinct"] = True
     return blob
 
 
-def _blob_to_taxon(blob: dict) -> TaxonInfo:
+def _blob_to_taxon(blob: LinkEntry) -> TaxonInfo:
+    """Build a `TaxonInfo` from a `links` entry."""
     return TaxonInfo(
-        nom=blob["nom"], rang=blob.get("rang"), auteur=blob.get("auteur"), eteint=blob.get("eteint")
+        name=blob["name"],
+        rank=blob.get("rank"),
+        author=blob.get("author"),
+        extinct=blob.get("extinct"),
     )
 
 
-def _to_rankname(entry: dict) -> RankName:
+def _to_rankname(entry: LinkEntry) -> RankName:
+    """Build a `RankName` from a `links` entry."""
     return RankName(
-        nom=entry["nom"],
-        rang=entry.get("rang"),
-        auteur=entry.get("auteur"),
-        eteint=entry.get("eteint"),
+        name=entry["name"],
+        rank=entry.get("rank"),
+        author=entry.get("author"),
+        extinct=entry.get("extinct"),
     )
 
 
-def _extract_classification(items: list[dict]) -> tuple[list[dict], str, str]:
-    """N'identifie pas elle-même l'entrée "genre" de la classification : l'appelant (branche
-    genre de `collect()`) la retrouve via une boucle séparée sur le résultat, voir
-    `_collect_genus`."""
-    out: list[dict] = []
+def _extract_classification(items: list[dict]) -> tuple[list[LinkEntry], str, str]:
+    """Return (entries, phylum, kingdom) from a classification list.
+
+    It does not identify the "genus" entry itself: the caller (genus
+    branch of `collect()`) finds it in a separate loop; see
+    `_collect_genus`.
+    """
+    out: list[LinkEntry] = []
     phylum = ""
     kingdom = ""
     for cl in items:
@@ -77,47 +94,57 @@ def _extract_classification(items: list[dict]) -> tuple[list[dict], str, str]:
             kingdom = cl.get("dwc:scientificName") or ""
         if raw_rank.lower() == "phylum":
             phylum = cl.get("dwc:scientificName") or ""
-        auteur = _format_auteur_year(cl).replace("& al.", "et al.")
+        author = _format_author_year(cl).replace("& al.", "et al.")
         out.append(
             {
-                "rang": algaebase_cherche_rang(raw_rank),
+                "rank": algaebase_to_wp_rank(raw_rank),
                 "id": cl.get("dwc:taxonID"),
-                "nom": (cl.get("dwc:scientificName") or "").strip(),
-                "auteur": format_auteur(auteur) if auteur else None,
+                "name": (cl.get("dwc:scientificName") or "").strip(),
+                "author": format_author(author) if author else None,
             }
         )
     return out, phylum, kingdom
 
 
 def _apply_etymology(struct: Struct, found: dict) -> None:
+    """Set the etymology from the record, if any."""
     origin = found.get("nameOrigin")
     if origin:
-        texte = re.sub(r"[.]\s*$", "", origin)
-        struct.etymologie = Etymology(texte=f"''{texte}''", source="AlgaeBASE")
+        text = re.sub(r"[.]\s*$", "", origin)
+        struct.etymology = Etymology(text=f"''{text}''", source="AlgaeBASE")
 
 
-def _apply_bibliographic_citation(struct: Struct, found: dict) -> None:
+async def _apply_bibliographic_citation(
+    adapter: AlgaeBaseAdapter, struct: Struct, found: dict
+) -> None:
+    """Set the original publication from the record citation."""
     citation = found.get("dcterms:bibliographicCitation")
     if not citation:
         return
-    text = citation.replace("<i>", "''").replace("</i>", "''")
+    text = await citation_or_text(
+        adapter.resolve_doi_citation, citation.replace("<i>", "''").replace("</i>", "''")
+    )
     pdfs = found.get("pdfs") or []
-    if pdfs and pdfs[0].get("pdf_url"):
+    if text and pdfs and pdfs[0].get("pdf_url"):
         text += f" ([{pdfs[0]['pdf_url']} PDF])"
-    struct.originale = text
+    struct.original_publication = text
 
 
-def _apply_detail_page(struct: Struct, details: dict) -> None:
+async def _apply_detail_page(adapter: AlgaeBaseAdapter, struct: Struct, details: dict) -> None:
+    """Set description and original publication from the page."""
     desc = details.get("description")
     if desc:
-        bucket = struct.liens.setdefault("description", {}).setdefault("AlgaeBASE", [])
+        bucket = struct.description.setdefault("AlgaeBASE", [])
         bucket.append(f"''{desc}''")
-    pub = details.get("originalPublicationRef")
-    if pub:
-        struct.originale = pub.replace("<i>", "''").replace("</i>", "''")
+    publication = details.get("originalPublicationRef")
+    if publication:
+        struct.original_publication = await citation_or_text(
+            adapter.resolve_doi_citation, publication.replace("<i>", "''").replace("</i>", "''")
+        )
 
 
 async def _find_species(adapter: AlgaeBaseAdapter, key: str, taxon: str) -> dict | None:
+    """Return the species record whose name equals `taxon`, or None."""
     offset = 0
     while True:
         res = await adapter.search_species_page(key, taxon, offset)
@@ -129,11 +156,11 @@ async def _find_species(adapter: AlgaeBaseAdapter, key: str, taxon: str) -> dict
         if results is None or total is None:
             return None
         for r in results:
-            nom = r.get("dwc:scientificName") or ""
+            name = r.get("dwc:scientificName") or ""
             authorship = r.get("dwc:scientificNameAuthorship") or ""
             if authorship:
-                nom = nom.replace(f" {authorship}", "")
-            if nom == taxon:
+                name = name.replace(f" {authorship}", "")
+            if name == taxon:
                 return r
         offset += PAGE_SIZE
         if offset >= total:
@@ -147,7 +174,8 @@ async def _collect_species(
     is_classification: bool,
     options: GenerateOptions,
 ) -> Struct | None:
-    taxon = struct.taxon.nom
+    """Collect a species."""
+    taxon = struct.taxon.name
     found = await _find_species(adapter, key, taxon)
     if found is None:
         return None
@@ -158,8 +186,8 @@ async def _collect_species(
         if detail_resp and detail_resp.get("details"):
             found = detail_resp["details"]
 
-    blob = _base_blob(found, taxon, id_field="dwc:acceptedNameUsageID")
-    struct.liens["algaebase"] = blob
+    blob: LinkEntry = _base_blob(found, taxon, id_field="dwc:acceptedNameUsageID")
+    struct.links["algaebase"] = blob
 
     if not is_classification:
         return struct
@@ -170,7 +198,7 @@ async def _collect_species(
     struct.classification = "AlgaeBASE"
     struct.classification_taxobox = "AlgaeBASE"
 
-    _apply_bibliographic_citation(struct, found)
+    await _apply_bibliographic_citation(adapter, struct, found)
     _apply_etymology(struct, found)
 
     tbl: list[str] = []
@@ -181,17 +209,19 @@ async def _collect_species(
     if found.get("dwc:isTerrestrial"):
         tbl.append("Cette espèce est terrestre")
     if tbl:
-        struct.liens.setdefault("description", {})["AlgaeBASE"] = tbl
+        struct.description["AlgaeBASE"] = tbl
 
     if genus_id is None:
         return struct
 
-    # genus_id (found["genusID"]) et blob["id"] (found["dwc:acceptedNameUsageID"]) sont deux clés
-    # indépendantes du même `found`, déjà résolues : les deux appels de détail peuvent partir en
-    # parallèle. blob["id"] peut être absent (résolution de synonyme sans id accepté) : sauter
-    # l'appel plutôt que taper /taxonomy/None/detail, comme pour species_detail() ci-dessus.
+    # `genus_id` (found["genusID"]) and blob["id"]
+    # (found["dwc:acceptedNameUsageID"]) are independent keys of the
+    # same `found`, already resolved: the two detail calls can run in
+    # parallel. blob["id"] may be missing (synonym resolution without
+    # accepted id): skip the call rather than hit /taxonomy/None/detail,
+    # as for species_detail() above.
     page_detail_call = (
-        adapter.taxonomy_page_detail(key, blob["id"])
+        adapter.taxonomy_page_detail(key, cast(int, blob["id"]))
         if blob["id"] is not None
         else asyncio.sleep(0, result=None)
     )
@@ -201,14 +231,14 @@ async def _collect_species(
     if genus_detail is None or "classification" not in genus_detail:
         return None
     rank_tbl, phylum, kingdom = _extract_classification(genus_detail["classification"])
-    struct.rangs = [_to_rankname(r) for r in reversed(rank_tbl)]
+    struct.ranks = [_to_rankname(r) for r in reversed(rank_tbl)]
 
-    struct.regne = algaebase_charte(phylum, kingdom)
-    if struct.regne != "algue":
-        struct.cacher_regne = True
+    struct.kingdom = algaebase_charter_kingdom(phylum, kingdom)
+    if struct.kingdom != "algue":
+        struct.hide_kingdom = True
 
     if isinstance(page_detail, dict):
-        _apply_detail_page(struct, page_detail.get("details") or {})
+        await _apply_detail_page(adapter, struct, page_detail.get("details") or {})
 
     return struct
 
@@ -220,7 +250,8 @@ async def _collect_genus(
     is_classification: bool,
     options: GenerateOptions,
 ) -> Struct | None:
-    taxon = struct.taxon.nom
+    """Collect a genus."""
+    taxon = struct.taxon.name
     res = await adapter.search_genus(key, taxon)
     if res is None:
         return None
@@ -243,8 +274,8 @@ async def _collect_genus(
     if found is None:
         return None
 
-    blob = _base_blob(found, taxon, id_field="dwc:acceptedNameUsageID")
-    struct.liens["algaebase"] = blob
+    blob: LinkEntry = _base_blob(found, taxon, id_field="dwc:acceptedNameUsageID")
+    struct.links["algaebase"] = blob
 
     if not is_classification:
         return struct
@@ -256,7 +287,7 @@ async def _collect_genus(
     struct.classification_taxobox = "AlgaeBASE"
 
     _apply_etymology(struct, found)
-    _apply_bibliographic_citation(struct, found)
+    await _apply_bibliographic_citation(adapter, struct, found)
 
     detail = await adapter.genus_detail(key, taxon_id)
     if detail is None or "classification" not in detail:
@@ -264,30 +295,30 @@ async def _collect_genus(
     rank_tbl, phylum, kingdom = _extract_classification(detail["classification"])
 
     c_id = None
-    filtered: list[dict] = []
+    filtered: list[LinkEntry] = []
     for cont in reversed(rank_tbl):
-        if cont["rang"] == "genre":
-            c_id = cont["id"]
+        if cont["rank"] == "genre":
+            c_id = cast(int, cont["id"])
             continue
         filtered.append(cont)
-    struct.rangs = [_to_rankname(r) for r in filtered]
+    struct.ranks = [_to_rankname(r) for r in filtered]
 
     sub_detail = await adapter.taxonomy_detail(key, c_id) if c_id is not None else None
     lower = sub_detail.get("lowerTaxa") if isinstance(sub_detail, dict) else None
     if lower:
         sub_tbl, _, _ = _extract_classification(lower)
         if sub_tbl:
-            struct.sous_taxons = SubTaxonList(
-                liste=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE"
+            struct.subtaxa = SubTaxonList(
+                items=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE"
             )
 
-    struct.regne = algaebase_charte(phylum, kingdom)
-    if struct.regne != "algue":
-        struct.cacher_regne = True
+    struct.kingdom = algaebase_charter_kingdom(phylum, kingdom)
+    if struct.kingdom != "algue":
+        struct.hide_kingdom = True
 
     page_detail = await adapter.taxonomy_page_detail(key, taxon_id)
     if isinstance(page_detail, dict):
-        _apply_detail_page(struct, page_detail.get("details") or {})
+        await _apply_detail_page(adapter, struct, page_detail.get("details") or {})
 
     return struct
 
@@ -299,7 +330,8 @@ async def _collect_superior(
     is_classification: bool,
     options: GenerateOptions,
 ) -> Struct | None:
-    taxon = struct.taxon.nom
+    """Collect a higher taxon."""
+    taxon = struct.taxon.name
     res = await adapter.search_taxonomy(key, taxon)
     if res is None:
         return None
@@ -316,8 +348,8 @@ async def _collect_superior(
     if found is None:
         return None
 
-    blob = _base_blob(found, taxon, id_field="dwc:taxonID")
-    struct.liens["algaebase"] = blob
+    blob: LinkEntry = _base_blob(found, taxon, id_field="dwc:taxonID")
+    struct.links["algaebase"] = blob
 
     if not is_classification:
         return struct
@@ -329,40 +361,42 @@ async def _collect_superior(
     struct.classification_taxobox = "AlgaeBASE"
 
     _apply_etymology(struct, found)
-    _apply_bibliographic_citation(struct, found)
+    await _apply_bibliographic_citation(adapter, struct, found)
 
     detail = await adapter.taxonomy_detail(key, taxon_id)
     if detail is None or "higherTaxa" not in detail:
         return None
     higher_tbl, phylum, kingdom = _extract_classification(detail["higherTaxa"])
-    struct.rangs = [
-        _to_rankname(r) for r in reversed(higher_tbl) if r["rang"] != struct.taxon.rang
+    struct.ranks = [
+        _to_rankname(r) for r in reversed(higher_tbl) if r["rank"] != struct.taxon.rank
     ]
 
     lower = detail.get("lowerTaxa")
     if lower:
         sub_tbl, _, _ = _extract_classification(lower)
         if sub_tbl:
-            struct.sous_taxons = SubTaxonList(
-                liste=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE"
+            struct.subtaxa = SubTaxonList(
+                items=[_to_rankname(r) for r in sub_tbl], source="AlgaeBASE"
             )
 
-    struct.regne = algaebase_charte(phylum, kingdom)
-    if struct.regne != "algue":
-        struct.cacher_regne = True
+    struct.kingdom = algaebase_charter_kingdom(phylum, kingdom)
+    if struct.kingdom != "algue":
+        struct.hide_kingdom = True
 
     page_detail = await adapter.taxonomy_page_detail(key, taxon_id)
     if isinstance(page_detail, dict):
-        _apply_detail_page(struct, page_detail.get("details") or {})
+        await _apply_detail_page(adapter, struct, page_detail.get("details") or {})
 
     return struct
 
 
-_ESPECE_RANGS = {"espèce", "sous-espèce", "forme", "variété", "pathovar", "cultivar"}
-_GENRE_RANGS = {"genre", "sous-genre"}
+_SPECIES_RANKS = {"espèce", "sous-espèce", "forme", "variété", "pathovar", "cultivar"}
+_GENUS_RANKS = {"genre", "sous-genre"}
 
 
 class AlgaeBaseModule(TaxonomyModule):
+    """AlgaeBase module."""
+
     meta = ModuleMeta(
         id="algaebase",
         can_classify=True,
@@ -372,17 +406,19 @@ class AlgaeBaseModule(TaxonomyModule):
     )
 
     def __init__(self, adapter: AlgaeBaseAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or AlgaeBaseAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from AlgaeBase."""
         adapter = self._adapter
         key = await adapter.fetch_key()
         if key is None:
             return None
 
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
         if len(taxon.split(" ")) >= 2:
             return await _collect_species(adapter, key, struct, is_classification, options)
 
@@ -392,24 +428,29 @@ class AlgaeBaseModule(TaxonomyModule):
         return await _collect_superior(adapter, key, struct, is_classification, options)
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("algaebase")
+        """Render the {{AlgaeBASE}} template."""
+        data = struct.links.get("algaebase")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        rang = data.get("rang") or struct.taxon.rang
-        nom = wp_met_italiques(data["nom"], rang, struct.regne)
-        if data.get("auteur"):
-            nom += " " + data["auteur"]
-        eteint = " éteint=oui |" if data.get("eteint") else ""
-        if rang in _ESPECE_RANGS:
-            type_, sup = " espèce", ""
-        elif rang in _GENRE_RANGS:
-            type_, sup = " genre", ""
+        cdate = retrieval_dates()
+        rank = data.get("rank") or struct.taxon.rank
+        name = wp_apply_italics(data["name"], rank, struct.kingdom)
+        if author := data.get("author"):
+            name += " " + author
+        extinct = " éteint=oui |" if data.get("extinct") else ""
+        if rank in _SPECIES_RANKS:
+            type_, extinct_param = " espèce", ""
+        elif rank in _GENUS_RANKS:
+            type_, extinct_param = " genre", ""
         else:
-            type_, sup = "", f" {rang} |"
-        return f"{{{{AlgaeBASE{type_} | {data['id']} | {nom} |{sup}{eteint} consulté le={cdate}}}}}"
+            type_, extinct_param = "", f" {rank} |"
+        return (
+            f"{{{{AlgaeBASE{type_} | {data['id']} | {name} |{extinct_param}{extinct} consulté "
+            f"le={cdate}}}}}"
+        )
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the AlgaeBase page."""
         return simple_debug_link(
             struct,
             "algaebase",

@@ -1,11 +1,12 @@
-"""Logique métier du module INPN/TAXREF : classification (lignée reconstruite à partir du fil
-d'Ariane de la fiche détail, chaque ancêtre résolu individuellement pour connaître son rang —
-voir adapter.py) et noms vernaculaires français.
+"""INPN/TAXREF module: classification and French vernacular names.
 
-Suivi de synonyme non implémenté (contrairement à ITIS/GBIF/WoRMS) : un taxon dont la
-correspondance exacte n'est pas "nom de référence" (`validite == "NR"`) est ignoré plutôt que
-suivi vers son nom accepté — portée volontairement réduite pour cette première version, à
-étendre si besoin (voir docs/log.md)."""
+The lineage is rebuilt from the detail page breadcrumb, each ancestor
+resolved individually to get its rank (see adapter.py).
+
+No synonym following: a taxon whose exact match is not a reference name
+(`validite == "NR"`) is ignored rather than followed to its accepted
+name; deliberately narrow, to extend if needed.
+"""
 
 from __future__ import annotations
 
@@ -15,55 +16,59 @@ import re
 from organon.core.config import GenerateOptions
 from organon.core.models import RankName, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import format_author
 from organon.modules.inpn.adapter import InpnAdapter
-from organon.modules.inpn.ranks import RANGS_REGNE, inpn_cherche_rang, inpn_cherche_regne
+from organon.modules.inpn.ranks import KINGDOM_RANKS, inpn_lookup_kingdom, inpn_to_wp_rank
 
-# Racine technique de TAXREF (pas un taxon biologique réel) : toujours en tête du fil
-# d'Ariane, filtrée avant résolution plutôt que de lui chercher un rang.
+# Technical root of TAXREF (not a real taxon): always first in the
+# breadcrumb, filtered before resolution rather than given a rank.
 _ROOT_NAME = "Biota"
 
-# TAXREF n'indexe jamais la notation "Genre (Sous-genre)" : le sous-genre y est stocké sous son
-# seul nom (`lbNom`), identique à celui du genre pour le sous-genre nominotypique (ex.
-# "Eupelmus (Eupelmus)" -> lbNom "Eupelmus", rang SSGN, à côté du genre "Eupelmus" lui-même,
-# rang GN, même lbNom) — une recherche littérale avec parenthèse ne renvoie donc jamais rien.
+# TAXREF never indexes the "Genus (Subgenus)" notation: the subgenus is
+# stored under its name alone (`lbNom`), identical to the genus for the
+# nominotypical subgenus (e.g. "Eupelmus (Eupelmus)" is lbNom
+# "Eupelmus", rank SSGN, next to the genus "Eupelmus", rank GN), so a
+# literal search with parentheses finds nothing.
 _SUBGENUS_RE = re.compile(r"^(?P<genre>\S+)\s*\((?P<sousgenre>\S+)\)$")
 
 
 class InpnModule(TaxonomyModule):
+    """INPN/TAXREF module."""
+
     meta = ModuleMeta(
         id="inpn", can_classify=True, can_render_external_link=True, domains="all", priority=500
     )
 
     def __init__(self, adapter: InpnAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or InpnAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from TAXREF."""
         adapter = self._adapter
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
 
-        subgenre = _SUBGENUS_RE.match(taxon)
-        nom_recherche = subgenre.group("sousgenre") if subgenre else taxon
+        subgenus = _SUBGENUS_RE.match(taxon)
+        search_name = subgenus.group("sousgenre") if subgenus else taxon
 
-        def _rang_correspond(r: dict) -> bool:
-            # Sans parenthèse dans la requête, écarte le sous-genre nominotypique homonyme du
-            # genre (même lbNom, rang SSGN) pour ne jamais le retenir à la place du genre lui-même
-            # au hasard de l'ordre de l'API — avec parenthèse, exige au contraire ce rang SSGN.
+        def _rank_matches(r: dict) -> bool:
+            # Without parentheses in the query, drop the nominotypical
+            # subgenus homonymous with the genus (same lbNom, rank SSGN)
+            # so it is never picked instead of the genus; with
+            # parentheses, require that SSGN rank.
             code = (r.get("rang") or {}).get("rang")
-            return code == "SSGN" if subgenre else code != "SSGN"
+            return code == "SSGN" if subgenus else code != "SSGN"
 
-        results = await adapter.search(nom_recherche)
+        results = await adapter.search(search_name)
         match = next(
             (
                 r
                 for r in results
-                if r.get("lbNom") == nom_recherche
-                and r.get("validite") == "NR"
-                and _rang_correspond(r)
+                if r.get("lbNom") == search_name and r.get("validite") == "NR" and _rank_matches(r)
             ),
             None,
         )
@@ -71,77 +76,87 @@ class InpnModule(TaxonomyModule):
             return None
 
         cd_nom = match["cdNom"]
-        auteur = format_auteur(match.get("lbAuteur"))
+        author = format_author(match.get("lbAuteur"))
 
-        struct.liens["inpn"] = {"id": cd_nom, "nom": taxon}
-        if auteur:
-            struct.liens["inpn"]["auteur"] = auteur
+        struct.links["inpn"] = {"id": cd_nom, "name": taxon}
+        if author:
+            struct.links["inpn"]["author"] = author
 
         html = await adapter.detail_html(cd_nom)
-        vernaculaire = adapter.parse_vernacular_french(html)
-        if vernaculaire:
-            struct.vernaculaire["INPN"] = vernaculaire
+        vernacular = adapter.parse_vernacular_french(html)
+        if vernacular:
+            struct.vernacular["INPN"] = {"fr": vernacular}
 
         if not is_classification:
             return struct
 
-        rang_code = (match.get("rang") or {}).get("rang")
-        rang_wp = inpn_cherche_rang(rang_code or "")
-        if rang_wp == "NOTFOUND":
+        rank_code = (match.get("rang") or {}).get("rang")
+        wp_rank = inpn_to_wp_rank(rank_code or "")
+        if wp_rank is None:
             return None
-        struct.taxon.rang = rang_wp
-        if auteur:
-            struct.taxon.auteur = auteur
+        struct.taxon.rank = wp_rank
+        if author:
+            struct.taxon.author = author
 
-        ancestors = [(aid, nom) for aid, nom in adapter.parse_breadcrumb(html) if nom != _ROOT_NAME]
-        ancestor_results = await asyncio.gather(*(adapter.search(nom) for _, nom in ancestors))
+        ancestors = [
+            (aid, name) for aid, name in adapter.parse_breadcrumb(html) if name != _ROOT_NAME
+        ]
+        ancestor_results = await asyncio.gather(*(adapter.search(name) for _, name in ancestors))
 
-        rangs: list[RankName] = []
-        regne_nom: str | None = None
-        for (anc_id, anc_nom), anc_matches in zip(ancestors, ancestor_results, strict=True):
-            anc_match = next(
+        ranks: list[RankName] = []
+        kingdom_name: str | None = None
+        for (ancestor_id, ancestor_name), ancestor_matches in zip(
+            ancestors, ancestor_results, strict=True
+        ):
+            ancestor_match = next(
                 (
                     r
-                    for r in anc_matches
-                    if r.get("cdNom") == anc_id and r.get("lbNom") == anc_nom
+                    for r in ancestor_matches
+                    if r.get("cdNom") == ancestor_id and r.get("lbNom") == ancestor_name
                 ),
                 None,
             )
-            if anc_match is None:
+            if ancestor_match is None:
                 continue
-            anc_rang_wp = inpn_cherche_rang((anc_match.get("rang") or {}).get("rang") or "")
-            if anc_rang_wp == "règne":
-                regne_nom = anc_nom
+            ancestor_wp_rank = inpn_to_wp_rank(
+                (ancestor_match.get("rang") or {}).get("rang") or ""
+            )
+            if ancestor_wp_rank == "règne":
+                kingdom_name = ancestor_name
                 continue
-            if anc_rang_wp == "NOTFOUND" or anc_rang_wp in RANGS_REGNE:
+            if ancestor_wp_rank is None or ancestor_wp_rank in KINGDOM_RANKS:
                 continue
-            rangs.append(
+            ranks.append(
                 RankName(
-                    nom=anc_nom, rang=anc_rang_wp, auteur=format_auteur(anc_match.get("lbAuteur"))
+                    name=ancestor_name,
+                    rank=ancestor_wp_rank,
+                    author=format_author(ancestor_match.get("lbAuteur")),
                 )
             )
-        rangs.reverse()  # fil d'Ariane : racine -> feuille ; struct.rangs veut proche -> lointain
-        struct.rangs = rangs
+        ranks.reverse()  # breadcrumb is root to leaf; struct.ranks wants nearest first
+        struct.ranks = ranks
 
-        if regne_nom:
-            struct.regne = inpn_cherche_regne(regne_nom)
+        if kingdom_name:
+            struct.kingdom = inpn_lookup_kingdom(kingdom_name)
 
         struct.classification = "TAXREF"
         struct.classification_taxobox = "inpn"
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("inpn")
+        """Render the {{INPN}} template."""
+        data = struct.links.get("inpn")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        return f"{{{{INPN | {data['id']} | {cible} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        target = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        if author := data.get("author"):
+            target += " " + author
+        return f"{{{{INPN | {data['id']} | {target} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("inpn")
+        """Return the debug link to the TAXREF page."""
+        data = struct.links.get("inpn")
         if not data or "id" not in data:
             return None
         return (

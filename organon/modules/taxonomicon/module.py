@@ -1,64 +1,72 @@
-"""Logique métier du module The Taxonomicon (taxonomicon.taxonomy.nl / Systema Naturae 2000).
-Module d'enrichissement uniquement (`can_classify=False`) : réutilise le rang déjà connu de la
-classification principale, comme `organon.modules.oepp` — Taxonomicon ne fournit pas de rang
-structuré exploitable côté scraping (voir adapter.py).
+"""The Taxonomicon module (Systema Naturae 2000).
 
-Ne retient que les correspondances valides ("Valid", au sens de la classification Systema
-Naturae 2000 du site — exclut les entrées "nom. inval.") dont le nom correspond exactement au
-taxon demandé, comme `organon.modules.eflora`. L'auteur complet nécessite un second appel vers
-la fiche de nomenclature, comme `organon.modules.oepp`."""
+Enrichment only (`can_classify=False`): reuses the rank already known
+from the main classification, as `organon.modules.oepp` does, since the
+site gives no structured rank to scrape (see adapter.py).
+
+Keeps only "Valid" matches (in the site's Systema Naturae 2000
+classification, excluding "nom. inval." entries) whose name equals the
+requested taxon, like `organon.modules.eflora`. The full author needs a
+second call to the nomenclature page, like `oepp`.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
+from organon.core.models import LinkEntry, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import format_author, simple_debug_link
 from organon.modules.taxonomicon.adapter import TaxonomiconAdapter
 
 
 class TaxonomiconModule(TaxonomyModule):
+    """The Taxonomicon module."""
+
     meta = ModuleMeta(
         id="taxonomicon", can_classify=False, can_render_external_link=True, domains="all"
     )
 
     def __init__(self, adapter: TaxonomiconAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or TaxonomiconAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from The Taxonomicon."""
         if is_classification:
             return None
 
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
         hits = await self._adapter.search(taxon)
         match = next((hit for hit in hits if hit[0] == "Valid" and hit[2] == taxon), None)
         if match is None:
             return None
         _, taxon_id, _ = match
 
-        blob: dict = {"id": taxon_id, "nom": taxon}
-        auteur = await self._adapter.author_citation(taxon_id)
-        if auteur:
-            blob["auteur"] = format_auteur(auteur)
+        blob: LinkEntry = {"id": taxon_id, "name": taxon}
+        author = await self._adapter.author_citation(taxon_id)
+        if author:
+            blob["author"] = format_author(author)
 
-        struct.liens["taxonomicon"] = blob
+        struct.links["taxonomicon"] = blob
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("taxonomicon")
+        """Render the {{Taxonomicon}} template."""
+        data = struct.links.get("taxonomicon")
         if not data:
             return None
-        cdate = dates_recupere()
-        nom = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            nom += " " + data["auteur"]
-        return f"{{{{Taxonomicon | {data['id']} | {nom} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        name = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        if author := data.get("author"):
+            name += " " + author
+        return f"{{{{Taxonomicon | {data['id']} | {name} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the Taxonomicon page."""
         return simple_debug_link(
             struct,
             "taxonomicon",

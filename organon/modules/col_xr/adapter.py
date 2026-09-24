@@ -1,13 +1,12 @@
-"""Couche d'accès réseau pour la Catalogue of Life Extended Release (ChecklistBank) : appels
-HTTP et décodage JSON bruts uniquement, aucune logique métier — utilisée par
-`organon.modules.col.module` (classification complète) et `organon.modules.col_xr.lookup`
-(résolution d'identifiant pour GBIF/subtaxa_merge).
+"""Network access to the Catalogue of Life Extended Release.
 
-`3LXR` est l'alias ChecklistBank pour la dernière release XR publiée (comme `3LR` pour la COL
-classique côté `organon/modules/col/adapter.py`, même infrastructure) — la XR fusionne la COL
-avec ~17 500 checklists sources supplémentaires et sert de taxonomie par défaut à GBIF depuis
-2024 (ids alphanumériques distincts du backbone GBIF legacy, voir
-`organon/modules/gbif/adapter.py`)."""
+Raw HTTP and JSON only, used by `organon.modules.col.module` and
+`organon.modules.col_xr.lookup`. `3LXR` is the ChecklistBank alias of
+the latest XR release (as `3LR` for the plain COL). The XR merges the
+COL with about 17,500 more source checklists and has been the GBIF
+default taxonomy since 2024 (alphanumeric ids, distinct from the legacy
+GBIF backbone).
+"""
 
 from __future__ import annotations
 
@@ -15,11 +14,18 @@ from organon.core.http import OwnedClientMixin, fetch_json
 from organon.modules.common import checklistbank_children_page, checklistbank_synonyms
 
 API_BASE = "https://api.checklistbank.org"
-DATASET_ID = "3LXR"  # dernière release XR publiée (permanente, sans découverte)
+DATASET_ID = "3LXR"  # latest published XR release (permanent, no discovery)
 
 
 class ColXrAdapter(OwnedClientMixin):
+    """Raw COL XR API client."""
+
     async def search(self, taxon: str, *, exact: bool = True) -> list[dict]:
+        """Search name usages; `exact` restricts to an exact name match.
+
+        Without `exact`, search the scientific name field by relevance;
+        see `lookup.resolve_col_xr_matches`, its only caller.
+        """
         params: dict[str, str | int] = {
             "limit": 50,
             "offset": 0,
@@ -30,16 +36,14 @@ class ColXrAdapter(OwnedClientMixin):
             params["type"] = "EXACT"
             params["sortBy"] = "taxonomic"
         else:
-            # `type=EXACT` ne matche jamais un nom noté avec sous-genre côté ChecklistBank
-            # ("Mus musculus" ne trouve pas "Mus (Mus) musculus") ni un binôme dont
-            # l'épithète a été corrigée depuis (accord de genre latin) : voir le repli
-            # `organon.modules.col_xr.lookup.resolve_col_xr_matches`, seul appelant de
-            # `exact=False`. Sans `type=EXACT`, une recherche non filtrée sur un binôme courant
-            # peut renvoyer plusieurs milliers de résultats sans rapport direct (vérifié en
-            # direct : total=5043 pour "Drosophila melanogaster" trié par taxonomie) — la bonne
-            # fiche resterait hors de portée de `limit`. Restreindre la recherche au champ nom
-            # scientifique et trier par pertinence la fait remonter dans les tout premiers
-            # résultats à la place.
+            # `type=EXACT` never matches a name written with a subgenus
+            # ("Mus musculus" misses "Mus (Mus) musculus") nor a
+            # binomial whose epithet was since corrected (Latin gender
+            # agreement). An unfiltered search on a common binomial can
+            # return thousands of unrelated results (5043 for
+            # "Drosophila melanogaster" sorted by taxonomy), leaving the
+            # right record beyond `limit`. Restricting to the scientific
+            # name field and sorting by relevance brings it to the top.
             params["sortBy"] = "RELEVANCE"
             params["content"] = "SCIENTIFIC_NAME"
         data = await fetch_json(
@@ -51,9 +55,11 @@ class ColXrAdapter(OwnedClientMixin):
         return data.get("result", [])
 
     async def children_page(self, taxon_id: str, offset: int = 0) -> dict:
+        """Return a page of children of a taxon."""
         return await checklistbank_children_page(
             self._client, API_BASE, DATASET_ID, taxon_id, offset
         )
 
     async def synonyms(self, taxon_id: str) -> dict:
+        """Return the synonyms of a taxon."""
         return await checklistbank_synonyms(self._client, API_BASE, DATASET_ID, taxon_id)

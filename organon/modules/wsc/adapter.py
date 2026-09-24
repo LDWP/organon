@@ -1,16 +1,17 @@
-"""Couche d'accès réseau pour le World Spider Catalog (WSC, NMBE) : télécharge et met en cache
-l'export CSV quotidien public (aucune clé requise, contrairement à l'API REST officielle qui en
-exige une — voir organon/core/data/db_inventory.yaml, id: wsc). Le fichier est republié chaque
-jour sous un nom daté (`species_export_YYYYMMDD.csv`) ; la date du jour (UTC) est essayée en
-premier, la veille en repli si le fichier du jour n'est pas encore disponible.
+"""Network access to the World Spider Catalog (WSC, NMBE).
 
-Licence CC BY-NC-SA 4.0 (https://wsc.nmbe.ch/dataresources) : usage non commercial, attribution
-requise — voir `organon.modules.wsc.module.WscModule` (can_render_external_link=False, aucun
-lien de citation publique produit).
+Download and cache the public daily CSV export (no key required, unlike
+the official REST API; see `db_inventory.yaml`, id: wsc). The file is
+republished daily under a dated name (`species_export_YYYYMMDD.csv`):
+today's date (UTC) is tried first, yesterday's as a fallback.
 
-L'index est reconstruit une fois par jour (UTC) au premier appel qui le nécessite, pas à
-l'import : ~7,8 Mo de CSV n'ont pas à être téléchargés pour un déploiement qui n'interroge
-jamais ce module."""
+License CC BY-NC-SA 4.0: non-commercial, attribution required; see
+`WscModule` (`can_render_external_link=False`, no public citation link).
+
+The index is rebuilt once a day (UTC) at the first call needing it, not
+at import: about 7.8 MB of CSV need not be downloaded by a deployment
+that never queries this module.
+"""
 
 from __future__ import annotations
 
@@ -24,17 +25,21 @@ import httpx
 from organon.core.http import OwnedClientMixin
 
 BASE_URL = "https://wsc.nmbe.ch/resources/species_export_{date}.csv"
-_DATE_ATTEMPTS = 2  # jour courant (UTC), puis veille si pas encore republié
+_DATE_ATTEMPTS = 2  # today (UTC), then yesterday if not republished yet
 
 
 class WscAdapter(OwnedClientMixin):
+    """WSC export client with a daily index."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client)
         self._by_name: dict[str, dict] | None = None
         self._cached_date: str | None = None
         self._lock = asyncio.Lock()
 
     async def _ensure_loaded(self) -> None:
+        """Load the index if not already built today."""
         today = datetime.now(UTC).strftime("%Y%m%d")
         if self._cached_date == today:
             return
@@ -43,8 +48,8 @@ class WscAdapter(OwnedClientMixin):
                 return
             rows = await self._download(today)
             if rows is None:
-                # échec de téléchargement : garde l'index précédent (même périmé) plutôt que
-                # de tout perdre
+                # download failed: keep the previous index (even stale)
+                # rather than lose everything
                 return
             by_name: dict[str, dict] = {}
             for row in rows:
@@ -55,10 +60,10 @@ class WscAdapter(OwnedClientMixin):
                     continue
                 subspecies = row.get("subspecies")
                 if subspecies:
-                    # Ne jamais écrire la clé binomiale ici : une ligne de sous-espèce ne doit
-                    # pas écraser la ligne espèce-mère (même genus+species) déjà indexée sous
-                    # cette clé, sans quoi une recherche sur le nom binomial retomberait sur la
-                    # sous-espèce au lieu de l'espèce.
+                    # Never write the binomial key here: a subspecies
+                    # row must not overwrite the parent species row
+                    # (same genus and species) already indexed under it,
+                    # or a binomial search would land on the subspecies.
                     by_name[f"{genus} {species} {subspecies}"] = row
                 else:
                     by_name[f"{genus} {species}"] = row
@@ -66,6 +71,7 @@ class WscAdapter(OwnedClientMixin):
             self._cached_date = today
 
     async def _download(self, today: str) -> list[dict] | None:
+        """Download the export of `today`, else of the day before."""
         date = datetime.strptime(today, "%Y%m%d")
         for attempt in range(_DATE_ATTEMPTS):
             candidate = (date - timedelta(days=attempt)).strftime("%Y%m%d")
@@ -77,6 +83,7 @@ class WscAdapter(OwnedClientMixin):
         return None
 
     async def search(self, name: str) -> dict | None:
+        """Return the row of an exact name, or None."""
         await self._ensure_loaded()
         if self._by_name is None:
             return None

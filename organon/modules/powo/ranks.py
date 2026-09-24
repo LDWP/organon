@@ -1,6 +1,8 @@
-"""Table de rangs pour POWO (Plants of the World Online / WCVP). Les rangs POWO sont observés
-en majuscules (ex. "SPECIES") sauf pour "Form" dans certaines listes de synonymes — la
-correspondance est donc faite insensible à la casse."""
+"""Rank table for POWO (Plants of the World Online / WCVP).
+
+Ranks are seen in uppercase ("SPECIES"), except "Form" in some synonym
+lists, so matching is case-insensitive.
+"""
 
 from __future__ import annotations
 
@@ -27,19 +29,19 @@ POWO_RANKS: dict[str, str] = {
 }
 
 
-def powo_cherche_rang(rang: str | None) -> str | None:
-    if not rang:
+def powo_to_wp_rank(rank: str | None) -> str | None:
+    """Return the Wikipedia rank of a POWO rank, or None."""
+    if not rank:
         return None
-    return POWO_RANKS.get(rang.upper())
+    return POWO_RANKS.get(rank.upper())
 
 
+# WCVP only covers Plantae, so a one-entry table is enough.
 POWO_KINGDOM_MAP: dict[str, str] = {"Plantae": "végétal"}
-"""WCVP ne couvre que Plantae (le champ `kingdom`/`plantae` ne varie pas en pratique, domaine du
-module déjà restreint à `['végétal']`) : une table à une entrée suffit, sans généraliser pour un
-cas qui ne se présente jamais."""
 
 
-def powo_cherche_regne(kingdom: str | None) -> str | None:
+def powo_lookup_kingdom(kingdom: str | None) -> str | None:
+    """Return the Organon domain of a POWO kingdom, or None."""
     if not kingdom:
         return None
     return POWO_KINGDOM_MAP.get(kingdom)

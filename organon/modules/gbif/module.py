@@ -1,5 +1,6 @@
-"""Logique métier du module GBIF : classification, synonymes, sous-taxons, noms vernaculaires.
-Ne fait aucun appel HTTP directement, voir adapter.py.
+"""GBIF module: classification, synonyms, sub-taxa, vernacular names.
+
+Makes no HTTP call itself; see adapter.py.
 """
 
 from __future__ import annotations
@@ -8,352 +9,358 @@ import html as _html
 import re
 
 from organon.core.config import GenerateOptions
+from organon.core.langues import groupe_par_langue
 from organon.core.models import (
     Basionym,
     RankName,
-    Redirection,
     Struct,
     SubTaxonList,
     SynonymList,
-    TaxonInfo,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.authors import BOTANIST_REGNES
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.authors import BOTANIST_KINGDOMS
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.bibliography import citation_or_text
 from organon.modules.col_xr.adapter import ColXrAdapter
 from organon.modules.col_xr.lookup import find_col_xr_link
 from organon.modules.common import (
-    MAX_SYNONYM_HOPS,
     as_limit,
     collect_pages,
-    format_auteur,
+    follow_synonym,
+    format_author,
     simple_debug_link,
 )
 from organon.modules.gbif.adapter import GbifAdapter
-from organon.modules.gbif.ranks import GBIF_MARKERS, GBIF_WP, gbif_cherche_rang, gbif_cherche_regne
+from organon.modules.gbif.ranks import (
+    GBIF_MARKERS,
+    GBIF_WP,
+    gbif_lookup_kingdom,
+    gbif_marker_to_rank,
+    gbif_to_wp_rank,
+)
 
-_ANNEE_PUBLICATION_RE = re.compile(r"\b(1[3-9]\d\d|20\d\d)\b")
+_PUBLICATION_YEAR_RE = re.compile(r"\b(1[3-9]\d\d|20\d\d)\b")
 
 
-def _annee_probable(published_in: str | None, regne: str | None) -> int | None:
-    """Extrait un candidat d'année de publication depuis `publishedIn` (citation bibliographique
-    en texte libre — GBIF n'expose aucun champ année structuré comme `namePublishedInYear` chez
-    POWO ou `YEAR_OF_PUBLICATION` chez Index Fungorum). Limité aux règnes ICN
-    (`BOTANIST_REGNES` : botanique/champignons), où l'année n'est jamais incluse dans la
-    citation d'auteur elle-même par convention, contrairement à l'ICZN zoologique (ex.
-    "Linnaeus, 1758" pour la zoologie contre "L." pour la botanique) — inutile d'en extraire une
-    pour un règne où GBIF la porte déjà nativement dans `authorship`.
+def _probable_year(published_in: str | None, kingdom: str | None) -> int | None:
+    """Extract a candidate publication year from `publishedIn`.
 
-    Prend le dernier nombre à 4 chiffres plausible (l'année termine généralement la citation,
-    ex. "Sp. Pl.: 996 (1753)") : une extraction imparfaite reste sans danger, ce candidat n'est
-    utilisé que s'il est recoupé avec un autre module (voir
-    `organon.core.selectors.coherence.gbif_annee_probable_validee`), jamais présenté seul à
-    l'utilisateur."""
-    if not published_in or regne not in BOTANIST_REGNES:
+    GBIF has no structured year field. Limited to the ICN kingdoms
+    (`BOTANIST_KINGDOMS`), where the author citation omits the year;
+    zoology already carries it in `authorship`. Take the last plausible
+    4-digit number. An imperfect extraction is harmless: the candidate
+    is only used when another module confirms it (see
+    `coherence.gbif_probable_year_validated`).
+    """
+    if not published_in or kingdom not in BOTANIST_KINGDOMS:
         return None
-    matches = _ANNEE_PUBLICATION_RE.findall(published_in)
+    matches = _PUBLICATION_YEAR_RE.findall(published_in)
     return int(matches[-1]) if matches else None
 
 
-def _extrait_marqueur_rang(nom: str) -> tuple[str | None, str]:
-    """Repère un marqueur de rang infraspécifique explicite dans un nom recherché (ex. "subsp."
-    dans "Mentha spicata subsp. spicata") et renvoie (rang GBIF correspondant, nom débarrassé de
-    ce marqueur). `/species?name=` (recherche exacte GBIF, voir `_collect`) indexe ces taxons
-    sans leur marqueur (vérifié en direct : la requête avec marqueur ne matche rien du tout ;
-    sans lui, elle matche mais devient ambiguë avec toute autre variation infraspécifique de
-    mêmes épithètes, ex. la variété homonyme d'une sous-espèce) — nécessaire à la fois pour
-    retenter la recherche sans le marqueur et pour départager les candidats obtenus ainsi."""
-    mots = nom.split()
-    for i, mot in enumerate(mots):
-        rang = GBIF_MARKERS.get(mot)
-        if rang:
-            return rang, " ".join(mots[:i] + mots[i + 1 :])
-    return None, nom
+def _extract_rank_marker(name: str) -> tuple[str | None, str]:
+    """Split an explicit infraspecific rank marker off a searched name.
+
+    E.g. "subsp." in "Mentha spicata subsp. spicata". Return (matching
+    GBIF rank, name without marker). `/species?name=` indexes these taxa
+    without their marker: with it nothing matches, without it the match
+    is ambiguous with other infraspecific variations, hence the rank.
+    """
+    words = name.split()
+    for i, word in enumerate(words):
+        rank = GBIF_MARKERS.get(word)
+        if rank:
+            return rank, " ".join(words[:i] + words[i + 1 :])
+    return None, name
 
 
-def _filtre_rang_marqueur(rang_attendu: str | None, candidats: list[dict]) -> list[dict]:
-    """Ne garde, parmi plusieurs candidats homonymes, que ceux dont le rang GBIF correspond au
-    marqueur explicite du nom recherché (`_extrait_marqueur_rang`) — sans quoi le premier
-    candidat de la liste l'emportait au hasard, un rang différent de celui demandé,
-    silencieusement (pas d'erreur : juste le mauvais taxon généré)."""
-    if rang_attendu is None or len(candidats) < 2:
-        return candidats
-    filtres = [r for r in candidats if r.get("rank") == rang_attendu]
-    return filtres or candidats
+def _filter_rank_marker(expected_rank: str | None, candidates: list[dict]) -> list[dict]:
+    """Keep the candidates whose GBIF rank matches the marker's rank.
+
+    Without this the first homonym won, silently giving the wrong rank.
+    """
+    if expected_rank is None or len(candidates) < 2:
+        return candidates
+    filters = [r for r in candidates if r.get("rank") == expected_rank]
+    return filters or candidates
 
 
 async def _taxon_info(adapter: GbifAdapter, key: int) -> dict | None:
-    """Porte gbif_taxon_info() : nom/auteur/rang/éteint pour un identifiant GBIF donné."""
+    """Return name, author, rank and extinction of a GBIF key."""
     name = await adapter.name_info(key)
     if name is None:
         return None
-    nom = name.get("canonicalNameWithMarker") or name.get("canonicalName")
-    complet = name.get("canonicalNameComplete")
-    if nom is not None and complet is not None:
-        auteur = complet[len(nom) + 1 :]
+    canonical_name = name.get("canonicalNameWithMarker") or name.get("canonicalName")
+    complete_name = name.get("canonicalNameComplete")
+    if canonical_name is not None and complete_name is not None:
+        author = complete_name[len(canonical_name) + 1 :]
     else:
-        # GBIF ne décompose pas tous les noms en nom canonique + auteur (`"parsed": false` sur
-        # /name) — notamment les noms de virus, qui ne suivent pas la nomenclature binomiale. On
-        # retombe sur le nom scientifique brut plutôt que d'abandonner la résolution.
-        nom = name.get("scientificName")
-        if nom is None:
+        # GBIF does not split every name into canonical name and author
+        # (`"parsed": false`), notably virus names. Fall back on the raw
+        # scientific name rather than give up.
+        canonical_name = name.get("scientificName")
+        if canonical_name is None:
             return None
-        auteur = ""
+        author = ""
 
-    result: dict = {"nom": nom, "auteur": auteur}
+    result: dict = {"name": canonical_name, "author": author}
     if name.get("rank"):
-        result["rang"] = gbif_cherche_rang(name["rank"])
+        result["rank"] = gbif_to_wp_rank(name["rank"])
     elif name.get("rankMarker"):
-        from organon.modules.gbif.ranks import gbif_marqueur_rang
-
-        buf = gbif_marqueur_rang(name["rankMarker"])
-        if buf != "NOTFOUND":
-            result["rang"] = gbif_cherche_rang(buf)
+        buf = gbif_marker_to_rank(name["rankMarker"])
+        if buf is not None:
+            result["rank"] = gbif_to_wp_rank(buf)
 
     profiles = await adapter.species_profiles(key)
     for p in profiles:
         if "extinct" in p:
-            result["eteint"] = p["extinct"]
+            result["extinct"] = p["extinct"]
             break
 
     return result
 
 
 class GbifModule(TaxonomyModule):
+    """GBIF module."""
+
     meta = ModuleMeta(
         id="gbif",
         can_classify=True,
         can_render_external_link=True,
         domains="all",
-        # Priorité abaissée derrière COL (voir col/module.py) : ne classe qu'avec les champs
-        # bruts du Backbone Taxonomy legacy (gbif/adapter.py::DATASET_KEY), jamais corrigés par
-        # CoL XR au-delà d'un rang manquant (audit #50). Reste le seul classeur pour un taxon
-        # absent de CoL XR (repli déjà géré par `successes` côté generate.py).
+        # Priority below COL: classifies only with the raw fields of the
+        # legacy Backbone Taxonomy, never corrected by CoL XR. Still the
+        # only classifier for a taxon absent from CoL XR.
         priority=200,
     )
 
     def __init__(
         self, adapter: GbifAdapter | None = None, col_xr_adapter: ColXrAdapter | None = None
     ) -> None:
+        """Use the given adapters, else create them."""
         self._adapter = adapter or GbifAdapter()
         self._col_xr_adapter = col_xr_adapter or ColXrAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from GBIF."""
         return await self._collect(struct, is_classification, options, hop=0)
 
     async def _collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions, hop: int
     ) -> Struct | None:
+        """Collect with a synonym hop count."""
         adapter = self._adapter
 
-        # Un identifiant déjà résolu (ex. choix dans la liste de désambiguïsation, voir
-        # `SearchMatch.gbif_key`) désigne un enregistrement précis sans ambiguïté : on l'utilise
-        # tel quel plutôt que de repasser par une recherche floue par nom, qui n'est pas garantie
-        # de retomber sur le même enregistrement (ex. un nom d'hôte qui matche aussi un nom
-        # d'espèce sans rapport). Uniquement au premier appel (hop 0) : un renvoi vers un synonyme
-        # accepté (voir plus bas) doit re-résoudre sur son propre nom, pas réutiliser cette clé.
+        # An already resolved id (e.g. chosen in the disambiguation
+        # list, see `SearchMatch.gbif_key`) names a precise record: use
+        # it rather than a fuzzy name search that may land elsewhere.
+        # First call only (hop 0): a redirect to an accepted synonym
+        # must resolve on its own name.
         cur: dict | None = None
         if hop == 0 and options.gbif_key is not None:
             cur = await adapter.species_record(options.gbif_key)
 
         if cur is None:
-            rang_marqueur, nom_sans_marqueur = _extrait_marqueur_rang(struct.taxon.nom)
-            results = await adapter.search(struct.taxon.nom)
-            if not results and rang_marqueur is not None:
-                # `/species?name=` ne matche rien avec le marqueur de rang infraspécifique
-                # botanique (ex. "subsp.") : on retente sans, voir `_extrait_marqueur_rang`. Le
-                # rang extrait sert plus bas à départager les candidats ainsi trouvés.
-                results = await adapter.search(nom_sans_marqueur)
+            marker_rank, name_without_marker = _extract_rank_marker(struct.taxon.name)
+            results = await adapter.search(struct.taxon.name)
+            if not results and marker_rank is not None:
+                # `/species?name=` matches nothing with the botanical
+                # infraspecific marker (e.g. "subsp."): retry without
+                # it. The extracted rank then breaks ties.
+                results = await adapter.search(name_without_marker)
             if not results:
                 return None
 
-            def _regne_correspond(r: dict) -> bool:
-                if struct.domaine in ("*", ""):
+            def _kingdom_matches(r: dict) -> bool:
+                if struct.domain in ("*", ""):
                     return True
-                return gbif_cherche_regne(r.get("kingdom", "")) == struct.domaine
+                return gbif_lookup_kingdom(r.get("kingdom", "")) == struct.domain
 
             accepted = [r for r in results if r.get("taxonomicStatus") == "ACCEPTED"]
-            # Un même nom peut désigner des taxons distincts selon le règne (ex. "Morus", mûrier
-            # chez les végétaux et fou de Bassan chez les animaux) : si un filtre de domaine est
-            # posé, on préfère l'entrée dont le règne correspond plutôt que la première trouvée.
-            candidats = [r for r in accepted if _regne_correspond(r)] or accepted
-            candidats = _filtre_rang_marqueur(rang_marqueur, candidats)
-            cur = candidats[0] if candidats else None
+            # A name can denote distinct taxa across kingdoms (e.g.
+            # "Morus"): with a domain filter, prefer the entry whose
+            # kingdom matches.
+            candidates = [r for r in accepted if _kingdom_matches(r)] or accepted
+            candidates = _filter_rank_marker(marker_rank, candidates)
+            cur = candidates[0] if candidates else None
             if cur is None:
-                if not options.suivre_synonymes:
+                if not options.follow_synonyms:
                     return None
-                repli = [r for r in results if _regne_correspond(r)] or results
-                cur = _filtre_rang_marqueur(rang_marqueur, repli)[0]
+                fallback = [r for r in results if _kingdom_matches(r)] or results
+                cur = _filter_rank_marker(marker_rank, fallback)[0]
 
         key = cur["key"]
         info = await _taxon_info(adapter, key)
         if info is None:
             return None
 
-        # COL XR (ChecklistBank dataset 3LXR) est la taxonomie par défaut de GBIF depuis 2024 :
-        # quand ce même nom y est résolu, son identifiant alphanumérique remplace la clé
-        # numérique GBIF pour le rendu (Modèle:GBIF réformé pour accepter les deux formats,
-        # voir render_bioref) — la clé numérique `key` continue de piloter tous les appels GBIF
-        # ci-dessous, seul l'identifiant stocké pour l'affichage change.
-        col_xr = await find_col_xr_link(self._col_xr_adapter, info["nom"], struct.domaine)
+        # COL XR (ChecklistBank 3LXR) has been the GBIF default taxonomy
+        # since 2024: when the name resolves there, its alphanumeric id
+        # replaces the numeric GBIF key for rendering (the template
+        # accepts both). The numeric `key` still drives every GBIF call.
+        col_xr = await find_col_xr_link(self._col_xr_adapter, info["name"], struct.domain)
 
-        struct.liens["gbif"] = {
+        struct.links["gbif"] = {
             "id": col_xr.id if col_xr is not None else key,
-            "auteur": format_auteur(info["auteur"]),
-            "nom": info["nom"],
-            **({"rang": info["rang"]} if "rang" in info else {}),
-            **({"eteint": info["eteint"]} if "eteint" in info else {}),
+            # Legacy key always kept: `id` may be a COL XR id (P14607),
+            # the numeric key stays that of P846.
+            "key": key,
+            "author": format_author(info["author"]),
+            "name": info["name"],
+            **({"rank": info["rank"]} if "rank" in info else {}),
+            **({"extinct": info["extinct"]} if "extinct" in info else {}),
         }
         if col_xr is not None:
-            # Fiche COL XR propre à l'identifiant ci-dessus : sert uniquement au second lien
-            # {{CatalogueofLife}} de `render_bioref`, pas au lien {{GBIF}} — sans ça, ce lien citait
-            # l'auteur du backbone GBIF au lieu de celui de la fiche COL XR réellement liée, ce qui
-            # produisait deux lignes {{CatalogueofLife}} au contenu différent (donc non fusionnées
-            # par le dédoublonnage de `_compute_ext_liens_items`) quand `ColModule` résolvait la
-            # même fiche indépendamment.
-            struct.liens["gbif"]["col_xr"] = {
-                "nom": col_xr.nom,
-                "auteur": col_xr.auteur,
-                "rang": col_xr.rang,
-                "eteint": col_xr.eteint,
+            # COL XR record of the id above: only used for the second
+            # {{CatalogueofLife}} link, not {{GBIF}}. Otherwise that
+            # link cited the GBIF backbone author, giving two differing
+            # lines that `compute_ext_link_items` would not merge when
+            # `ColModule` resolves the same record.
+            struct.links["gbif"]["col_xr"] = {
+                "name": col_xr.nom,
+                "author": col_xr.auteur,
+                "rank": col_xr.rang,
+                "extinct": col_xr.eteint,
             }
         if cur.get("publishedIn"):
-            # Citation bibliographique déjà présente dans la réponse de recherche utilisée
-            # ci-dessus (aucun appel réseau supplémentaire) — même usage que
-            # `dcterms:bibliographicCitation`/`originalPublicationRef` côté AlgaeBase
-            # (`algaebase/module.py::_apply_bibliographic_citation`/`_apply_detail_page`), pas de
-            # champ année structuré séparé contrairement à POWO/IPNI/Index Fungorum.
-            struct.originale = cur["publishedIn"]
+            # Bibliographic citation already in the search response (no
+            # extra call), like AlgaeBase's; no structured year field
+            # unlike POWO, IPNI or Index Fungorum.
+            struct.original_publication = await citation_or_text(
+                adapter.resolve_doi_citation, cur["publishedIn"]
+            )
 
-        regne_detecte = gbif_cherche_regne(cur["kingdom"]) if cur.get("kingdom") else None
-        annee_probable = _annee_probable(cur.get("publishedIn"), regne_detecte)
-        if annee_probable is not None:
-            struct.liens["gbif"]["annee_probable"] = annee_probable
-        if not is_classification and regne_detecte:
-            # Signal de règne détecté sans appel réseau supplémentaire : le champ "kingdom" est
-            # déjà présent dans la réponse de recherche utilisée ci-dessus. Voir RegneIncoherence.
-            struct.liens["gbif"]["regne_detecte"] = regne_detecte
+        detected_kingdom = gbif_lookup_kingdom(cur["kingdom"]) if cur.get("kingdom") else None
+        probable_year = _probable_year(cur.get("publishedIn"), detected_kingdom)
+        if probable_year is not None:
+            struct.links["gbif"]["probable_year"] = probable_year
+        if not is_classification and detected_kingdom:
+            # Kingdom signal detected with no extra call: "kingdom" is
+            # already in the search response. See KingdomInconsistency.
+            struct.links["gbif"]["detected_kingdom"] = detected_kingdom
         if not is_classification:
-            # Même principe que regne_detecte ci-dessus, pour la famille/l'ordre : "family"/"order"
-            # sont déjà des champs plats de la réponse de recherche (comme "kingdom"), aucun appel
-            # réseau de plus. Voir RangIncoherence — non peuplé en mode classification, où
-            # `struct.rangs` couvre déjà ces rangs pour le module gagnant.
+            # Same for family and order: flat fields of the search
+            # response. See RankInconsistency. Not set when classifying,
+            # where `struct.ranks` already covers them.
             if cur.get("family"):
-                struct.liens["gbif"]["famille_detectee"] = cur["family"]
+                struct.links["gbif"]["detected_family"] = cur["family"]
             if cur.get("order"):
-                struct.liens["gbif"]["ordre_detecte"] = cur["order"]
+                struct.links["gbif"]["detected_order"] = cur["order"]
 
-        # Les noms vernaculaires (`struct.vernaculaire`, namespacé par module, fusionné sans
-        # conflit avec les autres sources — voir `EnrichmentRunner.run`) ne doivent pas dépendre
-        # de savoir si GBIF pilote ou non la classification, sous peine de dépendre
-        # arbitrairement du module qui a gagné la classification (constaté en direct : absents
-        # dès que GBIF tourne en enrichissement derrière une autre source gagnante).
-        taxref_noms: list[str] = []
+        # Vernacular names (`struct.vernacular`, namespaced by module)
+        # must not depend on whether GBIF drives the classification, or
+        # they vanish when another source wins.
+        taxref_names: list[str] = []
 
-        async def fetch_vernacular(offset: int) -> tuple[list[str], int, bool]:
+        async def fetch_vernacular(offset: int) -> tuple[list[tuple[str | None, str]], int, bool]:
             page = await adapter.vernacular_names_page(key, offset)
             raw = page.get("results", [])
-            results = [c for c in raw if c.get("language") == "fra"]
-            taxref_noms.extend(
-                _html.unescape(c["vernacularName"]) for c in results if c.get("source") == "TAXREF"
+            taxref_names.extend(
+                _html.unescape(c["vernacularName"])
+                for c in raw
+                if c.get("language") == "fra" and c.get("source") == "TAXREF"
             )
-            names = [_html.unescape(c["vernacularName"]) for c in results]
+            names = [(c.get("language"), _html.unescape(c["vernacularName"])) for c in raw]
             return names, len(raw), page.get("endOfRecords", True)
 
-        vernaculaire, _ = await collect_pages(fetch_vernacular)
-        if vernaculaire:
-            struct.vernaculaire["GBIF"] = vernaculaire
-        if taxref_noms:
-            # Le référentiel MNHN/TAXREF (source de "INPN") est indisponible en accès direct
-            # (attaque informatique sur les serveurs du MNHN, durée indéterminée) : GBIF
-            # réexpose déjà ces mêmes noms via son propre endpoint (source="TAXREF" dans sa
-            # réponse), en secours le temps que taxref.mnhn.fr soit de nouveau joignable.
-            struct.vernaculaire["INPN"] = taxref_noms
+        pairs, _ = await collect_pages(fetch_vernacular)
+        vernacular = groupe_par_langue(pairs)
+        if vernacular:
+            struct.vernacular["GBIF"] = vernacular
+        if taxref_names:
+            # The MNHN/TAXREF reference ("INPN" source) is unreachable
+            # directly: GBIF re-exposes the same names (source "TAXREF")
+            # as a stopgap.
+            struct.vernacular["INPN"] = {"fr": taxref_names}
 
-        # Même contournement que ci-dessus, pour l'identifiant plutôt que les noms : TAXREF est
-        # aussi publiée comme checklist à part sur GBIF (`TAXREF_DATASET_KEY`), distincte du
-        # Backbone. `related` retrouve l'enregistrement TAXREF du même concept taxonomique que
-        # `key`, dont `taxonID` est le CD_NOM (identifiant INPN) — indépendant de la présence
-        # d'un nom vernaculaire français (contrairement à `taxref_noms` ci-dessus).
+        # Same workaround for the id: TAXREF is also published as a
+        # separate GBIF checklist (`TAXREF_DATASET_KEY`). `related`
+        # finds the TAXREF record of the same concept, whose `taxonID`
+        # is the CD_NOM (INPN id), whether or not a French name exists.
         taxref_records = await adapter.taxref_related(key)
         cd_nom = next((r["taxonID"] for r in taxref_records if r.get("taxonID")), None)
         if cd_nom:
-            struct.liens["gbif"]["inpn_id"] = cd_nom
+            struct.links["gbif"]["inpn_id"] = cd_nom
 
         accepted_key = cur.get("acceptedKey")
         is_synonym = accepted_key is not None and accepted_key != key
-        # Statut nomenclatural pour cet enregistrement précis (voir RangIncoherence) — posé avant
-        # la redirection ci-dessous : un hop redirigé reconstruit "gbif" à neuf pour la cible
-        # acceptée, dont le statut sera "accepté" à son propre tour de boucle, donc aucun statut
-        # obsolète ne subsiste après redirection.
-        struct.liens["gbif"]["statut_detecte"] = "synonyme" if is_synonym else "accepté"
+        # Nomenclatural status of this very record (see
+        # RankInconsistency), set before the redirect: a redirected hop
+        # rebuilds "gbif" for the accepted target, so no stale status
+        # remains.
+        struct.links["gbif"]["detected_status"] = "synonyme" if is_synonym else "accepté"
         if is_synonym:
-            if not is_classification:
-                struct.liens["gbif"]["synonyme"] = True
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
-                assert accepted_key is not None  # garanti par is_synonym (ligne 287)
+
+            async def resolve_accepted() -> str | None:
+                assert accepted_key is not None  # guaranteed by is_synonym above
                 accepted_info = await _taxon_info(adapter, accepted_key)
-                if accepted_info is None:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=accepted_info["nom"])
-                return await self._collect(struct, is_classification, options, hop=hop + 1)
-            # suivre_synonymes désactivé : pas de retour anticipé — la classification se
-            # construit directement à partir de ce synonyme plutôt que du taxon accepté.
+                return accepted_info["name"] if accepted_info is not None else None
+
+            handled, result = await follow_synonym(
+                struct,
+                "gbif",
+                is_classification,
+                options,
+                hop,
+                resolve_accepted,
+                lambda next_hop: self._collect(struct, is_classification, options, hop=next_hop),
+            )
+            if handled:
+                return result
+            # follow_synonyms is off: no early return, the
+            # classification is built from this synonym rather than the
+            # accepted taxon.
 
         if not is_classification:
             return struct
 
-        struct.taxon.auteur = format_auteur(info["auteur"])
-        struct.taxon.rang = gbif_cherche_rang(cur["rank"])
-        if "eteint" in info:
-            struct.taxon.eteint = info["eteint"]
-        # `info["nom"]` (déjà résolu par `_taxon_info` ci-dessus, avec repli sur le nom
-        # scientifique brut pour les noms que GBIF ne décompose pas, ex. les virus) plutôt que
-        # `cur["canonicalName"]` : ce champ est absent des enregistrements GBIF pour ces noms-là.
-        struct.taxon.nom = info["nom"].strip()
+        struct.taxon.author = format_author(info["author"])
+        struct.taxon.rank = gbif_to_wp_rank(cur["rank"])
+        if "extinct" in info:
+            struct.taxon.extinct = info["extinct"]
+        # `info["name"]` (from `_taxon_info`, falling back on the raw
+        # scientific name for names GBIF does not decompose, e.g.
+        # viruses) rather than `cur["canonicalName"]`, absent for those.
+        struct.taxon.name = info["name"].strip()
         struct.classification = "GBIF"
         struct.classification_taxobox = "GBIF"
 
-        rangs: list[RankName] = []
+        ranks: list[RankName] = []
         for marker in GBIF_WP:
             field = marker.lower()
             if field not in cur:
                 continue
             value = cur[field]
             if marker == "KINGDOM":
-                struct.regne = gbif_cherche_regne(value)
+                struct.kingdom = gbif_lookup_kingdom(value)
                 continue
-            buf = gbif_cherche_rang(marker)
-            if buf == struct.taxon.rang:
+            buf = gbif_to_wp_rank(marker)
+            if buf == struct.taxon.rank:
                 continue
-            entry: dict = {"nom": value, "rang": buf}
+            entry: dict = {"name": value, "rank": buf}
             key_field = f"{field}Key"
             if key_field in cur:
                 profiles = await adapter.species_profiles(cur[key_field])
                 for p in profiles:
                     if "extinct" in p:
-                        entry["eteint"] = p["extinct"]
+                        entry["extinct"] = p["extinct"]
                         break
-            rangs.append(RankName.model_validate(entry))
-        struct.rangs = rangs
+            ranks.append(RankName.model_validate(entry))
+        struct.ranks = ranks
 
-        if not struct.regne:
+        if not struct.kingdom:
             return None
 
         basionym_key = cur.get("basionymKey")
         if basionym_key:
-            basio_record = await adapter.species_record(basionym_key)
-            if basio_record and basio_record.get("canonicalName"):
-                struct.basionyme = Basionym(
-                    nom=basio_record["canonicalName"].strip(),
-                    auteur=format_auteur((basio_record.get("authorship") or "").strip()),
+            basionym_record = await adapter.species_record(basionym_key)
+            if basionym_record and basionym_record.get("canonicalName"):
+                struct.basionym = Basionym(
+                    name=basionym_record["canonicalName"].strip(),
+                    author=format_author((basionym_record.get("authorship") or "").strip()),
                     source="GBIF",
                 )
 
@@ -368,14 +375,21 @@ class GbifModule(TaxonomyModule):
                         continue
                     child_info = await _taxon_info(adapter, c["key"])
                     if child_info is not None:
-                        out.append(RankName.model_validate(child_info))
+                        out.append(
+                            RankName(
+                                name=child_info["name"],
+                                rank=child_info.get("rank"),
+                                author=child_info.get("author"),
+                                extinct=child_info.get("extinct"),
+                            )
+                        )
                 return out, len(raw), page.get("endOfRecords", True)
 
-            liste, coupe = await collect_pages(
-                fetch_children, limit=as_limit(options.limite_listes)
+            items, truncated = await collect_pages(
+                fetch_children, limit=as_limit(options.list_limit)
             )
-            if liste:
-                struct.sous_taxons = SubTaxonList(liste=liste, source="GBIF", coupe=coupe)
+            if items:
+                struct.subtaxa = SubTaxonList(items=items, source="GBIF", truncated=truncated)
 
         async def fetch_synonyms(offset: int) -> tuple[list[RankName], int, bool]:
             page = await adapter.synonyms_page(key, offset)
@@ -386,67 +400,69 @@ class GbifModule(TaxonomyModule):
                 if blob is not None:
                     out.append(
                         RankName(
-                            nom=blob["nom"],
-                            auteur=format_auteur(blob["auteur"]),
-                            rang=blob.get("rang"),
+                            name=blob["name"],
+                            author=format_author(blob["author"]),
+                            rank=blob.get("rank"),
                         )
                     )
             return out, len(raw), page.get("endOfRecords", True)
 
-        synonymes, coupe = await collect_pages(
-            fetch_synonyms, limit=as_limit(options.limite_listes)
+        synonyms, truncated = await collect_pages(
+            fetch_synonyms, limit=as_limit(options.list_limit)
         )
-        if synonymes:
-            struct.synonymes = SynonymList(liste=synonymes, source="GBIF", coupe=coupe)
+        if synonyms:
+            struct.synonyms = SynonymList(items=synonyms, source="GBIF", truncated=truncated)
 
         return struct
 
     def render_bioref(self, struct: Struct) -> list[str] | None:
-        data = struct.liens.get("gbif")
+        """Render {{GBIF}} and, if linked, {{CatalogueofLife}}."""
+        data = struct.links.get("gbif")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
+        cdate = retrieval_dates()
         col_xr = data.get("col_xr")
-        # Quand `data["id"]` est l'identifiant ChecklistBank (COL XR), il ne désigne plus le
-        # backbone GBIF mais la fiche COL XR (`col_xr`, voir _collect) : le nom/auteur/rang/éteint
-        # cités par {{GBIF}} doivent donc être ceux de cette fiche-là, sinon la citation contredit
-        # la page réellement pointée par cet id (constaté sur Amanita muscaria, id 5TYZ9 : citation
-        # "(L.) Pers." du backbone alors que la fiche COL XR/GBIF réellement affichée à cet id est
-        # "(L.) Lam.").
+        # When `data["id"]` is the ChecklistBank (COL XR) id it no
+        # longer denotes the GBIF backbone but the COL XR record
+        # (`col_xr`): {{GBIF}} must cite that record's name, author,
+        # rank and extinction, or the citation contradicts the page the
+        # id points to.
         source = col_xr if col_xr is not None else data
-        rang = source.get("rang") or struct.taxon.rang
-        cible = wp_met_italiques(source["nom"], rang, struct.regne)
-        if source.get("auteur"):
-            cible += " " + source["auteur"]
-        sup = " | éteint=oui" if source.get("eteint") else ""
-        # `nv` reflète le statut du backbone GBIF : ne s'applique qu'à la clé numérique GBIF
-        # legacy, jamais à un id substitué par COL XR (`find_col_xr_link` ne renvoie jamais une
-        # fiche synonyme, voir col_xr/lookup.py) qui contredirait la fiche accepted réellement liée.
-        nv = " | nv" if data.get("synonyme") and col_xr is None else ""
-        out = [f"{{{{GBIF | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"]
+        rank = source.get("rank") or struct.taxon.rank
+        target = wp_apply_italics(source["name"], rank, struct.kingdom)
+        if author := source.get("author"):
+            target += " " + author
+        extinct_param = " | éteint=oui" if source.get("extinct") else ""
+        # `synonym_flag` reflects the backbone status: only for the
+        # legacy numeric key, never for an id substituted by COL XR
+        # (`find_col_xr_link` never returns a synonym record).
+        synonym_flag = " | nv" if data.get("synonym") and col_xr is None else ""
+        out = [
+            f"{{{{GBIF | {data['id']} | {target}{extinct_param}{synonym_flag} | consulté "
+            f"le={cdate} }}}}"
+        ]
         if col_xr is not None:
-            # Identifiant ChecklistBank (COL XR) plutôt que la clé numérique GBIF legacy : la
-            # même fiche existe aussi sur catalogueoflife.org, d'où ce second lien, avec la même
-            # citation que {{GBIF}} ci-dessus (`source` = `col_xr`) — un lien {{CatalogueofLife}}
-            # doit citer la même chose que `ColModule` citerait pour la même fiche, sans quoi le
-            # dédoublonnage par ligne de `_compute_ext_liens_items` ne les reconnaît pas comme la
-            # même référence.
+            # ChecklistBank (COL XR) id rather than the legacy numeric
+            # key: the same record exists on catalogueoflife.org, hence
+            # this second link, citing the same as {{GBIF}} so that
+            # `compute_ext_link_items` sees one reference.
             out.append(
-                f"{{{{CatalogueofLife | {data['id']} | {cible}{sup} | consulté le={cdate} }}}}"
+                f"{{{{CatalogueofLife | {data['id']} | {target}{extinct_param} | consulté "
+                f"le={cdate} }}}}"
             )
         return out
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("gbif")
+        """Return the debug links to GBIF and, if known, INPN."""
+        data = struct.links.get("gbif")
         if not data or "id" not in data:
             return None
         path = "species" if isinstance(data["id"], int) else "taxon"
         link = simple_debug_link(struct, "gbif", f"https://www.gbif.org/{path}/{{id}}", "GBIF")
         if link and data.get("inpn_id"):
-            # Même page que le module `inpn` afficherait pour ce même identifiant (voir
-            # `organon.modules.inpn.module.InpnModule.debug_link`) — le lien reste utilisable
-            # même quand le module `inpn` lui-même échoue (403 côté serveur, voir `taxref_related`
-            # dans `_collect` ci-dessus), un navigateur normal n'étant pas concerné par ce blocage.
+            # Same page as the `inpn` module would show for this id;
+            # usable even when `inpn` itself fails (403 server-side), a
+            # normal browser not being blocked.
             link += (
                 f" <a href='https://taxref.mnhn.fr/taxref-web/taxa/{data['inpn_id']}' "
                 f"target='_blank' rel='noopener noreferrer'>INPN</a>"

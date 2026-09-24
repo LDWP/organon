@@ -1,76 +1,74 @@
-"""Logique métier du module Index Fungorum : classification fongique via CABI/Kew Mycology
-(indexfungorum.org/ixfwebservice), domaine `['champignon']`. Contrairement à MycoBank (backend
-CMS propriétaire à champs numériques magiques, laissé de côté), Index Fungorum expose un vrai
-webservice `.asmx` avec un binding `HttpGet` — une simple requête GET par opération, pas
-d'enveloppe SOAP à construire (voir adapter.py).
+"""Index Fungorum module: fungal classification (domain `champignon`).
 
-`NameSearch` (recherche par nom) ne renvoie ni les champs de publication ni la chaîne de
-classification : un second appel `NameByKey` (par `RECORD_NUMBER`) est toujours nécessaire pour
-obtenir l'enregistrement complet, même une fois le nom résolu.
+The service has a real `.asmx` webservice with an `HttpGet` binding (see
+adapter.py).
 
-La chaîne de classification n'est jointe par `NameByKey` que pour les enregistrements de rang
-genre et en dessous (voir ranks.py) : une recherche de rang famille ou supérieur ne porte aucun
-de ces champs, traité ici comme une donnée de classification insuffisante (`collect` renvoie
-None en mode classification), pas une erreur.
+`NameSearch` returns neither the publication fields nor the
+classification chain: a second `NameByKey` call is always needed. That
+chain is joined only for genus rank and below; a family or higher search
+is insufficient data (`collect` returns None when classifying), not an
+error.
 
-Résolution du nom accepté : parmi les correspondances exactes sur `NAME_OF_FUNGUS` (le
-filtrage serveur par préfixe de `name_search` peut renvoyer des noms voisins), l'enregistrement
-actuellement accepté est celui où `CURRENT_NAME_RECORD_NUMBER` égale son propre
-`RECORD_NUMBER` (auto-référence) ; à défaut (le nom demandé est lui-même un synonyme ou un
-basionyme), on suit `CURRENT_NAME_RECORD_NUMBER` via `NameByKey` jusqu'à cette auto-référence,
-borné par `MAX_SYNONYM_HOPS` comme les autres modules qui suivent des synonymes (GBIF, IRMNG).
+Accepted name: among the exact matches on `NAME_OF_FUNGUS`, the accepted
+record is the one whose `CURRENT_NAME_RECORD_NUMBER` equals its own
+`RECORD_NUMBER`; otherwise follow it via `NameByKey` to that
+self-reference, bounded by `MAX_SYNONYM_HOPS`.
 
-`NamesByCurrentKey` (recherche inverse par la clé du nom accepté) fournit une vraie liste de
-synonymes — non paginée côté service (aucun paramètre offset dans le WSDL), tronquée
-manuellement selon `limite-listes` plutôt que via `collect_pages` (qui suppose une pagination
-réelle).
-
-Aucun nom vernaculaire ni sous-taxon exposé par ce service (pas d'opération de type
-"Children")."""
+`NamesByCurrentKey` gives a real, unpaginated synonym list, truncated by
+hand per `limite-listes`. The service exposes no vernacular names or
+sub-taxa.
+"""
 
 from __future__ import annotations
 
 import asyncio
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Basionym, RankName, Redirection, Struct, SynonymList, TaxonInfo
+from organon.core.models import Basionym, LinkEntry, RankName, Struct, SynonymList, TaxonInfo
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.common import (
     MAX_SYNONYM_HOPS,
     as_limit,
-    format_auteur,
-    format_auteur_annee,
+    format_author,
+    format_author_year,
     simple_debug_link,
 )
 from organon.modules.indexfungorum.adapter import IndexFungorumAdapter
 from organon.modules.indexfungorum.ranks import (
     CLASSIFICATION_LADDER,
     UNRESOLVED_PLACEHOLDER,
-    ixf_rang,
-    ixf_regne,
+    indexfungorum_to_wp_rank,
+    ixf_kingdom,
 )
 
 MAX_NUMBER = 50
 
-_ESPECE_RANGS = {"espèce", "sous-espèce", "variété", "forme"}
-"""Rangs mappés sur `{{Fungorum espèce}}` — le genre et la famille ont chacun leur propre
-modèle, tout rang au-dessus de la famille retombe sur `{{Fungorum suprafamille}}`."""
+# Ranks mapped to `{{Fungorum espèce}}`; genus and family have their own
+# template, anything above the family uses `{{Fungorum suprafamille}}`.
+_SPECIES_RANKS = {"espèce", "sous-espèce", "variété", "forme"}
 
 
 class IndexFungorumModule(TaxonomyModule):
+    """Index Fungorum module."""
+
     meta = ModuleMeta(
-        id="indexfungorum", can_classify=True, can_render_external_link=True, domains=["champignon"]
+        id="indexfungorum",
+        can_classify=True,
+        can_render_external_link=True,
+        domains=["champignon"],
     )
 
     def __init__(self, adapter: IndexFungorumAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or IndexFungorumAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        records = await self._adapter.name_search(struct.taxon.nom, max_number=MAX_NUMBER)
-        exact = [r for r in records if r.get("NAME_OF_FUNGUS") == struct.taxon.nom]
+        """Collect the taxon from Index Fungorum."""
+        records = await self._adapter.name_search(struct.taxon.name, max_number=MAX_NUMBER)
+        exact = [r for r in records if r.get("NAME_OF_FUNGUS") == struct.taxon.name]
         if not exact:
             return None
 
@@ -81,7 +79,10 @@ class IndexFungorumModule(TaxonomyModule):
         if accepted_hit is not None:
             full = await self._adapter.name_by_key(accepted_hit["RECORD_NUMBER"])
         else:
-            if not options.suivre_synonymes:
+            # Variant outside `follow_synonym`: the synonym chain is
+            # followed by an iterative loop (no recursion) before
+            # `links` is built.
+            if not options.follow_synonyms:
                 return None
             full = await self._adapter.name_by_key(exact[0]["RECORD_NUMBER"])
             hop = 0
@@ -97,127 +98,128 @@ class IndexFungorumModule(TaxonomyModule):
         if full is None:
             return None
 
-        is_redirect = full["NAME_OF_FUNGUS"] != struct.taxon.nom
+        is_redirect = full["NAME_OF_FUNGUS"] != struct.taxon.name
 
-        # `AUTHORS` seul ne porte pas l'année de publication (convention ICN, comme POWO/IPNI/
-        # AlgaeBase) : `YEAR_OF_PUBLICATION` (uniquement présent sur `NameByKey`, absent de
-        # `NameSearch` — vérifié en direct) la fournit à part.
-        auteur_annee = format_auteur_annee(full.get("AUTHORS"), full.get("YEAR_OF_PUBLICATION"))
-        ixf_link: dict = {
+        # `AUTHORS` alone has no publication year (ICN convention, like
+        # POWO, IPNI, AlgaeBase): `YEAR_OF_PUBLICATION`, only on
+        # `NameByKey`, provides it.
+        author_year = format_author_year(full.get("AUTHORS"), full.get("YEAR_OF_PUBLICATION"))
+        ixf_link: LinkEntry = {
             "id": full["RECORD_NUMBER"],
-            "nom": full["NAME_OF_FUNGUS"],
-            "rang": ixf_rang(full.get("INFRASPECIFIC_RANK")),
-            "auteur": format_auteur(auteur_annee),
+            "name": full["NAME_OF_FUNGUS"],
+            "rank": indexfungorum_to_wp_rank(full.get("INFRASPECIFIC_RANK")),
+            "author": format_author(author_year),
         }
         if is_redirect:
-            ixf_link["synonyme"] = True
-        struct.liens["indexfungorum"] = ixf_link
+            ixf_link["synonym"] = True
+        struct.links["indexfungorum"] = ixf_link
 
         if is_redirect:
             if not is_classification:
                 return struct
-            if not options.suivre_synonymes:
+            if not options.follow_synonyms:
                 return struct
-            struct.redirection = Redirection(nom=struct.taxon.nom)
-            struct.taxon = TaxonInfo(nom=full["NAME_OF_FUNGUS"])
+            struct.taxon = TaxonInfo(name=full["NAME_OF_FUNGUS"])
 
         if not is_classification:
             return struct
 
         if not full.get("Genus_name"):
-            return None  # rang famille et au-dessus : NameByKey ne joint pas la hiérarchie
+            return None  # family and above: NameByKey joins no hierarchy
 
-        regne = ixf_regne(full.get("Kingdom_name"))
-        if regne is None:
-            return None  # Kingdom_name absent : donnée de classification insuffisante.
-        struct.regne = regne
-        struct.taxon.rang = ixf_rang(full.get("INFRASPECIFIC_RANK"))
-        struct.taxon.auteur = format_auteur(auteur_annee)
+        kingdom = ixf_kingdom(full.get("Kingdom_name"))
+        if kingdom is None:
+            return None  # no Kingdom_name: insufficient classification data
+        struct.kingdom = kingdom
+        struct.taxon.rank = indexfungorum_to_wp_rank(full.get("INFRASPECIFIC_RANK"))
+        struct.taxon.author = format_author(author_year)
 
-        # IF et SF partagent le même backend/RecordID mais pas le même rôle : IF est un simple
-        # répertoire de noms publiés (sans avis taxonomique, voir render_bioref/debug_link plus
-        # bas, laissés sur "Index Fungorum" pour les liens de fiches de noms individuels), tandis
-        # que SF est l'autorité qui tranche nom correct vs synonyme — d'où "Species Fungorum" ici
-        # pour la classification/taxobox. "speciesfungorum" (sans espace) est la clé Bioref
-        # proposée côté wiki ; Modèle:Bioref/switch n'a aujourd'hui aucune entrée "fungorum" avec
-        # espace ni "speciesfungorum" — création du modèle wiki nécessaire côté MediaWiki.
+        # IF and SF share one backend and RecordID but not their role:
+        # IF is a plain directory of published names (render_bioref and
+        # debug_link stay on "Index Fungorum"), while SF is the
+        # authority on correct name vs synonym, hence "Species Fungorum"
+        # for the classification. "speciesfungorum" is the proposed
+        # Bioref key; Modèle:Bioref/switch has no such entry yet and the
+        # wiki template must be created.
         struct.classification = "speciesfungorum"
         struct.classification_taxobox = "Species Fungorum"
 
-        rangs: list[RankName] = []
-        for field, rang_fr in CLASSIFICATION_LADDER:
+        ranks: list[RankName] = []
+        for field, french_rank in CLASSIFICATION_LADDER:
             value = full.get(field)
             if not value or value == UNRESOLVED_PLACEHOLDER or value == full["NAME_OF_FUNGUS"]:
                 continue
-            rangs.append(RankName(nom=value, rang=rang_fr))
-        struct.rangs = rangs
+            ranks.append(RankName(name=value, rank=french_rank))
+        struct.ranks = ranks
 
-        # `name_by_key` (basionyme) et `names_by_current_key` (synonymes) ne dépendent que de
-        # `full`, jamais l'un de l'autre : lancés en parallèle via gather plutôt qu'en série.
+        # `name_by_key` (basionym) and `names_by_current_key` (synonyms)
+        # depend only on `full`: run in parallel.
         basionym_id = full.get("BASIONYM_RECORD_NUMBER")
         if basionym_id and basionym_id != full["RECORD_NUMBER"]:
-            basio, synonym_records = await asyncio.gather(
+            basionym, synonym_records = await asyncio.gather(
                 self._adapter.name_by_key(basionym_id),
                 self._adapter.names_by_current_key(full["RECORD_NUMBER"]),
             )
-            if basio is not None:
-                struct.basionyme = Basionym(
-                    nom=basio["NAME_OF_FUNGUS"],
-                    auteur=format_auteur(basio.get("AUTHORS")),
+            if basionym is not None:
+                struct.basionym = Basionym(
+                    name=basionym["NAME_OF_FUNGUS"],
+                    author=format_author(basionym.get("AUTHORS")),
                     source="Index Fungorum",
                 )
         else:
             synonym_records = await self._adapter.names_by_current_key(full["RECORD_NUMBER"])
-        synonymes = [
+        synonyms = [
             RankName(
-                nom=s["NAME_OF_FUNGUS"],
-                auteur=format_auteur(s.get("AUTHORS")),
-                rang=ixf_rang(s.get("INFRASPECIFIC_RANK")),
+                name=s["NAME_OF_FUNGUS"],
+                author=format_author(s.get("AUTHORS")),
+                rank=indexfungorum_to_wp_rank(s.get("INFRASPECIFIC_RANK")),
             )
             for s in synonym_records
             if s.get("RECORD_NUMBER") != full["RECORD_NUMBER"]
         ]
-        if synonymes:
-            limit = as_limit(options.limite_listes)
-            coupe = limit is not None and len(synonymes) > limit
-            struct.synonymes = SynonymList(
-                liste=synonymes[:limit] if coupe else synonymes,
+        if synonyms:
+            limit = as_limit(options.list_limit)
+            truncated = limit is not None and len(synonyms) > limit
+            struct.synonyms = SynonymList(
+                items=synonyms[:limit] if truncated else synonyms,
                 source="Index Fungorum",
-                coupe=coupe,
+                truncated=truncated,
             )
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        """Quatre modèles dédiés selon le rang (`{{Fungorum espèce}}`, `{{Fungorum genre}}`,
-        `{{Fungorum famille}}`, `{{Fungorum suprafamille}}` pour tout rang au-dessus de la
-        famille), même signature positionnelle sur les quatre : `id | nom | auteur | validité`
-        (`nom` sans italique — géré par le modèle lui-même, contrairement à `wp_met_italiques`
-        utilisé pour les autres modules)."""
-        data = struct.liens.get("indexfungorum")
+        """Render one of four rank-specific {{Fungorum ...}} templates.
+
+        Species, genus, family, and anything above the family. Same
+        positional signature: `id | name | author | validity`. The name
+        is not italicized: the template does it.
+        """
+        data = struct.links.get("indexfungorum")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        rang = data.get("rang") or struct.taxon.rang
-        if rang in _ESPECE_RANGS:
-            modele = "Fungorum espèce"
-        elif rang == "genre":
-            modele = "Fungorum genre"
-        elif rang == "famille":
-            modele = "Fungorum famille"
+        cdate = retrieval_dates()
+        rank = data.get("rank") or struct.taxon.rank
+        if rank in _SPECIES_RANKS:
+            template = "Fungorum espèce"
+        elif rank == "genre":
+            template = "Fungorum genre"
+        elif rank == "famille":
+            template = "Fungorum famille"
         else:
-            modele = "Fungorum suprafamille"
-        auteur = data.get("auteur", "")
-        validite = "nv" if data.get("synonyme") else ""
-        champs = [str(data["id"]), data["nom"]]
-        if auteur or validite:
-            champs.append(auteur)
-        if validite:
-            champs.append(validite)
-        corps = " | ".join(champs)
-        return f"{{{{{modele} | {corps} | consulté le={cdate} }}}}"
+            template = "Fungorum suprafamille"
+        author = data.get("author") or ""
+        validity = "nv" if data.get("synonym") else ""
+        fields = [str(data["id"]), data["name"]]
+        if author or validity:
+            fields.append(author)
+        if validity:
+            fields.append(validity)
+        body = " | ".join(fields)
+        return f"{{{{{template} | {body} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the Index Fungorum record."""
         return simple_debug_link(
             struct,
             "indexfungorum",

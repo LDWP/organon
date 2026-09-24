@@ -1,11 +1,15 @@
-"""Table de rangs pour Hesperomys. L'enum GraphQL `Rank` (introspecté sur l'API, voir
-adapter.py) mélange rangs taxonomiques standards et rangs de bibliographie nomenclaturale
-(ex. `synonym_genus`, `informal_species`, `other_family`) qui ne correspondent à aucun rang
-Wikipédia : seuls les rangs standards sont mappés ci-dessous, le reste retombe sur "NOTFOUND"
-(même convention que GBIF_WP/ITIS_WP)."""
+"""Rank table for Hesperomys.
+
+The GraphQL `Rank` enum mixes standard ranks and nomenclatural
+bibliography ranks (`synonym_genus`, `informal_species`…) that match no
+Wikipedia rank: only standard ones are mapped, the rest is None.
+"""
 
 from __future__ import annotations
 
+# Kingdom-level ranks and `domain` are mapped but excluded from the rank
+# chain by the adapter: the kingdom is stored in struct.kingdom, not
+# duplicated in struct.ranks (same as ITIS).
 HESPEROMYS_RANKS: dict[str, str] = {
     "domain": "domaine",
     "superkingdom": "super-règne",
@@ -43,13 +47,10 @@ HESPEROMYS_RANKS: dict[str, str] = {
     "subvariety": "sous-variété",
     "form": "forme",
 }
-"""`kingdom`/`superkingdom`/`subkingdom`/`infrakingdom`/`domain`/`root` sont volontairement
-mappés (ou omis pour `root`, non atteignable en pratique) mais exclus de la chaîne de rangs
-par `_STOP_RANKS` dans adapter.py — le "règne" est stocké séparément dans struct.regne, pas
-dupliqué dans struct.rangs (même convention que ITIS, voir RANGS_REGNE dans itis/ranks.py)."""
 
 
-def hesperomys_cherche_rang(rang: str | None) -> str | None:
-    if not rang:
+def hesperomys_to_wp_rank(rank: str | None) -> str | None:
+    """Return the Wikipedia rank of a Hesperomys rank, or None."""
+    if not rank:
         return None
-    return HESPEROMYS_RANKS.get(rang, "NOTFOUND")
+    return HESPEROMYS_RANKS.get(rank)

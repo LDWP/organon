@@ -1,30 +1,36 @@
-"""Couche d'accès réseau pour Tropicos (tropicos.org/api) : appels HTTP et décodage JSON bruts
-uniquement.
+"""Network access to Tropicos (tropicos.org/api): raw HTTP and JSON.
 
-Le jeton ci-dessous est le jeton public utilisé par le widget de recherche du site lui-même
-côté client (pas un jeton personnel). Comme tout jeton non documenté officiellement par
-Tropicos, il peut être révoqué/changé sans préavis côté site — dans ce cas le module échouera
-proprement (statut HTTP non 200) plutôt que silencieusement."""
+The token (`AuthSettings.tropicos_token`) is the public one the site's
+own search widget uses client-side, not a personal token. As it is not
+officially documented, it may be revoked or changed without notice, in
+which case the module fails cleanly (non-200 HTTP status), not
+silently.
+"""
 
 from __future__ import annotations
 
 import httpx
 
-from organon.core.http import OwnedClientMixin
+from organon.core.auth_settings import get_auth_settings
+from organon.core.http import MinIntervalThrottle, OwnedClientMixin
 
 BASE_URL = "https://www.tropicos.org/api"
-_TOKEN = "RjRGNDA4RDgtOEY2NS00NzVGLUI3NDktRjk4MjE2Q0NCRTQ1"
+_throttle = MinIntervalThrottle(0.2).wait
 
 
 class TropicosAdapter(OwnedClientMixin):
+    """Raw Tropicos API client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         headers = {
-            "Authorization": f"Bearer {_TOKEN}",
+            "Authorization": f"Bearer {get_auth_settings().tropicos_token}",
             "Referer": "https://www.tropicos.org/name/Search",
         }
-        super().__init__(client, headers=headers)
+        super().__init__(client, headers=headers, throttle=_throttle)
 
     async def search(self, name: str) -> list[dict]:
+        """Return the name records matching `name`."""
         resp = await self._client.get(
             f"{BASE_URL}/Search/NameLookup",
             params={"value": name, "returnCount": 10, "lookupType": 1},

@@ -1,57 +1,66 @@
-"""Logique métier du module eFlora (eFloras.org). Module d'enrichissement uniquement
-(`can_classify=False`), limité au domaine végétal. Une espèce peut avoir une fiche par flore
-régionale (Amérique du Nord/Chine/Pakistan) — `render_bioref` renvoie donc une liste, un
-`{{EFloras}}` par fiche trouvée, comme `organon.modules.col` pour Catalogue of Life.
+"""eFloras module (eFloras.org): enrichment only.
 
-Vérifie que le nom affiché sur chaque résultat correspond exactement au taxon demandé avant de
-l'accepter (la recherche eFloras.org fait de la correspondance partielle, ex. une recherche par
-seul genre renvoie sa propre fiche répétée par flore, mais pourrait aussi renvoyer des taxons
-apparentés pour une requête plus ambiguë)."""
+`can_classify=False`, plant domain. A species may have a record per
+regional flora (North America, China, Pakistan), so `render_bioref`
+returns a list, one `{{EFloras}}` per record found, like
+`organon.modules.col` for Catalogue of Life.
+
+The displayed name of each result must equal the requested taxon: the
+eFloras.org search matches partially, so a genus-only query returns its
+own record repeated per flora but could return related taxa for a more
+ambiguous query.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.eflora.adapter import EfloraAdapter
 
 
 class EfloraModule(TaxonomyModule):
+    """eFloras module."""
+
     meta = ModuleMeta(
         id="eflora", can_classify=False, can_render_external_link=True, domains=["végétal"]
     )
 
     def __init__(self, adapter: EfloraAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or EfloraAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the eFloras records of the taxon."""
         if is_classification:
             return None
 
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
         hits = await self._adapter.search(taxon)
-        matches = [(fid, tid) for fid, tid, nom in hits if nom == taxon]
+        matches = [(fid, tid) for fid, tid, name in hits if name == taxon]
         if not matches:
             return None
 
-        struct.liens["eflora"] = {"nom": taxon, "ids": matches}
+        struct.links["eflora"] = {"name": taxon, "ids": matches}
         return struct
 
     def render_bioref(self, struct: Struct) -> list[str] | None:
-        data = struct.liens.get("eflora")
+        """Render one {{EFloras}} template per record."""
+        data = struct.links.get("eflora")
         if not data or not data.get("ids"):
             return None
-        cdate = dates_recupere()
+        cdate = retrieval_dates()
         return [
-            f"{{{{EFloras | {fid} | {tid} | {data['nom']} | consulté le={cdate} }}}}"
+            f"{{{{EFloras | {fid} | {tid} | {data['name']} | consulté le={cdate} }}}}"
             for fid, tid in data["ids"]
         ]
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("eflora")
+        """Return the debug links to the eFloras records."""
+        data = struct.links.get("eflora")
         if not data or not data.get("ids"):
             return None
         links = [

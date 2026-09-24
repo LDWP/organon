@@ -1,0 +1,2 @@
+"""LPSN module: prokaryote nomenclature."""
+

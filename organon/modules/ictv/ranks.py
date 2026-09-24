@@ -1,16 +1,18 @@
-"""Table de correspondance rangs ICTV (colonnes de organon/core/data/ictv_taxonomy.tsv) -> rangs
-Wikipédia (organon/core/data/ranks.yaml). `Subkingdom` n'a volontairement aucune entrée :
-entièrement vide dans le MSL courant (voir scripts/build_ictv_taxonomy.py) — à ajouter le jour où
-l'ICTV l'utilise réellement.
+"""ICTV to Wikipedia rank table.
 
-`Realm`/`Subrealm` ne sont volontairement pas traduits (pas de "royaume"/"sous-royaume") :
-conformément à {{Modèle:Taxoboxoutils rang}} sur frwiki, qui affiche ces rangs ICTV en anglais
-via {{lang|en|Realm}}/{{lang|en|Subrealm}} liés vers [[Realm (virologie)]] — voir le champ
-`lang_en` de `RankEntry` (organon/core/rendering/grammar.py)."""
+Keys are the columns of `organon/core/data/ictv_taxonomy.tsv`.
+`Subkingdom` has no entry: fully empty in the current MSL; add it when
+ICTV uses it.
+
+`Realm` and `Subrealm` are deliberately not translated: per
+{{Modèle:Taxoboxoutils rang}} on frwiki they show in English through
+{{lang|en|Realm}}, linked to [[Realm (virologie)]]; see the `lang_en`
+field of `RankEntry` (`core/rendering/grammar.py`).
+"""
 
 from __future__ import annotations
 
-ICTV_RANGS: dict[str, str] = {
+_ICTV_RANKS: dict[str, str] = {
     "Realm": "realm",
     "Subrealm": "subrealm",
     "Kingdom": "kingdom",
@@ -28,5 +30,6 @@ ICTV_RANGS: dict[str, str] = {
 }
 
 
-def ictv_rang(colonne: str) -> str:
-    return ICTV_RANGS.get(colonne, f"NOTFOUND-{colonne}")
+def ictv_to_wp_rank(column: str) -> str | None:
+    """Return the Wikipedia rank of an ICTV column, or None."""
+    return _ICTV_RANKS.get(column)

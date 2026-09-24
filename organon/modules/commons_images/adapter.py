@@ -1,22 +1,23 @@
-"""Couche d'accès réseau pour la suggestion d'images Wikimedia Commons dans la taxobox : appels
-HTTP et décodage JSON bruts uniquement (voir `organon.modules.commons_images.service` pour le
-filtrage par licence/distinction qualité).
+"""Network access for Commons image suggestions: raw HTTP and JSON.
 
-N'est volontairement pas un `TaxonomyModule` (voir `organon.core.registry`) : il ne participe ni
-à la classification ni à l'enrichissement de la taxobox, il répond à une requête explicite de
-l'utilisateur (choix d'une image) exposée par sa propre route (voir
-`organon.api.routes.commons_images`), pas au pipeline `/generate`.
+See `organon.modules.commons_images.service` for the filtering by
+license and quality distinction.
 
-Le champ `extmetadata.Assessments` (renvoyé par `prop=imageinfo`) porte directement, pour un
-fichier donné, la liste de ses distinctions Commons séparées par « | » (`quality`, `featured`,
-`potd`...) — vérifié en direct sur l'API (ex. File:Atlantic cod live.jpg → Assessments vide ; un
-Featured Picture → "quality|featured|potd"). Une image « remarquable » se détecte donc sur ce
-champ, sans avoir à recouper la liste de `Category:Quality_images`/
-`Category:Featured_pictures_on_Wikimedia_Commons` (des centaines de milliers de membres chacune,
-impraticables à énumérer côté client pour une intersection)."""
+Deliberately not a `TaxonomyModule`: it takes part in neither the
+classification nor the taxobox enrichment. It answers an explicit user
+request (choosing an image) through its own route (see
+`organon.api.routes.commons_images`), not the `/generate` pipeline.
+
+`extmetadata.Assessments` (from `prop=imageinfo`) lists a file's Commons
+distinctions separated by "|" (`quality`, `featured`, `potd`…), so a
+notable image is detected on that field alone, without intersecting the
+huge `Category:Quality_images` and
+`Category:Featured_pictures_on_Wikimedia_Commons`.
+"""
 
 from __future__ import annotations
 
+import logging
 from urllib.parse import unquote
 
 import httpx
@@ -24,24 +25,30 @@ import httpx
 from organon.core.http import USER_AGENT, OwnedClientMixin
 from organon.modules.common import sparql_escape
 
+logger = logging.getLogger(__name__)
+
 COMMONS_API_URL = "https://commons.wikimedia.org/w/api.php"
 WIKIDATA_SPARQL_URL = "https://query.wikidata.org/sparql"
 
-# Limite de titres par appel `prop=imageinfo` côté anonyme (voir
-# https://www.mediawiki.org/wiki/API:Query#Multiple_values, "500" pour les comptes autorisés,
-# "50" sinon — ce client n'authentifie jamais ses requêtes).
+# Title limit per anonymous `prop=imageinfo` call (500 for authorized
+# accounts, 50 otherwise; this client never authenticates).
 _IMAGEINFO_BATCH_SIZE = 50
 
 
 class CommonsImagesAdapter(OwnedClientMixin):
+    """Raw Commons image API client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client, headers={"User-Agent": USER_AGENT})
 
     async def category_files(self, category_title: str, *, limit: int = 500) -> list[str]:
-        """Titres des fichiers membres d'une catégorie Commons (ex. `Category:Gadus morhua`),
-        jusqu'à `limit` résultats en une seule page. Fonctionne même si la page de catégorie
-        elle-même n'a jamais été créée (catégorie "rouge") : l'appartenance d'un fichier à une
-        catégorie ne dépend que de son wikitexte, pas de l'existence de la page de catégorie."""
+        """Return the titles of the files of a Commons category.
+
+        Up to `limit` results in one page. Works even if the category
+        page was never created: membership depends on the file's
+        wikitext only.
+        """
         try:
             resp = await self._client.get(
                 COMMONS_API_URL,
@@ -55,14 +62,17 @@ class CommonsImagesAdapter(OwnedClientMixin):
                 },
             )
             resp.raise_for_status()
-        except httpx.HTTPError:
+        except httpx.HTTPError as exc:
+            logger.warning("Commons : catégorie « %s » illisible (%s)", category_title, exc)
             return []
         members = resp.json().get("query", {}).get("categorymembers", [])
         return [m["title"] for m in members]
 
     async def imageinfo(self, titles: list[str]) -> dict[str, dict]:
-        """URL de vignette et métadonnées (licence, distinctions) pour une liste de titres de
-        fichiers, par lots de `_IMAGEINFO_BATCH_SIZE` titres."""
+        """Return thumbnail URL and metadata per file title.
+
+        License and distinctions, in batches of `_IMAGEINFO_BATCH_SIZE`.
+        """
         result: dict[str, dict] = {}
         for i in range(0, len(titles), _IMAGEINFO_BATCH_SIZE):
             batch = titles[i : i + _IMAGEINFO_BATCH_SIZE]
@@ -79,7 +89,8 @@ class CommonsImagesAdapter(OwnedClientMixin):
                     },
                 )
                 resp.raise_for_status()
-            except httpx.HTTPError:
+            except httpx.HTTPError as exc:
+                logger.warning("Commons : métadonnées d'images illisibles (%s)", exc)
                 continue
             pages = resp.json().get("query", {}).get("pages", {})
             for page in pages.values():
@@ -90,9 +101,11 @@ class CommonsImagesAdapter(OwnedClientMixin):
         return result
 
     async def wikidata_image(self, taxon: str) -> str | None:
-        """Nom de fichier Commons (propriété P18) déjà utilisé par l'item Wikidata de ce taxon,
-        s'il existe — sert uniquement à repérer qu'une suggestion n'est pas une nouveauté (voir
-        `organon.modules.commons_images.service`), jamais à la construire elle-même."""
+        """Return the Commons file (P18) the taxon's Wikidata item uses.
+
+        Only to flag a suggestion as not new (see `service`), never to
+        build one.
+        """
         escaped = sparql_escape(taxon)
         query = (
             "SELECT ?image WHERE { "
@@ -106,12 +119,13 @@ class CommonsImagesAdapter(OwnedClientMixin):
                 headers={"Accept": "application/sparql-results+json"},
             )
             resp.raise_for_status()
-        except httpx.HTTPError:
+        except httpx.HTTPError as exc:
+            logger.warning("Wikidata : image P18 de « %s » illisible (%s)", taxon, exc)
             return None
         bindings = resp.json().get("results", {}).get("bindings", [])
         if not bindings:
             return None
-        # Valeur du type "http://commons.wikimedia.org/wiki/Special:FilePath/Atlantic%20cod.jpg"
-        # (vérifié en direct) : le nom de fichier est le dernier segment, encodé en pourcent.
+        # The value is a Special:FilePath URL: the file name is its last
+        # segment, percent-encoded.
         uri = bindings[0]["image"]["value"]
         return unquote(uri.rsplit("/", 1)[-1])

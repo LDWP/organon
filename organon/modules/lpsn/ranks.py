@@ -1,15 +1,10 @@
-"""Tables de correspondance de rangs/domaines LPSN -> Wikipédia.
+"""LPSN to Wikipedia rank and domain tables.
 
-LPSN suit le Code international de nomenclature des procaryotes (ICNP), dont la hiérarchie
-officielle de rangs est nettement plus courte que celle des codes zoologique/botanique : pas de
-sous-embranchement, super-famille, tribu, etc. `LPSN_WP` couvre donc uniquement les valeurs de
-`category` réellement définies par l'ICNP (domain, kingdom, phylum, class, order, family, genus,
-species, subspecies — "kingdom" est un ajout récent, 2021-2022, encore rare en pratique).
-
-"phylum" est gardé tel quel (pas traduit en "embranchement") : c'est le mot utilisé aussi bien
-par l'ICNP que par le paramètre `rang` du modèle Wikipédia {{LPSN}} (voir `module.py`), et
-`organon/core/data/ranks.yaml` le liste comme rang autonome distinct de "embranchement" pour
-cette raison."""
+LPSN follows the ICNP, whose rank hierarchy is shorter than the
+zoological or botanical ones, so `LPSN_WP` only covers the ICNP
+`category` values. "phylum" is kept as is: ICNP and the {{LPSN}}
+template both use it, and `ranks.yaml` lists it apart.
+"""
 
 from __future__ import annotations
 
@@ -27,23 +22,24 @@ LPSN_WP: dict[str, str] = {
     "subspecies": "sous-espèce",
 }
 
-# "domain" (Bacteria/Archaea) est le niveau équivalent à struct.regne pour ce module (comme
-# "Kingdom" pour ITIS/GBIF) : `module.py` arrête la remontée de la chaîne des parents dès qu'il
-# atteint ce niveau, sans l'ajouter à struct.rangs, pour ne pas dupliquer l'info déjà portée par
-# struct.regne. "kingdom" (rang ICNP réellement distinct, ex. Bacillati) reste lui inclus dans la
-# chaîne.
+# "domain" (Bacteria/Archaea) is the equivalent of struct.kingdom here:
+# `module.py` stops climbing the parent chain at that level without
+# adding it to struct.ranks. "kingdom" (a distinct ICNP rank, e.g.
+# Bacillati) stays in the chain.
 
 
-def lpsn_cherche_rang(category: str | None) -> str:
+def lpsn_to_wp_rank(category: str | None) -> str | None:
+    """Return the Wikipedia rank of an LPSN category, or None."""
     if not category:
-        return "NOTFOUND"
-    return LPSN_WP.get(category, "NOTFOUND")
+        return None
+    return LPSN_WP.get(category)
 
 
-def lpsn_cherche_regne(domain_name: str | None) -> str:
-    """`domain_name` = `full_name` du nœud LPSN de catégorie "domain" (ex. "Bacteria",
-    "Archaea"). Réutilise la table partagée plutôt qu'une copie : LPSN n'a pas de cas
-    particulier comme le Chromista d'ITIS."""
+def lpsn_lookup_kingdom(domain_name: str | None) -> str:
+    """Return the kingdom of a domain node name ("Bacteria", "Archaea").
+
+    Reuses the shared table; LPSN has no special case.
+    """
     if not domain_name:
         return ""
     return _SHARED_KINGDOM_MAP.get(domain_name, "")

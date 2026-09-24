@@ -1,56 +1,60 @@
-"""Logique métier du module World Spider Catalog (WSC) : classification des araignées (Araneae)
-à partir de l'export CSV quotidien (voir adapter.py — aucune API REST utilisée, celle-ci exigeant
-une inscription WSCA + clé personnelle, incompatible avec un service automatisé sans compte
-dédié).
+"""World Spider Catalog (WSC) module: classification of spiders.
 
-Le CSV ne couvre que famille/genre/espèce/sous-espèce : aucun rang supérieur à la famille n'y
-figure. Le catalogue entier ne couvrant que l'ordre Araneae (classe Arachnida, embranchement
-Arthropoda), cette chaîne fixe est injectée directement — même principe que
-`organon.modules.powo.ranks.POWO_KINGDOM_MAP`, à une seule entrée car WCVP ne couvre que Plantae.
+From the daily CSV export (see adapter.py); no REST API, which needs a
+WSCA registration and a personal key, unusable by an automated service
+without a dedicated account.
 
-Aucune résolution de synonymes : la page https://wsc.nmbe.ch/dataresources documente l'export
-quotidien comme couvrant "all currently valid species" — un nom synonyme n'y apparaît donc
-jamais, ni sous sa propre ligne ni via un identifiant vers l'espèce acceptée. Seule l'API REST
-(écartée ci-dessus) expose ce lien (`validTaxon`/`status`) ; s'en passer signifie qu'une recherche
-sur un nom synonyme échoue simplement (`search` renvoie `None`, comme pour un nom inconnu).
+The CSV only covers family, genus, species and subspecies. The whole
+catalog being Araneae (class Arachnida, phylum Arthropoda), that fixed
+chain is injected directly, as
+`organon.modules.powo.ranks.POWO_KINGDOM_MAP` does.
 
-`can_render_external_link=False` (aucun {{Bioref}} publié) : la licence CC BY-NC-SA 4.0 de
-l'export est nonCommercial, ce module n'expose donc la source qu'en classification interne, pas
-en lien de citation public — voir organon/core/data/db_inventory.yaml (id: wsc).
+No synonym resolution: the export covers "all currently valid species",
+so a synonym never appears. Only the REST API exposes that link, so a
+search on a synonym simply fails (`search` returns None).
 
-Pas de distribution géographique portée par ce module : le champ CSV `distribution` est un texte
-libre de noms de pays en anglais, sans code pays structuré (contrairement à POWO/GBIF) — aucune
-table de correspondance nom-de-pays -> code n'existe dans ce dépôt, en construire une improvisée
-produirait des codes inventés plutôt que dérivés d'une source fiable."""
+`can_render_external_link=False` (no {{Bioref}}): the export license is
+non-commercial, so the source is exposed only as internal
+classification, not as a public citation link.
+
+No geographic distribution: the CSV `distribution` field is free text of
+English country names with no structured code, and the repository has no
+country-name to code table; an improvised one would produce invented
+codes.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import RankName, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.modules.common import format_author, simple_debug_link
 from organon.modules.wsc.adapter import WscAdapter
 
-_CHAINE_FIXE = (
-    RankName(nom="Araneae", rang="ordre"),
-    RankName(nom="Arachnida", rang="classe"),
-    RankName(nom="Arthropoda", rang="embranchement"),
+# WSC covers a single phylum, class and order (the whole catalog is
+# Araneae), absent from the CSV (family, genus, species only): injected
+# rather than queried.
+_FIXED_CHAIN = (
+    RankName(name="Araneae", rank="ordre"),
+    RankName(name="Arachnida", rank="classe"),
+    RankName(name="Arthropoda", rank="embranchement"),
 )
-"""WSC ne couvre que cet unique embranchement/classe/ordre (tout le catalogue est Araneae),
-absent de l'export CSV (limité à famille/genre/espèce) : injecté en dur plutôt qu'interrogé."""
 
 
-def _format_auteur_wsc(row: dict) -> str | None:
-    auteur, annee = row.get("author"), row.get("year")
-    if not auteur:
+def _format_author_wsc(row: dict) -> str | None:
+    """Return the author and year of a row, parenthesized if needed."""
+    author, year = row.get("author"), row.get("year")
+    if not author:
         return None
-    brut = f"{auteur}, {annee}" if annee else auteur
+    raw = f"{author}, {year}" if year else author
     if row.get("parentheses") == "1":
-        brut = f"({brut})"
-    return format_auteur(brut)
+        raw = f"({raw})"
+    return format_author(raw)
 
 
 class WscModule(TaxonomyModule):
+    """WSC module."""
+
     meta = ModuleMeta(
         id="wsc",
         can_classify=True,
@@ -60,40 +64,47 @@ class WscModule(TaxonomyModule):
     )
 
     def __init__(self, adapter: WscAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or WscAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        row = await self._adapter.search(struct.taxon.nom)
+        """Collect the taxon from the WSC export."""
+        row = await self._adapter.search(struct.taxon.name)
         if row is None:
             return None
 
-        struct.liens["wsc"] = {"id": row["speciesId"], "nom": struct.taxon.nom}
+        struct.links["wsc"] = {"id": row["speciesId"], "name": struct.taxon.name}
 
         if not is_classification:
             return struct
 
-        sous_espece = bool(row.get("subspecies")) and struct.taxon.nom == (
+        subspecies = bool(row.get("subspecies")) and struct.taxon.name == (
             f"{row['genus']} {row['species']} {row['subspecies']}"
         )
-        struct.taxon.rang = "sous-espèce" if sous_espece else "espèce"
-        struct.taxon.auteur = _format_auteur_wsc(row)
-        struct.regne = "animal"
+        struct.taxon.rank = "sous-espèce" if subspecies else "espèce"
+        struct.taxon.author = _format_author_wsc(row)
+        struct.kingdom = "animal"
         struct.classification = "WSC"
         struct.classification_taxobox = "WSC"
 
-        rangs: list[RankName] = []
-        if sous_espece:
-            rangs.append(RankName(nom=f"{row['genus']} {row['species']}", rang="espèce"))
-        rangs.append(RankName(nom=row["genus"], rang="genre"))
-        rangs.append(RankName(nom=row["family"], rang="famille"))
-        rangs.extend(_CHAINE_FIXE)
-        struct.rangs = rangs
+        ranks: list[RankName] = []
+        if subspecies:
+            ranks.append(RankName(name=f"{row['genus']} {row['species']}", rank="espèce"))
+        ranks.extend(
+            (
+                RankName(name=row["genus"], rank="genre"),
+                RankName(name=row["family"], rank="famille"),
+            )
+        )
+        ranks.extend(_FIXED_CHAIN)
+        struct.ranks = ranks
 
         return struct
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the WSC page."""
         return simple_debug_link(struct, "wsc", "https://wsc.nmbe.ch/species/{id}", "WSC")
 
 

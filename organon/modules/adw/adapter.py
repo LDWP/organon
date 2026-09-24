@@ -1,27 +1,25 @@
-"""Couche d'accès réseau pour Animal Diversity Web (animaldiversity.org) : scraping HTML sans
-API, une page potentielle par taxon (`accounts/<Nom_avec_underscores>/`). L'auteur/l'année ne
-sont exposés nulle part sous forme structurée : seul le paragraphe "To cite this page:" en
-donne une version textuelle, extraite ici par expression régulière (1/2/3+ auteurs).
+"""Network access to Animal Diversity Web (animaldiversity.org).
 
-Vérifié en direct (2026-07-23), deux écarts avec le PHP d'origine :
+HTML scraping, no API: one possible page per taxon
+(`accounts/<Name_with_underscores>/`). The author and year are not
+exposed in a structured form: only the "To cite this page:" paragraph
+gives a textual version, extracted by regular expression (1, 2 or 3+
+authors).
 
-- Le marqueur "taxon non trouvé" du PHP (`: Not Found<`) n'existe plus : la page 404 actuelle
-  répond en HTTP 200 avec un simple `<h1>Page not found</h1>` dans le corps — détecté à la
-  place. Certains taxons valides (ex. *Bufo bufo*) redirigent (302) leur compte vers une
-  sous-page "classification" sans texte de citation propre ; `follow_redirects=True` permet de
-  quand même reconnaître ces taxons comme trouvés (juste sans citation).
-- Le HTML a changé de structure : la citation est coupée par une balise `<span>` imbriquée
-  portant la date de consultation, que le site ne rend d'ailleurs jamais lui-même (littéralement
-  `{%B %d, %Y}` non substitué) — ignorée ici, seule l'année de publication (dans le texte de la
-  citation elle-même) est retenue.
+The "taxon not found" marker is a `<h1>Page not found</h1>` in an HTTP
+200 body. Some valid taxa (e.g. *Bufo bufo*) redirect (302) to a
+"classification" subpage with no citation of its own;
+`follow_redirects=True` still recognizes them as found, without a
+citation.
 
-Bug corrigé plutôt que reproduit : la regex PHP des auteurs suivants, appliquée à la citation
-entière, capture parfois "and" comme un nom d'auteur bidon quand le premier auteur n'est pas
-suivi d'une virgule avant "and" (ex. "Wund, M. and P. Myers 2005." sur la fiche Mammalia,
-observé en direct) — gonflant artificiellement le décompte d'auteurs. Ici, la recherche des
-auteurs suivants est bornée au texte *après* le premier auteur trouvé, ce qui élimine le faux
-positif sans changer le résultat sur les citations bien formées (ex. "Myers, P., R. Espinosa,
-C. S. Parr, ..., and T. A. Dewey.")."""
+The citation is cut by a nested `<span>` holding the access date, which
+the site never renders itself (a literal `{%B %d, %Y}`): it is ignored,
+only the publication year in the citation text is kept.
+
+The search for the following authors is bounded to the text AFTER the
+first author found: applied to the whole citation, the regex could
+capture "and" as a bogus author (e.g. "Wund, M. and P. Myers 2005.").
+"""
 
 from __future__ import annotations
 
@@ -42,9 +40,7 @@ _CITATION_BLOCK_RE = re.compile(
 _TAG_RE = re.compile(r"<[^>]+>")
 
 _LETTERS = r"[^\W\d_]+"
-_FIRST_AUTHOR_RE = re.compile(
-    rf"(?P<nom>{_LETTERS}),\s(?P<prenom1>[A-Z]\.)(?P<prenom2> [A-Z]\.)?"
-)
+_FIRST_AUTHOR_RE = re.compile(rf"(?P<nom>{_LETTERS}),\s(?P<prenom1>[A-Z]\.)(?P<prenom2> [A-Z]\.)?")
 _OTHER_AUTHOR_RE = re.compile(
     rf"(and )?(?P<prenom1>[A-Z]\.)(?P<prenom2> [A-Z]\.)? (?P<nom>{_LETTERS})"
 )
@@ -53,6 +49,8 @@ _YEAR_RE = re.compile(r"([1-9][0-9]{3})[.]")
 
 @dataclass
 class Author:
+    """An author: surname and one or two initials."""
+
     nom: str
     prenom1: str
     prenom2: str | None = None
@@ -60,8 +58,11 @@ class Author:
 
 @dataclass
 class AdwCitation:
-    """Citation extraite de la page ADW d'un taxon. `premier_auteur` vaut `None` quand la page
-    existe mais ne porte aucune citation exploitable (ex. fiche "classification" seule)."""
+    """Citation extracted from the ADW page of a taxon.
+
+    `premier_auteur` is None when the page exists but carries no usable
+    citation (e.g. a "classification" page alone).
+    """
 
     premier_auteur: Author | None
     autres_auteurs: list[Author] = field(default_factory=list)
@@ -69,6 +70,7 @@ class AdwCitation:
 
 
 def _parse_author(match: re.Match[str]) -> Author:
+    """Build an `Author` from a regex match."""
     return Author(
         nom=match.group("nom"),
         prenom1=match.group("prenom1"),
@@ -77,37 +79,44 @@ def _parse_author(match: re.Match[str]) -> Author:
 
 
 def _parse_citation(html_page: str) -> AdwCitation:
+    """Extract the citation of an ADW page."""
     block = _CITATION_BLOCK_RE.search(html_page)
     if block is None:
         return AdwCitation(premier_auteur=None)
 
-    texte = _TAG_RE.sub(" ", block.group("texte"))
-    texte = _html.unescape(" ".join(texte.split()))
+    text = _TAG_RE.sub(" ", block.group("texte"))
+    text = _html.unescape(" ".join(text.split()))
 
-    premier_match = _FIRST_AUTHOR_RE.search(texte)
-    if premier_match is None:
+    first_match = _FIRST_AUTHOR_RE.search(text)
+    if first_match is None:
         return AdwCitation(premier_auteur=None)
 
-    reste = texte[premier_match.end() :]
-    autres = [_parse_author(m) for m in _OTHER_AUTHOR_RE.finditer(reste)]
+    rest = text[first_match.end() :]
+    others = [_parse_author(m) for m in _OTHER_AUTHOR_RE.finditer(rest)]
 
-    annee_match = _YEAR_RE.search(texte)
+    year_match = _YEAR_RE.search(text)
 
     return AdwCitation(
-        premier_auteur=_parse_author(premier_match),
-        autres_auteurs=autres,
-        annee=annee_match.group(1) if annee_match else None,
+        premier_auteur=_parse_author(first_match),
+        autres_auteurs=others,
+        annee=year_match.group(1) if year_match else None,
     )
 
 
 class AdwAdapter(OwnedClientMixin):
+    """Raw ADW client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client, follow_redirects=True)
 
     async def fetch(self, slug: str) -> AdwCitation | None:
-        """Renvoie la citation du taxon `slug` (espaces déjà remplacés par des underscores), ou
-        `None` si le taxon n'existe pas sur ADW. Une `AdwCitation` dont `premier_auteur` vaut
-        `None` signifie que la page existe mais n'a pas de citation propre à en tirer."""
+        """Return the citation of taxon `slug`, or None if absent.
+
+        `slug` has underscores for spaces. A citation whose
+        `premier_auteur` is None means the page exists without a
+        citation of its own.
+        """
         html_page = await fetch_text(self._client, f"{BASE_URL}/accounts/{slug}/")
         if html_page is None:
             return None

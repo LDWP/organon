@@ -1,18 +1,12 @@
-"""Enrichissement de la « publication originale » LPSN (`struct.originale`) : contrairement à
-WoRMS, LPSN expose `publication_doi` comme champ JSON structuré (voir doc publique
-https://lpsn.dsmz.de/text/lpsn-api) — pas de scraping ni d'extraction par regex nécessaires, le
-DOI est déjà séparé du texte de citation dans `publication_text`. Délègue ensuite à
-`organon.modules.bibliography.resolve_doi_citation` (Wikidata P356 -> `{{Bibliographie|Qxxx}}`,
-sinon Crossref -> `{{Article}}`/`{{Ouvrage}}`), partagée avec WoRMS.
+"""Enrichment of the LPSN original publication.
 
-Volontairement hors périmètre (voir docs/md/plans/plan-doi-publication-originale.md) :
-`ijsem_list_text`/`ijsem_list_doi` (publication de *Validation List*, distincte de la publication
-originale pour les noms validés a posteriori — n'entre en jeu que si l'on voulait un jour refléter
-la date qui fait foi pour la priorité nomenclaturale, pas la publication originale elle-même) et
-`publication_pmid` (pas de source PubMed déjà intégrée au projet).
-
-Toute étape en échec (réseau, forme de réponse inattendue) retombe sur `publication_text` brut :
-cet enrichissement est un bonus, jamais une condition de succès du module LPSN."""
+LPSN exposes `publication_doi` as a structured field, so no scraping is
+needed. The DOI is resolved by
+`organon.modules.bibliography.resolve_doi_citation`, shared with WoRMS.
+Out of scope: `ijsem_list_*` (Validation List) and `publication_pmid`.
+Any failing step falls back on the raw `publication_text`: this is a
+bonus, never a condition of success.
+"""
 
 from __future__ import annotations
 
@@ -20,23 +14,22 @@ from organon.modules.bibliography import LOOKUP_ERRORS
 from organon.modules.lpsn.adapter import LpsnAdapter
 
 
-def _wikify_italics(texte: str) -> str:
-    # Même convention que WoRMS/AlgaeBase pour un titre d'ouvrage éventuellement mis en italique
-    # dans le texte source (voir `organon.modules.common.extract_aphia_original_description`) —
-    # vérifié en direct (Haemophilus felis, Escherichia coli, Bacillus subtilis) : `publication_
-    # text` est du texte brut sans balise sur les fiches consultées, ce remplacement reste donc un
-    # no-op inoffensif tant qu'aucun contre-exemple n'est rencontré.
-    return texte.replace("<i>", "''").replace("</i>", "''")
+def _wikify_italics(text: str) -> str:
+    # Same convention as WoRMS and AlgaeBase for a work title possibly
+    # italicized in the source text. `publication_text` is plain text on
+    # the records checked, so this stays a harmless no-op.
+    return text.replace("<i>", "''").replace("</i>", "''")
 
 
 async def build_citation(adapter: LpsnAdapter, record: dict) -> str | None:
-    texte = record.get("publication_text")
+    """Return the citation of the record, via its DOI if resolvable."""
+    text = record.get("publication_text")
     doi = record.get("publication_doi")
     if doi:
         try:
-            enrichie = await adapter.resolve_doi_citation(doi)
-            if enrichie:
-                return enrichie
+            enriched = await adapter.resolve_doi_citation(doi)
+            if enriched:
+                return enriched
         except LOOKUP_ERRORS:
             pass
-    return _wikify_italics(texte) if texte else None
+    return _wikify_italics(text) if text else None

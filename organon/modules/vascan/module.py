@@ -1,74 +1,98 @@
-"""Logique métier du module VASCAN (Base de données des plantes vasculaires du Canada) :
-enrichissement botanique pur (auteur, noms vernaculaires français, identifiant), domaine
-`['végétal']`. Portée volontairement régionale (flore du Canada) — pas une classification
-généraliste, et `higherClassification` (chaîne de noms d'ancêtres séparés par `;`) n'est pas
-exploitée pour construire `struct.rangs` : l'API ne fournit aucun rang par élément de cette
-chaîne (ex. sous-famille et section s'y mélangent sans distinction), ce qui rendrait toute
-tentative de reconstruction du rang par position fragile. Comme CITES/NCBI/TelaMétro, ce module
-réutilise `struct.taxon.rang` déjà connu plutôt que de deviner.
+"""VASCAN module (database of vascular plants of Canada).
 
-VASCAN distingue explicitement synonymes et noms acceptés (`taxonomicStatus`) — ce module ne
-suit pas la cible acceptée (n'affecte pas la classification), il se contente de marquer le
-statut, comme les autres modules d'enrichissement face à un synonyme."""
+Botanical enrichment only (author, French vernacular names, id), domain
+`végétal`. Deliberately regional (the flora of Canada), not a general
+classification. `higherClassification` (a `;`-separated chain of
+ancestor names) is not used for `struct.ranks`: the API gives no rank
+per element (subfamily and section mix there), so rebuilding the rank by
+position would be fragile. Like CITES, NCBI and TelaMétro, it reuses the
+known `struct.taxon.rank`.
+
+VASCAN distinguishes synonyms from accepted names (`taxonomicStatus`);
+this module does not follow the accepted target (it does not affect
+classification), it only marks the status, like the other enrichment
+modules.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
+from organon.core.langues import groupe_par_langue
+from organon.core.models import LinkEntry, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.core.selectors.coherence import reference_module_is_consistent
+from organon.modules.common import format_author, simple_debug_link
 from organon.modules.vascan.adapter import VascanAdapter
 
 
 class VascanModule(TaxonomyModule):
+    """VASCAN module."""
+
     meta = ModuleMeta(
         id="vascan", can_classify=False, can_render_external_link=True, domains=["végétal"]
     )
 
     def __init__(self, adapter: VascanAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or VascanAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        matches = await self._adapter.search(struct.taxon.nom)
-        if not matches:
+        """Collect the taxon from VASCAN."""
+        # The domain filter is bypassed when the domain is unknown ("*")
+        if not reference_module_is_consistent(self.meta.id, struct.kingdom):
             return None
-        match = matches[0]
+        # `search` is fuzzy (e.g. "Chaetodon" returns
+        # "Astragalus chaetodon"): only an exact scientific name is the
+        # same taxon.
+        wanted = struct.taxon.name.casefold()
+        match = next(
+            (
+                m
+                for m in await self._adapter.search(struct.taxon.name)
+                if m["canonicalName"].casefold() == wanted
+            ),
+            None,
+        )
+        if match is None:
+            return None
 
-        vascan_link: dict = {
+        vascan_link: LinkEntry = {
             "id": match["taxonID"],
-            "nom": match["canonicalName"],
-            "auteur": format_auteur(match.get("scientificNameAuthorship")),
+            "name": match["canonicalName"],
+            "author": format_author(match.get("scientificNameAuthorship")),
         }
         assertions = match.get("taxonomicAssertions") or []
         if assertions and assertions[0].get("taxonomicStatus") != "accepted":
-            vascan_link["synonyme"] = True
-        struct.liens["vascan"] = vascan_link
+            vascan_link["synonym"] = True
+        struct.links["vascan"] = vascan_link
 
-        noms_fr = []
-        for entry in match.get("vernacularNames") or []:
-            if entry.get("language") == "fr" and entry.get("vernacularName") not in noms_fr:
-                noms_fr.append(entry["vernacularName"])
-        if noms_fr:
-            struct.vernaculaire["VASCAN"] = noms_fr
+        vernacular = groupe_par_langue(
+            (e.get("language"), e.get("vernacularName"))
+            for e in match.get("vernacularNames") or []
+        )
+        if vernacular:
+            struct.vernacular["VASCAN"] = vernacular
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("vascan")
+        """Render the {{VASCAN}} template."""
+        data = struct.links.get("vascan")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        nv = " | nv" if data.get("synonyme") else ""
-        return f"{{{{VASCAN | {data['id']} | {cible}{nv} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        target = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        if author := data.get("author"):
+            target += " " + author
+        synonym_flag = " | nv" if data.get("synonym") else ""
+        return f"{{{{VASCAN | {data['id']} | {target}{synonym_flag} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the VASCAN page."""
         return simple_debug_link(
             struct, "vascan", "https://data.canadensys.net/vascan/taxon/{id}", "VASCAN"
         )

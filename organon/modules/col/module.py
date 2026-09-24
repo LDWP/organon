@@ -1,160 +1,169 @@
-"""Logique métier du module CoL (Catalogue of Life) : classification complète, synonymes,
-sous-taxons, noms vernaculaires — source de classification à part entière (`can_classify=True`),
-sélectionnable au même titre que GBIF/ITIS/WoRMS via la facette de classification du frontend.
+"""CoL (Catalogue of Life) module: full classification.
 
-Interroge uniquement ChecklistBank dataset `3LXR` (Extended Release, voir
-`organon.modules.col_xr.adapter`) plutôt que `3LR` (release COL classique, ancien module fusionné
-ici) : la XR est un sur-ensemble de la COL (COL + ~17 500 checklists sources supplémentaires) et
-`catalogueoflife.org/data/taxon/{id}` résout correctement les deux familles d'identifiants (testé
-en direct : un id propre à la XR comme un id partagé avec la release classique s'affichent tous
-deux sur le site public) — donc pas besoin d'interroger 3LR séparément ni de désambiguïser la
-provenance d'un id avant de construire {{CatalogueofLife}}.
+Synonyms, sub-taxa and vernacular names too; a classification source in
+its own right (`can_classify=True`), selectable like GBIF, ITIS and
+WoRMS.
 
-Risque accepté en fusionnant : contrairement à l'ancien module CoL (voir historique de ce
-fichier), celui-ci ne construit plus une liste de fiches en cas d'homonymie non résolue (ex.
-*Morus* L. (Plantae) / *Morus* Vieillot, 1816 (Animalia), tous deux "accepted" dans 3LXR) — il
-retient une seule fiche, désambiguïsée par règne quand `struct.domaine` est connu, puis par
-qualité de fiche (voir `select_col_xr_candidate`) quand plusieurs candidats restent malgré tout à
-égalité — cas observé sur de vraies homonymies inter-règnes non résolues par 3LXR (ex. Toxoplasma
-gondii, résolu vers le protiste Chromista plutôt qu'un homonyme Animalia issu d'une liste
-hôte-parasite mal absorbée) et sur des doublons non dédupliqués au sein d'un même règne (ex.
-Escherichia coli, deux fiches "accepted" concurrentes chez les bactéries). Jugé rare en pratique
-au-delà de ces cas (aucun autre trouvé sur ~75 taxons bien documentés lors de l'audit) et déjà le
-comportement de facto de l'ancien module CoL dès qu'un nom était directement "accepted" (sa
-désambiguïsation multi-fiches ne couvrait que le cas où toutes les entrées étaient des synonymes
-pointant vers des cibles distinctes).
+It queries only ChecklistBank dataset `3LXR` (Extended Release, see
+`organon.modules.col_xr.adapter`) rather than `3LR` (the plain COL
+release, the old merged module): the XR is a superset of the COL, and
+`catalogueoflife.org/data/taxon/{id}` resolves both families of ids, so
+there is no need to query 3LR apart or to tell where an id comes from
+before building {{CatalogueofLife}}.
 
-`organon/modules/col/adapter.py` et `organon/modules/col/ranks.py` (dataset `3LR`) restent dans
-le dépôt sans être importés ici — conservés par précaution en cas de retour en arrière, pas du
-code mort accidentel.
+Accepted risk of the merge: unlike the old CoL module, it no longer
+builds a list of records for an unresolved homonymy (e.g. *Morus* L.
+(Plantae) and *Morus* Vieillot (Animalia), both "accepted" in 3LXR). It
+keeps one record, disambiguated by kingdom when `struct.domain` is
+known, then by record quality (see `select_col_xr_candidate`) when
+several remain tied. Seen on cross-kingdom homonyms 3LXR leaves
+unresolved (Toxoplasma gondii) and on non-deduplicated duplicates within
+a kingdom (Escherichia coli). Judged rare beyond these cases.
 
-Ne fait aucun appel HTTP directement, voir `organon.modules.col_xr.adapter`."""
+Makes no HTTP call itself; see `organon.modules.col_xr.adapter`.
+"""
 
 from __future__ import annotations
 
 import html as _html
+from functools import partial
 
 from organon.core.config import GenerateOptions
-from organon.core.domains import regne_depuis_classification
+from organon.core.domains import kingdom_from_classification
+from organon.core.langues import groupe_par_langue
 from organon.core.models import (
     RankName,
-    Redirection,
     Struct,
     SubTaxonList,
     SynonymList,
-    TaxonInfo,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.col_xr.adapter import ColXrAdapter
-from organon.modules.col_xr.lookup import resolve_col_xr_matches, select_col_xr_candidate
-from organon.modules.col_xr.ranks import col_xr_cherche_rang
+from organon.modules.col_xr.lookup import (
+    resolve_col_xr_matches,
+    select_col_xr_candidate,
+    strip_subgenus_before_epithet,
+)
+from organon.modules.col_xr.ranks import col_xr_to_wp_rank
 from organon.modules.common import (
-    MAX_SYNONYM_HOPS,
     as_limit,
+    checklistbank_accepted_name,
     collect_pages,
-    format_auteur,
+    follow_synonym,
+    format_author,
     simple_debug_link,
 )
 
 
 def _kingdom_index(classification: list[dict]) -> int | None:
+    """Return the index of the kingdom in a classification, or None."""
     return next((i for i, c in enumerate(classification) if c.get("rank") == "kingdom"), None)
 
 
 class ColModule(TaxonomyModule):
+    """CoL module."""
+
     meta = ModuleMeta(
         id="col",
         can_classify=True,
         can_render_external_link=True,
         domains="all",
-        # Classification par défaut face à GBIF (priority=200 auparavant) : GBIF ne classe
-        # qu'avec les champs bruts de son dataset "Backbone Taxonomy" legacy, jamais corrigés
-        # par CoL XR au-delà d'un rang manquant (voir gbif/module.py) — quand les deux
-        # réussissent et se contredisent, la fiche CoL XR est la plus à jour (audit #50).
+        # Default classification against GBIF (priority 200 formerly):
+        # GBIF classifies only with the raw fields of its legacy
+        # Backbone Taxonomy, never corrected by CoL XR beyond a missing
+        # rank (see gbif/module.py). When both succeed and contradict,
+        # the CoL XR record is the most up to date.
         priority=999,
         is_default_classification=True,
     )
 
     def __init__(self, adapter: ColXrAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or ColXrAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from the Catalogue of Life."""
         return await self._collect(struct, is_classification, options, hop=0)
 
     async def _collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions, hop: int
     ) -> Struct | None:
+        """Collect with a synonym hop count."""
         adapter = self._adapter
 
-        candidats = await resolve_col_xr_matches(adapter, struct.taxon.nom)
-        if not candidats:
+        candidates = await resolve_col_xr_matches(adapter, struct.taxon.name)
+        if not candidates:
             return None
 
-        accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
-        cur = select_col_xr_candidate(accepted, struct.domaine)
+        accepted = [r for r in candidates if r["usage"]["status"] == "accepted"]
+        cur = select_col_xr_candidate(accepted, struct.domain)
         if cur is None:
-            if not options.suivre_synonymes:
+            if not options.follow_synonyms:
                 return None
-            cur = select_col_xr_candidate(candidats, struct.domaine)
-            if cur is None:  # candidats non vide (garde ci-dessus) : jamais atteint en pratique
+            cur = select_col_xr_candidate(candidates, struct.domain)
+            if cur is None:  # candidates is non-empty (guard above): never reached in practice
                 return None
 
         usage = cur["usage"]
         name = usage["name"]
         taxon_id = cur["id"]
 
-        struct.liens["col"] = {
+        struct.links["col"] = {
             "id": taxon_id,
-            "nom": name["scientificName"],
-            "auteur": format_auteur(name.get("authorship")),
-            "rang": col_xr_cherche_rang(name.get("rank", "")),
-            **({"eteint": usage["extinct"]} if "extinct" in usage else {}),
+            "name": name["scientificName"],
+            "author": format_author(name.get("authorship")),
+            "rank": col_xr_to_wp_rank(name.get("rank", "")),
+            **({"extinct": usage["extinct"]} if "extinct" in usage else {}),
         }
 
         if not is_classification:
-            # Même principe que gbif/module.py : la chaîne "classification" est déjà présente dans
-            # la réponse de recherche utilisée ci-dessus, aucun appel réseau de plus. Voir
-            # RangIncoherence — non peuplé en mode classification, où `struct.rangs` couvre déjà
-            # ces rangs pour le module gagnant.
-            for ancetre in cur.get("classification", []):
-                rang_ancetre = col_xr_cherche_rang(ancetre.get("rank", ""))
-                if rang_ancetre == "famille" and ancetre.get("name"):
-                    struct.liens["col"]["famille_detectee"] = ancetre["name"]
-                elif rang_ancetre == "ordre" and ancetre.get("name"):
-                    struct.liens["col"]["ordre_detecte"] = ancetre["name"]
+            # Same as gbif/module.py: the "classification" chain is
+            # already in the search response, no extra call. See
+            # RankInconsistency; not set when classifying, where
+            # `struct.ranks` already covers these ranks for the winning
+            # module.
+            for ancestor in cur.get("classification", []):
+                ancestor_rank = col_xr_to_wp_rank(ancestor.get("rank", ""))
+                if ancestor_rank == "famille" and ancestor.get("name"):
+                    struct.links["col"]["detected_family"] = ancestor["name"]
+                elif ancestor_rank == "ordre" and ancestor.get("name"):
+                    struct.links["col"]["detected_order"] = ancestor["name"]
 
         is_synonym = usage["status"] == "synonym"
-        # Statut nomenclatural pour cette fiche précise (voir RangIncoherence) — posé avant la
-        # redirection ci-dessous, même raisonnement que gbif/module.py.
-        struct.liens["col"]["statut_detecte"] = "synonyme" if is_synonym else "accepté"
+        # Nomenclatural status of this very record (see
+        # RankInconsistency), set before the redirect below, as in
+        # gbif/module.py.
+        struct.links["col"]["detected_status"] = "synonyme" if is_synonym else "accepté"
         if is_synonym:
-            if not is_classification:
-                struct.liens["col"]["synonyme"] = True
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
-                accepted_target = usage.get("accepted")
-                if accepted_target is None:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=accepted_target["name"]["scientificName"])
-                return await self._collect(struct, is_classification, options, hop=hop + 1)
-            # suivre_synonymes désactivé : la classification se construit directement à partir
-            # de ce synonyme plutôt que du taxon accepté.
+            handled, result = await follow_synonym(
+                struct,
+                "col",
+                is_classification,
+                options,
+                hop,
+                partial(checklistbank_accepted_name, usage),
+                lambda next_hop: self._collect(struct, is_classification, options, hop=next_hop),
+            )
+            if handled:
+                return result
+            # follow_synonyms is off: the classification is built from
+            # this synonym rather than the accepted taxon.
 
         if not is_classification:
             return struct
 
-        struct.taxon.auteur = format_auteur(name.get("authorship"))
-        struct.taxon.rang = col_xr_cherche_rang(name.get("rank", ""))
+        struct.taxon.author = format_author(name.get("authorship"))
+        struct.taxon.rank = col_xr_to_wp_rank(name.get("rank", ""))
         if "extinct" in usage:
-            struct.taxon.eteint = usage["extinct"]
-        struct.taxon.nom = name["scientificName"].strip()
+            struct.taxon.extinct = usage["extinct"]
+        # Without the subgenus CoL inserts ("Mus (Mus) musculus"):
+        # enrichment modules search by this name, and no other source
+        # indexes it so.
+        struct.taxon.name = strip_subgenus_before_epithet(name["scientificName"].strip())
         struct.classification = "CatalogueofLife"
         struct.classification_taxobox = "COL"
 
@@ -162,21 +171,20 @@ class ColModule(TaxonomyModule):
         idx = _kingdom_index(classification)
         if idx is None:
             return None
-        struct.regne = regne_depuis_classification(classification)
-        if not struct.regne:
+        struct.kingdom = kingdom_from_classification(classification)
+        if not struct.kingdom:
             return None
 
-        # `classification` va de la racine (domaine) au taxon demandé lui-même inclus (dernier
-        # élément, même id que `taxon_id` — vérifié sur de vraies réponses ChecklistBank) : on
-        # exclut tout ce qui est au règne ou au-dessus (même logique que WRMS/IRMNG, voir
-        # `filter_ancestors_above_regne`) et l'entrée du taxon lui-même (même principe que
-        # `gbif/module.py`, qui saute l'entrée dont le rang égale `struct.taxon.rang`), puis on
-        # inverse pour l'ordre "du plus proche au plus éloigné" attendu par `struct.rangs`.
-        struct.rangs = [
+        # `classification` goes from the root (domain) to the requested
+        # taxon included (last element, same id as `taxon_id`). Drop
+        # everything at or above the kingdom (as WRMS and IRMNG, see
+        # `filter_ancestors_above_kingdom`) and the taxon's own entry,
+        # then reverse to the nearest-first order of `struct.ranks`.
+        struct.ranks = [
             RankName(
-                nom=c["name"],
-                rang=col_xr_cherche_rang(c.get("rank", "")),
-                auteur=format_auteur(c.get("authorship")),
+                name=c["name"],
+                rank=col_xr_to_wp_rank(c.get("rank", "")),
+                author=format_author(c.get("authorship")),
             )
             for c in reversed(classification[idx + 1 :])
             if c.get("id") != taxon_id
@@ -187,65 +195,76 @@ class ColModule(TaxonomyModule):
             raw = page.get("result", [])
             out = []
             for c in raw:
-                # "rank" absent (fiche ChecklistBank malformée) traité comme "unranked" : même
-                # absence d'information exploitable, même exclusion de la liste des sous-taxons.
+                # A missing "rank" (malformed record) is treated as
+                # "unranked": same lack of usable information, same
+                # exclusion from the sub-taxa list.
                 if c.get("rank", "unranked") == "unranked" or c.get("status") != "accepted":
                     continue
                 out.append(
                     RankName(
-                        nom=c["name"],
-                        rang=col_xr_cherche_rang(c["rank"]),
-                        auteur=format_auteur(c.get("authorship")),
-                        # ChecklistBank signale l'extinction par un "†" en tête du libellé HTML,
-                        # pas par un champ structuré sur cet endpoint (contrairement à /taxon/{id}).
-                        eteint=c.get("labelHtml", "").startswith("†") or None,
+                        name=c["name"],
+                        rank=col_xr_to_wp_rank(c["rank"]),
+                        author=format_author(c.get("authorship")),
+                        # ChecklistBank flags extinction with a leading
+                        # "†" in the HTML label, not a structured field
+                        # on this endpoint (unlike /taxon/{id}).
+                        extinct=c.get("labelHtml", "").startswith("†") or None,
                     )
                 )
             return out, len(raw), page.get("last", True)
 
-        liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
-        if liste:
-            struct.sous_taxons = SubTaxonList(liste=liste, source="CatalogueofLife", coupe=coupe)
+        items, truncated = await collect_pages(fetch_children, limit=as_limit(options.list_limit))
+        if items:
+            struct.subtaxa = SubTaxonList(
+                items=items, source="CatalogueofLife", truncated=truncated
+            )
 
-        vernaculaire = [
-            _html.unescape(v["name"])
-            for v in cur.get("vernacularNames", [])
-            if v.get("language") == "fra"
-        ]
-        if vernaculaire:
-            struct.vernaculaire["CatalogueofLife"] = vernaculaire
+        vernacular = groupe_par_langue(
+            (v.get("language"), _html.unescape(v["name"])) for v in cur.get("vernacularNames", [])
+        )
+        if vernacular:
+            struct.vernacular["CatalogueofLife"] = vernacular
 
         syn = await adapter.synonyms(taxon_id)
-        synonymes = []
+        synonyms = []
         for entry in [*syn.get("homotypic", []), *syn.get("heterotypic", [])]:
             sname = entry.get("name") or {}
             if not sname.get("scientificName"):
                 continue
-            synonymes.append(
+            synonyms.append(
                 RankName(
-                    nom=sname["scientificName"],
-                    auteur=format_auteur(sname.get("authorship")),
-                    rang=col_xr_cherche_rang(sname.get("rank", "")),
+                    name=sname["scientificName"],
+                    author=format_author(sname.get("authorship")),
+                    rank=col_xr_to_wp_rank(sname.get("rank", "")),
                 )
             )
-        if synonymes:
-            struct.synonymes = SynonymList(liste=synonymes, source="CatalogueofLife", coupe=False)
+        if synonyms:
+            struct.synonyms = SynonymList(
+                items=synonyms, source="CatalogueofLife", truncated=False
+            )
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("col")
+        """Render the {{CatalogueofLife}} template."""
+        data = struct.links.get("col")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        cible = wp_met_italiques(data["nom"], data.get("rang") or struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
-        sup = " | éteint=oui" if data.get("eteint") else ""
-        nv = " | nv" if data.get("synonyme") else ""
-        return f"{{{{CatalogueofLife | {data['id']} | {cible}{sup}{nv} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        target = wp_apply_italics(
+            data["name"], data.get("rank") or struct.taxon.rank, struct.kingdom
+        )
+        if author := data.get("author"):
+            target += " " + author
+        extinct_param = " | éteint=oui" if data.get("extinct") else ""
+        synonym_flag = " | nv" if data.get("synonym") else ""
+        return (
+            f"{{{{CatalogueofLife | {data['id']} | {target}{extinct_param}{synonym_flag} | "
+            f"consulté le={cdate} }}}}"
+        )
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the CoL page."""
         return simple_debug_link(
             struct, "col", "https://www.catalogueoflife.org/data/taxon/{id}", "CoL"
         )

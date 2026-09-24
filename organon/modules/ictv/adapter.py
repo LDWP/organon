@@ -1,12 +1,14 @@
-"""Couche d'accès aux données ICTV : lecture du dataset embarqué
-(organon/core/data/ictv_taxonomy.tsv, voir scripts/build_ictv_taxonomy.py), aucun appel réseau.
-L'ICTV n'expose aucune API interrogeable par nom de taxon (Taxonomy Browser limité à la recherche
-par nom de RANG, ontologie ICTV hébergée par l'EBI/OLS obsolète depuis 2009 — vérifié) : la seule
-donnée à jour est le VMR export publié sur GitHub, embarqué ici comme organon/core/data/ranks.yaml
-plutôt qu'interrogé en direct.
+"""Access to the ICTV data: the embedded dataset, with no network call.
 
-Recherche exacte insensible à la casse uniquement (comme le permet la donnée source, qui n'offre
-aucune notion de recherche floue ni de synonymes)."""
+The data is `organon/core/data/ictv_taxonomy.tsv` (see
+scripts/build_ictv_taxonomy.py). ICTV has no API queryable by taxon name
+(its Taxonomy Browser only searches by RANK name, and the EBI/OLS
+ontology is obsolete since 2009), so the only up-to-date data is the VMR
+export published on GitHub, embedded here rather than queried.
+
+Exact case-insensitive search only, as the source data has no fuzzy
+search or synonyms.
+"""
 
 from __future__ import annotations
 
@@ -14,79 +16,104 @@ import csv
 from collections import defaultdict
 from dataclasses import dataclass
 from functools import lru_cache
+from operator import itemgetter
 from pathlib import Path
 
 DATA_PATH = Path(__file__).resolve().parent.parent.parent / "core" / "data" / "ictv_taxonomy.tsv"
 
+# Lineage columns of the dataset, broadest to most specific (see
+# scripts/build_ictv_taxonomy.py for the columns kept or dropped).
 LINEAGE_COLUMNS = [
-    "Realm", "Subrealm", "Kingdom", "Phylum", "Subphylum", "Class", "Subclass",
-    "Order", "Suborder", "Family", "Subfamily", "Genus", "Subgenus", "Species",
+    "Realm",
+    "Subrealm",
+    "Kingdom",
+    "Phylum",
+    "Subphylum",
+    "Class",
+    "Subclass",
+    "Order",
+    "Suborder",
+    "Family",
+    "Subfamily",
+    "Genus",
+    "Subgenus",
+    "Species",
 ]
-"""Colonnes de lignée du dataset, du plus large au plus spécifique (voir
-scripts/build_ictv_taxonomy.py pour le détail des colonnes retenues/écartées)."""
 
 
 @dataclass(frozen=True)
 class IctvRecord:
-    """Un taxon ICTV, à n'importe quel rang de `LINEAGE_COLUMNS`. `ancestors` va du plus large
-    au taxon lui-même inclus (dernier élément), ne contient que les rangs renseignés (la lignée
-    ICTV est creuse : beaucoup de taxons n'ont pas de valeur à tous les rangs intermédiaires)."""
+    """An ICTV taxon, at any rank of `LINEAGE_COLUMNS`.
+
+    `ancestors` goes from the broadest to the taxon itself (last item)
+    and keeps only the filled ranks: the ICTV lineage is sparse.
+    """
 
     ancestors: tuple[tuple[str, str], ...]
     ictv_id: str | None
 
     @property
     def rang_colonne(self) -> str:
+        """Return the lineage column (rank) of the taxon."""
         return self.ancestors[-1][0]
 
     @property
     def nom(self) -> str:
+        """Return the name of the taxon."""
         return self.ancestors[-1][1]
 
 
 def _load_rows(path: Path) -> list[dict[str, str]]:
+    """Read the TSV rows."""
     with path.open(encoding="utf-8", newline="") as fh:
         return list(csv.DictReader(fh, delimiter="\t"))
 
 
 @lru_cache(maxsize=4)
-def _build_index(path: Path) -> tuple[dict[str, IctvRecord], dict[str, frozenset[tuple[str, str]]]]:
-    """Construit l'index nom (minuscule) -> IctvRecord, et la table des enfants immédiats
-    (nom de parent en minuscule -> ensemble de (colonne, nom) enfants), en un seul passage sur le
-    dataset. Un taxon peut apparaître comme parent de rangs enfants différents selon les lignes
-    (ex. une famille dont certains genres sont directement rattachés et d'autres passent par une
-    sous-famille) : la lignée creuse est donc gérée ligne par ligne plutôt que par décalage de
-    colonne fixe."""
+def _build_index(
+    path: Path,
+) -> tuple[dict[str, IctvRecord], dict[str, frozenset[tuple[str, str]]]]:
+    """Build the name index and the immediate-children table.
+
+    Name (lowercase) to `IctvRecord`, and parent name (lowercase) to its
+    set of (column, name) children, in a single pass. A family may have
+    genera attached directly and others through a subfamily, so the
+    sparse lineage is handled row by row, not by a fixed column shift.
+    """
     rows = _load_rows(path)
     index: dict[str, IctvRecord] = {}
     children: dict[str, set[tuple[str, str]]] = defaultdict(set)
 
     for row in rows:
         chain = [(col, row[col]) for col in LINEAGE_COLUMNS if row.get(col)]
-        for i, (col, nom) in enumerate(chain):
-            key = nom.lower()
+        for i, (col, name) in enumerate(chain):
+            key = name.lower()
             if key not in index:
-                # Homonyme entre deux lignées distinctes -> la première occurrence du TSV
-                # l'emporterait silencieusement. Vérifié absent du VMR actuel (22670 noms,
-                # tous à lignée d'ancêtres unique) ; à surveiller si un futur export en
-                # introduit un.
+                # A homonym across two lineages would silently resolve
+                # to the first TSV occurrence. Absent from the current
+                # VMR (22670 names, each with a single ancestor
+                # lineage); to watch if a future export has one.
                 ictv_id = row.get("ICTV_ID") or None if col == "Species" else None
                 index[key] = IctvRecord(ancestors=tuple(chain[: i + 1]), ictv_id=ictv_id)
             if i > 0:
-                children[chain[i - 1][1].lower()].add((col, nom))
+                children[chain[i - 1][1].lower()].add((col, name))
 
     return index, {k: frozenset(v) for k, v in children.items()}
 
 
 class IctvAdapter:
+    """Reader of the embedded ICTV dataset."""
+
     def __init__(self, path: Path = DATA_PATH) -> None:
+        """Use the given dataset path."""
         self._path = path
 
     def find(self, name: str) -> IctvRecord | None:
+        """Return the record of a name (case-insensitive), or None."""
         index, _ = _build_index(self._path)
         return index.get(name.lower())
 
     def children_of(self, name: str) -> list[tuple[str, str]]:
-        """Enfants immédiats de `name` (colonne, nom), triés par nom."""
+        """Return the immediate children of `name` as (column, name)."""
         _, children = _build_index(self._path)
-        return sorted(children.get(name.lower(), frozenset()), key=lambda item: item[1])
+        return sorted(children.get(name.lower(), frozenset()), key=itemgetter(1))

@@ -1,9 +1,11 @@
-"""Couche d'accès réseau pour l'API IUCN Red List v4 (api.iucnredlist.org) : appels HTTP et
-décodage JSON bruts uniquement, aucune logique métier (voir module.py).
+"""Network access to the IUCN Red List API v4 (api.iucnredlist.org).
 
-Jeton individuel gratuit requis (inscription sur https://api.iucnredlist.org/users/sign_up, voir
-`organon.core.auth_settings.AuthSettings.iucn_api_token`) : contrairement à Tropicos, l'UICN
-n'expose aucun jeton public partageable, chaque déploiement doit enregistrer le sien."""
+Raw HTTP and JSON only; see module.py.
+
+A free individual token is required (see `AuthSettings.iucn_api_token`):
+IUCN offers no shareable public token, so each deployment must register
+its own.
+"""
 
 from __future__ import annotations
 
@@ -16,7 +18,10 @@ BASE_URL = "https://api.iucnredlist.org/api/v4"
 
 
 class IucnAdapter(OwnedClientMixin):
+    """Raw IUCN Red List API client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None, token: str | None = None) -> None:
+        """Use the given token, else the configured one."""
         self._token = token if token is not None else get_auth_settings().iucn_api_token
         headers = {"Authorization": f"Bearer {self._token}"} if self._token else None
         super().__init__(client, headers=headers)
@@ -24,13 +29,16 @@ class IucnAdapter(OwnedClientMixin):
     async def scientific_name(
         self, genus_name: str, species_name: str, infra_name: str | None = None
     ) -> dict | None:
-        """Résultat de `/taxa/scientific_name` : identité du taxon + historique complet de ses
-        évaluations (voir `module.py` pour le choix de l'évaluation retenue parmi celles-ci). Pas
-        d'appel à `/assessment/{id}` séparé : cette réponse porte déjà `red_list_category_code`
-        et `criteria` par évaluation, seuls champs exploités ici."""
+        """Return the `/taxa/scientific_name` result, or None.
+
+        The taxon identity and the full history of its assessments (see
+        `module.py` for the one retained). That answer already carries
+        `red_list_category_code` and `criteria` per assessment, the only
+        fields used, so there is no separate `/assessment/{id}` call.
+        """
         if not self._token:
-            # Jeton absent : module simplement sauté (voir docstring de tête d'adapter.py),
-            # pas d'appel réseau voué à un 401.
+            # No token: the module is simply skipped, with no network
+            # call doomed to a 401.
             return None
         params: dict[str, str] = {"genus_name": genus_name, "species_name": species_name}
         if infra_name:

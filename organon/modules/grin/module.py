@@ -1,109 +1,115 @@
-"""Logique métier du module GRIN Taxonomy (Germplasm Resources Information Network, USDA) :
-classification des plantes cultivées/ressources génétiques via ChecklistBank dataset 2018 — voir
-`adapter.py`. Domaine restreint à `["végétal"]` (pas de sous-domaine dédié dans l'arbre de
-domaines Organon, comme POWO/Bryonames) : un taxon hors périmètre n'y figure simplement pas,
-`collect` renvoie alors None sans qu'aucune restriction explicite ne soit nécessaire ici.
+"""GRIN Taxonomy (Germplasm Resources Information Network, USDA).
 
-Comme `organon.modules.bryonames.module` (même plateforme ChecklistBank), ce dataset est
-mono-source et curaté par un seul éditeur : pas de désambiguïsation multi-candidats nécessaire
-(`select_col_xr_candidate`/`_code_incoherent`) — le premier candidat "accepted" retourné par
-`type=EXACT` suffit.
+Classification of cultivated plants and genetic resources through
+ChecklistBank dataset 2018. Domain `végétal` (no dedicated subdomain in
+the Organon tree): a taxon out of scope is simply absent, and `collect`
+returns None.
 
-Le règne n'est jamais déduit de `classification` : la chaîne ne porte aucun rang `kingdom`/
-`order`/`class` (elle démarre à `family`, vérifié en direct sur Poaceae/Zea — GRIN Taxonomy
-n'indexe que famille et rangs inférieurs) — `struct.regne` est donc fixé à `"végétal"` en dur une
-fois un candidat validé, sur le même principe que `bryonames`/`algaebase_charte`.
+Like `organon.modules.bryonames.module`, this dataset is single-source
+and curated by one editor: no multi-candidate disambiguation
+(`select_col_xr_candidate`) is needed, the first "accepted" candidate of
+`type=EXACT` is enough.
 
-Contrairement à Bryonames, GRIN a de vrais modèles `{{Bioref}}` dédiés sur fr.wikipedia,
-vérifiés en direct (un par rang : `{{GRIN espèce}}`/`genre`/`sous-tribu`/`tribu`/`sous-famille`/
-`famille`, wikicode de chacun consulté via `action=raw`) — `render_bioref` les sélectionne selon
-le rang du taxon rendu, comme `indexfungorum` le fait pour ses propres modèles dédiés.
-`codeGRIN` (paramètre 1 de ces modèles) est l'identifiant numérique brut sur npgsweb.ars-grin.gov ;
-ChecklistBank préfixe cet identifiant par groupe de rangs (`gen:`/`fam:`, ce dernier couvrant
-aussi bien famille que sous-famille/tribu/sous-tribu) — retirer ce préfixe restitue le codeGRIN
-d'origine (recoupé en direct : le champ `name.link` d'un enregistrement d'espèce pointe vers
-`taxonomydetail?id=<partie numérique de son id ChecklistBank>`).
+The kingdom is never deduced from `classification`: the chain has no
+`kingdom`, `order` or `class` rank (it starts at `family`), so
+`struct.kingdom` is fixed to `"végétal"` once a candidate is validated,
+as `bryonames` does.
 
-Particularité vérifiée sur le wikicode brut de `{{GRIN espèce}}` : contrairement aux cinq autres
-modèles, il n'a pas de paramètre positionnel « validité » (`nv`) pour marquer un synonyme —
-`render_bioref` retombe alors sur le même suffixe textuel `<small>(non valide)</small>` que
-`bryonames` pour ce seul rang.
+Unlike Bryonames, GRIN has real dedicated `{{Bioref}}` templates on
+frwiki, one per rank (`{{GRIN espèce}}`, genre, sous-tribu, tribu,
+sous-famille, famille); `render_bioref` picks one by rank, as
+`indexfungorum` does. `codeGRIN` (parameter 1) is the raw numeric id on
+npgsweb.ars-grin.gov; ChecklistBank prefixes it by rank group (`gen:` or
+`fam:`), and removing the prefix restores it.
 
-`debug_link` ne peut pas se contenter d'un unique gabarit d'URL : `name.link` (fiche GRIN
-d'origine) n'est renvoyé par l'API qu'au rang espèce (vérifié en direct, absent sur
-genre/famille/tribu/etc.) ; `_url_grin` reconstruit alors l'URL par rang à partir du même
-schéma que les modèles wiki (`taxonomydetail` pour l'espèce, `taxonomygenus.aspx` pour le
-genre, `taxonomyfamily.aspx?type=...` pour famille/sous-famille/tribu/sous-tribu)."""
+`{{GRIN espèce}}` has no positional "validity" (`nv`) parameter, so
+`render_bioref` falls back on the same `<small>(non valide)</small>`
+suffix as `bryonames` for that rank only.
+
+`debug_link` cannot use a single URL pattern: `name.link` is returned
+only at species rank, so `_grin_url` rebuilds the URL per rank from the
+scheme of the wiki templates.
+"""
 
 from __future__ import annotations
+
+from functools import partial
 
 from organon.core.config import GenerateOptions
 from organon.core.models import (
     RankName,
-    Redirection,
     Struct,
     SubTaxonList,
     SynonymList,
-    TaxonInfo,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import MAX_SYNONYM_HOPS, as_limit, collect_pages, format_auteur
-from organon.modules.grin.adapter import GrinAdapter
-from organon.modules.grin.ranks import grin_cherche_rang
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.checklistbank import ChecklistBankAdapter
+from organon.modules.col_xr.ranks import col_xr_to_wp_rank
+from organon.modules.common import (
+    as_limit,
+    checklistbank_accepted_name,
+    collect_pages,
+    follow_synonym,
+    format_author,
+)
 
-_ESPECE_RANGS = {"espèce", "sous-espèce", "variété", "forme"}
-"""Rangs mappés sur `{{GRIN espèce}}` — les autres rangs observés dans ce dataset (famille et
-en dessous) ont chacun leur propre modèle dédié."""
+# Ranks mapped to `{{GRIN espèce}}`; the others in this dataset (family
+# and below) each have their own template.
+_SPECIES_RANKS = {"espèce", "sous-espèce", "variété", "forme"}
 
-_RANG_MODELE = {
+# Any rank absent here falls back on `{{GRIN famille}}`: the GRIN chain
+# never goes above the family, which is the default template.
+_TEMPLATE_BY_RANK = {
     "sous-tribu": "GRIN sous-tribu",
     "tribu": "GRIN tribu",
     "sous-famille": "GRIN sous-famille",
     "genre": "GRIN genre",
 }
-"""Tout rang absent d'ici retombe sur `{{GRIN famille}}` : la chaîne de classification GRIN ne
-dépasse jamais la famille (vérifié en direct), qui sert donc de modèle par défaut plutôt que
-`espèce`/`genre`."""
 
 
-def _modele_pour_rang(rang: str) -> str:
-    if rang in _ESPECE_RANGS:
+def _template_for_rank(rank: str) -> str:
+    """Return the {{GRIN ...}} template name for a rank."""
+    if rank in _SPECIES_RANKS:
         return "GRIN espèce"
-    return _RANG_MODELE.get(rang, "GRIN famille")
+    return _TEMPLATE_BY_RANK.get(rank, "GRIN famille")
 
 
-def _code_grin(taxon_id: str) -> str:
+def _grin_code(taxon_id: str) -> str:
+    """Return the raw GRIN code of a ChecklistBank id."""
     return taxon_id.rsplit(":", 1)[-1]
 
 
+# GRIN serves family, subfamily, tribe and subtribe through one
+# `taxonomyfamily.aspx` page told apart by `type=`, while species and
+# genus have their own pages. Scheme taken from the six templates and
+# reused by `debug_link`, `name.link` being returned at species rank
+# only.
 _URL_TYPE = {
     "GRIN sous-tribu": "subtribe",
     "GRIN tribu": "tribe",
     "GRIN sous-famille": "subfamily",
     "GRIN famille": "family",
 }
-"""Le site GRIN sert genre/famille/tribu/sous-famille/sous-tribu par une même page
-`taxonomyfamily.aspx` distinguée par `type=`, mais l'espèce et le genre ont chacun leur propre
-page (`taxonomydetail`/`taxonomygenus`) — schéma d'URL relevé sur le wikicode brut des six
-modèles GRIN, réutilisé ici pour `debug_link` faute de `name.link` renvoyé par l'API au-delà du
-rang espèce (vérifié en direct : absent sur genre/famille)."""
 
 
-def _url_grin(rang: str, code: str) -> str:
-    modele = _modele_pour_rang(rang)
-    if modele == "GRIN espèce":
+def _grin_url(rank: str, code: str) -> str:
+    """Return the GRIN site URL of a taxon, by rank."""
+    template = _template_for_rank(rank)
+    if template == "GRIN espèce":
         return f"https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomydetail?id={code}"
-    if modele == "GRIN genre":
+    if template == "GRIN genre":
         return f"https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomygenus.aspx?id={code}"
     return (
         "https://npgsweb.ars-grin.gov/gringlobal/taxon/taxonomyfamily.aspx"
-        f"?type={_URL_TYPE[modele]}&id={code}"
+        f"?type={_URL_TYPE[template]}&id={code}"
     )
 
 
 class GrinModule(TaxonomyModule):
+    """GRIN Taxonomy module."""
+
     meta = ModuleMeta(
         id="grin",
         can_classify=True,
@@ -111,74 +117,76 @@ class GrinModule(TaxonomyModule):
         domains=["végétal"],
     )
 
-    def __init__(self, adapter: GrinAdapter | None = None) -> None:
-        self._adapter = adapter or GrinAdapter()
+    def __init__(self, adapter: ChecklistBankAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
+        self._adapter = adapter or ChecklistBankAdapter("2018")
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from GRIN."""
         return await self._collect(struct, is_classification, options, hop=0)
 
     async def _collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions, hop: int
     ) -> Struct | None:
+        """Collect with a synonym hop count."""
         adapter = self._adapter
 
-        candidats = await adapter.search(struct.taxon.nom)
-        if not candidats:
+        candidates = await adapter.search(struct.taxon.name)
+        if not candidates:
             return None
 
-        accepted = [r for r in candidats if r["usage"]["status"] == "accepted"]
+        accepted = [r for r in candidates if r["usage"]["status"] == "accepted"]
         cur = accepted[0] if accepted else None
         if cur is None:
-            if not options.suivre_synonymes:
+            if not options.follow_synonyms:
                 return None
-            cur = candidats[0]
+            cur = candidates[0]
 
         usage = cur["usage"]
         name = usage["name"]
         taxon_id = cur["id"]
 
-        struct.liens["grin"] = {
+        struct.links["grin"] = {
             "id": taxon_id,
-            "nom": name["scientificName"],
-            "auteur": format_auteur(name.get("authorship")),
-            "rang": grin_cherche_rang(name["rank"]),
+            "name": name["scientificName"],
+            "author": format_author(name.get("authorship")),
+            "rank": col_xr_to_wp_rank(name["rank"]),
             "link": name.get("link"),
         }
 
         is_synonym = usage["status"] == "synonym"
-        struct.liens["grin"]["statut_detecte"] = "synonyme" if is_synonym else "accepté"
+        struct.links["grin"]["detected_status"] = "synonyme" if is_synonym else "accepté"
         if is_synonym:
-            if not is_classification:
-                struct.liens["grin"]["synonyme"] = True
-                return struct
-            if options.suivre_synonymes:
-                if hop >= MAX_SYNONYM_HOPS:
-                    return None
-                accepted_target = usage.get("accepted")
-                if accepted_target is None:
-                    return None
-                struct.redirection = Redirection(nom=struct.taxon.nom)
-                struct.taxon = TaxonInfo(nom=accepted_target["name"]["scientificName"])
-                return await self._collect(struct, is_classification, options, hop=hop + 1)
+            handled, result = await follow_synonym(
+                struct,
+                "grin",
+                is_classification,
+                options,
+                hop,
+                partial(checklistbank_accepted_name, usage),
+                lambda next_hop: self._collect(struct, is_classification, options, hop=next_hop),
+            )
+            if handled:
+                return result
 
         if not is_classification:
             return struct
 
-        struct.taxon.auteur = format_auteur(name.get("authorship"))
-        struct.taxon.rang = grin_cherche_rang(name["rank"])
-        struct.taxon.nom = name["scientificName"].strip()
+        struct.taxon.author = format_author(name.get("authorship"))
+        struct.taxon.rank = col_xr_to_wp_rank(name["rank"])
+        struct.taxon.name = name["scientificName"].strip()
         struct.classification = "GRIN"
         struct.classification_taxobox = "GRIN"
-        struct.regne = "végétal"
+        struct.kingdom = "végétal"
 
         classification = cur.get("classification", [])
-        struct.rangs = [
+        struct.ranks = [
             RankName(
-                nom=c["name"],
-                rang=grin_cherche_rang(c["rank"]),
-                auteur=format_auteur(c.get("authorship")),
+                name=c["name"],
+                rank=col_xr_to_wp_rank(c["rank"]),
+                author=format_author(c.get("authorship")),
             )
             for c in reversed(classification)
             if c.get("id") != taxon_id
@@ -193,63 +201,65 @@ class GrinModule(TaxonomyModule):
                     continue
                 out.append(
                     RankName(
-                        nom=c["name"],
-                        rang=grin_cherche_rang(c["rank"]),
-                        auteur=format_auteur(c.get("authorship")),
+                        name=c["name"],
+                        rank=col_xr_to_wp_rank(c["rank"]),
+                        author=format_author(c.get("authorship")),
                     )
                 )
             return out, len(raw), page.get("last", True)
 
-        liste, coupe = await collect_pages(fetch_children, limit=as_limit(options.limite_listes))
-        if liste:
-            struct.sous_taxons = SubTaxonList(liste=liste, source="GRIN", coupe=coupe)
+        items, truncated = await collect_pages(fetch_children, limit=as_limit(options.list_limit))
+        if items:
+            struct.subtaxa = SubTaxonList(items=items, source="GRIN", truncated=truncated)
 
         syn = await adapter.synonyms(taxon_id)
-        synonymes = []
+        synonyms = []
         for entry in [*syn.get("homotypic", []), *syn.get("heterotypic", [])]:
             sname = entry.get("name") or {}
             if not sname.get("scientificName"):
                 continue
-            synonymes.append(
+            synonyms.append(
                 RankName(
-                    nom=sname["scientificName"],
-                    auteur=format_auteur(sname.get("authorship")),
-                    rang=grin_cherche_rang(sname.get("rank", "")),
+                    name=sname["scientificName"],
+                    author=format_author(sname.get("authorship")),
+                    rank=col_xr_to_wp_rank(sname.get("rank", "")),
                 )
             )
-        if synonymes:
-            struct.synonymes = SynonymList(liste=synonymes, source="GRIN", coupe=False)
+        if synonyms:
+            struct.synonyms = SynonymList(items=synonyms, source="GRIN", truncated=False)
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("grin")
+        """Render the {{GRIN ...}} template of the rank."""
+        data = struct.links.get("grin")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        rang = data.get("rang") or struct.taxon.rang or ""
-        modele = _modele_pour_rang(rang)
-        code = _code_grin(data["id"])
-        cible = wp_met_italiques(data["nom"], rang, struct.regne)
-        if data.get("auteur"):
-            cible += " " + data["auteur"]
+        cdate = retrieval_dates()
+        rank = data.get("rank") or struct.taxon.rank or ""
+        template = _template_for_rank(rank)
+        code = _grin_code(str(data["id"]))
+        target = wp_apply_italics(data["name"], rank, struct.kingdom)
+        if author := data.get("author"):
+            target += " " + author
 
-        if modele == "GRIN espèce":
-            post = " <small>(non valide)</small>" if data.get("synonyme") else ""
-            return f"{{{{{modele} | {code} | {cible} | consulté le={cdate} }}}}{post}"
+        if template == "GRIN espèce":
+            post = " <small>(non valide)</small>" if data.get("synonym") else ""
+            return f"{{{{{template} | {code} | {target} | consulté le={cdate} }}}}{post}"
 
-        champs = [code, cible]
-        if data.get("synonyme"):
-            champs.append("nv")
-        corps = " | ".join(champs)
-        return f"{{{{{modele} | {corps} | consulté le={cdate} }}}}"
+        fields = [code, target]
+        if data.get("synonym"):
+            fields.append("nv")
+        body = " | ".join(fields)
+        return f"{{{{{template} | {body} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("grin")
+        """Return the debug link to the GRIN page."""
+        data = struct.links.get("grin")
         if not data or "id" not in data:
             return None
-        rang = data.get("rang") or struct.taxon.rang or ""
-        url = data.get("link") or _url_grin(rang, _code_grin(data["id"]))
+        rank = data.get("rank") or struct.taxon.rank or ""
+        url = data.get("link") or _grin_url(rank, _grin_code(str(data["id"])))
         return f"<a href='{url}' target='_blank' rel='noopener noreferrer'>GRIN</a>"
 
 

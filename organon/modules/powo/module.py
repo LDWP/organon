@@ -1,94 +1,69 @@
-"""Logique métier du module POWO (Plants of the World Online) : classification (domaine
-`['végétal']`), auteur, rang, synonymes, distribution géographique.
+"""POWO module: classification, synonyms, distribution, sub-taxa.
 
-`search()` renvoie plusieurs enregistrements pour un nom ambigu (homonymes) sans distinction
-fiable hormis le champ `accepted` : filtré sur correspondance exacte de `name`, puis préférence à
-l'enregistrement `accepted=True` s'il existe (à défaut, le premier résultat exact, comme
-`organon.modules.tropicos`).
+Domain `végétal`.
 
-`lookup(id, include=['distribution'])` sert de seconde étape pour récupérer la fiche complète
-(classification, synonymes, distribution) à partir du `fqId` (LSID IPNI complet) trouvé par la
-recherche — `fqId` sert directement d'identifiant pour `pykew.powo.lookup`, sans reconstruction
-depuis `url`.
+`search()` returns several records for an ambiguous name: filter on an
+exact `name`, then prefer `accepted=True` (else the first exact match,
+as `organon.modules.tropicos`). `lookup(id, include=['distribution'])`
+then fetches the full record from the `fqId` (full IPNI LSID).
 
-Suivi de synonyme (mode classification uniquement, comme ITIS/GBIF) : un enregistrement dont
-`taxonomicStatus` n'est pas "Accepted" porte un champ `accepted` (fqId + nom du nom accepté) —
-utilisé pour relancer la collecte sur ce nom si `suivre_synonymes` est actif, sinon la
-classification se construit directement à partir du synonyme tel quel (même convention que
-ITIS/GBIF : "on continue avec les données du synonyme").
+Synonym following (classification only): a record whose
+`taxonomicStatus` is not "Accepted" carries an `accepted` field, used to
+rerun the collection on that name if `follow_synonyms` is on; otherwise
+the classification is built from the synonym itself.
 
-Distribution (`detail["distribution"]`) : un dict de catégories (`natives`, `introduced`,
-`absent`, vues en direct ; `extinct`/`doubtful` probables par le même schéma WCVP mais non
-observées) plutôt qu'une simple liste de codes — chaque entrée porte `tdwgCode` (code régional
-TDWG/WGSRPD, niveau 3, ex. "FRA" ; vérifié empiriquement sur de vraies réponses — `tdwgLevel`
-vaut systématiquement 3, y compris pour des pays comme la France dont le `locationTree` contient
-pourtant des sous-codes de niveau 4 comme "FRA_FR" : ce sont ces derniers qu'un commentaire
-précédent citait à tort comme exemple de `tdwgCode`) et `establishment` (ex. "Native",
-"Introduced", "Absent"). Bug corrigé ici : une version précédente lisait
-`detail.get("distribution")` comme si c'était déjà une liste de codes — comme ce champ est
-toujours un dict (jamais None) quand `include=['distribution']` est demandé, la garde
-`isinstance(raw, list)` était toujours fausse et aucune distribution n'était jamais retenue.
-`_distribution_entries` ci-dessous consomme la structure réelle, classe "Absent" exclu (le taxon
-n'y est explicitement pas), "Native"/"Introduced" en présence certaine, tout le reste (ex.
-"Doubtful"/"Extinct") en présence incertaine ; secours sur `locations` (liste plate de codes,
-sans distinction de statut) si `distribution` est absent. "Introduced" et "Extinct" sont en plus
-isolés dans deux sous-ensembles dédiés (`introduced`/`extinct` de `DistributionEntry`) pour
-permettre une couleur distincte (violet/rouge) sur {{WGSRPD}}, sans changer le classement
-certain/incertain utilisé par le texte de la section Répartition.
+Distribution: `detail["distribution"]` is a dict of categories
+(`natives`, `introduced`, `absent`…), each entry carrying `tdwgCode` (a
+WGSRPD level-3 code, e.g. "FRA") and `establishment`.
+`_distribution_entries` drops "Absent", takes "Native" and "Introduced"
+as certain, the rest as uncertain, and falls back on the flat
+`locations` list. "Introduced" and "Extinct" are also isolated in their
+own subsets for distinct {{WGSRPD}} colors.
 
-Ces codes TDWG/WGSRPD ne sont pas des codes pays ISO 3166 : `organon.core.rendering.support`
-attend des codes ISO pour le texte de la section Répartition, et retombe sur le code brut non
-lié pour tout code inconnu (comportement documenté) — donc aucun crash, seulement un rendu moins
-soigné pour ce texte. Ces mêmes codes alimentent en revanche directement `{{WGSRPD}}` (carte de
-répartition sur fr.wikipedia.org, Module:WGSRPD + pages Data:WGSRPD/level3/*.map sur Commons),
-émis par `organon.core.rendering.sections.render_distribution` pour la seule source `"powo"`
-(voir ce module pour le détail).
-
-Sous-taxons (mode classification uniquement, comme GBIF/COL/ITIS) : `detail["childNameUsages"]`
-donne directement les enfants acceptés du taxon consulté, quel que soit son rang (genres d'une
-famille, espèces d'un genre, sous-espèces d'une espèce...), un seul niveau, jamais récursif — pas
-besoin de requête supplémentaire ni de brancher sur le rang du taxon courant (voir docstring de
-`PowoAdapter` pour la vérification en direct). Absent (`None`, pas liste vide) si le taxon n'a
-aucun enfant enregistré."""
+These are not ISO 3166 codes: the Répartition text falls back on the raw
+unlinked code, while `{{WGSRPD}}` uses them directly (see
+`sections.render_distribution`).
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import (
     DistributionEntry,
+    LinkEntry,
     RankName,
-    Redirection,
     Struct,
     SubTaxonList,
     SynonymList,
     TaxonInfo,
 )
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.common import (
     MAX_SYNONYM_HOPS,
     as_limit,
-    format_auteur,
-    format_auteur_annee,
+    format_author,
+    format_author_year,
     simple_debug_link,
 )
 from organon.modules.powo.adapter import PowoAdapter
-from organon.modules.powo.ranks import powo_cherche_rang, powo_cherche_regne
+from organon.modules.powo.ranks import powo_lookup_kingdom, powo_to_wp_rank
 
 _ABSENT = "absent"
 _EXTINCT = "extinct"
 _INTRODUCED = "introduced"
-_INCERTAIN = {"doubtful", _EXTINCT}
+_UNCERTAIN = {"doubtful", _EXTINCT}
 
 
 def _distribution_entries(
     detail: dict,
 ) -> tuple[dict[str, str], dict[str, str], dict[str, str], dict[str, str]]:
-    """Renvoie (certain, uncertain, introduced, extinct). `introduced`/`extinct` sont des
-    sous-ensembles de `certain`/`uncertain` (voir docstring de `DistributionEntry`) : ils isolent
-    les codes dont le statut POWO est explicitement "Introduced"/"Extinct" pour leur permettre
-    une couleur dédiée sur {{WGSRPD}} (violet/rouge) sans perdre le classement certain/incertain
-    déjà utilisé par le texte de la section Répartition."""
+    """Return (certain, uncertain, introduced, extinct) code dicts.
+
+    `introduced` and `extinct` are subsets of the other two, isolating
+    the codes whose POWO status is explicitly so (see
+    `DistributionEntry`).
+    """
     certain: dict[str, str] = {}
     uncertain: dict[str, str] = {}
     introduced: dict[str, str] = {}
@@ -103,16 +78,16 @@ def _distribution_entries(
                 code = e.get("tdwgCode")
                 if not isinstance(code, str):
                     continue
-                statut = (e.get("establishment") or "").lower()
-                if statut == _ABSENT:
+                status = (e.get("establishment") or "").lower()
+                if status == _ABSENT:
                     continue
-                if statut in _INCERTAIN:
+                if status in _UNCERTAIN:
                     uncertain[code] = code
-                    if statut == _EXTINCT:
+                    if status == _EXTINCT:
                         extinct[code] = code
                 else:
                     certain[code] = code
-                    if statut == _INTRODUCED:
+                    if status == _INTRODUCED:
                         introduced[code] = code
         return certain, uncertain, introduced, extinct
 
@@ -123,23 +98,28 @@ def _distribution_entries(
 
 
 class PowoModule(TaxonomyModule):
+    """POWO module."""
+
     meta = ModuleMeta(
         id="powo", can_classify=True, can_render_external_link=True, domains=["végétal"]
     )
 
     def __init__(self, adapter: PowoAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or PowoAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon from POWO."""
         return await self._collect(struct, is_classification, options, hop=0)
 
     async def _collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions, hop: int
     ) -> Struct | None:
-        results = await self._adapter.search(struct.taxon.nom)
-        exact = [r for r in results if r.get("name") == struct.taxon.nom]
+        """Collect with a synonym hop count."""
+        results = await self._adapter.search(struct.taxon.name)
+        exact = [r for r in results if r.get("name") == struct.taxon.name]
         if not exact:
             return None
         match = next((r for r in exact if r.get("accepted")), exact[0])
@@ -152,37 +132,37 @@ class PowoModule(TaxonomyModule):
         if detail is None:
             return None
 
-        numero = taxon_id.rsplit(":", 1)[-1]
-        rang = powo_cherche_rang(detail.get("rank"))
-        auteur_annee = format_auteur_annee(detail.get("authors"), detail.get("namePublishedInYear"))
-        entry: dict = {
-            "id": numero,
-            "nom": detail.get("name") or match["name"],
-            "auteur": format_auteur(auteur_annee),
+        number = taxon_id.rsplit(":", 1)[-1]
+        rank = powo_to_wp_rank(detail.get("rank"))
+        author_year = format_author_year(detail.get("authors"), detail.get("namePublishedInYear"))
+        entry: LinkEntry = {
+            "id": number,
+            "name": detail.get("name") or match["name"],
+            "author": format_author(author_year),
         }
-        if rang:
-            entry["rang"] = rang
-        est_synonyme = detail.get("taxonomicStatus") not in (None, "Accepted")
-        if est_synonyme:
-            entry["synonyme"] = True
-        struct.liens["powo"] = entry
+        if rank:
+            entry["rank"] = rank
+        is_synonym = detail.get("taxonomicStatus") not in (None, "Accepted")
+        if is_synonym:
+            entry["synonym"] = True
+        struct.links["powo"] = entry
 
-        synonymes_liste = [
+        synonyms_list = [
             RankName(
-                nom=s["name"],
-                auteur=format_auteur(s.get("author")),
-                rang=powo_cherche_rang(s.get("rank")),
+                name=s["name"],
+                author=format_author(s.get("author")),
+                rank=powo_to_wp_rank(s.get("rank")),
             )
             for s in detail.get("synonyms") or []
             if s.get("name")
         ]
-        limit = as_limit(options.limite_listes)
-        coupe = False
-        if limit is not None and len(synonymes_liste) > limit:
-            synonymes_liste = synonymes_liste[:limit]
-            coupe = True
-        if synonymes_liste:
-            struct.synonymes = SynonymList(liste=synonymes_liste, source="POWO", coupe=coupe)
+        limit = as_limit(options.list_limit)
+        truncated = False
+        if limit is not None and len(synonyms_list) > limit:
+            synonyms_list = synonyms_list[:limit]
+            truncated = True
+        if synonyms_list:
+            struct.synonyms = SynonymList(items=synonyms_list, source="POWO", truncated=truncated)
 
         certain, uncertain, introduced, extinct = _distribution_entries(detail)
         if certain or uncertain:
@@ -190,59 +170,61 @@ class PowoModule(TaxonomyModule):
                 certain=certain, uncertain=uncertain, introduced=introduced, extinct=extinct
             )
 
-        if est_synonyme:
+        # Variant outside `follow_synonym`: the synonym is not marked in
+        # `links` outside classification, and an unusable "accepted"
+        # field falls back on the synonym itself.
+        if is_synonym:
             if not is_classification:
                 return struct
-            if options.suivre_synonymes:
+            if options.follow_synonyms:
                 accepted = detail.get("accepted") or {}
                 if accepted.get("fqId") and accepted.get("name"):
                     if hop >= MAX_SYNONYM_HOPS:
                         return None
-                    struct.redirection = Redirection(nom=struct.taxon.nom)
-                    struct.taxon = TaxonInfo(nom=accepted["name"])
+                    struct.taxon = TaxonInfo(name=accepted["name"])
                     return await self._collect(struct, is_classification, options, hop=hop + 1)
-            # suivre_synonymes désactivé (ou pas de champ "accepted" exploitable) : on continue
-            # avec les données du synonyme tel quel, comme ITIS/GBIF.
+            # follow_synonyms is off (or no usable "accepted" field):
+            # keep going with the synonym as is, like ITIS and GBIF.
 
         if not is_classification:
             return struct
 
-        regne = powo_cherche_regne(detail.get("kingdom"))
-        if not regne:
+        kingdom = powo_lookup_kingdom(detail.get("kingdom"))
+        if not kingdom:
             return None
 
-        struct.taxon.rang = rang
-        struct.taxon.auteur = format_auteur(auteur_annee)
-        struct.regne = regne
+        struct.taxon.rank = rank
+        struct.taxon.author = format_author(author_year)
+        struct.kingdom = kingdom
         struct.classification = "POWO"
         struct.classification_taxobox = "POWO"
 
         chain = detail.get("classification") or []
-        rangs = [
+        ranks = [
             RankName(
-                nom=c["name"],
-                rang=powo_cherche_rang(c.get("rank")),
-                auteur=format_auteur(c.get("author")),
+                name=c["name"],
+                rank=powo_to_wp_rank(c.get("rank")),
+                author=format_author(c.get("author")),
             )
             for c in chain
             if c.get("fqId") != taxon_id and c.get("name")
         ]
-        rangs.reverse()
+        ranks.reverse()
 
-        # `classification` ne remonte que famille+genre (WCVP) : les rangs supérieurs
-        # (embranchement, classe, sous-classe, ordre) sont des champs scalaires séparés sur la
-        # fiche, absents de la chaîne — sans quoi la taxobox POWO s'arrêtait à la famille.
+        # `classification` only has family and genus (WCVP): the higher
+        # ranks (phylum, class, subclass, order) are separate scalar
+        # fields, or the POWO taxobox would stop at the family.
         for field, rank_code in (
             ("order", "ORDER"),
             ("subclass", "SUBCLASS"),
             ("clazz", "CLASS"),
             ("phylum", "PHYLUM"),
         ):
-            nom = detail.get(field)
-            if nom:
-                rangs.append(RankName(nom=nom, rang=powo_cherche_rang(rank_code)))
+            name = detail.get(field)
+            if name:
+                ranks.append(RankName(name=name, rank=powo_to_wp_rank(rank_code)))
 
-        struct.rangs = rangs
+        struct.ranks = ranks
 
         children = [
             c
@@ -250,40 +232,42 @@ class PowoModule(TaxonomyModule):
             if c.get("name") and c.get("taxonomicStatus") == "Accepted"
         ]
         if children:
-            limit = as_limit(options.limite_listes)
-            coupe = False
+            limit = as_limit(options.list_limit)
+            truncated = False
             if limit is not None and len(children) > limit:
                 children = children[:limit]
-                coupe = True
-            struct.sous_taxons = SubTaxonList(
-                liste=[
+                truncated = True
+            struct.subtaxa = SubTaxonList(
+                items=[
                     RankName(
-                        nom=c["name"],
-                        auteur=format_auteur(c.get("author")),
-                        rang=powo_cherche_rang(c.get("rank")),
+                        name=c["name"],
+                        author=format_author(c.get("author")),
+                        rank=powo_to_wp_rank(c.get("rank")),
                     )
                     for c in children
                 ],
                 source="POWO",
-                coupe=coupe,
+                truncated=truncated,
             )
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("powo")
+        """Render the {{POWO}} template."""
+        data = struct.links.get("powo")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        parts = [data["id"], data["nom"]]
-        if data.get("auteur") or data.get("synonyme"):
-            parts.append(data.get("auteur") or "")
-        if data.get("synonyme"):
+        cdate = retrieval_dates()
+        parts = [str(data["id"]), data["name"]]
+        if data.get("author") or data.get("synonym"):
+            parts.append(data.get("author") or "")
+        if data.get("synonym"):
             parts.append("nv")
         body = " | ".join(parts)
         return f"{{{{POWO | {body} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the POWO page."""
         return simple_debug_link(
             struct,
             "powo",

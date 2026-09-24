@@ -1,63 +1,76 @@
-"""Logique métier du module MNHN (science.mnhn.fr). Module d'enrichissement uniquement
-(`can_classify=False`), limité aux rangs espèce et genre — le site ne propose de fiche dédiée
-que pour ces deux niveaux.
+"""MNHN module (science.mnhn.fr): enrichment only.
 
-Bug corrigé plutôt que reproduit (intention non ambiguë, vérifié en direct) : l'URL était
-construite en remplaçant l'espace par `/_` (ex. `species/gadus/_morhua`), qui renvoie
-systématiquement 404 sur le site actuel — le séparateur correct est un simple `/`
-(`species/gadus/morhua`, confirmé fonctionnel). Sans cette correction, le module ne pouvait
-jamais trouver la moindre espèce."""
+`can_classify=False`, limited to species and genus ranks: the site has a
+dedicated page for those two levels only.
+
+Fixed bug (verified): the URL used to be built by replacing the space
+with `/_` (e.g. `species/gadus/_morhua`), which always returns 404; the
+right separator is a plain `/` (`species/gadus/morhua`). Without the fix
+the module could never find any species.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.mnhn.adapter import MnhnAdapter
 
 _RANK_PATH = {"espèce": "species", "genre": "genus"}
 
 
 class MnhnModule(TaxonomyModule):
+    """MNHN module."""
+
     meta = ModuleMeta(id="mnhn", can_classify=False, can_render_external_link=True, domains="all")
 
     def __init__(self, adapter: MnhnAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or MnhnAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the MNHN page of the taxon."""
         if is_classification:
             return None
 
-        rang = struct.taxon.rang
-        segment = _RANK_PATH.get(rang or "")
+        rank = struct.taxon.rank
+        segment = _RANK_PATH.get(rank or "")
         if segment is None:
             return None
 
-        slug = struct.taxon.nom.lower().replace(" ", "/")
+        slug = struct.taxon.name.lower().replace(" ", "/")
         path = f"{segment}/{slug}"
 
         if not await self._adapter.exists(path):
             return None
 
-        struct.liens["mnhn"] = {"id": slug, "rang": rang, "url": f"https://science.mnhn.fr/taxon/{path}"}
+        struct.links["mnhn"] = {
+            "id": slug,
+            "rank": rank,
+            "url": f"https://science.mnhn.fr/taxon/{path}",
+        }
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("mnhn")
+        """Render the {{MNHN}} template."""
+        data = struct.links.get("mnhn")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        description = wp_met_italiques(
-            struct.taxon.nom, data.get("rang") or struct.taxon.rang, struct.regne
+        cdate = retrieval_dates()
+        description = wp_apply_italics(
+            struct.taxon.name, data.get("rank") or struct.taxon.rank, struct.kingdom
         )
-        return f"{{{{MNHN | {data['rang']} | {data['id']} | {description} | consulté le={cdate}}}}}"
+        return (
+            f"{{{{MNHN | {data['rank']} | {data['id']} | {description} | consulté le={cdate}}}}}"
+        )
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("mnhn")
+        """Return the debug link to the MNHN page."""
+        data = struct.links.get("mnhn")
         if not data or "url" not in data:
             return None
         return f"<a href='{data['url']}' target='_blank' rel='noopener noreferrer'>MNHN</a>"

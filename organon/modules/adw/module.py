@@ -1,69 +1,78 @@
-"""Logique métier du module Animal Diversity Web (ADW, animaldiversity.org). Module
-d'enrichissement uniquement (`can_classify=False` — ADW ne fournit aucune classification
-structurée, comme dans le PHP d'origine), domaine "tous". Voir le docstring de `adapter.py`
-pour le détail de l'extraction et les écarts constatés en direct par rapport au PHP."""
+"""Animal Diversity Web (ADW) module.
+
+Enrichment only (`can_classify=False`: ADW gives no structured
+classification), domain "all". See `adapter.py` for the extraction.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
+from organon.core.models import LinkEntry, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.adw.adapter import AdwAdapter, AdwCitation, Author
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.modules.common import format_author, simple_debug_link
 
 
-def _format_nom(auteur: Author) -> str:
-    return f"{auteur.nom}, {auteur.prenom1}{auteur.prenom2 or ''}"
+def _format_name(author: Author) -> str:
+    """Format an author as "Surname, Initials"."""
+    return f"{author.nom}, {author.prenom1}{author.prenom2 or ''}"
 
 
 def _format_citation(citation: AdwCitation) -> str | None:
-    """Formate premier_auteur/autres_auteurs façon citation Wikipédia : auteur seul, "X et Y",
-    ou "X et al." à partir de 3 auteurs — comme le PHP d'origine."""
+    """Format the authors like a Wikipedia citation.
+
+    A single author, "X et Y", or "X et al." from 3 authors.
+    """
     if citation.premier_auteur is None:
         return None
-    premier = _format_nom(citation.premier_auteur)
+    first = _format_name(citation.premier_auteur)
     if not citation.autres_auteurs:
-        return premier
+        return first
     if len(citation.autres_auteurs) == 1:
-        return f"{premier} et {_format_nom(citation.autres_auteurs[0])}"
-    return format_auteur(f"{premier} et al.")
+        return f"{first} et {_format_name(citation.autres_auteurs[0])}"
+    return format_author(f"{first} et al.")
 
 
 class AdwModule(TaxonomyModule):
+    """ADW module."""
+
     meta = ModuleMeta(id="adw", can_classify=False, can_render_external_link=True, domains="all")
 
     def __init__(self, adapter: AdwAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or AdwAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the ADW citation of the taxon."""
         if is_classification:
             return None
 
-        slug = struct.taxon.nom.replace(" ", "_")
+        slug = struct.taxon.name.replace(" ", "_")
         citation = await self._adapter.fetch(slug)
         if citation is None:
             return None
 
-        data: dict = {"id": slug}
-        auteurs = _format_citation(citation)
-        if auteurs:
-            data["citation"] = auteurs
+        data: LinkEntry = {"id": slug}
+        authors = _format_citation(citation)
+        if authors:
+            data["citation"] = authors
         if citation.annee:
             data["date"] = citation.annee
 
-        struct.liens["adw"] = data
+        struct.links["adw"] = data
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("adw")
+        """Render the {{ADW}} template."""
+        data = struct.links.get("adw")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        description = wp_met_italiques(struct.taxon.nom, struct.taxon.rang, struct.regne)
+        cdate = retrieval_dates()
+        description = wp_apply_italics(struct.taxon.name, struct.taxon.rank, struct.kingdom)
         adw = f"{{{{ADW | {data['id']} | {description} | consulté le={cdate}"
         if data.get("citation"):
             adw += f" | auteur={data['citation']}"
@@ -73,6 +82,7 @@ class AdwModule(TaxonomyModule):
         return adw
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the ADW page."""
         return simple_debug_link(
             struct, "adw", "https://animaldiversity.org/accounts/{id}/", "ADW"
         )

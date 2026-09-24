@@ -1,41 +1,48 @@
-"""Logique métier du module TelaMétro (Tela Botanica, référentiel BDTFX — flore de France
-métropolitaine). Module d'enrichissement uniquement (`can_classify=False`), limité au domaine
-végétal. Réutilise nom/rang déjà connus de la classification principale (BDTFX n'expose pas de
-rang traduisible directement vers le vocabulaire Wikipédia dans cette recherche).
+"""TelaMétro module (Tela Botanica, BDTFX).
 
-Les noms vernaculaires viennent d'un second appel (`noms_communs_fr`, scraping de l'onglet
-Ethnobotanique) plutôt que du `common_name` renvoyé par la recherche Algolia — voir
-`TelametroAdapter` pour pourquoi ce dernier est insuffisant. Alimentent `struct.autres_noms`
-(groupés par statut BDTFX), pas `struct.vernaculaire` : contrairement aux autres sources de
-noms vernaculaires, la BDTFX qualifie elle-même chaque nom d'un statut explicite, information
-qu'on ne veut pas perdre en la fondant dans la liste plate `vernaculaire`."""
+The BDTFX is the flora of metropolitan France. Enrichment only
+(`can_classify=False`), plant domain. Reuses the name and rank already
+known from the main classification (the BDTFX gives no rank translatable
+to Wikipedia in this search).
+
+Vernacular names come from a second call (`french_common_names`,
+scraping the Ethnobotanique tab) rather than the Algolia `common_name`;
+see `TelametroAdapter`. They feed `struct.other_names` (grouped by BDTFX
+status), not `struct.vernacular`: the BDTFX qualifies each name with an
+explicit status, which must not be lost by merging into the flat
+`vernacular` list.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
-from organon.core.models import Struct
+from organon.core.models import LinkEntry, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur, simple_debug_link
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import format_author, simple_debug_link
 from organon.modules.telametro.adapter import TelametroAdapter
 
 
 class TelametroModule(TaxonomyModule):
+    """TelaMétro module."""
+
     meta = ModuleMeta(
         id="telametro", can_classify=False, can_render_external_link=True, domains=["végétal"]
     )
 
     def __init__(self, adapter: TelametroAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or TelametroAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the taxon and its vernacular names from TelaMétro."""
         if is_classification:
             return None
 
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
         hits = await self._adapter.search(taxon)
 
         match = None
@@ -49,33 +56,35 @@ class TelametroModule(TaxonomyModule):
         if match is None:
             return None
 
-        auteur = match.get("author") or ""
+        author = match.get("author") or ""
         year = match.get("year")
         if year:
-            auteur = f"{auteur} {year}".strip()
+            author = f"{author} {year}".strip()
 
-        blob: dict = {"id": match["nomenclatural_number"], "nom": taxon}
-        if auteur:
-            blob["auteur"] = format_auteur(auteur)
-        struct.liens["telametro"] = blob
+        blob: LinkEntry = {"id": match["nomenclatural_number"], "name": taxon}
+        if author:
+            blob["author"] = format_author(author)
+        struct.links["telametro"] = blob
 
-        autres_noms = await self._adapter.noms_communs_fr(match["nomenclatural_number"])
-        if autres_noms:
-            struct.autres_noms["Tela-métro"] = autres_noms
+        other_names = await self._adapter.french_common_names(match["nomenclatural_number"])
+        if other_names:
+            struct.other_names["Tela-métro"] = other_names
 
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("telametro")
+        """Render the {{Tela-métro}} template."""
+        data = struct.links.get("telametro")
         if not data or "id" not in data:
             return None
-        cdate = dates_recupere()
-        texte = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        if data.get("auteur"):
-            texte += " " + data["auteur"]
-        return f"{{{{Tela-métro | {data['id']} | {texte} | consulté le={cdate} }}}}"
+        cdate = retrieval_dates()
+        text = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        if author := data.get("author"):
+            text += " " + author
+        return f"{{{{Tela-métro | {data['id']} | {text} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
+        """Return the debug link to the TelaMétro page."""
         return simple_debug_link(
             struct,
             "telametro",

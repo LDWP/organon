@@ -1,12 +1,13 @@
-"""Couche d'accès réseau pour The Reptile Database (reptile-database.reptarium.cz) : aucune API
-structurée, la fiche espèce est atteinte directement par `/species?genus=X&species=Y` (redirige
-vers l'URL canonique `/Genus/species`) sans passer par une page de résultats de recherche
-intermédiaire — contrairement à eFloras.org, le site renvoie toujours un HTTP 200, y compris pour
-une espèce absente ; seul le contenu du `<h1>` distingue les deux cas.
+"""Network access to The Reptile Database: no structured API.
 
-La fiche espèce porte aussi un champ « Higher Taxa » (ex. `"Lacertidae, Lacertinae, Sauria,
-Lacertoidea, Squamata (lizards)"`) exploité pour la classification — voir `_parse_higher_taxa`
-pour le détail de ce qui en est extrait de façon fiable et ce qui est volontairement ignoré."""
+The species page is reached directly by `/species?genus=X&species=Y`
+(redirecting to `/Genus/species`), with no search result page. The site
+always answers HTTP 200, even for an absent species; only the `<h1>`
+tells the two apart.
+
+The page also has a "Higher Taxa" field used for the classification; see
+`_parse_higher_taxa`.
+"""
 
 from __future__ import annotations
 
@@ -22,16 +23,18 @@ BASE_URL = "https://reptile-database.reptarium.cz"
 _NOT_FOUND_RE = re.compile(r"<h1>Species <em>[^<]+</em> was not found!</h1>")
 _FOUND_RE = re.compile(r"<h1><em>([^<]+)</em>([^<]*)</h1>")
 _HIGHER_TAXA_RE = re.compile(r"<tr><td>Higher Taxa</td><td>([^<]*)</td>")
+_SEARCH_RESULTS_RE = re.compile(r"<h1>Search results</h1>")
 _SEARCH_NOT_FOUND_RE = re.compile(r"<p>No species were found\.</p>")
 
-_ORDRES_CONNUS = frozenset({"Squamata", "Testudines", "Crocodylia", "Rhynchocephalia"})
-"""Les 4 seuls ordres de reptiles vivants couverts par la base (squamates, tortues,
-crocodiliens, rhynchocéphales) : vocabulaire fermé utilisé par `_parse_higher_taxa` pour repérer
-l'ordre dans le champ « Higher Taxa », qui ne porte lui-même aucun rang explicite."""
+# The only 4 orders of living reptiles in the database: closed
+# vocabulary used by `_parse_higher_taxa` to spot the order.
+_KNOWN_ORDERS = frozenset({"Squamata", "Testudines", "Crocodylia", "Rhynchocephalia"})
 
 
 @dataclass(frozen=True)
 class SpeciesHit:
+    """A species page: name, author, family and order."""
+
     nom: str
     auteur: str | None
     famille: str | None
@@ -39,18 +42,16 @@ class SpeciesHit:
 
 
 def _parse_higher_taxa(raw: str) -> tuple[str | None, str | None]:
-    """Découpe le champ « Higher Taxa » en (famille, ordre). Exemples réels observés :
-    `"Lacertidae, Lacertinae, Sauria, Lacertoidea, Squamata (lizards)"` ou, pour les
-    Crocodylia (seulement 3 familles au total, aucun clade intermédiaire listé),
-    `"Crocodylidae (Crocodylia, crocodiles)"`.
+    """Split the "Higher Taxa" field into (family, order).
 
-    Le champ n'indique aucun rang explicite, et l'ordre des clades intermédiaires (sous-famille,
-    super-famille, sous-ordre...) varie d'une fiche à l'autre — ex. "Sauria" cité avant ou après
-    "Iguania" selon l'espèce — donc seuls deux éléments en sont extraits de façon fiable :
-    - la famille, toujours le premier terme de la liste ;
-    - l'ordre, repéré par vocabulaire fermé (`_ORDRES_CONNUS`) plutôt que par position : il
-      apparaît tantôt en dernier terme avant le nom vernaculaire entre parenthèses (cas
-      général), tantôt à l'intérieur même de la parenthèse (cas Crocodylia ci-dessus)."""
+    E.g. "Lacertidae, Lacertinae, Sauria, Lacertoidea, Squamata
+    (lizards)" or, for Crocodylia, "Crocodylidae (Crocodylia,
+    crocodiles)". The field has no explicit rank and the order of the
+    intermediate clades varies, so only two items are reliable:
+    - the family, always the first term;
+    - the order, found by closed vocabulary (`_KNOWN_ORDERS`) rather
+      than by position: last term before the parenthesis, or inside it.
+    """
     text = raw.strip()
     if not text:
         return None, None
@@ -62,29 +63,32 @@ def _parse_higher_taxa(raw: str) -> tuple[str | None, str | None]:
     tokens = [t.strip() for t in main.split(",") if t.strip()]
     if not tokens:
         return None, None
-    famille = tokens[0]
+    family = tokens[0]
     if len(tokens) > 1:
-        candidat_ordre = tokens[-1]
+        order_candidate = tokens[-1]
     elif paren:
-        candidat_ordre = paren.split(",", 1)[0].strip()
+        order_candidate = paren.split(",", 1)[0].strip()
     else:
-        candidat_ordre = None
-    ordre = candidat_ordre if candidat_ordre in _ORDRES_CONNUS else None
-    return famille, ordre
+        order_candidate = None
+    order = order_candidate if order_candidate in _KNOWN_ORDERS else None
+    return family, order
 
 
 class ReptileDatabaseAdapter(OwnedClientMixin):
+    """Raw Reptile Database client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client, follow_redirects=True)
 
     async def get_species(self, genus: str, species: str) -> SpeciesHit | None:
-        """Renvoie la fiche si elle existe, `None` sinon. `auteur` est le texte brut suivant le
-        nom dans le `<h1>` (ex. "SHAW, 1802" ou "(SHAW, 1802)" — les parenthèses signalent un
-        changement de genre depuis la description originale, en nomenclature zoologique, mais
-        ne sont pas retirées ici faute de besoin actuel côté module), tel quel, non parsé plus
-        finement (année/nom séparés). `famille`/`ordre` sont `None` si le champ « Higher Taxa »
-        est absent de la fiche ou si son contenu ne suit pas le format attendu (voir
-        `_parse_higher_taxa`)."""
+        """Return the species page, or None if absent.
+
+        `author` is the raw text after the name in the `<h1>` (e.g.
+        "SHAW, 1802"; parentheses mean a genus change), left unparsed.
+        Family and order are None if "Higher Taxa" is absent or
+        malformed.
+        """
         resp = await self._client.get(
             f"{BASE_URL}/species", params={"genus": genus, "species": species}
         )
@@ -94,37 +98,45 @@ class ReptileDatabaseAdapter(OwnedClientMixin):
         match = _FOUND_RE.search(resp.text)
         if not match:
             return None
-        nom, auteur = match.groups()
+        name, author = match.groups()
 
-        famille, ordre = None, None
+        family, order = None, None
         higher_taxa_match = _HIGHER_TAXA_RE.search(resp.text)
         if higher_taxa_match:
-            famille, ordre = _parse_higher_taxa(higher_taxa_match.group(1))
+            family, order = _parse_higher_taxa(higher_taxa_match.group(1))
 
         return SpeciesHit(
-            nom=nom.strip(), auteur=(auteur.strip() or None), famille=famille, ordre=ordre
+            nom=name.strip(), auteur=(author.strip() or None), famille=family, ordre=order
         )
 
-    async def _advanced_search_exists(self, champ: str, valeur: str) -> bool:
-        """Le site n'a pas de fiche dédiée genre/famille, seulement ce formulaire de recherche
-        (`/advanced_search`) listant les espèces correspondantes — `exact[]` est nécessaire car
-        sans lui la recherche fait une correspondance par sous-chaîne (ex. `genus=Varan` renvoie
-        aussi les 93 espèces de *Varanus*)."""
-        params = {
-            champ: valeur,
-            "exact[]": champ,
-            "ok": "Search",
-            "do": "AdvancedSearchForm-submit",
-        }
+    async def _advanced_search_exists(self, field: str, value: str) -> bool:
+        """Return True if the advanced search finds the value.
+
+        The site has no genus or family page, only this search form
+        listing the matching species. `exact[]` is needed: without it
+        the match is by substring (`genus=Varan` also returns the
+        species of *Varanus*).
+        """
+        # The site redirects the form submission (`ok`/`do`) to this
+        # URL; submitting it directly is stable, whereas the form
+        # handler sometimes answers the bare form.
+        params = {field: value, "exact[0]": field, "submit": "Search"}
         resp = await self._client.get(f"{BASE_URL}/advanced_search", params=params)
         resp.raise_for_status()
-        return not _SEARCH_NOT_FOUND_RE.search(resp.text)
+        # Anything but a results page (e.g. the bare form) is not a
+        # confirmation: a false positive would cite an unrelated taxon.
+        return bool(_SEARCH_RESULTS_RE.search(resp.text)) and not _SEARCH_NOT_FOUND_RE.search(
+            resp.text
+        )
 
     async def genus_exists(self, genus: str) -> bool:
+        """Return True if the genus has species."""
         return await self._advanced_search_exists("genus", genus)
 
     async def family_exists(self, family: str) -> bool:
-        """Le champ « Higher Taxa » d'une fiche espèce mélange famille et ordre (voir
-        `_parse_higher_taxa`) ; côté recherche, ils partagent le même champ `taxon` ("Higher
-        taxa")."""
+        """Return True if the family or order has species.
+
+        "Higher Taxa" mixes family and order; searching uses the same
+        `taxon` field.
+        """
         return await self._advanced_search_exists("taxon", family)

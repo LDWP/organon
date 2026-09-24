@@ -1,22 +1,27 @@
-"""Logique métier du module DORIS (doris.ffessm.fr). Module d'enrichissement uniquement
-(`can_classify=False`) : le site ne fournit aucune donnée de classification exploitable, juste
-un regroupement simplifié par icône ("groupe DORIS") — voir adapter.py pour le détail de la
-recherche HTML utilisée en l'absence d'API publique.
+"""DORIS module (doris.ffessm.fr): enrichment only.
 
-Domaine restreint à la faune/flore subaquatique effectivement couverte par le site (animal, algue,
-végétal aquatique, protiste — pas de bactérie/champignon/archaea/virus)."""
+`can_classify=False`: the site gives no usable classification, only a
+simplified grouping by icon ("DORIS group"). See adapter.py for the HTML
+search used in the absence of a public API.
+
+Domain restricted to the underwater fauna and flora the site covers
+(animal, algae, aquatic plants, protists; no bacteria, fungi, archaea or
+viruses).
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.grammar import wp_met_italiques
-from organon.core.rendering.support import dates_recupere
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.doris.adapter import LEGACY_FICHE_URL, DorisAdapter
 
 
 class DorisModule(TaxonomyModule):
+    """DORIS module."""
+
     meta = ModuleMeta(
         id="doris",
         can_classify=False,
@@ -25,35 +30,39 @@ class DorisModule(TaxonomyModule):
     )
 
     def __init__(self, adapter: DorisAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or DorisAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
+        """Collect the DORIS page of the taxon."""
         if is_classification:
             return None
 
-        taxon = struct.taxon.nom
+        taxon = struct.taxon.name
         hit = await self._adapter.search(taxon)
         if hit is None:
             return None
-        species_id, nom_commun = hit
+        species_id, common_name = hit
 
-        struct.liens["doris"] = {"id": species_id, "nom": taxon, "nom_commun": nom_commun}
+        struct.links["doris"] = {"id": species_id, "name": taxon, "common_name": common_name}
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("doris")
+        """Render the {{DORIS}} template."""
+        data = struct.links.get("doris")
         if not data:
             return None
-        cdate = dates_recupere()
-        description = wp_met_italiques(data["nom"], struct.taxon.rang, struct.regne)
-        if struct.taxon.auteur_resolu:
-            description += f" {struct.taxon.auteur_resolu}"
+        cdate = retrieval_dates()
+        description = wp_apply_italics(data["name"], struct.taxon.rank, struct.kingdom)
+        if struct.taxon.resolved_author:
+            description += f" {struct.taxon.resolved_author}"
         return f"{{{{DORIS | {data['id']} | {description} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("doris")
+        """Return the debug link to the DORIS page."""
+        data = struct.links.get("doris")
         if not data:
             return None
         url = f"{LEGACY_FICHE_URL}?fiche_numero={data['id']}"

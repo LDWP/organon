@@ -1,17 +1,16 @@
-"""Table de rangs pour la Catalogue of Life Extended Release (ChecklistBank, dataset 3LXR).
+"""Rank table for the Catalogue of Life Extended Release.
 
-Réutilise le vocabulaire de rangs de GBIF (`GBIF_WP`) plutôt que de dupliquer à la main une
-cinquantaine de libellés français identiques : ce sont les mêmes rangs linnéens, seule la casse
-diffère (GBIF : constantes MAJUSCULES : ChecklistBank : chaînes minuscules). Complété par les
-quelques rangs propres à ChecklistBank absents du vocabulaire GBIF — la chaîne ancestrale de la
-XR est nettement plus fine que celle du backbone legacy, qui n'expose que les 6-7 rangs
-linnéens standards (ex. "parvphylum"/"megaclass" observés en pratique sur des taxons animaux)."""
+Reuses GBIF's rank vocabulary (`GBIF_WP`): same Linnaean ranks, only the
+case differs (GBIF constants are uppercase, ChecklistBank strings
+lowercase). Completed with ChecklistBank ranks absent from GBIF, the XR
+ancestral chain being finer than the legacy backbone's.
+"""
 
 from __future__ import annotations
 
 from organon.modules.gbif.ranks import GBIF_WP
 
-COL_XR_RANKS: dict[str, str] = {k.lower(): v for k, v in GBIF_WP.items() if k != "NOTFOUND"} | {
+COL_XR_RANKS: dict[str, str] = {k.lower(): v for k, v in GBIF_WP.items()} | {
     "parvphylum": "micro-embranchement",
     "megaclass": "super-classe",
     "gigaclass": "super-classe",
@@ -25,5 +24,6 @@ COL_XR_RANKS: dict[str, str] = {k.lower(): v for k, v in GBIF_WP.items() if k !=
 }
 
 
-def col_xr_cherche_rang(rang: str) -> str:
-    return COL_XR_RANKS.get(rang, "non classé")
+def col_xr_to_wp_rank(rank: str) -> str | None:
+    """Return the Wikipedia rank of a COL XR rank, or None."""
+    return COL_XR_RANKS.get(rank)

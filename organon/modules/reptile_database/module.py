@@ -1,65 +1,71 @@
-"""Logique métier du module Reptile Database (reptile-database.reptarium.cz). `can_classify=True`
-: la fiche espèce porte un champ « Higher Taxa » dont seuls la famille (toujours premier terme
-de la liste) et l'ordre (vocabulaire fermé des 4 ordres de reptiles vivants) sont extraits de
-façon fiable — voir `organon.modules.reptile_database.adapter._parse_higher_taxa` pour le détail
-des clades intermédiaires (sous-famille, super-famille, sous-ordre...) volontairement ignorés :
-rang non indiqué dans le HTML, et position incohérente d'une fiche à l'autre.
+"""Reptile Database module.
 
-Le site n'a de fiche dédiée (`/Genus/species`) que pour le nom binomial accepté (genre +
-épithète spécifique) : un nom trinomial de sous-espèce n'y correspond à rien et est donc ignoré
-plutôt que d'être tronqué au hasard — cette base ne peut donc jamais classifier au rang
-sous-espèce. Un nom à un seul mot (genre ou famille) n'a lui non plus aucune fiche, seulement un
-formulaire de recherche listant les espèces correspondantes (voir
-`ReptileDatabaseAdapter.genus_exists`/`family_exists`) : insuffisant pour classifier (pas de
-rang parent extractible), mais assez pour confirmer la présence du taxon et publier une
-citation ({{ReptileDB genre}}/{{ReptileDB famille}}) une fois son rang déjà résolu par un autre
-module — voir `collect()`."""
+`can_classify=True`: the species page has a "Higher Taxa" field of which
+only the family (first term) and the order (closed vocabulary of 4
+orders) are reliably extracted; see `adapter._parse_higher_taxa`.
+
+The site only has a page (`/Genus/species`) for the accepted binomial: a
+subspecies trinomial matches nothing and is ignored, so this database
+never classifies at subspecies rank. A single-word name (genus or
+family) has no page either, only a search form: insufficient to
+classify, but enough to confirm the taxon and publish a citation
+({{ReptileDB genre}}, {{ReptileDB famille}}) once another module
+resolved its rank; see `collect()`.
+"""
 
 from __future__ import annotations
 
 from organon.core.config import GenerateOptions
 from organon.core.models import RankName, Struct
 from organon.core.registry import ModuleMeta, TaxonomyModule, register_module
-from organon.core.rendering.support import dates_recupere
-from organon.modules.common import format_auteur
+from organon.core.rendering.support import retrieval_dates
+from organon.modules.common import format_author
 from organon.modules.reptile_database.adapter import BASE_URL, ReptileDatabaseAdapter
 
 
 class ReptileDatabaseModule(TaxonomyModule):
+    """Reptile Database module."""
+
     meta = ModuleMeta(
-        id="reptile_database", can_classify=True, can_render_external_link=True, domains=["reptile"]
+        id="reptile_database",
+        can_classify=True,
+        can_render_external_link=True,
+        domains=["reptile"],
     )
 
     def __init__(self, adapter: ReptileDatabaseAdapter | None = None) -> None:
+        """Use `adapter` if given, else create one."""
         self._adapter = adapter or ReptileDatabaseAdapter()
 
     async def collect(
         self, struct: Struct, is_classification: bool, options: GenerateOptions
     ) -> Struct | None:
-        taxon = struct.taxon.nom
-        mots = taxon.split()
-        if len(mots) == 2:
-            return await self._collect_espece(struct, is_classification, *mots)
-        # Le site n'a pas de fiche genre/famille (voir adapter.py), seulement un formulaire de
-        # recherche : on ne peut donc pas classifier à ces rangs, uniquement y ajouter une
-        # citation une fois le rang déjà résolu par un autre module de classification.
-        if len(mots) == 1 and not is_classification and struct.taxon.rang in ("genre", "famille"):
-            return await self._collect_taxon_superieur(struct, struct.taxon.rang, mots[0])
+        """Collect the taxon from the Reptile Database."""
+        taxon = struct.taxon.name
+        words = taxon.split()
+        if len(words) == 2:
+            return await self._collect_species(struct, is_classification, *words)
+        # The site has no genus or family page (see adapter.py), only a
+        # search form: no classification at those ranks, only a citation
+        # once another classification module resolved the rank.
+        if len(words) == 1 and not is_classification and struct.taxon.rank in ("genre", "famille"):
+            return await self._collect_superior_taxon(struct, struct.taxon.rank, words[0])
         return None
 
-    async def _collect_espece(
-        self, struct: Struct, is_classification: bool, genre: str, espece: str
+    async def _collect_species(
+        self, struct: Struct, is_classification: bool, genus: str, species: str
     ) -> Struct | None:
-        hit = await self._adapter.get_species(genre, espece)
+        """Collect a species from its page."""
+        hit = await self._adapter.get_species(genus, species)
         if hit is None:
             return None
 
-        auteur = format_auteur(hit.auteur)
-        struct.liens["reptile_database"] = {
-            "rang": "espèce",
-            "genre": genre,
-            "espece": espece,
-            "auteur": auteur,
+        author = format_author(hit.auteur)
+        struct.links["reptile_database"] = {
+            "rank": "espèce",
+            "genus": genus,
+            "species": species,
+            "author": author,
         }
 
         if not is_classification:
@@ -67,54 +73,57 @@ class ReptileDatabaseModule(TaxonomyModule):
         if hit.famille is None:
             return None
 
-        struct.taxon.rang = "espèce"
-        struct.taxon.auteur = auteur
-        struct.regne = "animal"
+        struct.taxon.rank = "espèce"
+        struct.taxon.author = author
+        struct.kingdom = "animal"
         struct.classification = "reptiledb"
         struct.classification_taxobox = "Reptile Database"
 
-        rangs = [RankName(nom=genre, rang="genre"), RankName(nom=hit.famille, rang="famille")]
+        ranks = [RankName(name=genus, rank="genre"), RankName(name=hit.famille, rank="famille")]
         if hit.ordre:
-            rangs.append(RankName(nom=hit.ordre, rang="ordre"))
-        struct.rangs = rangs
+            ranks.append(RankName(name=hit.ordre, rank="ordre"))
+        struct.ranks = ranks
 
         return struct
 
-    async def _collect_taxon_superieur(self, struct: Struct, rang: str, nom: str) -> Struct | None:
-        existe = (
-            await self._adapter.genus_exists(nom)
-            if rang == "genre"
-            else await self._adapter.family_exists(nom)
+    async def _collect_superior_taxon(self, struct: Struct, rank: str, name: str) -> Struct | None:
+        """Confirm a genus or family, for citation only."""
+        exists = (
+            await self._adapter.genus_exists(name)
+            if rank == "genre"
+            else await self._adapter.family_exists(name)
         )
-        if not existe:
+        if not exists:
             return None
-        struct.liens["reptile_database"] = {"rang": rang, "nom": nom}
+        struct.links["reptile_database"] = {"rank": rank, "name": name}
         return struct
 
     def render_bioref(self, struct: Struct) -> str | None:
-        data = struct.liens.get("reptile_database")
+        """Render the {{ReptileDB ...}} template."""
+        data = struct.links.get("reptile_database")
         if not data:
             return None
-        cdate = dates_recupere()
-        if data["rang"] == "espèce":
-            auteur = f" | {data['auteur']}" if data.get("auteur") else ""
+        cdate = retrieval_dates()
+        if data["rank"] == "espèce":
+            author = f" | {data['author']}" if data.get("author") else ""
             return (
-                f"{{{{ReptileDB espèce | {data['genre']} | {data['espece']}{auteur} "
+                f"{{{{ReptileDB espèce | {data['genus']} | {data['species']}{author} "
                 f"| consulté le={cdate} }}}}"
             )
-        modele = "ReptileDB genre" if data["rang"] == "genre" else "ReptileDB famille"
-        return f"{{{{{modele} | {data['nom']} | consulté le={cdate} }}}}"
+        template = "ReptileDB genre" if data["rank"] == "genre" else "ReptileDB famille"
+        return f"{{{{{template} | {data['name']} | consulté le={cdate} }}}}"
 
     def debug_link(self, struct: Struct) -> str | None:
-        data = struct.liens.get("reptile_database")
+        """Return the debug link to the Reptile Database."""
+        data = struct.links.get("reptile_database")
         if not data:
             return None
-        if data["rang"] == "espèce":
-            url = f"{BASE_URL}/{data['genre']}/{data['espece']}"
+        if data["rank"] == "espèce":
+            url = f"{BASE_URL}/{data['genus']}/{data['species']}"
         else:
-            champ = "genus" if data["rang"] == "genre" else "taxon"
+            field = "genus" if data["rank"] == "genre" else "taxon"
             url = (
-                f"{BASE_URL}/advanced_search?{champ}={data['nom']}&exact%5B%5D={champ}"
+                f"{BASE_URL}/advanced_search?{field}={data['name']}&exact%5B%5D={field}"
                 "&ok=Search&do=AdvancedSearchForm-submit"
             )
         return f"<a href='{url}' target='_blank' rel='noopener noreferrer'>Reptile Database</a>"

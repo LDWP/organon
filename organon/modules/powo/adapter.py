@@ -1,137 +1,87 @@
-"""Couche d'accès réseau pour POWO (Plants of the World Online) : passe exclusivement par la
-bibliothèque officielle `pykew` (https://github.com/RBGKew/pykew), jamais par un appel HTTP
-direct à powo.science.kew.org. `pykew.powo.search`/`lookup` sont synchrones (basés sur
-`requests`) : chaque appel est déporté sur un thread via `asyncio.to_thread` pour ne pas bloquer
-la boucle événementielle.
+"""Network access to POWO (Plants of the World Online).
 
-`pykew.powo.lookup` ne lève pas d'exception sur un identifiant inconnu : l'API POWO répond alors
-HTTP 404 avec un corps JSON `{"error": "Not Found"}` (vérifié en direct), que `Api.get(...).json()`
-décode sans broncher (pas de `raise_for_status`). C'est donc `lookup()` ci-dessous qui détecte ce
-cas via la clé `"error"`, plutôt que par exception.
+Called directly on `https://powo.science.kew.org/api/2`, without
+`pykew`, which does not compile everywhere. `requests` stays necessary:
+POWO sits behind a Cloudflare challenge that refuses `httpx` (403)
+whatever the User-Agent but accepts `requests` with the Organon one.
+Synchronous calls run in a thread.
 
-Deux défauts corrigés en place sur l'objet `pykew.powo.API`, plutôt que dupliqués (interdit par
-la consigne « toujours passer par pykew ») :
+The API answers 404 with `{"error": "Not Found"}` for an unknown id:
+`lookup()` returns None. Status 249 means "too many requests": retried
+at most `MAX_BUSY_ATTEMPTS` times. Kew recommends staying under about 5
+requests/s.
 
-1. `Api.get` : `pykew` 0.1.3 appelle `requests.get(url)` sans aucun en-tête. Le WAF devant
-   powo.science.kew.org (Azure Application Gateway) bloque ce client avec un 403 HTML dès lors
-   que le `User-Agent` n'a pas une forme de navigateur — la page d'erreur HTML fait alors
-   échouer `response.json()` dans pykew avec `JSONDecodeError` (vérifié en direct : un
-   `requests.get` nu renvoie 403, le même appel avec un `User-Agent` de navigateur renvoie
-   200/JSON). `_get_with_browser_headers` corrige `pykew.core.Api.get` en place pour y ajouter
-   ces en-têtes (et un timeout, absent de l'original).
-
-2. `POWO_URL` : la constante codée en dur dans pykew pointe vers l'ancien domaine
-   `www.plantsoftheworldonline.org`, qui redirige (301 x2) vers `powo.science.kew.org` — mais
-   **cette redirection perd la query string en route** (vérifié en direct : `resp.history` montre
-   les paramètres présents jusqu'à l'avant-dernier saut, absents de `resp.url` final), si bien
-   que toute recherche retombe silencieusement sur un browse-all non filtré (`totalResults`
-   dans les millions) au lieu du résultat attendu. `_patch_pykew_base_url` réécrit `API._base_url`
-   pour cibler directement `powo.science.kew.org`, sans passer par le domaine cassé.
-
-Les deux correctifs sont appliqués une fois à l'import de ce module.
-
-Throttling : aucun mécanisme de rate limiting mutualisé n'existe dans `organon/core` (vérifié :
-aucun autre module n'en a besoin, chacun appelant `httpx` directement sans contrainte de débit
-documentée côté source tierce). Kew recommande de rester sous ~5 req/s côté POWO : `_throttle`
-impose un intervalle minimal entre appels via un verrou asyncio partagé au niveau du module.
-
-Sous-taxons (enfants directs, voir `powo/module.py`) : `lookup()` renvoie déjà un champ
-`childNameUsages` (liste des taxons acceptés directement rattachés au taxon consulté — genres
-d'une famille, espèces d'un genre, sous-espèces d'une espèce, etc., un seul niveau, jamais
-récursif) sans paramètre `include` supplémentaire ni requête réseau à part (vérifié en direct :
-présent que `include` vaille `None` ou `["distribution"]`). Pas de troncature côté API non plus
-(vérifié sur des genres à plusieurs milliers d'espèces, ex. Astragalus : 3145 entrées reçues en
-un seul appel) — inutile donc de passer par `search()` avec des filtres de rang comme GBIF le
-fait avec sa pagination par page ; POWO expose directement la relation parent/enfant."""
+Sub-taxa: `lookup()` already returns `childNameUsages` (the accepted
+direct children, one level, never recursive), with no extra parameter or
+request and no API-side truncation.
+"""
 
 from __future__ import annotations
 
 import asyncio
-import itertools
+import logging
 import time
 
-import pykew.core as pykew_core
-import pykew.powo as powo
 import requests
 
-_BROWSER_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/138 Safari/537.36"
-    ),
-    "Accept": "application/json",
-}
+from organon.core.http import USER_AGENT, MinIntervalThrottle
 
+logger = logging.getLogger(__name__)
 
-def _get_with_browser_headers(
-    self: pykew_core.Api, method: str, params: dict | None = None
-) -> requests.Response:
-    resp = requests.get(self._url(method, params or {}), headers=_BROWSER_HEADERS, timeout=30)
-    if resp.status_code == 249:  # trop de requêtes : pykew retente après 5s
-        time.sleep(5)
-        return self.get(method, params)
-    return resp
+BASE_URL = "https://powo.science.kew.org/api/2"
+_HEADERS = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+_TIMEOUT = 30
 
-
-_POWO_BASE_URL = "https://powo.science.kew.org/api/2"
-
-
-def _patch_pykew_headers() -> None:
-    if pykew_core.Api.get is not _get_with_browser_headers:
-        pykew_core.Api.get = _get_with_browser_headers  # type: ignore[method-assign]
-
-
-def _patch_pykew_base_url() -> None:
-    powo.API._base_url = _POWO_BASE_URL
-
-
-_patch_pykew_headers()
-_patch_pykew_base_url()
-
+# Bound on the results kept from a search (a page of 500 is asked):
+# plenty to filter on an exact name match.
 MAX_RESULTS = 50
-"""Borne le nombre de résultats matérialisés depuis `SearchResult` (pagination interne pykew de
-500 éléments/page) : largement suffisant pour filtrer sur une correspondance exacte de nom, sans
-matérialiser une page entière pour une requête à faible sélectivité."""
 
-_MIN_INTERVAL = 0.2  # ~5 requêtes/s
+_PAGE_SIZE = 500
+_MIN_INTERVAL = 0.2  # ~5 requests/s
+_BUSY_STATUS = 249
+MAX_BUSY_ATTEMPTS = 3
+_BUSY_DELAY = 5
 
-_last_call = 0.0
-_lock = asyncio.Lock()
-
-
-async def _throttle() -> None:
-    global _last_call
-    async with _lock:
-        wait = _last_call + _MIN_INTERVAL - time.monotonic()
-        if wait > 0:
-            await asyncio.sleep(wait)
-        _last_call = time.monotonic()
+_throttle = MinIntervalThrottle(_MIN_INTERVAL).wait
 
 
-def _do_search(query: str) -> list[dict]:
-    results = powo.search(query)
-    if results.size() == 0:
-        return []
-    return list(itertools.islice(results, MAX_RESULTS))
-
-
-def _do_lookup(taxon_id: str, include: list[str] | None) -> dict:
-    return powo.lookup(taxon_id, include=include)
+def _get_json(path: str, params: dict) -> object:
+    """GET a POWO path, retrying while the service is busy (249)."""
+    for attempt in range(MAX_BUSY_ATTEMPTS):
+        resp = requests.get(
+            f"{BASE_URL}/{path}", params=params, headers=_HEADERS, timeout=_TIMEOUT
+        )
+        if resp.status_code != _BUSY_STATUS:
+            return resp.json()
+        if attempt < MAX_BUSY_ATTEMPTS - 1:
+            time.sleep(_BUSY_DELAY)
+    raise requests.exceptions.RetryError(f"POWO occupé (249) après {MAX_BUSY_ATTEMPTS} essais")
 
 
 class PowoAdapter:
+    """Raw POWO API client."""
+
     async def search(self, name: str) -> list[dict]:
+        """Return up to `MAX_RESULTS` search results; [] on failure."""
         await _throttle()
+        params = {"q": name, "perPage": _PAGE_SIZE, "cursor": "*"}
         try:
-            return await asyncio.to_thread(_do_search, name)
-        except requests.exceptions.RequestException:
+            data = await asyncio.to_thread(_get_json, "search", params)
+        except (requests.exceptions.RequestException, ValueError) as exc:
+            logger.warning("POWO : recherche de « %s » impossible (%s)", name, exc)
             return []
+        if not isinstance(data, dict):
+            return []
+        return (data.get("results") or [])[:MAX_RESULTS]
 
     async def lookup(self, taxon_id: str, include: list[str] | None = None) -> dict | None:
+        """Return the full record of a taxon id, or None."""
         await _throttle()
+        params = {"fields": ",".join(include)} if include else {}
         try:
-            result = await asyncio.to_thread(_do_lookup, taxon_id, include)
-        except requests.exceptions.RequestException:
+            result = await asyncio.to_thread(_get_json, f"taxon/{taxon_id}", params)
+        except (requests.exceptions.RequestException, ValueError) as exc:
+            logger.warning("POWO : lecture de %s impossible (%s)", taxon_id, exc)
             return None
         if not isinstance(result, dict) or "error" in result:
             return None

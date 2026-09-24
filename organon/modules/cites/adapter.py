@@ -1,5 +1,7 @@
-"""Couche d'accès réseau pour CITES via l'API Species+ (speciesplus.net) : appels HTTP et
-décodage JSON bruts uniquement."""
+"""Network access to CITES through the Species+ API (speciesplus.net).
+
+Raw HTTP and JSON only.
+"""
 
 from __future__ import annotations
 
@@ -9,7 +11,10 @@ BASE_URL = "https://www.speciesplus.net/api/v1"
 
 
 class CitesAdapter(OwnedClientMixin):
+    """Raw Species+ client."""
+
     async def autocomplete(self, name: str) -> list[dict]:
+        """Return the taxon concepts matching a name."""
         resp = await self._client.get(
             f"{BASE_URL}/auto_complete_taxon_concepts",
             params={"taxonomy": "cites", "taxon_concept_query": name},
@@ -18,6 +23,7 @@ class CitesAdapter(OwnedClientMixin):
         return resp.json().get("auto_complete_taxon_concepts") or []
 
     async def taxon_concept(self, concept_id: int) -> dict | None:
+        """Return a taxon concept by id, or None."""
         data = await fetch_json(
             self._client, f"{BASE_URL}/taxon_concepts/{concept_id}", empty_value={}
         )
