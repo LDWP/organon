@@ -1,8 +1,8 @@
-"""GET /api/v1/sources — vue d'ensemble de toutes les bases de données considérées pour le
-projet, intégrées ou non, pour la page « Sources » du frontend. Contrairement à
-/api/v1/modules (qui ne liste que les modules réellement enregistrés), cette route couvre
-aussi les bases jamais portées, en fusionnant l'inventaire statique
-(organon/core/data/db_inventory.yaml) avec l'état réel du registre."""
+"""GET /api/v1/sources: every database considered, integrated or not.
+
+Unlike /api/v1/modules, it merges the static inventory with the
+live registry, so never-ported databases appear too.
+"""
 
 from __future__ import annotations
 
@@ -17,5 +17,6 @@ router = APIRouter()
 
 @router.get("/sources", response_model=SourcesResponse)
 async def list_sources() -> SourcesResponse:
+    """Return the merged inventory of sources."""
     ensure_modules_registered()
     return SourcesResponse(**build_sources_overview().model_dump())

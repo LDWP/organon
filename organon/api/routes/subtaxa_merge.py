@@ -1,23 +1,22 @@
-"""POST /api/v1/subtaxa-merge — fusionne les sous-taxons de plusieurs sources de classification
-déjà résolues côté frontend (voir `organon.core.rendering.subtaxa_merge`), pour le mode de rendu
-"sous-taxons fusionnés" de l'onglet Wikitexte. Prend en entrée les listes déjà récupérées par le
-frontend (`resultsBySource`, voir `GenerateResponse.subtaxa_liste`), ne recontacte aucun module de
-classification.
+"""POST /api/v1/subtaxa-merge: merge sub-taxa of several sources.
 
-Exception ciblée : quand deux sources rapportent le même nombre d'espèces mais divergent sur un ou
-plusieurs noms (synonymie, voir Discussion Projet:Biologie/Organon #30), un appel réseau COL XR
-est fait par nom orphelin (`resolve_col_xr_concept_id`, qui suit la redirection vers le concept
-accepté même si le nom orphelin n'est lui-même qu'un synonyme dans COL XR) pour vérifier s'il
-s'agit du même taxon avant de fusionner (voir
-`organon.core.rendering.subtaxa_merge.reconcile_synonym_groups`). Aucun appel réseau si toutes les
-sources s'accordent déjà exactement, ou si leurs listes divergentes ont des tailles différentes.
+Takes the lists the frontend already holds (see
+`GenerateResponse.subtaxa`), and contacts no classification
+module.
+
+One exception: when two sources report the same number of species
+but differ on some names (synonymy), COL XR is queried per orphan
+name (`resolve_col_xr_concept_id`) to check they are the same taxon
+before merging; see `reconcile_synonym_groups`. No network call if
+the sources agree exactly or their lists differ in size.
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 
-from organon.api.rate_limit import limiter
+from organon.api.deps import require_username
+from organon.api.rate_limit import DEFAULT_RATE_LIMIT, limiter
 from organon.api.schemas import (
     MergedGroupOut,
     MergedSpeciesOut,
@@ -32,28 +31,31 @@ router = APIRouter()
 
 
 @router.post("/subtaxa-merge", response_model=MergedSubtaxaResponse)
-@limiter.limit("30/minute")
-async def subtaxa_merge(request: Request, req: SubtaxaMergeRequest) -> MergedSubtaxaResponse:
+@limiter.limit(DEFAULT_RATE_LIMIT)
+async def subtaxa_merge(
+    request: Request, req: SubtaxaMergeRequest, username: str = Depends(require_username)
+) -> MergedSubtaxaResponse:
+    """Merge the sub-taxa lists, reconciling synonyms through COL XR."""
     result = merge_subtaxa(
-        req.taxon_rang, req.taxon_nom, req.regne, [(s.module_id, s.liste) for s in req.sources]
+        req.taxon_rank,
+        req.taxon_name,
+        req.kingdom,
+        [(s.module_id, s.subtaxa) for s in req.sources],
     )
 
-    adapter = ColXrAdapter()
-    try:
+    async with ColXrAdapter() as adapter:
         groups = await reconcile_synonym_groups(
             result.groups,
             [s.module_id for s in req.sources],
-            lambda nom: resolve_col_xr_concept_id(adapter, nom, req.regne),
+            lambda name: resolve_col_xr_concept_id(adapter, name, req.kingdom),
         )
-    finally:
-        await adapter.aclose()
 
     return MergedSubtaxaResponse(
-        rang_txt=result.rang_txt,
-        rang_txt_singulier=result.rang_txt_singulier,
+        rank_text=result.rank_text,
+        rank_text_singular=result.rank_text_singular,
         pronoun=result.pronoun,
         taxon_phrase=result.taxon_phrase,
-        rang_names=result.rang_names,
+        rank_names=result.rank_names,
         groups=[
             MergedGroupOut(
                 sources=g.sources,
@@ -61,7 +63,7 @@ async def subtaxa_merge(request: Request, req: SubtaxaMergeRequest) -> MergedSub
                 intro=g.intro,
                 species=[
                     MergedSpeciesOut(
-                        nom=s.nom, rang=s.rang, line=s.line, default_checked=s.default_checked
+                        name=s.name, rank=s.rank, line=s.line, default_checked=s.default_checked
                     )
                     for s in g.species
                 ],

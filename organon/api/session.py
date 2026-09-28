@@ -1,7 +1,8 @@
-"""Cookies signés pour le flux OAuth : pas de stockage serveur, l'état `state` (anti-CSRF) et
-la session utilisateur identifiée tiennent dans des cookies signés par `itsdangerous`, jamais
-dans une base de données ou une mémoire de session côté serveur (compatible plusieurs
-répliques, aucune affinité de session requise).
+"""Signed cookies for the OAuth flow.
+
+The anti-CSRF `state` and the user session live in cookies signed
+by `itsdangerous`, with no server-side storage, so any number of
+replicas work without session affinity.
 """
 
 from __future__ import annotations
@@ -27,10 +28,12 @@ def _serializer(salt: str) -> URLSafeTimedSerializer:
 
 
 def sign_state(state: str) -> str:
+    """Sign an OAuth `state` value."""
     return _serializer(_STATE_SALT).dumps(state)
 
 
 def verify_state(token: str, *, expected: str) -> bool:
+    """Return True if `token` is a fresh signature of `expected`."""
     settings = get_auth_settings()
     try:
         value = _serializer(_STATE_SALT).loads(token, max_age=settings.oauth_state_max_age_seconds)
@@ -40,10 +43,12 @@ def verify_state(token: str, *, expected: str) -> bool:
 
 
 def sign_session(username: str) -> str:
+    """Sign a session cookie for `username`."""
     return _serializer(_SESSION_SALT).dumps({"username": username})
 
 
 def verify_session(token: str) -> str | None:
+    """Return the username of a valid session token, else None."""
     settings = get_auth_settings()
     try:
         data = _serializer(_SESSION_SALT).loads(token, max_age=settings.session_max_age_seconds)

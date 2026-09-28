@@ -1,15 +1,16 @@
-"""Application FastAPI — sert à la fois l'API JSON et, une fois `web-app/` buildé
-(`npm run build`), le frontend React statique (voir organon/web-app/README.md). Un seul
-process/port, contrainte de l'hébergement Toolforge.
+"""FastAPI application serving the JSON API and the built frontend.
+
+Once `web-app/` is built, the static React frontend is served by
+the same process and port, as Toolforge requires.
 """
 
 from __future__ import annotations
 
 import os
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
@@ -26,19 +27,23 @@ from organon.api.routes import (
     sources,
     subtaxa_merge,
     taxobox_refresh,
+    update,
 )
+from organon.api.schemas import VersionInfo
 from organon.modules.bootstrap import ensure_modules_registered
 
-VERSION = "0.1.0"
+try:
+    VERSION = version("organon")
+except PackageNotFoundError:  # run from a checkout without installing the package
+    VERSION = "unknown"
 
-# Build de production du frontend (`cd web-app && npm run build`). Chemin relatif au
-# répertoire de travail du process (le build service Toolforge démarre le Procfile depuis la
-# racine du dépôt) — pas relatif à `__file__`, qui pointerait vers site-packages une fois le
-# paquet installé et ne trouverait jamais web-app/.
+# Production frontend build. Relative to the working directory, not
+# `__file__`, which points into site-packages once installed.
 STATIC_DIR = Path(os.environ.get("ORGANON_STATIC_DIR", "web-app/dist")).resolve()
 
 
 def create_app() -> FastAPI:
+    """Build the app: routers, middleware and SPA fallback."""
     ensure_modules_registered()
 
     app = FastAPI(
@@ -48,21 +53,9 @@ def create_app() -> FastAPI:
     )
 
     app.state.limiter = limiter
-    # Signature slowapi spécifique à RateLimitExceeded, plus stricte que le
-    # Callable[[Request, Exception], ...] générique attendu par Starlette.
+    # slowapi's handler is stricter than the generic Starlette type.
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore[arg-type]
     app.add_middleware(SlowAPIMiddleware)
-
-    # CORS uniquement en dev, quand le frontend Vite (port 5173) et l'API (port 8000) tournent
-    # sur des origines différentes. En prod le frontend buildé est servi par ce même process
-    # (voir STATIC_DIR ci-dessous) donc CORS devient inutile.
-    if os.environ.get("ORGANON_DEV") == "1":
-        app.add_middleware(
-            CORSMiddleware,
-            allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-            allow_methods=["*"],
-            allow_headers=["*"],
-        )
 
     app.include_router(generate.router, prefix="/api/v1", tags=["generate"])
     app.include_router(search.router, prefix="/api/v1", tags=["search"])
@@ -73,28 +66,26 @@ def create_app() -> FastAPI:
     app.include_router(taxobox_refresh.router, prefix="/api/v1", tags=["taxobox"])
     app.include_router(commons_images.router, prefix="/api/v1", tags=["commons-images"])
     app.include_router(subtaxa_merge.router, prefix="/api/v1", tags=["subtaxa-merge"])
+    app.include_router(update.router, prefix="/api/v1", tags=["update"])
 
-    @app.get("/api/v1/version")
-    async def version() -> dict[str, str]:
-        return {"version": VERSION}
+    @app.get("/api/v1/version", response_model=VersionInfo)
+    async def version() -> VersionInfo:
+        return VersionInfo(version=VERSION)
 
     @app.get("/healthz")
     async def healthz() -> dict[str, str]:
         return {"status": "ok"}
 
     if STATIC_DIR.is_dir():
-        # Route attrape-tout, enregistrée en dernier pour ne jamais court-circuiter /api/v1/*,
-        # /healthz ci-dessus : sert un fichier statique s'il existe (JS/CSS buildés, favicon,
-        # etc.), sinon index.html pour laisser React Router gérer la route côté client. Exclut
-        # /api/* explicitement : un chemin API inconnu doit rester un 404 JSON, pas une page
-        # HTML — sinon un client qui tape une route API erronée reçoit silencieusement le SPA.
+        # Catch-all, registered last so it never shadows /api/v1/* or
+        # /healthz. Serves a static file if it exists, else index.html
+        # for the client router. /api/* stays a JSON 404, not the SPA.
         @app.get("/{full_path:path}")
         async def spa(full_path: str) -> FileResponse:
             if full_path.startswith("api/"):
                 raise HTTPException(status_code=404, detail="Not Found")
-            # full_path vient du client : résoudre puis vérifier qu'on reste dans STATIC_DIR
-            # avant de servir, sinon une séquence "../" laisserait lire n'importe quel fichier
-            # du pod (traversal).
+            # `full_path` is client input: stay inside STATIC_DIR
+            # (path traversal).
             candidate = (STATIC_DIR / full_path).resolve()
             if candidate.is_relative_to(STATIC_DIR) and candidate.is_file():
                 return FileResponse(candidate)

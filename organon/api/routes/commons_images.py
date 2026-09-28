@@ -1,17 +1,15 @@
-"""GET /api/v1/commons-images — suggestions d'images Wikimedia Commons pour la taxobox d'un
-taxon (voir `organon.modules.commons_images.service` pour la sélection : catégorie du taxon +
-distinction qualité/featured + licence permissive + dédoublonnage avec l'image Wikidata P18).
+"""GET /api/v1/commons-images: Commons image suggestions.
 
-Lecture seule et anonyme (pas d'appel à `require_username`, contrairement à
-`organon.api.routes.taxobox_refresh`) : parcourir des suggestions d'images n'édite rien, seul le
-choix final laissé à l'utilisateur applique un changement, et seulement dans le wikitexte déjà en
-sa possession côté frontend."""
+Selection is described in `organon.modules.commons_images.service`.
+Read-only and anonymous: browsing suggestions edits nothing.
+"""
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Depends, Query, Request
 
-from organon.api.rate_limit import limiter
+from organon.api.deps import require_username
+from organon.api.rate_limit import DEFAULT_RATE_LIMIT, limiter
 from organon.api.schemas import CommonsImagesResponse, CommonsImageSuggestion
 from organon.modules.commons_images.adapter import CommonsImagesAdapter
 from organon.modules.commons_images.service import find_images
@@ -20,15 +18,15 @@ router = APIRouter()
 
 
 @router.get("/commons-images", response_model=CommonsImagesResponse)
-@limiter.limit("30/minute")
+@limiter.limit(DEFAULT_RATE_LIMIT)
 async def commons_images(
-    request: Request, taxon: str = Query(..., min_length=1)
+    request: Request,
+    taxon: str = Query(..., min_length=1),
+    username: str = Depends(require_username),
 ) -> CommonsImagesResponse:
-    adapter = CommonsImagesAdapter()
-    try:
+    """Return Commons image suggestions for the taxobox of `taxon`."""
+    async with CommonsImagesAdapter() as adapter:
         result = await find_images(taxon, adapter)
-    finally:
-        await adapter.aclose()
 
     return CommonsImagesResponse(
         taxon=result.taxon,

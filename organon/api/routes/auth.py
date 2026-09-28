@@ -1,11 +1,12 @@
-"""Endpoints OAuth 2.0 utilisateur : identifient qui déclenche une action, sans donner aucun
-droit d'édition — c'est le compte bot dédié (`organon.core.mediawiki_bot`) qui édite
-réellement, sous réserve d'autorisation (`organon.core.wiki_permissions`), voir
+"""User OAuth 2.0 endpoints.
+
+They identify who triggers an action and grant no edit right: the
+dedicated bot account (`organon.core.mediawiki_bot`) edits, subject
+to `organon.core.wiki_permissions`; see
 `organon.api.routes.taxobox_refresh`.
 
-Pas de session côté serveur : l'état anti-CSRF (`state`) et l'identité une fois confirmée
-tiennent dans des cookies signés (`organon.api.session`), compatible plusieurs répliques sans
-affinité de session.
+No server-side session: the anti-CSRF `state` and the confirmed
+identity live in signed cookies (`organon.api.session`).
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import JSONResponse, RedirectResponse
 
 from organon.api.deps import get_current_username
+from organon.api.rate_limit import DEFAULT_RATE_LIMIT, limiter
 from organon.api.session import (
     SESSION_COOKIE_NAME,
     STATE_COOKIE_NAME,
@@ -27,7 +29,8 @@ from organon.api.session import (
     sign_state,
     verify_state,
 )
-from organon.core.auth_settings import get_auth_settings
+from organon.core.auth_settings import AuthSettings, get_auth_settings
+from organon.core.http import USER_AGENT
 
 router = APIRouter()
 
@@ -50,6 +53,7 @@ def _require_oauth_configured() -> None:
 
 @router.get("/auth/login")
 async def login() -> RedirectResponse:
+    """Redirect to the OAuth authorization page."""
     _require_oauth_configured()
     settings = get_auth_settings()
 
@@ -72,8 +76,20 @@ async def login() -> RedirectResponse:
     return response
 
 
+def _oauth_client(settings: AuthSettings) -> AsyncOAuth2Client:
+    """Return the OAuth client, sending the Organon User-Agent."""
+    return AsyncOAuth2Client(
+        settings.oauth_client_id,
+        settings.oauth_client_secret,
+        redirect_uri=settings.oauth_redirect_uri,
+        headers={"User-Agent": USER_AGENT},
+    )
+
+
 @router.get("/auth/callback")
+@limiter.limit(DEFAULT_RATE_LIMIT)
 async def callback(request: Request, code: str, state: str) -> RedirectResponse:
+    """Exchange the OAuth code and open the session."""
     _require_oauth_configured()
     settings = get_auth_settings()
 
@@ -83,11 +99,7 @@ async def callback(request: Request, code: str, state: str) -> RedirectResponse:
             400, detail="État OAuth invalide ou expiré, merci de relancer la connexion."
         )
 
-    async with AsyncOAuth2Client(
-        settings.oauth_client_id,
-        settings.oauth_client_secret,
-        redirect_uri=settings.oauth_redirect_uri,
-    ) as client:
+    async with _oauth_client(settings) as client:
         try:
             await client.fetch_token(
                 settings.oauth_token_url, code=code, grant_type="authorization_code"
@@ -95,9 +107,9 @@ async def callback(request: Request, code: str, state: str) -> RedirectResponse:
             profile_resp = await client.get(settings.oauth_profile_url)
             profile_resp.raise_for_status()
         except (httpx.HTTPError, OAuthError) as exc:
-            # authlib lève OAuthError (pas httpx.HTTPError) quand le token endpoint répond 200/400
-            # avec un JSON `{"error": ...}` — cas courant d'un code déjà consommé (rechargement de
-            # la page de callback).
+            # authlib raises OAuthError, not httpx.HTTPError, when the
+            # token endpoint answers with a JSON `{"error": ...}`, e.g.
+            # a code already used (callback page reloaded).
             raise HTTPException(
                 502, detail=f"Échec de l'échange OAuth avec Wikimedia : {exc}"
             ) from exc
@@ -124,12 +136,14 @@ async def callback(request: Request, code: str, state: str) -> RedirectResponse:
 
 @router.get("/auth/me")
 async def me(request: Request) -> dict:
+    """Return the authentication state and username."""
     username = get_current_username(request)
     return {"authenticated": username is not None, "username": username}
 
 
 @router.post("/auth/logout")
 async def logout() -> JSONResponse:
+    """Delete the session cookie."""
     response = JSONResponse({"ok": True})
     response.delete_cookie(SESSION_COOKIE_NAME)
     return response

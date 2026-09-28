@@ -1,23 +1,21 @@
-"""POST /api/v1/generate — orchestration de la génération : résout la classification,
-l'exécute, puis exécute les modules non-classification applicables au domaine, calcule les
-catégories/portails, résout l'auteur du taxon principal, puis rend le wikitexte.
+"""POST /api/v1/generate: the generation orchestration.
 
-La résolution complète de l'auteur (`resoudre_auteur_principal`) se fait ici plutôt qu'au
-moment du rendu : elle a besoin de `struct.regne` (déjà résolu à ce stade) pour choisir la bonne
-table (botanistes/procaryotes/zoologistes), et ses avertissements de désaccord de source
-rejoignent la liste `warnings` de la réponse au même titre que ceux des modules.
+Resolves and runs the classification, runs the enrichment modules
+applicable to the domain, computes categories and portals, resolves
+the main author, then renders the wikitext.
 
-POST /api/v1/generate/stream — même pipeline, exposé en Server-Sent Events (un `module_status`
-par module de classification/enrichissement, un `plan` une fois la classification connue, puis
-un `result` final identique au corps JSON de `/generate`) pour que le frontend affiche une
-progression module par module plutôt qu'un seul état bloquant pendant les 10-20s que peut durer
-une génération avec ~20 modules applicables. Voir `EnrichmentRunner` ci-dessous : la boucle
-d'enrichissement est partagée par les deux endpoints (même ordre, mêmes messages
-d'avertissement) pour que `/generate` reste identique en comportement — seul `/generate/stream`
-observe les événements intermédiaires au lieu de les laisser s'accumuler silencieusement.
+The author is resolved here rather than at rendering because it
+needs `struct.regne` to pick the right table; its disagreement
+warnings join the module warnings in the response.
 
-Hors périmètre pour l'instant : le mode `-juste-ext` (liens externes uniquement, sans
-classification).
+POST /api/v1/generate/stream runs the same pipeline as Server-Sent
+Events: one `module_status` per module, a `plan` once the
+classification is known, then a final `result` identical to the
+`/generate` body. `EnrichmentRunner` is shared by both endpoints.
+
+Both endpoints, and `POST /update/diagnose` and `/update/export`
+through `_generate_core`, share one computation; see
+`_generation_cache`.
 """
 
 from __future__ import annotations
@@ -26,15 +24,18 @@ import asyncio
 import json
 import logging
 import time
+from collections import Counter
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Literal
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from organon.api.deps import require_username
+from organon.api.generation_cache import GenerationCache
 from organon.api.rate_limit import limiter
 from organon.api.schemas import (
     ExternalLink,
@@ -48,8 +49,9 @@ from organon.api.schemas import (
     ResultEvent,
 )
 from organon.core.config import GenerateOptions
-from organon.core.domains import DomainTree, meilleure_classification, modules_possibles
-from organon.core.models import Struct, TaxonInfo
+from organon.core.domains import DomainTree, best_classification, possible_modules
+from organon.core.langues import LANGUE_INDETERMINEE
+from organon.core.models import FOOTER_LINK, Struct, TaxonInfo
 from organon.core.registry import (
     TaxonomyModule,
     classification_modules,
@@ -58,65 +60,47 @@ from organon.core.registry import (
     module_domain_trees,
     module_priorities,
 )
-from organon.core.rendering.authors import resoudre_auteur_principal
+from organon.core.rendering.authors import resolve_main_author
 from organon.core.rendering.engine import (
     render,
     render_references_items_block,
     render_subtaxa_block,
     render_taxobox_block,
 )
-from organon.core.rendering.sections import compute_rank_lines
-from organon.core.rendering.support import ajoute_si_besoin, data_pays_code
-from organon.core.selectors.categorization import compute_fin_liens
+from organon.core.rendering.sections import compute_rank_lines, render_see_also
+from organon.core.rendering.support import add_if_needed, country_data_by_code
+from organon.core.selectors.categorization import compute_footer_links
 from organon.core.selectors.coherence import (
-    classification_regne_coherents,
-    detect_rang_incoherences,
-    detect_regne_incoherences,
-    gbif_annee_probable_validee,
-    reference_module_coherente,
+    consistent_kingdom_classifications,
+    detect_kingdom_inconsistencies,
+    detect_rank_inconsistencies,
+    gbif_probable_year_validated,
+    reference_module_is_consistent,
 )
-from organon.modules.bootstrap import ensure_modules_registered
 
 router = APIRouter()
 
-# Limite partagée entre POST /generate, GET /generate et POST /generate/stream : ce sont trois
-# façons de déclencher la même opération coûteuse (~20 appels externes, 10-20s), le quota doit
-# donc être commun plutôt que triplé.
-#
-# Une seule recherche déclenche déjà jusqu'à ~8 de ces requêtes (App.jsx,
-# prefetchOtherClassifications : une par module de classification applicable au domaine,
-# lancées en parallèle en arrière-plan) — 10/minute laissait moins d'une recherche de marge
-# avant 429, sans lien avec l'authentification malgré les apparences.
+# Shared by POST /generate, GET /generate and POST /generate/stream:
+# three ways to trigger the same costly operation (~20 external calls,
+# 10-20s). One search already triggers up to ~8 of them (App.jsx
+# prefetchOtherClassifications, one per applicable classification
+# module).
 _GENERATE_RATE_LIMIT = "40/minute"
 logger = logging.getLogger(__name__)
 
-_MONOVALUE_FIELDS = (
-    "classification",
-    "classification_taxobox",
-    "regne",
-    "redirection",
-    "rangs",
-    "basionyme",
-    "sous_taxons",
-    "etymologie",
-    "originale",
-    "synonymes",
-    "type_taxon",
-    "cacher_regne",
-    "image",
-    "milieu",
-    "taxon",
+# Per-module namespaced fields, plus `domain`, which only the request
+# decides.
+_UNMERGED_FIELDS = frozenset(
+    {"links", "vernacular", "other_names", "description", "distribution", "domain"}
 )
-"""Champs mono-valeur de `Struct` que plusieurs modules d'enrichissement peuvent chacun vouloir
-écrire (contrairement à `liens`/`vernaculaire`/`distribution`, déjà namespacés par module). Un
-module n'a modifié un de ces champs, par rapport à la struct de base pré-enrichissement, que si
-sa valeur diffère de celle de `_BASELINE` — voir `EnrichmentRunner.run` pour la fusion."""
+# Single-value `Struct` fields several enrichment modules may write.
+# A module changed one only if its value differs from the
+# pre-enrichment baseline; see `EnrichmentRunner.run` for the merge.
+_MONOVALUE_FIELDS = tuple(f for f in Struct.model_fields if f not in _UNMERGED_FIELDS)
 
-
+# Per-attempt bound (s) when `options.timeout` is 0, so one slow
+# parallel module cannot block the whole search.
 _CLASSIFICATION_FALLBACK_TIMEOUT = 20.0
-"""Borne (s) par tentative de classification quand `options.timeout` vaut 0 (défaut jamais changé
-par le frontend) — sans ça, un module lancé en parallèle des autres peut bloquer la recherche
-entière indéfiniment plutôt que de céder la place aux modules qui répondent."""
 
 
 async def _collect_with_timeout(
@@ -127,8 +111,10 @@ async def _collect_with_timeout(
     options: GenerateOptions,
     fallback_timeout: float | None = None,
 ) -> Struct | None:
-    """Applique `options.timeout` si non nul, sinon `fallback_timeout`, autour de
-    `module.collect(...)` (seul endroit qui lit `GenerateOptions.timeout`)."""
+    """Run `module.collect` under `options.timeout` or the fallback.
+
+    The only place that reads `GenerateOptions.timeout`.
+    """
     coro = module.collect(struct, is_classification=is_classification, options=options)
     timeout = options.timeout if options.timeout > 0 else fallback_timeout
     if timeout:
@@ -136,39 +122,54 @@ async def _collect_with_timeout(
     return await coro
 
 
+def _log_module_failure(module_id: str, role: str, exc: Exception) -> None:
+    """Log a module failure.
+
+    A network error or timeout is expected (warning); any other
+    exception is a module bug, logged with its traceback.
+    """
+    if isinstance(exc, httpx.HTTPError | asyncio.TimeoutError):
+        logger.warning("Module '%s' (%s) : erreur réseau (%s), ignoré.", module_id, role, exc)
+    else:
+        logger.exception("Module '%s' (%s) : erreur interne du module, ignoré.", module_id, role)
+
+
 def _options_from_request(req: GenerateRequest) -> GenerateOptions:
+    """Extract the generation options from a request."""
     return GenerateOptions(**req.model_dump(exclude={"taxon"}))
 
 
 def _all_applicable_classification_modules(
-    domaine: str, off: set[str], trees: dict[str, DomainTree]
+    domain: str, off: set[str], trees: dict[str, DomainTree]
 ) -> list[tuple[str, TaxonomyModule]]:
-    applicable = set(modules_possibles(domaine, trees) or [])
+    """Return the enabled classification modules covering `domaine`."""
+    applicable = set(possible_modules(domain, trees) or [])
     candidates = [
-        (m, get_module(m))
-        for m in classification_modules()
-        if m in applicable and m not in off
+        (m, get_module(m)) for m in classification_modules() if m in applicable and m not in off
     ]
     return [(m, module) for m, module in candidates if module is not None]
 
 
 def _classification_candidates(
-    req: GenerateRequest, off: set[str], trees: dict[str, DomainTree], priorities: dict[str, int]
+    req: GenerateRequest, off: set[str], trees: dict[str, DomainTree]
 ) -> list[tuple[str, TaxonomyModule]]:
-    """Modules de classification à interroger en parallèle. Choix explicite
-    (`req.classification`, ex. facette de source ou désambiguïsation GBIF) : un seul candidat —
-    voir `_classification_network_fallback` pour le repli si celui-ci échoue au réseau. Sinon :
-    tous les modules applicables au domaine demandé, aucun privilégié a priori (voir
-    `_pick_classification_winner`)."""
+    """Return the classification modules to query in parallel.
+
+    An explicit choice (`req.classification`) gives a single candidate;
+    see `_classification_network_fallback`. Otherwise all modules
+    applicable to the domain, none favored; see
+    `_pick_classification_winner`.
+    """
     if req.classification:
         module = get_module(req.classification)
         if module is None or req.classification in off:
             raise HTTPException(
-                400, detail=f"Module de classification '{req.classification}' inconnu ou désactivé."
+                400,
+                detail=f"Module de classification '{req.classification}' inconnu ou désactivé.",
             )
         return [(req.classification, module)]
 
-    candidates = _all_applicable_classification_modules(req.domaine, off, trees)
+    candidates = _all_applicable_classification_modules(req.domain, off, trees)
     if not candidates:
         raise HTTPException(400, detail="Aucun module de classification disponible.")
     return candidates
@@ -177,14 +178,16 @@ def _classification_candidates(
 def _classification_network_fallback(
     req: GenerateRequest, off: set[str], trees: dict[str, DomainTree], tried: dict[str, tuple]
 ) -> list[tuple[str, TaxonomyModule]]:
-    """Un choix explicite qui échoue par erreur réseau (pas un "non trouvé", un signal fiable
-    qu'on respecte tel quel) n'est pas la faute du taxon — retente les autres modules
-    applicables plutôt que d'abandonner sur la seule panne d'un module."""
+    """Return the other modules to retry after a network failure.
+
+    An explicit choice failing on the network says nothing about the
+    taxon. A "not found" is reliable and kept as is.
+    """
     if not (req.classification and all(exc is not None for _, exc in tried.values())):
         return []
     return [
         (m, module)
-        for m, module in _all_applicable_classification_modules(req.domaine, off, trees)
+        for m, module in _all_applicable_classification_modules(req.domain, off, trees)
         if m not in tried
     ]
 
@@ -192,11 +195,13 @@ def _classification_network_fallback(
 async def _attempt_classification(
     module_id: str, module: TaxonomyModule, req: GenerateRequest, options: GenerateOptions
 ) -> tuple[str, Struct | None, Exception | None]:
-    """Ne lève jamais (même contrat que `EnrichmentRunner.collect_one_module`) : le résultat
-    porte l'erreur éventuelle plutôt que de la laisser se propager hors du `gather`/
-    `as_completed`."""
+    """Run one classification attempt; never raise.
+
+    The result carries the error, so it cannot escape `gather` or
+    `as_completed`.
+    """
     struct = Struct(
-        taxon=TaxonInfo(nom=req.taxon), classification=req.classification, domaine=req.domaine
+        taxon=TaxonInfo(name=req.taxon), classification=req.classification, domain=req.domain
     )
     try:
         resolved = await _collect_with_timeout(
@@ -207,8 +212,8 @@ async def _attempt_classification(
             fallback_timeout=_CLASSIFICATION_FALLBACK_TIMEOUT,
         )
         return module_id, resolved, None
-    except Exception as exc:  # noqa: BLE001 — dégradé en HTTPException par l'appelant
-        logger.warning("Module de classification '%s' : erreur réseau (%s)", module_id, exc)
+    except Exception as exc:  # noqa: BLE001 - degraded to an HTTPException by the caller
+        _log_module_failure(module_id, "classification", exc)
         return module_id, None, exc
 
 
@@ -218,12 +223,14 @@ async def _run_classification_batch(
     options: GenerateOptions,
     results: dict[str, tuple[Struct | None, Exception | None]],
     started: float,
-) -> AsyncIterator[str]:
-    """Lance un lot de candidats de classification en parallèle, en écrivant chaque résultat
-    dans `results` au fil de l'eau — partagé par le lot initial et le repli réseau de
-    `_classification_network_fallback` dans `event_stream()`."""
+) -> AsyncIterator[ModuleStatusEvent]:
+    """Run classification candidates in parallel, yielding progress.
+
+    Each result is written to `results` as it arrives. Shared by the
+    initial batch and the network fallback.
+    """
     for cid, _ in batch:
-        yield _sse(ModuleStatusEvent(module_id=cid, role="classification", status="running"))
+        yield ModuleStatusEvent(module_id=cid, role="classification", status="running")
     tasks = [
         asyncio.create_task(_attempt_classification(cid, cm, req, options)) for cid, cm in batch
     ]
@@ -238,75 +245,73 @@ async def _run_classification_batch(
             status, message = "error", "taxon non trouvé"
         else:
             status, message = "found", None
-        yield _sse(
-            ModuleStatusEvent(
-                module_id=module_id,
-                role="classification",
-                status=status,
-                message=message,
-                duration_seconds=time.monotonic() - started,
-            )
+        yield ModuleStatusEvent(
+            module_id=module_id,
+            role="classification",
+            status=status,
+            message=message,
+            duration_seconds=time.monotonic() - started,
         )
 
 
 def _pick_classification_winner(
-    domaine: str,
+    domain: str,
     successes: list[str],
     trees: dict[str, DomainTree],
     priorities: dict[str, int],
     results: dict[str, tuple[Struct | None, Exception | None]],
 ) -> tuple[str, list[str]]:
-    """Départage les modules de classification ayant réussi — par spécialisation au domaine
-    demandé (`meilleure_classification`), ou par simple priorité quand cette notion ne
-    s'applique pas (un seul candidat retenu, ou aucun règne majoritaire exploitable sans filtre).
+    """Pick the winning classification among the successful modules.
 
-    Écarte d'abord les candidats dont le règne est minoritaire face aux autres candidats
-    (`classification_regne_coherents` — voir docstring pour la définition de majorité retenue) :
-    un module plus spécialisé ou prioritaire ne doit pas l'emporter au détriment de la
-    cohérence globale si son résultat est un homonyme inter-règnes minoritaire. Retourne
-    également la liste des candidats ainsi écartés, pour que l'appelant en informe l'utilisateur
-    plutôt que de les faire disparaître silencieusement.
-
-    Sans filtre explicite (`domaine == "*"`), le règne majoritaire détecté par les modules eux-
-    mêmes (ex. GBIF/ITIS/WoRMS) sert de domaine de facto pour `meilleure_classification` — un
-    module spécialisé (LPSN pour une bactérie, POWO pour une plante...) doit l'emporter sur un
-    généraliste mieux priorisé même quand l'utilisateur n'a rien filtré à la recherche."""
-    regnes = {
-        cid: struct.regne for cid in successes if (struct := results[cid][0]) is not None
+    Return (winner, excluded). First drop candidates whose kingdom is
+    a minority (`consistent_kingdom_classifications`): a cross-kingdom
+    homonym must not win on specialization or priority. The excluded
+    are returned so the caller can report them. Without a domain
+    filter, the majority kingdom serves as the domain, so a
+    specialized module (LPSN, POWO) beats a better-ranked generalist.
+    """
+    kingdoms = {
+        cid: struct.kingdom for cid in successes if (struct := results[cid][0]) is not None
     }
-    coherents, exclus, regne_majoritaire = classification_regne_coherents(successes, regnes)
-    pool = coherents or successes
+    consistent, excluded, majority_kingdom = consistent_kingdom_classifications(
+        successes, kingdoms
+    )
+    pool = consistent or successes
 
-    if domaine == "*" and regne_majoritaire:
-        domaine = regne_majoritaire
+    if domain == "*" and majority_kingdom:
+        domain = majority_kingdom
 
-    if len(pool) == 1 or domaine == "*":
-        return max(pool, key=lambda m: priorities.get(m, 0)), exclus
-    # `meilleure_classification` peut renvoyer None (aucun module noté positivement sur ce
-    # domaine ET aucun module de classification par défaut enregistré) — n'arrive pas en
-    # pratique (COL est toujours enregistré comme module par défaut), mais un repli sur le
-    # premier candidat de `pool` (non vide ici, `len(pool) >= 2`) reste préférable à un plantage.
-    winner = meilleure_classification(
-        domaine,
-        classification_module_ids=pool,
-        module_trees=trees,
-        module_priorities=priorities,
-        default_module=default_classification_module(),
-    ) or pool[0]
-    return winner, exclus
+    if len(pool) == 1 or domain == "*":
+        return max(pool, key=lambda m: priorities.get(m, 0)), excluded
+    # `best_classification` may return None (no positively scored module
+    # and no registered default). Unlikely, but falling back to the
+    # first candidate of `pool` (non-empty, `len(pool) >= 2`) beats
+    # crashing.
+    winner = (
+        best_classification(
+            domain,
+            classification_module_ids=pool,
+            module_trees=trees,
+            module_priorities=priorities,
+            default_module=default_classification_module(),
+        )
+        or pool[0]
+    )
+    return winner, excluded
 
 
-def _avertissements_exclusion_regne(
-    exclus: list[str], results: dict[str, tuple[Struct | None, Exception | None]]
+def _kingdom_exclusion_warnings(
+    excluded: list[str], results: dict[str, tuple[Struct | None, Exception | None]]
 ) -> list[str]:
-    """Un candidat de classification écarté par `_pick_classification_winner` pour règne
-    minoritaire a bel et bien trouvé quelque chose (ex. ITIS retrouvant un homonyme bactérien
-    pour un genre de champignon) — le signaler plutôt que le faire disparaître silencieusement,
-    au même titre que les autres avertissements affichés dans le panneau Données."""
+    """Return a warning for each candidate dropped for its kingdom.
+
+    They found something (e.g. a bacterial homonym of a fungus genus),
+    so they must not vanish silently.
+    """
     return [
-        f"{cid.upper()} écarté de la classification : règne « {struct.regne} » "
+        f"{cid.upper()} écarté de la classification : règne « {struct.kingdom} » "
         "minoritaire face aux autres sources (possible homonyme inter-règnes)."
-        for cid in exclus
+        for cid in excluded
         if (struct := results[cid][0]) is not None
     ]
 
@@ -316,7 +321,7 @@ _ModuleStatus = Literal["running", "found", "empty", "error"]
 
 @dataclass
 class ModuleRunEvent:
-    """Un pas de progression émis par `EnrichmentRunner.run()` pour un module donné."""
+    """Progress step of one module in `EnrichmentRunner.run`."""
 
     module_id: str
     status: _ModuleStatus
@@ -325,11 +330,12 @@ class ModuleRunEvent:
 
 
 class EnrichmentRunner:
-    """Exécute en parallèle les modules d'enrichissement applicables (hors classification), en
-    accumulant `struct`/`ran_modules`/`warnings` — extrait ici uniquement pour que
-    `/generate/stream` puisse observer un `ModuleRunEvent` par module sans dupliquer cette
-    logique (et donc sans risquer une divergence de comportement entre les deux endpoints). Voir
-    `run()` pour l'ordre de fusion des résultats."""
+    """Run the applicable enrichment modules in parallel.
+
+    Accumulates `struct`, `ran_modules` and `warnings`. Extracted so
+    `/generate/stream` can observe one `ModuleRunEvent` per module
+    without duplicating the logic. See `run` for the merge order.
+    """
 
     def __init__(
         self,
@@ -340,45 +346,37 @@ class EnrichmentRunner:
         options: GenerateOptions,
         priorities: dict[str, int],
     ) -> None:
+        """Select the modules to run, lowest priority first."""
         self.struct = struct
+        # Pre-enrichment snapshot, to tell a field written by a module
+        # from an unchanged one (see `_MONOVALUE_FIELDS`).
         self._baseline = struct.model_copy(deep=True)
-        """Snapshot pré-enrichissement, pour distinguer un champ mono-valeur effectivement écrit
-        par un module d'un champ resté inchangé (voir `_MONOVALUE_FIELDS`)."""
         self.ran_modules: list[str] = [classification_id]
-        self.warnings: list[str] = []
         self._options = options
-        # Filtré une fois ici (classification déjà traitée séparément, modules désactivés ou
-        # inconnus) plutôt que dans `run()`, pour ne créer une task et émettre un `ModuleRunEvent`
-        # "running" que pour les modules réellement interrogés. Trié par priorité croissante :
-        # `run()` applique les résultats dans cet ordre, donc le module le plus prioritaire est
-        # traité en dernier et l'emporte sur les autres en cas de conflit sur un champ mono-valeur
-        # (voir `_MONOVALUE_FIELDS`). Avant ce tri, l'ordre était celui d'enregistrement des
-        # modules dans `bootstrap.py` (alphabétique), sans rapport avec `ModuleMeta.priority`.
+        # Filtered once here (classification handled separately,
+        # disabled or unknown modules) so only queried modules get a
+        # task and a "running" event. Sorted by increasing priority:
+        # `run` applies results in that order, so the highest priority
+        # wins on single-value fields (see `_MONOVALUE_FIELDS`).
         candidates = [
             m
             for m in applicable
             if m != classification_id and m not in off and get_module(m) is not None
         ]
-        self._enrichment_ids = sorted(candidates, key=lambda m: priorities.get(m, 0))
+        self.enrichment_ids = sorted(candidates, key=lambda m: priorities.get(m, 0))
 
     async def collect_one_module(
         self, module_id: str
     ) -> tuple[str, Struct | None, Exception | None]:
-        """Ne lève jamais : le résultat porte l'erreur éventuelle plutôt que de la laisser se
-        propager, pour que `run()` puisse identifier de façon fiable quel module a échoué —
-        `asyncio.as_completed` ne préserve pas l'identité des tasks qu'on lui passe (il renvoie
-        des wrappers internes), donc retrouver `module_id` après coup via un mapping tâche ->
-        id, ou via l'unpacking d'un tuple qui échouerait avant d'avoir été produit, ne marche
-        pas de façon fiable en cas d'exception.
+        """Run one module on its own copy of the struct; never raise.
 
-        Chaque module reçoit sa propre copie profonde de `self.struct` plutôt que l'objet
-        partagé : les modules mutent `struct` en place (`Struct` a été conçu pour un pipeline
-        séquentiel, voir sa docstring), donc en exécution concurrente deux modules qui écrivent
-        au même moment le même champ mono-valeur produiraient un résultat dépendant de
-        l'entrelacement de la boucle d'événements plutôt que de la priorité déclarée — `run()`
-        fusionne ensuite ces copies indépendantes dans l'ordre de priorité."""
+        The result carries the error, so `run` can tell which module
+        failed (`as_completed` does not preserve task identity). Each
+        module gets a deep copy because modules mutate `struct` in
+        place; `run` merges the copies in priority order.
+        """
         module = get_module(module_id)
-        assert module is not None  # garanti par le filtre de `_enrichment_ids` (registre statique)
+        assert module is not None  # guaranteed by the `enrichment_ids` filter
         try:
             updated = await _collect_with_timeout(
                 module,
@@ -387,29 +385,26 @@ class EnrichmentRunner:
                 options=self._options,
             )
             return module_id, updated, None
-        except Exception as exc:  # noqa: BLE001 — un module tiers en échec ne doit pas casser la génération
+        except Exception as exc:  # noqa: BLE001 - a failing third-party module must not break the generation
+            _log_module_failure(module_id, "enrichissement", exc)
             return module_id, None, exc
 
     async def run(self) -> AsyncIterator[ModuleRunEvent]:
-        """Lance tous les modules d'enrichissement en parallèle sur la même base `struct` (celle
-        laissée par la classification) et notifie leur progression au fil de l'eau via
-        `asyncio.as_completed`, mais n'applique leurs résultats à `self.struct`/`self.ran_modules`
-        qu'une fois tous terminés, dans l'ordre de priorité `_enrichment_ids` plutôt que dans
-        l'ordre d'arrivée réseau. Sans ça, deux modules qui écrivent le même champ mono-valeur de
-        `Struct` (`sous_taxons`, `synonymes`, `basionyme`...) donneraient un résultat dépendant de
-        la latence de chacun plutôt que de la priorité déclarée. Les champs déjà namespacés par
-        module (`liens`, `vernaculaire`, `autres_noms`, `distribution`) n'ont pas ce problème —
-        chaque copie ne porte que la clé de son propre module, donc un simple `update()` les
-        fusionne sans conflit ; seuls les champs mono-valeur de `_MONOVALUE_FIELDS` nécessitent
-        un choix par priorité, tranché en comparant chaque copie à `self._baseline`."""
+        """Run all modules in parallel, yielding progress.
+
+        Results are applied only once all finished, in `enrichment_ids`
+        priority order, not arrival order, so single-value fields do not
+        depend on latency. Namespaced fields merge with `update()`. Each
+        `_MONOVALUE_FIELDS` entry is compared to `_baseline`.
+        """
         started: dict[str, float] = {
-            module_id: time.monotonic() for module_id in self._enrichment_ids
+            module_id: time.monotonic() for module_id in self.enrichment_ids
         }
         tasks = [
             asyncio.create_task(self.collect_one_module(module_id), name=module_id)
-            for module_id in self._enrichment_ids
+            for module_id in self.enrichment_ids
         ]
-        for module_id in self._enrichment_ids:
+        for module_id in self.enrichment_ids:
             yield ModuleRunEvent(module_id, "running")
 
         results: dict[str, Struct] = {}
@@ -417,9 +412,6 @@ class EnrichmentRunner:
             module_id, updated, exc = await task
             duration = time.monotonic() - started[module_id]
             if exc is not None:
-                logger.warning(
-                    "Module '%s' (enrichissement) : erreur réseau (%s), ignoré.", module_id, exc
-                )
                 yield ModuleRunEvent(
                     module_id, "error", message=str(exc), duration_seconds=duration
                 )
@@ -427,20 +419,20 @@ class EnrichmentRunner:
                 results[module_id] = updated
                 yield ModuleRunEvent(module_id, "found", duration_seconds=duration)
             else:
-                # Pas d'entrée dans `self.warnings` : un module d'enrichissement qui ne
-                # trouve rien pour ce taxon est le cas courant (la plupart des ~20 modules
-                # ne couvrent qu'un domaine restreint), pas une anomalie à afficher dans le
-                # wikitexte final — le statut "empty" reste visible module par module via
-                # `ModuleRunEvent`/l'onglet Données côté frontend.
+                # No warning: most modules cover a narrow domain, so
+                # finding nothing is the common case, not an anomaly.
+                # The "empty" status stays visible per module in the
+                # frontend.
                 yield ModuleRunEvent(module_id, "empty", duration_seconds=duration)
 
-        for module_id in self._enrichment_ids:
+        for module_id in self.enrichment_ids:
             if module_id not in results:
                 continue
             copy = results[module_id]
-            self.struct.liens.update(copy.liens)
-            self.struct.vernaculaire.update(copy.vernaculaire)
-            self.struct.autres_noms.update(copy.autres_noms)
+            self.struct.links.update(copy.links)
+            self.struct.vernacular.update(copy.vernacular)
+            self.struct.other_names.update(copy.other_names)
+            self.struct.description.update(copy.description)
             self.struct.distribution.update(copy.distribution)
             for field in _MONOVALUE_FIELDS:
                 value = getattr(copy, field)
@@ -449,71 +441,136 @@ class EnrichmentRunner:
             self.ran_modules.append(module_id)
 
 
-async def _generate_core(req: GenerateRequest) -> GenerateResponse:
-    ensure_modules_registered()
-    started = time.monotonic()
-    logs: list[str] = []
-    warnings: list[str] = []
-    options = _options_from_request(req)
+GenerationEvent = ModuleStatusEvent | PlanEvent | ResultEvent | FatalErrorEvent
 
+
+def _keep_generation(events: list[GenerationEvent]) -> bool:
+    """Keep only a generation that ran to completion.
+
+    A `fatal_error` (source down, taxon not found) may be transient.
+    """
+    return bool(events) and isinstance(events[-1], ResultEvent)
+
+
+_generation_cache: GenerationCache[GenerationEvent] = GenerationCache(keep=_keep_generation)
+
+
+def _cache_key(req: GenerateRequest) -> str:
+    """Return the cache key of a request."""
+    return req.model_copy(update={"taxon": req.taxon.strip()}).model_dump_json()
+
+
+def _cached_generation(req: GenerateRequest) -> AsyncIterator[GenerationEvent]:
+    """Return the events of a request, computed once.
+
+    Configuration errors (unknown module) are raised here, before any
+    task starts.
+    """
+    off = set(req.off)
+    candidates = _classification_candidates(req, off, module_domain_trees(exclude=off))
+    return _generation_cache.stream(_cache_key(req), lambda: _generation_pipeline(req, candidates))
+
+
+async def _generation_pipeline(
+    req: GenerateRequest, candidates: list[tuple[str, TaxonomyModule]]
+) -> AsyncIterator[GenerationEvent]:
+    """Run the full pipeline shared by both endpoints.
+
+    Yield a `module_status` per module, a `plan` after classification,
+    then a `result`, or a `fatal_error` (taxon not found, network
+    error on every classification module).
+    """
+    options = _options_from_request(req)
     off = set(req.off)
     trees = module_domain_trees(exclude=off)
     priorities = module_priorities(exclude=off)
+    started = time.monotonic()
+    logs: list[str] = []
+    warnings: list[str] = []
 
-    candidates = _classification_candidates(req, off, trees, priorities)
-    attempts = await asyncio.gather(
-        *(_attempt_classification(cid, cm, req, options) for cid, cm in candidates)
-    )
-    results = {cid: (resolved, exc) for cid, resolved, exc in attempts}
+    classification_started = time.monotonic()
+    results: dict[str, tuple[Struct | None, Exception | None]] = {}
+    async for event in _run_classification_batch(
+        candidates, req, options, results, classification_started
+    ):
+        yield event
 
     fallback = _classification_network_fallback(req, off, trees, results)
     if fallback:
-        fallback_attempts = await asyncio.gather(
-            *(_attempt_classification(cid, cm, req, options) for cid, cm in fallback)
-        )
-        results.update({cid: (resolved, exc) for cid, resolved, exc in fallback_attempts})
+        async for event in _run_classification_batch(
+            fallback, req, options, results, classification_started
+        ):
+            yield event
 
-    successes = [cid for cid, (resolved, _) in results.items() if resolved is not None]
-
+    # Declared candidate order, not `results` (filled in network arrival
+    # order), so the priority tie-break stays deterministic.
+    successes = [cid for cid, _ in candidates + fallback if results[cid][0] is not None]
     if not successes:
         if all(exc is not None for _, exc in results.values()):
-            raise HTTPException(
-                502,
+            yield FatalErrorEvent(
+                status_code=502,
                 detail=(
                     f"Modules de classification en erreur réseau : {', '.join(sorted(results))}."
                 ),
             )
-        raise HTTPException(
-            404,
-            detail=(
-                f"Taxon « {req.taxon} » non trouvé "
-                f"(classifications essayées : {', '.join(sorted(results))})."
-            ),
-        )
+        else:
+            yield FatalErrorEvent(
+                status_code=404,
+                detail=(
+                    f"Taxon « {req.taxon} » non trouvé "
+                    f"(classifications essayées : {', '.join(sorted(results))})."
+                ),
+            )
+        return
 
-    classification_id, exclus_regne = _pick_classification_winner(
-        req.domaine, successes, trees, priorities, results
+    classification_id, excluded_kingdom = _pick_classification_winner(
+        req.domain, successes, trees, priorities, results
     )
+    logs.append(f"Classification : {classification_id}")
+    warnings.extend(_kingdom_exclusion_warnings(excluded_kingdom, results))
     struct = results[classification_id][0]
     assert struct is not None  # garanti par `successes` (voir _pick_classification_winner)
-    logs.append(f"Classification : {classification_id}")
-    warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
 
-    applicable = modules_possibles(struct.domaine, trees) or []
+    applicable = possible_modules(struct.domain, trees) or []
     runner = EnrichmentRunner(struct, classification_id, applicable, off, options, priorities)
-    async for _event in runner.run():
-        pass  # /generate ignore la progression intermédiaire ; /generate/stream l'observe.
+    yield PlanEvent(classification_id=classification_id, modules=runner.enrichment_ids)
 
-    return _assemble_response(
-        req,
-        options,
-        classification_id,
-        runner.struct,
-        runner.ran_modules,
-        warnings + runner.warnings,
-        logs,
-        started,
+    async for module_event in runner.run():
+        yield ModuleStatusEvent(
+            module_id=module_event.module_id,
+            role="enrichment",
+            status=module_event.status,
+            message=module_event.message,
+            duration_seconds=module_event.duration_seconds,
+        )
+
+    yield ResultEvent(
+        data=_assemble_response(
+            req,
+            options,
+            classification_id,
+            runner.struct,
+            runner.ran_modules,
+            warnings,
+            logs,
+            started,
+        )
     )
+
+
+async def _generate_core(req: GenerateRequest) -> GenerateResponse:
+    """Run a generation and return its response, raising HTTP errors."""
+    result: GenerateResponse | None = None
+    async for event in _cached_generation(req):
+        if isinstance(event, FatalErrorEvent):
+            raise HTTPException(event.status_code, detail=event.detail)
+        if isinstance(event, ResultEvent):
+            result = event.data
+    assert (
+        result is not None
+    )  # le pipeline se termine toujours par un `result` ou un `fatal_error`
+    # Copy: the cached response is shared and the caller may mutate it.
+    return result.model_copy(deep=True)
 
 
 @router.post("/generate", response_model=GenerateResponse)
@@ -521,6 +578,7 @@ async def _generate_core(req: GenerateRequest) -> GenerateResponse:
 async def generate(
     request: Request, req: GenerateRequest, username: str = Depends(require_username)
 ) -> GenerateResponse:
+    """Generate the article skeleton of a taxon."""
     return await _generate_core(req)
 
 
@@ -529,66 +587,48 @@ async def generate(
 async def generate_via_get(
     request: Request, taxon: str, username: str = Depends(require_username)
 ) -> GenerateResponse:
-    """Alias GET de `POST /generate`, avec uniquement `taxon` en paramètre de requête (toutes
-    les autres options à leur valeur par défaut) — pour pouvoir déclencher une génération
-    depuis un simple lien ou la barre d'adresse d'un navigateur, sans construire de corps JSON.
-    Le frontend continue d'utiliser `POST /generate`/`POST /generate/stream`, qui exposent
-    l'intégralité de `GenerateOptions`."""
+    """GET alias of `POST /generate`, with defaults except `taxon`.
+
+    Lets a link or address bar trigger a generation. The frontend uses
+    the POST endpoints, which expose all of `GenerateOptions`.
+    """
     return await _generate_core(GenerateRequest(taxon=taxon))
 
 
-def _auteur_candidats(struct: Struct, classification_id: str) -> dict[str, str]:
-    """Auteur brut rapporté par chaque module ayant contribué à ce taxon, avant vote majoritaire
-    — exposé via `GenerateResponse.auteur_candidats` pour permettre à l'utilisateur d'imposer une
-    source via `GenerateOptions.auteur_source` plutôt que de subir le vote automatique de
-    `_auteur_majoritaire`. Même périmètre que ce vote, mais un candidat par module plutôt qu'un
-    multi-ensemble : ici seule la liste des sources disponibles compte, pas leur poids dans un
-    vote."""
-    candidats: dict[str, str] = {}
-    classification_auteur = (struct.taxon.auteur or "").strip()
-    if classification_auteur:
-        candidats[classification_id] = classification_auteur
-    for module_id, data in struct.liens.items():
-        auteur = data.get("auteur")
-        if auteur:
-            candidats[module_id] = auteur.strip()
-    return candidats
+def _author_candidates(struct: Struct, classification_id: str) -> dict[str, str]:
+    """Return the raw author reported by each contributing module.
+
+    Exposed so the user can force a source via
+    `GenerateOptions.author_source` instead of the majority vote.
+    """
+    candidates: dict[str, str] = {}
+    classification_author = (struct.taxon.author or "").strip()
+    if classification_author:
+        candidates[classification_id] = classification_author
+    for module_id, data in struct.links.items():
+        author = data.get("author")
+        if author:
+            candidates[module_id] = author.strip()
+    return candidates
 
 
-def _auteur_majoritaire(struct: Struct, classification_id: str) -> str:
-    """Retient l'auteur que le plus de modules rapportent à l'identique, plutôt que celui du
-    seul module de classification (qui peut très bien n'avoir rien trouvé alors qu'un module
-    d'enrichissement, lui, a l'info — ex. classifier via OTL/iNaturalist, qui n'exposent pas
-    l'auteur, alors que GBIF tourné en enrichissement l'a trouvé) ou le premier rencontré dans
-    un ordre arbitraire. Aucune priorité de module : à effectif égal, l'auteur du module de
-    classification l'emporte (c'est lui qui pilote cette génération), à défaut le premier
-    rencontré."""
-    classification_auteur = (struct.taxon.auteur or "").strip()
-    candidats = [classification_auteur] if classification_auteur else []
-    for module_id, data in struct.liens.items():
-        if module_id == classification_id:
-            continue  # déjà compté via classification_auteur — sinon double voix pour ce module
-        auteur = data.get("auteur")
-        if auteur:
-            candidats.append(auteur.strip())
+def _majority_author(candidates: dict[str, str], struct: Struct, classification_id: str) -> str:
+    """Return the author most modules report identically.
 
-    if not candidats:
-        return ""
-
-    comptes: dict[str, int] = {}
-    for c in candidats:
-        comptes[c] = comptes.get(c, 0) + 1
-    meilleur_effectif = max(comptes.values())
-    ex_aequo = [c for c in candidats if comptes[c] == meilleur_effectif]
-    return classification_auteur if classification_auteur in ex_aequo else ex_aequo[0]
+    Better than the classification module's alone, which may have
+    none. On a tie the classification author wins, else the first seen.
+    """
+    classification_author = (struct.taxon.author or "").strip()
+    votes = [classification_author] if classification_author else []
+    votes += [a for m, a in candidates.items() if m != classification_id]
+    return Counter(votes).most_common(1)[0][0] if votes else ""
 
 
 def _compute_data_found(struct: Struct, classification_id: str) -> dict[str, list[str]]:
-    """Pour chaque module, les catégories d'information qu'il a effectivement rapportées pour
-    ce taxon (ex. "Classification", "Taxons inférieurs", "Auteur"...) — dérivé directement des
-    champs déjà peuplés de `struct` (quel module est `struct.sous_taxons.source`, quelles clés
-    de `struct.vernaculaire`/`struct.distribution` sont non vides...) plutôt qu'une liste
-    maintenue à la main module par module. Sert de base à `GenerateResponse.data_found`."""
+    """Return, per module, the information categories it reported.
+
+    Derived from the populated `struct` fields, not maintained by hand.
+    """
     found: dict[str, list[str]] = {classification_id: ["Classification"]}
 
     def add(module_id: str | None, label: str) -> None:
@@ -598,58 +638,55 @@ def _compute_data_found(struct: Struct, classification_id: str) -> dict[str, lis
         if label not in labels:
             labels.append(label)
 
-    if struct.sous_taxons and struct.sous_taxons.liste:
-        add(struct.sous_taxons.source, "Taxons inférieurs")
-    if struct.synonymes and struct.synonymes.liste:
-        add(struct.synonymes.source, "Synonymes")
-    if struct.basionyme:
-        add(struct.basionyme.source, "Basionyme")
+    if struct.subtaxa and struct.subtaxa.items:
+        add(struct.subtaxa.source, "Taxons inférieurs")
+    if struct.synonyms and struct.synonyms.items:
+        add(struct.synonyms.source, "Synonymes")
+    if struct.basionym:
+        add(struct.basionym.source, "Basionyme")
     if struct.type_taxon:
         add(struct.type_taxon.source, "Taxon type")
-    if struct.etymologie:
-        add(struct.etymologie.source, "Étymologie")
+    if struct.etymology:
+        add(struct.etymology.source, "Étymologie")
     for module_id, entry in struct.distribution.items():
         if entry.certain or entry.uncertain:
             add(module_id, "Répartition")
-    for module_id, noms in struct.vernaculaire.items():
-        if noms:
+    for module_id, names in struct.vernacular_names("fr").items():
+        if names:
             add(module_id, "Noms vernaculaires")
-    for module_id, data in struct.liens.items():
-        if data.get("auteur"):
+    for module_id, data in struct.links.items():
+        if data.get("author"):
             add(module_id, "Auteur")
 
     return found
 
 
 def _compute_external_ids(struct: Struct, ran_modules: list[str]) -> dict[str, str]:
-    """Identifiant du taxon par module ayant contribué à cette génération — convention
-    `struct.liens[module_id]['id']` suivie par tous les modules (voir
-    `organon.modules.common.simple_debug_link`). Un module dont l'entrée ne porte pas cette clé
-    (ex. `externe`, qui ne référence aucune base externe propre) est simplement absent du
-    résultat."""
+    """Return the taxon id of each contributing module.
+
+    Follows the `struct.liens[module_id]['id']` convention; modules
+    without it are absent.
+    """
     ids: dict[str, str] = {}
     for module_id in ran_modules:
-        data = struct.liens.get(module_id)
-        if not isinstance(data, dict):
-            continue
+        data = struct.links.get(module_id, {})
         if data.get("id"):
             ids[module_id] = str(data["id"])
+        if module_id == "gbif" and data.get("key"):
+            ids["gbif_key"] = str(data["key"])
     return ids
 
 
-def _repli_eteint(struct: Struct) -> None:
-    """Filet de sécurité : la source de classification retenue peut n'avoir aucun signal
-    d'extinction pour ce taxon (ex. Hesperomys sans `age` renseigné à ce rang) alors qu'une
-    autre source consultée en enrichissement le sait (`isExtinct`/`isFossil`/`extinct` -> `True`
-    dans `struct.liens[<module>]["eteint"]`, voir modules irmng/wrms/algaebase/gbif/hesperomys).
-    Seul un `True` explicite compte : l'affichage ne distingue pas "non éteint" de "inconnu", donc
-    inutile de chercher un `False` à faire gagner. En revanche un `False` explicite de la source
-    de classification (elle a une opinion, contrairement à `None`) n'est pas écrasé : seule
-    l'absence de signal déclenche le repli."""
-    if struct.taxon.eteint is not None:
+def _extinct_fallback(struct: Struct) -> None:
+    """Fall back to another module's extinction signal.
+
+    Only if the classification source has none (None). An explicit
+    False from it is kept; only an explicit True elsewhere counts.
+    """
+    if struct.taxon.extinct is not None:
         return
-    if any(entry.get("eteint") for entry in struct.liens.values()):
-        struct.taxon.eteint = True
+    if any(entry.get("extinct") for entry in struct.links.values()):
+        struct.taxon.extinct = True
 
 
 def _assemble_response(
@@ -662,39 +699,40 @@ def _assemble_response(
     logs: list[str],
     started: float,
 ) -> GenerateResponse:
-    """Étapes finales communes aux deux endpoints, une fois tous les modules d'enrichissement
-    exécutés : incohérences de règne, catégories/portails, auteur principal, rendu du
-    wikitexte, liens externes, réponse. Ne fait plus aucun appel réseau (uniquement du calcul
-    local) : peut donc être appelée telle quelle depuis le générateur SSE de `/generate/stream`
-    sans considération de streaming."""
-    _repli_eteint(struct)
-    regne_incoherences = detect_regne_incoherences(struct, classification_id)
-    rang_incoherences = detect_rang_incoherences(struct, classification_id)
+    """Run the final steps shared by both endpoints.
 
-    struct.liens["fin"] = compute_fin_liens(struct, options)
+    Kingdom inconsistencies, categories and portals, main author,
+    wikitext, external links and response. Local computation only, no
+    network call.
+    """
+    _extinct_fallback(struct)
+    kingdom_inconsistencies = detect_kingdom_inconsistencies(struct, classification_id)
+    rank_inconsistencies = detect_rank_inconsistencies(struct, classification_id)
 
-    auteur_candidats = _auteur_candidats(struct, classification_id)
-    if options.auteur_source and options.auteur_source in auteur_candidats:
-        struct.taxon.auteur = auteur_candidats[options.auteur_source]
+    struct.links[FOOTER_LINK] = compute_footer_links(struct, options)
+
+    author_candidates = _author_candidates(struct, classification_id)
+    if options.author_source and options.author_source in author_candidates:
+        struct.taxon.author = author_candidates[options.author_source]
     else:
-        struct.taxon.auteur = _auteur_majoritaire(struct, classification_id)
-    # Année GBIF (parsing de `publishedIn`, texte libre — voir gbif/module.py::_annee_probable) :
-    # ajoutée seulement si un autre module rapporte la même année dans son propre auteur (voir
-    # gbif_annee_probable_validee), jamais présentée à l'utilisateur sur la seule foi du parsing.
-    annee_gbif_validee = gbif_annee_probable_validee(struct, struct.taxon.auteur)
-    if annee_gbif_validee is not None:
-        struct.taxon.auteur = f"{struct.taxon.auteur}, {annee_gbif_validee}"
-    struct.taxon.auteur_resolu, auteur_warnings = resoudre_auteur_principal(struct)
-    warnings = warnings + auteur_warnings
+        struct.taxon.author = _majority_author(author_candidates, struct, classification_id)
+    # GBIF year (parsed from free-text `publishedIn`): added only if
+    # another module reports it in its own author, never on parsing
+    # alone.
+    gbif_validated_year = gbif_probable_year_validated(struct, struct.taxon.author)
+    if gbif_validated_year is not None:
+        struct.taxon.author = f"{struct.taxon.author}, {gbif_validated_year}"
+    struct.taxon.resolved_author, author_warnings = resolve_main_author(struct)
+    warnings = warnings + author_warnings
 
-    wikitext = render(struct, options, ext_only=req.juste_ext)
-    taxobox_wikitext = "" if req.juste_ext else render_taxobox_block(struct, options)
-    subtaxa_wikitext = "" if req.juste_ext else render_subtaxa_block(struct, options)
+    wikitext = render(struct, options, ext_only=req.external_only)
+    taxobox_wikitext = "" if req.external_only else render_taxobox_block(struct, options)
+    subtaxa_wikitext = "" if req.external_only else render_subtaxa_block(struct, options)
     reference_items = [
         ReferenceItem(
             module_id=module_id,
             wikitext=wikitext,
-            default_checked=reference_module_coherente(module_id, struct.regne),
+            default_checked=reference_module_is_consistent(module_id, struct.kingdom),
         )
         for module_id, wikitext in render_references_items_block(struct)
     ]
@@ -705,8 +743,8 @@ def _assemble_response(
     )
     rank_lines = (
         []
-        if req.juste_ext
-        else [RankLine(rang=r, nom=n, line=line) for r, n, line in compute_rank_lines(struct)]
+        if req.external_only
+        else [RankLine(rank=r, name=n, line=line) for r, n, line in compute_rank_lines(struct)]
     )
 
     external_links = []
@@ -719,58 +757,59 @@ def _assemble_response(
             external_links.append(ExternalLink(module_id=module_id, html=link))
 
     truncated = {
-        "sous_taxons": bool(struct.sous_taxons and struct.sous_taxons.coupe),
-        "synonymes": bool(struct.synonymes and struct.synonymes.coupe),
+        "subtaxa": bool(struct.subtaxa and struct.subtaxa.truncated),
+        "synonyms": bool(struct.synonyms and struct.synonyms.truncated),
     }
 
     vernacular_merged: dict[str, list[str]] = {}
-    for src, noms in struct.vernaculaire.items():
-        for nom in noms:
-            ajoute_si_besoin(vernacular_merged, nom, src)
+    for src, names in struct.vernacular_names("fr").items():
+        for name in names:
+            add_if_needed(vernacular_merged, name, src)
 
-    autres_noms_merged: dict[str, dict[str, list[str]]] = {}
-    for src, statuts in struct.autres_noms.items():
-        for statut, noms in statuts.items():
-            bucket = autres_noms_merged.setdefault(statut, {})
-            for nom in noms:
-                ajoute_si_besoin(bucket, nom, src)
-    autres_noms_response = {statut: list(noms) for statut, noms in autres_noms_merged.items()}
+    other_names_merged: dict[str, dict[str, list[str]]] = {}
+    for src, statuses in struct.other_names.items():
+        for status, names in statuses.items():
+            bucket = other_names_merged.setdefault(status, {})
+            for name in names:
+                add_if_needed(bucket, name, src)
+    other_names_response = {status: list(names) for status, names in other_names_merged.items()}
 
-    # Anciennement un unique `completeness_score` (rangs + sous-taxons + synonymes + noms
-    # vernaculaires additionnés) : scindé en deux mesures indépendantes, une par facette du
-    # "zoom" classification (taxobox / sous-taxons), pour que le frontend puisse recommander une
-    # source différente pour chaque facette plutôt qu'une seule source "la plus complète" au
-    # global. Synonymes et noms vernaculaires ne rentrent dans aucune des deux mesures : ils ne
-    # font partie ni du bloc taxobox ni du bloc sous-taxons (voir `taxobox_wikitext`/
-    # `subtaxa_wikitext`), donc les compter ferait pencher un score sans rapport avec ce qu'il
-    # sert à choisir.
-    taxobox_completeness_score = len(struct.rangs)
-    subtaxa_completeness_score = len(struct.sous_taxons.liste if struct.sous_taxons else [])
+    # Two independent measures, one per classification "zoom" facet
+    # (taxobox, sub-taxa), so the frontend can recommend a different
+    # source for each. Synonyms and vernacular names count in neither.
+    taxobox_completeness_score = len(struct.ranks)
+    subtaxa_completeness_score = len(struct.subtaxa.items if struct.subtaxa else [])
 
     data_found = _compute_data_found(struct, classification_id)
 
     distribution_merged: dict[str, list[str]] = {}
     for module_id, entry in struct.distribution.items():
         codes = {**entry.certain, **entry.uncertain}
-        noms = sorted(dict.fromkeys(data_pays_code(code) for code in codes))
-        if noms:
-            distribution_merged[module_id] = noms
+        names = sorted(dict.fromkeys(country_data_by_code(code) for code in codes))
+        if names:
+            distribution_merged[module_id] = names
 
     return GenerateResponse(
-        taxon_requested=req.taxon,
-        taxon_resolved=struct.taxon.nom,
-        taxon_rang=struct.taxon.rang or "",
-        classification_used=classification_id,
-        domain_used=struct.domaine,
-        regne=struct.regne,
-        eteint=bool(struct.taxon.eteint),
-        uicn_statut=struct.liens.get("iucn", {}).get("risque", ""),
+        requested_taxon=req.taxon,
+        resolved_taxon=struct.taxon.name,
+        taxon_rank=struct.taxon.rank or "",
+        used_classification=classification_id,
+        used_domain=struct.domain,
+        kingdom=struct.kingdom,
+        extinct=bool(struct.taxon.extinct),
+        iucn_status=struct.links.get("iucn", {}).get("risk", ""),
+        iucn_criterion=struct.links.get("iucn", {}).get("criterion", ""),
         vernacular_names=list(vernacular_merged)[:6],
-        autres_noms=autres_noms_response,
+        vernacular_names_without_language=struct.vernacular_names(LANGUE_INDETERMINEE),
+        other_names=other_names_response,
         wikitext=wikitext,
         taxobox_wikitext=taxobox_wikitext,
         subtaxa_wikitext=subtaxa_wikitext,
-        subtaxa_liste=struct.sous_taxons.liste if struct.sous_taxons else [],
+        subtaxa=struct.subtaxa.items if struct.subtaxa else [],
+        subtaxa_source=(struct.subtaxa.source or "") if struct.subtaxa else "",
+        classification_taxobox=struct.classification_taxobox,
+        see_also_wikitext=render_see_also(struct, options),
+        distribution_entries=struct.distribution,
         references_wikitext=references_wikitext,
         reference_items=reference_items,
         taxobox_completeness_score=taxobox_completeness_score,
@@ -778,35 +817,33 @@ def _assemble_response(
         rank_lines=rank_lines,
         external_links=external_links,
         data_found=data_found,
-        auteur_candidats=auteur_candidats,
-        auteur_consolide=struct.taxon.auteur or "",
-        auteur_resolu=struct.taxon.auteur_resolu or "",
-        synonymes=struct.synonymes.liste if struct.synonymes else [],
-        synonymes_source=(struct.synonymes.source or "") if struct.synonymes else "",
-        basionyme=struct.basionyme,
+        author_candidates=author_candidates,
+        consolidated_author=struct.taxon.author or "",
+        resolved_author=struct.taxon.resolved_author or "",
+        synonyms=struct.synonyms.items if struct.synonyms else [],
+        synonyms_source=(struct.synonyms.source or "") if struct.synonyms else "",
+        basionym=struct.basionym,
         logs=logs,
         warnings=warnings,
         elapsed_seconds=round(time.monotonic() - started, 3),
         truncated=truncated,
-        regne_incoherences=regne_incoherences,
-        rang_incoherences=rang_incoherences,
-        milieu=struct.milieu or "",
+        kingdom_inconsistencies=kingdom_inconsistencies,
+        rank_inconsistencies=rank_inconsistencies,
+        habitat=struct.habitat or "",
         distribution=distribution_merged,
         external_ids=_compute_external_ids(struct, ran_modules),
     )
 
 
 def _sse(event: BaseModel) -> str:
-    """Encode un événement (`ModuleStatusEvent`/`PlanEvent`/`ResultEvent`/`FatalErrorEvent`) au
-    format Server-Sent Events (une ligne `data: <json>`, suivie d'une ligne vide qui marque la
-    fin de l'événement — voir la spec WHATWG). Passer par les modèles Pydantic plutôt que des
-    dicts construits à la main garantit que chaque événement respecte le schéma documenté dans
-    `organon/api/schemas.py` (ex. `status` limité aux quatre valeurs attendues) — une divergence
-    lèverait une `ValidationError` ici plutôt qu'un event mal formé silencieusement envoyé au
-    client. `ensure_ascii` volontairement laissé à sa valeur par défaut (True) : les caractères
-    non-ASCII (noms de taxons accentués, etc.) passent en échappement \\uXXXX plutôt qu'en
-    UTF-8 brut, ce qui évite tout risque de couper un caractère multi-octets au milieu si le
-    corps de la réponse est un jour re-découpé par un proxy intermédiaire."""
+    """Encode an event as Server-Sent Events.
+
+    Format: a `data: <json>` line followed by a blank line.
+
+    Going through Pydantic models guarantees the documented schema.
+    `ensure_ascii` stays True so a proxy cannot split a multi-byte
+    character.
+    """
     return f"data: {json.dumps(event.model_dump(mode='json'))}\n\n"
 
 
@@ -815,116 +852,24 @@ def _sse(event: BaseModel) -> str:
 async def generate_stream(
     request: Request, req: GenerateRequest, username: str = Depends(require_username)
 ) -> StreamingResponse:
-    """Variante de `/generate` en Server-Sent Events : un `module_status` par module de
-    classification/enrichissement (voir `ModuleStatusEvent`), un `plan` juste après la
-    classification, puis un `result` final portant la même donnée que `POST /generate`. En cas
-    d'échec après le début du flux (taxon non trouvé, erreur réseau sur la classification), un
-    `fatal_error` est émis à la place du `result` — le code de statut HTTP reste 200 dans tous
-    les cas puisqu'il est déjà envoyé au moment où le premier octet du flux part (voir
-    `FatalErrorEvent`). Les erreurs de configuration qui ne dépendent d'aucun appel réseau (ex.
-    module de classification inconnu) restent de vraies erreurs HTTP, levées par
-    `_classification_candidates` avant l'ouverture du flux.
+    """Stream a generation as Server-Sent Events.
+
+    After the stream starts, failures become a `fatal_error` event and
+    the HTTP status stays 200. Configuration errors are raised by
+    `_classification_candidates` before the stream opens.
     """
-    ensure_modules_registered()
-    options = _options_from_request(req)
-    off = set(req.off)
-    trees = module_domain_trees(exclude=off)
-    priorities = module_priorities(exclude=off)
-    candidates = _classification_candidates(req, off, trees, priorities)
+    events = _cached_generation(req)
 
     async def event_stream() -> AsyncIterator[str]:
-        started = time.monotonic()
-        logs: list[str] = []
-        warnings: list[str] = []
-
-        classification_started = time.monotonic()
-        results: dict[str, tuple[Struct | None, Exception | None]] = {}
-        async for event in _run_classification_batch(
-            candidates, req, options, results, classification_started
-        ):
-            yield event
-
-        fallback = _classification_network_fallback(req, off, trees, results)
-        if fallback:
-            async for event in _run_classification_batch(
-                fallback, req, options, results, classification_started
-            ):
-                yield event
-
-        # Ordre des candidats déclarés, pas `results` (rempli via `as_completed`, donc en ordre
-        # d'arrivée réseau) — sinon le départage par priorité de `_pick_classification_winner`
-        # devient non déterministe d'un appel à l'autre en cas d'égalité de priorité.
-        successes = [cid for cid, _ in candidates + fallback if results[cid][0] is not None]
-        if not successes:
-            if all(exc is not None for _, exc in results.values()):
-                yield _sse(
-                    FatalErrorEvent(
-                        status_code=502,
-                        detail=(
-                            "Modules de classification en erreur réseau : "
-                            f"{', '.join(sorted(results))}."
-                        ),
-                    )
-                )
-            else:
-                yield _sse(
-                    FatalErrorEvent(
-                        status_code=404,
-                        detail=(
-                            f"Taxon « {req.taxon} » non trouvé "
-                            f"(classifications essayées : {', '.join(sorted(results))})."
-                        ),
-                    )
-                )
-            return
-
-        classification_id, exclus_regne = _pick_classification_winner(
-            req.domaine, successes, trees, priorities, results
-        )
-        logs.append(f"Classification : {classification_id}")
-        warnings.extend(_avertissements_exclusion_regne(exclus_regne, results))
-        struct = results[classification_id][0]
-        assert struct is not None  # garanti par `successes` (voir _pick_classification_winner)
-
-        applicable = modules_possibles(struct.domaine, trees) or []
-        enrichment_ids = [
-            m
-            for m in applicable
-            if m != classification_id and m not in off and get_module(m) is not None
-        ]
-        yield _sse(PlanEvent(classification_id=classification_id, modules=enrichment_ids))
-
-        runner = EnrichmentRunner(struct, classification_id, applicable, off, options, priorities)
-        async for module_event in runner.run():
-            yield _sse(
-                ModuleStatusEvent(
-                    module_id=module_event.module_id,
-                    role="enrichment",
-                    status=module_event.status,
-                    message=module_event.message,
-                    duration_seconds=module_event.duration_seconds,
-                )
-            )
-
-        response = _assemble_response(
-            req,
-            options,
-            classification_id,
-            runner.struct,
-            runner.ran_modules,
-            warnings + runner.warnings,
-            logs,
-            started,
-        )
-        yield _sse(ResultEvent(data=response))
+        async for event in events:
+            yield _sse(event)
 
     return StreamingResponse(
         event_stream(),
         media_type="text/event-stream",
         headers={
-            # Empêche un proxy intermédiaire (ex. nginx en frontal de certains hébergements) de
-            # bufferiser la réponse en entier avant de la relayer — sans ça, le flux perdrait
-            # tout son intérêt (le client ne verrait qu'un seul paquet final, comme /generate).
+            # Stops a proxy (e.g. nginx) from buffering the whole
+            # response, which would defeat the stream.
             "Cache-Control": "no-cache",
             "X-Accel-Buffering": "no",
         },

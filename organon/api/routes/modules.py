@@ -1,6 +1,8 @@
-"""GET /api/v1/modules — liste tous les modules enregistrés (métadonnées : domaines,
-priorité, classification par défaut), pour alimenter dynamiquement le multiselect « modules à
-désactiver » de l'interface web et l'option `--list-modules` de la CLI."""
+"""GET /api/v1/modules: the registered modules and their metadata.
+
+Feeds the "modules to disable" multiselect and the CLI's
+`--list-modules`.
+"""
 
 from __future__ import annotations
 
@@ -15,6 +17,7 @@ router = APIRouter()
 
 @router.get("/modules", response_model=list[ModuleInfo])
 async def list_modules() -> list[ModuleInfo]:
+    """Return the registered modules, highest priority first."""
     ensure_modules_registered()
     default_id = default_classification_module()
     return [

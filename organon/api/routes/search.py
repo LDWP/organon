@@ -1,32 +1,26 @@
-"""GET /api/v1/search — recherche floue par nom scientifique ou vernaculaire, avant génération.
+"""GET /api/v1/search: fuzzy search by scientific or vernacular name.
 
-S'appuie sur `GbifAdapter.search_any` (endpoint `species/search`, distinct de l'endpoint de
-résolution exacte utilisé par le module GBIF) : matche aussi bien "Gadus morhua" que "morue
-franche", et résout au passage l'homonymie entre règnes (ex. "Morus" = mûrier chez les
-végétaux, fou de Bassan chez les animaux) puisque `species/search` renvoie un résultat distinct
-par règne pour un même nom. Dédupliqué par (nom scientifique, règne) : GBIF renvoie parfois
-plusieurs enregistrements pour la même combinaison (variantes d'auteur, sources multiples au
-sein du Backbone).
-
-Chaque `SearchMatch` porte aussi `gbif_key`/`parent_key` (tels quels de `key`/`parentKey` côté
-GBIF) : le frontend peut ainsi confirmer qu'une suggestion est réellement la sous-espèce d'une
-autre suggestion de la même réponse (`parent_key` pointant vers le `gbif_key` d'une entrée
-listée), plutôt que de se fier à une ressemblance textuelle des noms qui mélangerait à tort des
-taxons sans rapport partageant un même préfixe (ex. un virus nommé d'après son hôte)."""
+Uses `GbifAdapter.search_any` (`species/search`), which matches
+"Gadus morhua" as well as "morue franche" and returns one result
+per kingdom for a homonym (e.g. "Morus"). Each `SearchMatch`
+carries `gbif_key` and `parent_key`, so the frontend can confirm a
+real parentage between suggestions instead of guessing from names.
+"""
 
 from __future__ import annotations
 
 import re
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from organon.api.deps import require_username
+from organon.api.rate_limit import SEARCH_RATE_LIMIT, limiter
 from organon.api.schemas import SearchMatch, SearchResponse
 from organon.core.domains import KINGDOM_MAP
-from organon.core.rendering.grammar import wp_nom_rang
+from organon.core.rendering.grammar import wp_rank_name
 from organon.modules.gbif.adapter import GbifAdapter
-from organon.modules.gbif.ranks import gbif_cherche_rang
-from organon.modules.wikidata.adapter import WikidataAdapter
+from organon.modules.gbif.ranks import gbif_to_wp_rank
+from organon.modules.wikidata.adapter import WikidataEntityAdapter
 
 router = APIRouter()
 
@@ -35,20 +29,25 @@ MAX_VERNACULAR_PER_MATCH = 5
 
 _QID_RE = re.compile(r"^Q[1-9]\d*$", re.IGNORECASE)
 
+DedupKey = int | tuple[str, str, str]
+
 
 def _preferred_vernaculars(raw: list[dict]) -> list[str]:
-    francais = [v["vernacularName"] for v in raw if v.get("language") == "fra"]
-    autres = [v["vernacularName"] for v in raw if v.get("language") != "fra"]
-    vus: dict[str, None] = {}
-    for nom in francais + autres:
-        vus.setdefault(nom, None)
-    return list(vus)[:MAX_VERNACULAR_PER_MATCH]
+    """Return up to five vernacular names, French first."""
+    french = [v["vernacularName"] for v in raw if v.get("language") == "fra"]
+    others = [v["vernacularName"] for v in raw if v.get("language") != "fra"]
+    seen: dict[str, None] = {}
+    for name in french + others:
+        seen.setdefault(name, None)
+    return list(seen)[:MAX_VERNACULAR_PER_MATCH]
 
 
 def _relevance(match: SearchMatch, query: str) -> int:
-    """Une correspondance exacte (nom scientifique, puis nom vernaculaire) doit apparaître en
-    tête plutôt que dans l'ordre brut de `species/search`, qui mélange homonymes et variantes
-    (sous-espèces, formes) sans toujours placer le nom demandé en premier."""
+    """Rank an exact scientific, then vernacular, match first.
+
+    `species/search` mixes homonyms and variants without always
+    putting the requested name first.
+    """
     query_lower = query.lower()
     if match.scientific_name.lower() == query_lower:
         return 0
@@ -58,47 +57,47 @@ def _relevance(match: SearchMatch, query: str) -> int:
 
 
 def _clean_name(entry: dict) -> str | None:
-    """`canonicalName` omet le marqueur de rang ("subsp."/"var."/"f.") pour les taxons
-    infraspécifiques botaniques (vérifié en direct sur l'API GBIF : "Mentha spicata subsp.
-    spicata" y devient "Mentha spicata spicata", indiscernable d'une variété de mêmes épithètes)
-    — d'où la préférence pour `scientificName`, qui le conserve, en lui retirant le suffixe
-    `authorship` pour retrouver un nom sans auteur. Pas de risque de sur-découpage : `authorship`
-    est toujours un suffixe littéral de `scientificName` côté GBIF."""
-    nom = entry.get("scientificName") or entry.get("canonicalName")
-    if not nom:
+    """Return the scientific name without its authorship, or None.
+
+    Prefers `scientificName` over `canonicalName`, which drops the
+    "subsp."/"var." marker of infraspecific plants. `authorship` is
+    always a literal suffix of `scientificName`.
+    """
+    name = entry.get("scientificName") or entry.get("canonicalName")
+    if not name:
         return None
-    # `.strip()` : GBIF renvoie parfois `authorship` avec un espace final absent du même
-    # suffixe dans `scientificName` (ex. "Panthera leo (Linnaeus, 1758)" avec authorship
-    # "(Linnaeus, 1758) ") — `endswith` échouait alors silencieusement, laissant l'auteur
-    # dans le nom nettoyé et cassant la correspondance exacte de `_relevance`.
-    auteur = (entry.get("authorship") or "").strip()
-    if auteur and nom.endswith(auteur):
-        nom = nom[: -len(auteur)].rstrip()
-    return nom or None
+    # `.strip()`: GBIF may return `authorship` with a trailing space
+    # absent from the same suffix of `scientificName`, which would make
+    # `endswith` fail and break the exact match of `_relevance`.
+    author = (entry.get("authorship") or "").strip()
+    if author and name.endswith(author):
+        name = name[: -len(author)].rstrip()
+    return name or None
 
 
 def _doubtful_rank(status: str) -> int:
-    """Départage une égalité de `_relevance` entre deux fiches GBIF du même nom : un statut
-    `DOUBTFUL` (ex. variant orthographique non lié par `acceptedKey` à l'entrée acceptée, voir
-    Acroteriobatus annulatus — Projet:Biologie/Organon #43) ne doit pas primer sur `ACCEPTED`
-    juste parce que `species/search` l'a renvoyé en premier : le tri de Python étant stable, un
-    ordre brut défavorable se propageait tel quel jusqu'au `gbif_key` retenu par défaut."""
+    """Break `_relevance` ties: DOUBTFUL sorts after the others.
+
+    Python's sort is stable, so an unfavorable raw order would
+    otherwise decide the default `gbif_key`.
+    """
     return 1 if status == "DOUBTFUL" else 0
 
 
 def _rank_label(rank_raw: str) -> str:
-    """Traduit le rang GBIF (ex. "GENUS") vers le libellé français utilisé partout ailleurs
-    dans l'app (table `organon/core/data/ranks.yaml`), plutôt qu'un second vocabulaire de
-    rangs propre à la recherche."""
-    rang_id = gbif_cherche_rang(rank_raw)
-    if rang_id == "NOTFOUND":
+    """Translate a GBIF rank to the French label used app-wide."""
+    rank_id = gbif_to_wp_rank(rank_raw)
+    if rank_id is None:
         return rank_raw.lower()
-    label = wp_nom_rang(rang_id, False, False, False)
-    return label if label != "NOTFOUND" else rank_raw.lower()
+    return wp_rank_name(rank_id, False, False, False) or rank_raw.lower()
 
 
 @router.get("/search", response_model=SearchResponse)
-async def search(q: str, username: str = Depends(require_username)) -> SearchResponse:
+@limiter.limit(SEARCH_RATE_LIMIT)
+async def search(
+    request: Request, q: str, username: str = Depends(require_username)
+) -> SearchResponse:
+    """Return suggestions for a name, or the item for a Wikidata QID."""
     query = q.strip()
     if not query:
         return SearchResponse(query=q, matches=[])
@@ -106,29 +105,27 @@ async def search(q: str, username: str = Depends(require_username)) -> SearchRes
     if _QID_RE.match(query):
         return await _search_by_qid(query.upper())
 
-    adapter = GbifAdapter()
-    try:
+    async with GbifAdapter() as adapter:
         raw_results = await adapter.search_any(query, limit=30)
-    finally:
-        await adapter.aclose()
 
-    # Dédoublonné par identifiant GBIF (`key`), pas par (nom, règne) : plusieurs taxons
-    # authentiquement distincts peuvent partager le même nom **et** le même règne (ex.
-    # "Acanthocephala" désigne à la fois un phylum de vers et un genre d'insectes, tous deux
-    # Animalia — dédupliquer sur (nom, règne) les aurait silencieusement fusionnés en un seul
-    # résultat, masquant l'homonymie qu'on cherche justement à révéler).
-    DedupKey = int | tuple[str, str, str]
+    # Deduplicated by GBIF `key`, not by (name, kingdom): distinct taxa
+    # can share both (e.g. "Acanthocephala", a phylum and an insect
+    # genus, both Animalia).
     seen: dict[DedupKey, tuple[SearchMatch, int]] = {}
     for entry in raw_results:
-        nom = _clean_name(entry)
-        if not nom:
+        found_name = _clean_name(entry)
+        if not found_name:
             continue
         kingdom_raw = entry.get("kingdom", "")
-        dedup_key: DedupKey = entry.get("key") or (nom, kingdom_raw, entry.get("authorship", ""))
+        dedup_key: DedupKey = entry.get("key") or (
+            found_name,
+            kingdom_raw,
+            entry.get("authorship", ""),
+        )
         if dedup_key in seen:
             continue
         match = SearchMatch(
-            scientific_name=nom,
+            scientific_name=found_name,
             author=entry.get("authorship", "").strip(),
             extinct=bool(entry.get("extinct", False)),
             kingdom=KINGDOM_MAP.get(kingdom_raw, kingdom_raw.lower()),
@@ -139,34 +136,32 @@ async def search(q: str, username: str = Depends(require_username)) -> SearchRes
         )
         seen[dedup_key] = (match, _doubtful_rank(entry.get("taxonomicStatus", "")))
 
-    # Dédoublonné sur l'ensemble des résultats bruts avant de trier par pertinence puis de
-    # couper à MAX_MATCHES — trier avant de couper, pas l'inverse, sinon la correspondance
-    # exacte pourrait être perdue si elle arrive après la position MAX_MATCHES côté GBIF.
+    # Sort by relevance before cutting to MAX_MATCHES, or the exact
+    # match could be lost if GBIF returns it late.
     ordered = sorted(seen.values(), key=lambda pair: (_relevance(pair[0], query), pair[1]))
     matches = [match for match, _ in ordered][:MAX_MATCHES]
     return SearchResponse(query=q, matches=matches)
 
 
 async def _search_by_qid(qid: str) -> SearchResponse:
-    """Résout un QID Wikidata en un `SearchMatch` unique porteur des identifiants externes déjà
-    connus par l'item (voir `WikidataAdapter.external_ids`) — pas de logique de pertinence ni de
-    dédoublonnage, un QID désigne un item précis, pas une requête floue."""
-    adapter = WikidataAdapter()
-    try:
+    """Resolve a Wikidata QID to a single `SearchMatch`.
+
+    It carries the external ids the item already knows. A QID names a
+    precise item, so no relevance or deduplication applies.
+    """
+    async with WikidataEntityAdapter() as adapter:
         entity = await adapter.get_entity(qid)
         if entity is None:
             return SearchResponse(query=qid, matches=[])
 
-        nom = adapter.taxon_name(entity)
-        if not nom:
+        name = adapter.taxon_name(entity)
+        if not name:
             return SearchResponse(query=qid, matches=[])
 
         match = SearchMatch(
-            scientific_name=nom,
+            scientific_name=name,
             source="Wikidata",
             qid=qid,
             external_ids=adapter.external_ids(entity),
         )
         return SearchResponse(query=qid, matches=[match])
-    finally:
-        await adapter.aclose()

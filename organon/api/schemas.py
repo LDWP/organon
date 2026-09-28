@@ -1,201 +1,179 @@
-"""Schémas de requête/réponse de l'API JSON. `GenerateRequest` hérite de `GenerateOptions`
-(organon.core.config) : un seul modèle sert à la fois de schéma de requête API, de base des
-flags CLI et de champs de formulaire web."""
+"""Request and response schemas of the JSON API.
+
+`GenerateRequest` extends `GenerateOptions`, so one model serves as
+API schema, CLI flags and web form fields.
+"""
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from organon.core.config import GenerateOptions
 from organon.core.db_inventory import DbInventory
-from organon.core.models import Basionym, RangIncoherence, RankName, RegneIncoherence
+from organon.core.models import (
+    Basionym,
+    DistributionEntry,
+    KingdomInconsistency,
+    RankInconsistency,
+    RankName,
+)
 
 
 class GenerateRequest(GenerateOptions):
+    """Generation request: the taxon plus the options."""
+
     taxon: str = Field(..., description="Le nom scientifique du taxon à traiter")
 
 
 class ExternalLink(BaseModel):
-    """Un lien externe de debug (`TaxonomyModule.debug_link`), attribué à son module d'origine —
-    nécessaire côté frontend pour l'associer à la bonne ligne du tableau de suivi par module
-    (onglet Données), plutôt qu'une simple liste de HTML sans moyen de savoir quel module a
-    produit quel lien."""
+    """A debug link attributed to the module that produced it."""
 
     module_id: str
     html: str
 
 
 class ReferenceItem(BaseModel):
-    """Une référence taxonomique individuelle (`module.render_bioref`), attribuée à son module
-    d'origine — pendant structuré de `GenerateResponse.references_wikitext` qui permet au
-    frontend de cocher/décocher chaque référence plutôt que de recevoir uniquement le bloc déjà
-    joint (voir l'onglet Wikitexte > Références taxonomiques)."""
+    """One taxonomic reference, attributed to its module.
+
+    Structured counterpart of `GenerateResponse.references_wikitext`.
+    """
 
     module_id: str
     wikitext: str
+    # False if the module domain excludes the taxon kingdom; still
+    # manually checkable, only the initial state changes.
     default_checked: bool = True
-    """False si le domaine déclaré du module (`ModuleMeta.domains`) exclut le règne retenu pour
-    ce taxon (voir `organon.core.selectors.coherence.reference_module_coherente`) — reste
-    cochable manuellement, seule la case initiale change."""
 
 
 class RankLine(BaseModel):
-    """Un rang de la taxobox (voir `organon.core.rendering.sections.compute_rank_lines`), avec
-    sa ligne wikitexte déjà mise en forme — exposé structuré pour permettre de comparer les
-    rangs entre plusieurs classifications d'un même taxon (désaccord de source à un rang donné,
-    voir `{{Taxobox conflit}}`) sans reconstruire la ligne côté frontend."""
+    """A taxobox rank with its formatted wikitext line.
 
-    rang: str
-    nom: str
+    Lets the frontend compare ranks across classifications.
+    """
+
+    rank: str
+    name: str
     line: str
 
 
 class GenerateResponse(BaseModel):
-    taxon_requested: str
-    taxon_resolved: str
-    taxon_rang: str = ""
-    """`struct.taxon.rang` — rang du taxon lui-même (ex. "genre", "famille"), pas exposé
-    ailleurs dans la réponse (`rank_lines` ne porte que les rangs *supérieurs*). Nécessaire côté
-    frontend pour appeler `POST /api/v1/subtaxa-merge` (accord grammatical "il"/"elle" de la
-    phrase introductive, voir `organon.core.rendering.subtaxa_merge`)."""
-    classification_used: str
-    domain_used: str
-    regne: str = ""
-    eteint: bool = False
-    uicn_statut: str = ""
-    """Code de statut de conservation UICN (LC/NT/VU/EN/CR/EW/EX/DD/NE...), rapporté par GBIF
-    via `/species/{key}/iucnRedListCategory` (voir `organon.modules.gbif`) ; vide si absent."""
+    """Result of one generation."""
+
+    requested_taxon: str
+    resolved_taxon: str
+    # Rank of the taxon itself (`rank_lines` holds higher ranks only).
+    # Needed to call `POST /api/v1/subtaxa-merge`.
+    taxon_rank: str = ""
+    used_classification: str
+    used_domain: str
+    kingdom: str = ""
+    extinct: bool = False
+    # IUCN conservation status code reported by GBIF; empty if absent.
+    iucn_status: str = ""
+    # IUCN criteria (`links["iucn"]["criterion"]`); may be empty.
+    iucn_criterion: str = ""
     vernacular_names: list[str] = []
-    autres_noms: dict[str, list[str]] = {}
-    """`struct.autres_noms`, fondu toutes sources confondues par statut (ex. « Recommandé ou
-    typique » -> [...]) — pendant de `vernacular_names` pour les noms qu'une source qualifie
-    elle-même d'un statut explicite (voir `organon.core.models.Struct.autres_noms`), affichés à
-    part dans l'onglet Noms & synonymes plutôt que fondus dans `vernacular_names`."""
+    # Module -> names whose source gave no usable language code
+    # (`struct.vernacular[module]["und"]`). Never rendered; flagged
+    # so the user can sort them.
+    vernacular_names_without_language: dict[str, list[str]] = {}
+    # `struct.other_names` merged across sources by status.
+    other_names: dict[str, list[str]] = {}
     wikitext: str
+    # The `{{ébauche}}` to `{{Taxobox fin}}` block, isolated so that it
+    # can be swapped without regenerating the other sections.
     taxobox_wikitext: str
-    """Le bloc `{{ébauche}}` → `{{Taxobox fin}}` isolé du reste de `wikitext` — permet de
-    changer de source de classification en ne remplaçant que ce bloc dans l'article d'une
-    autre source, sans regénérer les autres sections (systématique, publication originale,
-    liens externes...)."""
+    # The sub-taxa section, isolated like `taxobox_wikitext`.
     subtaxa_wikitext: str = ""
-    """La section "Liste des taxons de rang inférieur" isolée du reste de `wikitext`, selon le
-    même principe que `taxobox_wikitext` — permet de choisir indépendamment la source qui
-    alimente la taxobox et celle qui alimente les sous-taxons plutôt qu'un bloc unique."""
-    subtaxa_liste: list[RankName] = []
-    """`struct.sous_taxons.liste` telle quelle (nom/rang/auteur/eteint), sans mise en forme —
-    pendant structuré de `subtaxa_wikitext` (déjà rendu en wikitexte pour une seule source).
-    Permet au frontend de recouper les sous-taxons de plusieurs sources déjà résolues (voir
-    `POST /api/v1/subtaxa-merge`) sans reparser `subtaxa_wikitext`."""
+    # `struct.subtaxa.items` unformatted, so the frontend can merge
+    # several sources (`POST /api/v1/subtaxa-merge`).
+    subtaxa: list[RankName] = []
+    # Module that supplied `subtaxa`; empty without sub-taxa.
+    subtaxa_source: str = ""
+    # Code written in the Taxobox `classification=`.
+    classification_taxobox: str = ""
+    # `render_see_also` output, isolated to compare an article.
+    see_also_wikitext: str = ""
+    # Taxonomic references isolated from `wikitext`, excluding
+    # `{{Autres projets}}`. Derived from `reference_items`; kept for
+    # callers already using this block.
     references_wikitext: str = ""
-    """Les références taxonomiques (liens `render_bioref` de chaque module) isolées du reste de
-    `wikitext`, selon le même principe que `taxobox_wikitext`/`subtaxa_wikitext` — exclut
-    volontairement le bloc `{{Autres projets}}` (Commons/Wikispecies/Wiktionnaire), qui n'est
-    pas une référence taxonomique au sens strict. Dérivé de `reference_items` (tri alphabétique
-    + jointure) ; conservé pour compatibilité avec les appelants qui consomment déjà ce bloc."""
+    # One entry per reference line, so the frontend can toggle each.
     reference_items: list[ReferenceItem] = []
-    """Pendant structuré de `references_wikitext` : une entrée par ligne de référence plutôt
-    qu'un bloc déjà joint, pour permettre au frontend de cocher/décocher chaque référence
-    individuellement (le backend n'a aucun moyen de détecter automatiquement une source
-    incohérente, donc toutes cochées par défaut)."""
+    # Taxobox completeness (ranks found), to recommend a source for
+    # the "taxobox" facet.
     taxobox_completeness_score: int = 0
-    """Mesure de complétude de la taxobox de cette classification (nombre de rangs trouvés) —
-    sert à recommander automatiquement une source pour la facette "taxobox" du zoom
-    classification, indépendamment de la facette "taxons inférieurs" (voir
-    `subtaxa_completeness_score`). Les deux facettes étaient auparavant agrégées dans un unique
-    `completeness_score` ; elles sont séparées ici car l'utilisateur peut vouloir retenir une
-    source pour la taxobox et une autre pour les sous-taxons."""
+    # Sub-taxa completeness (taxa found), for the "taxons inférieurs"
+    # facet. Synonyms and vernacular names count in neither score.
     subtaxa_completeness_score: int = 0
-    """Mesure de complétude des sous-taxons de cette classification (nombre de taxons de rang
-    inférieur trouvés) — pendant de `taxobox_completeness_score` pour la facette "taxons
-    inférieurs". Les synonymes et noms vernaculaires ne sont volontairement rattachés à aucune
-    des deux facettes : ils ne font partie ni du bloc taxobox ni du bloc sous-taxons
-    (`taxobox_wikitext`/`subtaxa_wikitext`), donc les compter dans l'un ou l'autre score
-    fausserait le classement sans bénéfice pour le choix que ces scores éclairent."""
     rank_lines: list[RankLine] = []
     external_links: list[ExternalLink] = []
+    # Module -> information categories it reported ("Classification",
+    # "Auteur"…), derived from the populated `Struct` fields.
     data_found: dict[str, list[str]] = {}
-    """Pour chaque module ayant contribué à cette génération, la liste des catégories
-    d'information qu'il a effectivement rapportées (ex. "Classification", "Taxons inférieurs",
-    "Auteur"...) — dérivée des champs déjà peuplés du `Struct` (quel module est la source des
-    sous-taxons/synonymes, quelles clés de noms vernaculaires/répartition sont non vides...)
-    plutôt que maintenue à la main module par module. Alimente la colonne "Informations" de
-    l'onglet Données côté frontend."""
-    auteur_candidats: dict[str, str] = {}
-    """Pour chaque module ayant rapporté un auteur pour ce taxon, l'auteur brut qu'il rapporte —
-    avant vote majoritaire entre modules (voir `_auteur_majoritaire`). Permet à l'utilisateur
-    d'imposer une source via `GenerateOptions.auteur_source` plutôt que de subir le vote
-    automatique (ex. Campylobacter : ITIS rapporte une citation d'auteur plus complète que
-    GBIF/WoRMS)."""
-    auteur_consolide: str = ""
-    """`struct.taxon.auteur` une fois le vote majoritaire (ou l'imposition manuelle via
-    `auteur_source`) tranché — même valeur que celle wikifiée dans `wikitext`, mais en texte
-    brut : `auteur_candidats` donne le détail par module, celui-ci donne le résultat retenu."""
-    auteur_resolu: str = ""
-    """`struct.taxon.auteur_resolu` — version wikifiée (liens `{{auteur|...}}`, années liées) de
-    `auteur_consolide`, telle qu'insérée dans le bloc `{{Taxobox taxon | ...}}` de `wikitext`.
-    Exposée séparément pour que le frontend puisse reprendre l'auteur déjà wikifié d'une autre
-    classification déjà préchargée (voir `resultsBySource` côté web-app) sans reconstruire le
-    wikilinking à la main côté client."""
-    synonymes: list[RankName] = []
-    """`struct.synonymes.liste`, si un module en a rapporté (voir `synonymes_source`) —
-    déjà collecté pour alimenter la section "Systématique" du wikitexte, ici exposé structuré."""
-    synonymes_source: str = ""
-    """Module source de `synonymes` (`struct.synonymes.source`) ; vide si aucun synonyme."""
-    basionyme: Basionym | None = None
-    """`struct.basionyme`, si un module en a rapporté un — `None` sinon."""
+    # Module -> raw author it reported, before the majority vote.
+    # Lets the user force a source via `GenerateOptions.author_source`.
+    author_candidates: dict[str, str] = {}
+    # `struct.taxon.author` once the vote or the forced source has
+    # decided, as plain text.
+    consolidated_author: str = ""
+    # Wikified `consolidated_author`, as put in `{{Taxobox taxon}}`.
+    resolved_author: str = ""
+    # `struct.synonyms.items`, if a module reported any.
+    synonyms: list[RankName] = []
+    # Source module of `synonyms`; empty if none.
+    synonyms_source: str = ""
+    # `struct.basionym`, if a module reported one.
+    basionym: Basionym | None = None
     logs: list[str] = []
     warnings: list[str] = []
     elapsed_seconds: float
     truncated: dict[str, bool] = {}
-    regne_incoherences: list[RegneIncoherence] = []
-    """Modules d'enrichissement dont le règne détecté diffère de celui retenu par la
-    classification — signe possible d'homonymie inter-règnes (voir RegneIncoherence).
-    Détection partielle : seuls quelques modules (GBIF/ITIS/WoRMS) exposent ce signal sans coût
-    réseau supplémentaire ; son absence ne garantit donc pas la cohérence."""
-    rang_incoherences: list[RangIncoherence] = []
-    """Modules de classification concurrents (GBIF/CoL XR) dont la famille, l'ordre ou le statut
-    (accepté/synonyme) détecté diffère de celui retenu — vrai désaccord taxonomique entre deux
-    sources ayant chacune une valeur, jamais un trou de données (voir RangIncoherence). Détection
-    partielle, comme `regne_incoherences` : son absence ne garantit pas la cohérence."""
-    milieu: str = ""
-    """`Struct.milieu` ('marin'/'terrestre'), copié tel quel depuis la source qui l'a détecté
-    (ex. WoRMS via isMarine/isTerrestrial) ; vide si aucune source ne l'a renseigné."""
+    # Enrichment modules whose detected kingdom differs from the
+    # retained one (possible cross-kingdom homonymy). Partial: absence
+    # does not guarantee coherence.
+    kingdom_inconsistencies: list[KingdomInconsistency] = []
+    # Competing classification modules disagreeing on family, order
+    # or status. Partial, like `kingdom_inconsistencies`.
+    rank_inconsistencies: list[RankInconsistency] = []
+    # `Struct.habitat` ("marin" or "terrestre"); empty if unknown.
+    habitat: str = ""
+    # Module -> sorted, deduplicated country names (certain and
+    # uncertain merged).
     distribution: dict[str, list[str]] = {}
-    """Pour chaque module ayant rapporté une répartition géographique, la liste (triée,
-    dédupliquée) des noms de pays qu'il rapporte — fusion de `DistributionEntry.certain` et
-    `.uncertain` (la distinction n'est pas utile à ce niveau d'affichage synthétique)."""
+    # `struct.distribution` as is, to compare with an article.
+    distribution_entries: dict[str, DistributionEntry] = {}
+    # Module -> taxon id in its database (`struct.links[module]["id"]`).
+    # Absent for modules carrying none (`externe`, unresolved `col`).
     external_ids: dict[str, str] = {}
-    """Pour chaque module ayant contribué à cette génération, son identifiant du taxon dans la
-    base qu'il interroge (`struct.liens[module_id]['id']`, converti en texte) — pendant
-    structuré des identifiants déjà présents mais noyés dans `external_links` (HTML) et
-    `reference_items` (wikitext). Absent pour un module qui a contribué sans porter
-    d'identifiant propre au taxon (ex. `externe`, ou `col` en cas d'homonymie non résolue, voir
-    `_compute_external_ids`)."""
 
 
 class ModuleStatusEvent(BaseModel):
-    """Un événement SSE de `POST /api/v1/generate/stream` : progression d'un module de
-    classification ou d'enrichissement pendant une génération en cours. `status="running"` est
-    émis juste avant l'appel réseau du module, puis exactement un des trois statuts terminaux
-    ("found"/"empty"/"error") une fois l'appel terminé — jamais les deux à la fois pour un même
-    module dans une même génération."""
+    """SSE event: progress of one module during a generation.
+
+    "running" is sent before the module's network call, then exactly
+    one terminal status ("found", "empty" or "error").
+    """
 
     type: Literal["module_status"] = "module_status"
     module_id: str
     role: Literal["classification", "enrichment"]
     status: Literal["running", "found", "empty", "error"]
+    # Error detail, only when status is "error".
     message: str | None = None
-    """Détail de l'erreur, uniquement quand status == "error"."""
+    # Time since "running"; absent while running.
     duration_seconds: float | None = None
-    """Temps écoulé entre le "running" et ce statut terminal — absent quand status == "running"."""
 
 
 class PlanEvent(BaseModel):
-    """Émis une seule fois, juste après le succès de la classification : liste les modules
-    d'enrichissement qui vont être exécutés, pour que le frontend puisse afficher toutes les
-    lignes de statut (en attente) avant même que le premier module ne démarre."""
+    """SSE event sent once after classification succeeds.
+
+    Lists the enrichment modules to run, so the frontend can show every
+    pending status row.
+    """
 
     type: Literal["plan"] = "plan"
     classification_id: str
@@ -203,19 +181,18 @@ class PlanEvent(BaseModel):
 
 
 class ResultEvent(BaseModel):
-    """Dernier événement d'une génération réussie : porte la même donnée que la réponse de
-    `POST /api/v1/generate` (`GenerateResponse`), pour que le frontend n'ait pas à la
-    reconstituer lui-même à partir des événements de progression."""
+    """Last SSE event of a successful generation."""
 
     type: Literal["result"] = "result"
     data: GenerateResponse
 
 
 class FatalErrorEvent(BaseModel):
-    """Émis quand la génération ne peut pas aboutir (ex. taxon non trouvé via le module de
-    classification, ou erreur réseau sur ce module) — équivalent en SSE d'une `HTTPException`,
-    utilisé ici parce que le code de statut HTTP de la réponse (200) est déjà figé au moment où
-    cet événement est produit (les en-têtes SSE sont envoyés dès le premier octet)."""
+    """SSE event for a generation that cannot complete.
+
+    The SSE equivalent of an `HTTPException`: the HTTP status is
+    already sent when the error occurs.
+    """
 
     type: Literal["fatal_error"] = "fatal_error"
     status_code: int
@@ -223,10 +200,11 @@ class FatalErrorEvent(BaseModel):
 
 
 class SearchMatch(BaseModel):
-    """`gbif_key`/`parent_key` viennent tels quels de `key`/`parentKey` (GBIF) : permettent au
-    frontend de reconstruire une filiation *confirmée* entre deux suggestions de la même
-    réponse (ex. une sous-espèce dont le `parent_key` pointe vers le `gbif_key` d'une espèce
-    listée juste au-dessus), plutôt qu'une simple ressemblance textuelle de noms."""
+    """A taxon search suggestion.
+
+    `gbif_key` and `parent_key` let the frontend rebuild a confirmed
+    parentage between suggestions rather than guess from names.
+    """
 
     scientific_name: str
     author: str = ""
@@ -237,21 +215,23 @@ class SearchMatch(BaseModel):
     source: str = "GBIF"
     gbif_key: int | None = None
     parent_key: int | None = None
+    # Wikidata QID, only when the search was on a Wikidata item.
     qid: str | None = None
-    """QID Wikidata, uniquement renseigné quand la recherche portait sur un item Wikidata (voir
-    `organon.api.routes.search._search_by_qid`)."""
+    # External ids of the Wikidata item (module id -> id), exposed but
+    # not yet wired to id-based resolution.
     external_ids: dict[str, str] = {}
-    """Identifiants externes portés par l'item Wikidata (clé = id de module organon, ex. "gbif",
-    "itis"), pour un futur branchement sur la résolution par id plutôt que par nom des modules
-    d'enrichissement — non câblé pour l'instant, seulement exposé."""
 
 
 class SearchResponse(BaseModel):
+    """Search suggestions for a query."""
+
     query: str
     matches: list[SearchMatch] = []
 
 
 class ModuleInfo(BaseModel):
+    """Public description of a registered module."""
+
     id: str
     can_classify: bool
     can_render_external_link: bool
@@ -261,24 +241,30 @@ class ModuleInfo(BaseModel):
 
 
 class DomainInfo(BaseModel):
+    """A domain and its parent."""
+
     id: str
     parent: str | None = None
 
 
 class VersionInfo(BaseModel):
+    """API version."""
+
     version: str
 
 
 class SourcesResponse(DbInventory):
-    """Réponse de GET /api/v1/sources. Alias de DbInventory (organon.core.db_inventory) : la
-    forme de la réponse API est exactement celle du fichier de données fusionné avec le
-    registre de modules, pas besoin d'une enveloppe séparée."""
+    """Response of GET /api/v1/sources.
+
+    An alias of `DbInventory`: no separate envelope needed.
+    """
 
 
 class CommonsImageSuggestion(BaseModel):
-    """Une image Commons proposée pour la taxobox (voir
-    `organon.modules.commons_images.service.find_images`) : déjà filtrée par licence et par
-    distinction qualité/featured, jamais une simple recherche brute."""
+    """A Commons image proposed for the taxobox.
+
+    Already filtered by license and quality or featured status.
+    """
 
     file_name: str
     thumb_url: str
@@ -286,12 +272,13 @@ class CommonsImageSuggestion(BaseModel):
     license_code: str
     license_label: str
     assessments: list[str] = []
+    # True if the Wikidata item already uses this image (P18).
     is_wikidata_image: bool = False
-    """True si cette même image est déjà utilisée par l'item Wikidata du taxon (P18) — la
-    proposer resterait correct mais ne serait pas une nouveauté, voir la spec du frontend."""
 
 
 class CommonsImagesResponse(BaseModel):
+    """Commons image suggestions for a taxon."""
+
     taxon: str
     category_title: str
     search_url: str
@@ -300,17 +287,16 @@ class CommonsImagesResponse(BaseModel):
 
 
 class MergedSpeciesOut(BaseModel):
-    """Un sous-taxon fusionné (voir `organon.core.rendering.subtaxa_merge.MergedSpecies`)."""
+    """A merged sub-taxon, see `subtaxa_merge.MergedSpecies`."""
 
-    nom: str
-    rang: str
+    name: str
+    rank: str
     line: str
     default_checked: bool
 
 
 class MergedGroupOut(BaseModel):
-    """Un groupe d'espèces rapportées par exactement le même ensemble de sources (voir
-    `organon.core.rendering.subtaxa_merge.MergedGroup`)."""
+    """Species reported by the same sources, see `MergedGroup`."""
 
     sources: list[str]
     kind: Literal["primary", "alternative"]
@@ -319,44 +305,98 @@ class MergedGroupOut(BaseModel):
 
 
 class MergedSubtaxaResponse(BaseModel):
-    """Réponse de `POST /api/v1/subtaxa-merge` (voir
-    `organon.core.rendering.subtaxa_merge.merge_subtaxa`)."""
+    """Response of `POST /api/v1/subtaxa-merge`."""
 
-    rang_txt: str
-    rang_txt_singulier: str
+    rank_text: str
+    rank_text_singular: str
     pronoun: Literal["il", "elle"]
     taxon_phrase: str
-    rang_names: dict[str, tuple[str, str]]
-    """Nom de rang (pluriel, singulier) par clé technique de rang, pour que le frontend recalcule
-    `rang_txt`/`rang_txt_singulier` au fil des cases (dé)cochées (voir
-    `organon.core.rendering.subtaxa_merge.MergedSubtaxa.rang_names`)."""
+    # (plural, singular) rank name per rank key, so the frontend can
+    # recompute `rank_text` as boxes are checked.
+    rank_names: dict[str, tuple[str, str]]
     groups: list[MergedGroupOut]
 
 
 class SubtaxaMergeSource(BaseModel):
-    """Une source déjà résolue par le frontend (voir `GenerateResponse.subtaxa_liste`), fournie
-    telle quelle à `POST /api/v1/subtaxa-merge` — aucun appel réseau supplémentaire, seulement du
-    recoupement local entre listes déjà en mémoire côté client."""
+    """A source already resolved by the frontend.
+
+    Merged locally with no extra network call.
+    """
 
     module_id: str
-    liste: list[RankName] = Field(default_factory=list)
+    subtaxa: list[RankName] = Field(default_factory=list)
 
 
 class SubtaxaMergeRequest(BaseModel):
-    taxon_rang: str = Field(..., description="Rang du taxon principal (ex. 'genre', 'famille')")
-    taxon_nom: str = Field(..., description="Nom du taxon principal (ex. 'Panthera')")
-    regne: str = ""
+    """Request to merge sub-taxa lists of several sources."""
+
+    taxon_rank: str = Field(..., description="Rang du taxon principal (ex. 'genre', 'famille')")
+    taxon_name: str = Field(..., description="Nom du taxon principal (ex. 'Panthera')")
+    kingdom: str = ""
     sources: list[SubtaxaMergeSource] = Field(default_factory=list)
 
 
 class TaxoboxRefreshRequest(BaseModel):
+    """Request to write a full wikitext to a page."""
+
     page_title: str = Field(..., description="Titre de la page Wikipédia à éditer")
     wikitext: str = Field(
-        ..., description="Wikitexte complet à écrire sur la page (ex. produit par /api/v1/generate)"
+        ...,
+        description="Wikitexte complet à écrire sur la page (ex. produit par /api/v1/generate)",
     )
 
 
 class TaxoboxRefreshResponse(BaseModel):
+    """Outcome of a taxobox refresh edit."""
+
     page_title: str
     new_revision_id: int
     requested_by: str
+
+
+class UpdateDiagnoseRequest(BaseModel):
+    """Request to diagnose a taxon against Wikidata and frwiki."""
+
+    taxon: str | None = Field(None, description="Nom scientifique du taxon")
+    qid: str | None = Field(None, description="QID Wikidata ; prime sur `taxon`")
+    classification: str | None = Field(None, description="Module de classification de référence")
+    domain: str = Field(
+        "*", description="Domaine de la recherche : même génération que celle déjà affichée"
+    )
+    gbif_key: int | None = Field(None, description="Clé GBIF de la correspondance choisie")
+
+    @model_validator(mode="after")
+    def _taxon_ou_qid(self) -> UpdateDiagnoseRequest:
+        if not (self.taxon or self.qid):
+            raise ValueError("`taxon` ou `qid` est requis")
+        return self
+
+
+class UpdateExportRequest(BaseModel):
+    """Request to export the checked proposals as QuickStatements."""
+
+    qid: str | None = Field(
+        None, description="QID Wikidata de l'item à mettre à jour (absent : création d'un item)"
+    )
+    taxon: str | None = Field(None, description="Nom scientifique du taxon")
+    classification: str | None = Field(None, description="Module de classification de référence")
+    domain: str = Field(
+        "*", description="Domaine de la recherche : même génération que celle déjà affichée"
+    )
+    gbif_key: int | None = Field(None, description="Clé GBIF de la correspondance choisie")
+    proposal_ids: list[str] = Field(
+        ..., min_length=1, description="Ids des propositions cochées du diagnostic"
+    )
+
+    @model_validator(mode="after")
+    def _qid_or_taxon(self) -> UpdateExportRequest:
+        if not self.qid and not self.taxon:
+            raise ValueError("`taxon` ou `qid` requis")
+        return self
+
+
+class UpdateExportResponse(BaseModel):
+    """QuickStatements export of the checked proposals."""
+
+    quickstatements: str
+    retrieved: date
