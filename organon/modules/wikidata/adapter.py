@@ -1,18 +1,19 @@
-"""Couche d'accès en lecture à l'item Wikidata d'un taxon, via l'API d'action `wbgetentities`
-(distincte du service SPARQL WDQS déjà utilisé par `organon.modules.wikimedia.wikidata.adapter`
-pour la résolution nom -> QID : ici l'entrée est déjà un QID, obtenu depuis la recherche par item
-Wikidata, voir `organon.api.routes.search`).
+"""Read access to a taxon's Wikidata item, via `wbgetentities`.
 
-`EXTERNAL_ID_PROPERTIES` ne couvre que les propriétés vérifiées en direct sur
-www.wikidata.org (voir recherches du 2026-07-24) : pas de propriété devinée de mémoire,
-conformément à la rigueur attendue ailleurs dans le dépôt (ex.
-organon/core/data/db_inventory.yaml, tout "vérifié en direct"). Modules Organon dont l'id de
-propriété Wikidata reste à vérifier (absents ci-dessous par choix, pas par oubli) : algaebase,
-reptile_database, vascan, eflora, telametro, wsc.
+Distinct from the WDQS SPARQL service used by
+`organon.modules.wikimedia.wikidata.adapter` to resolve a name to a QID:
+here the input is already a QID.
+
+`EXTERNAL_ID_PROPERTIES` only covers verified properties, none guessed.
+Absent by choice, not oversight: modules whose Wikidata property is
+unverified or whose `id` is not Wikidata's (algaebase, eflora,
+telametro, reptile_database, wsc, fishbase, taxonomicon, doris, tpdb,
+eol).
 """
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any
 
 import httpx
@@ -22,15 +23,34 @@ from organon.core.http import USER_AGENT, OwnedClientMixin
 WIKIDATA_API_URL = "https://www.wikidata.org/w/api.php"
 
 TAXON_NAME_PROPERTY = "P225"
-AUTHOR_PROPERTY = "P405"
-PUBLICATION_YEAR_PROPERTY = "P574"
-PARENT_TAXON_PROPERTY = "P171"
+TAXON_RANK_PROPERTY = "P105"
 
-# GBIF est en migration au 2026-07-24 : P846 ("GBIF-species-ID (before 2026 update)", ~3,3M
-# d'utilisations, toujours majoritaire) et P14607 ("GBIF taxon ID", nouveau schéma, ~500
-# utilisations) coexistent sur Wikidata. Les deux sont vérifiés donc les deux sont gardés, avec
-# P14607 déclaré après P846 : à valeur présente des deux côtés sur un même item, la boucle de
-# `external_ids()` doit retenir la nouvelle plutôt que l'ancienne.
+# Rank items (P105); value is a `ranks.yaml` key. An absent rank is not
+# guessed: `rank()` returns None.
+RANK_QIDS: dict[str, str] = {
+    "Q146481": "domaine",
+    "Q36732": "règne",
+    "Q38348": "phylum",
+    "Q37517": "classe",
+    "Q36602": "ordre",
+    "Q5867959": "sous-ordre",
+    "Q2136103": "super-famille",
+    "Q35409": "famille",
+    "Q164280": "sous-famille",
+    "Q227936": "tribu",
+    "Q34740": "genre",
+    "Q3238261": "sous-genre",
+    "Q7432": "espèce",
+    "Q68947": "sous-espèce",
+    "Q767728": "variété",
+    "Q279749": "forme",
+    "Q713623": "clade",
+}
+
+# GBIF is migrating: P846 (legacy, still the majority) and P14607 (new
+# scheme) coexist on Wikidata. Both are kept, P14607 declared after
+# P846: when both are present on an item, `external_ids()` must retain
+# the newer.
 EXTERNAL_ID_PROPERTIES: dict[str, str] = {
     "P846": "gbif",
     "P14607": "gbif",
@@ -45,16 +65,82 @@ EXTERNAL_ID_PROPERTIES: dict[str, str] = {
     "P12560": "mdd",
     "P4024": "adw",
     "P11043": "hesperomys",
-    "P10907": "tpdb",
-    "P830": "eol",
     "P2040": "cites",
     "P685": "ncbi",
     "P3031": "oepp",
     "P5055": "irmng",
+    "P3186": "inpn",
+    "P627": "iucn",
+    "P1745": "vascan",
 }
 
 
+# Database item cited as "stated in" (P248) for each comparable module:
+# P9073 of the id property, or P1629 when absent (P14607 has no P9073).
+# Q4874420 is the "EPPO code" item, as declared by P9073 of P3031.
+DATABASE_ITEMS: dict[str, str] = {
+    "gbif": "Q1531570",
+    "gbif_col_xr": "Q1531570",
+    "itis": "Q82575",
+    "wrms": "Q604063",
+    "ipni": "Q922063",
+    "powo": "Q47542613",
+    "indexfungorum": "Q1860469",
+    "tropicos": "Q2578548",
+    "wfo": "Q77076820",
+    "col": "Q38840",
+    "mdd": "Q120753297",
+    "adw": "Q2850008",
+    "hesperomys": "Q113467651",
+    "cites": "Q20962955",
+    "ncbi": "Q12159796",
+    "oepp": "Q4874420",
+    "irmng": "Q51885189",
+    "inpn": "Q26924544",
+    "iucn": "Q32059",
+    "vascan": "Q19544711",
+}
+
+
+# Conservation status items (P141). `NE` (not evaluated) is not an
+# assessment, hence absent. Key is the code of
+# `GenerateResponse.iucn_status`.
+IUCN_STATUS_QIDS: dict[str, str] = {
+    "LC": "Q211005",
+    "NT": "Q719675",
+    "VU": "Q278113",
+    "EN": "Q96377276",
+    "CR": "Q219127",
+    "EW": "Q239509",
+    "EX": "Q237350",
+    "DD": "Q3245245",
+}
+
+_BATCH_SIZE = 50
+"""Plafond de `wbgetentities` pour `ids` (utilisateur non-bot)."""
+
+
+@dataclass(frozen=True)
+class Statement:
+    """A Wikidata statement reduced to what the diagnosis compares.
+
+    Main snak value, rank (`preferred` or `normal`), qualifiers and
+    references (one dict property to values per reference).
+    """
+
+    value: Any
+    rank: str
+    qualifiers: dict[str, list[Any]] = field(default_factory=dict)
+    references: list[dict[str, list[Any]]] = field(default_factory=list)
+
+
+def _snak_values(snaks: list[dict[str, Any]]) -> list[Any]:
+    """Return the values of the snaks that carry one."""
+    return [s["datavalue"]["value"] for s in snaks if "datavalue" in s]
+
+
 def _first_snak_value(claims: dict[str, Any], prop: str) -> Any | None:
+    """Return the main value of the first statement of `prop`."""
     statements = claims.get(prop)
     if not statements:
         return None
@@ -64,18 +150,25 @@ def _first_snak_value(claims: dict[str, Any], prop: str) -> Any | None:
         return None
 
 
-class WikidataAdapter(OwnedClientMixin):
+class WikidataEntityAdapter(OwnedClientMixin):
+    """Read client of Wikidata items."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client, headers={"User-Agent": USER_AGENT})
 
     async def get_entity(self, qid: str) -> dict[str, Any] | None:
-        """Récupère claims + label français de l'item, ou None si le QID n'existe pas."""
+        """Return an item's claims, French label and frwiki sitelink.
+
+        None if the QID does not exist.
+        """
         resp = await self._client.get(
             WIKIDATA_API_URL,
             params={
                 "action": "wbgetentities",
                 "ids": qid,
-                "props": "claims|labels",
+                "props": "claims|labels|sitelinks",
+                "sitefilter": "frwiki",
                 "languages": "fr",
                 "format": "json",
             },
@@ -86,11 +179,69 @@ class WikidataAdapter(OwnedClientMixin):
             return None
         return entity
 
+    async def get_entities(self, qids: list[str]) -> dict[str, dict[str, Any]]:
+        """Return claims and labels of several items, in batches of 50.
+
+        Nonexistent QIDs are absent from the result.
+        """
+        entities: dict[str, dict[str, Any]] = {}
+        for start in range(0, len(qids), _BATCH_SIZE):
+            resp = await self._client.get(
+                WIKIDATA_API_URL,
+                params={
+                    "action": "wbgetentities",
+                    "ids": "|".join(qids[start : start + _BATCH_SIZE]),
+                    "props": "claims|labels|sitelinks",
+                    "sitefilter": "frwiki",
+                    "languages": "fr",
+                    "format": "json",
+                },
+            )
+            resp.raise_for_status()
+            for qid, entity in resp.json().get("entities", {}).items():
+                if "missing" not in entity:
+                    entities[qid] = entity
+        return entities
+
+    def statements(self, entity: dict[str, Any], prop: str) -> list[Statement]:
+        """Return the statements of `prop` that carry a value.
+
+        *deprecated* ones are skipped (Wikidata reserves that rank for
+        values not to use), as are `novalue` and `somevalue`.
+        """
+        result: list[Statement] = []
+        for raw in entity.get("claims", {}).get(prop, []):
+            rank = raw.get("rank", "normal")
+            mainsnak = raw.get("mainsnak", {})
+            if rank == "deprecated" or "datavalue" not in mainsnak:
+                continue
+            result.append(
+                Statement(
+                    value=mainsnak["datavalue"]["value"],
+                    rank=rank,
+                    qualifiers={
+                        q: _snak_values(snaks) for q, snaks in raw.get("qualifiers", {}).items()
+                    },
+                    references=[
+                        {p: _snak_values(snaks) for p, snaks in ref.get("snaks", {}).items()}
+                        for ref in raw.get("references", [])
+                    ],
+                )
+            )
+        return result
+
+    def frwiki_title(self, entity: dict[str, Any]) -> str | None:
+        """Return the frwiki sitelink title, or None."""
+        title = entity.get("sitelinks", {}).get("frwiki", {}).get("title")
+        return title if isinstance(title, str) else None
+
     def taxon_name(self, entity: dict[str, Any]) -> str | None:
+        """Return the taxon name (P225), or None."""
         value = _first_snak_value(entity.get("claims", {}), TAXON_NAME_PROPERTY)
         return value if isinstance(value, str) else None
 
     def external_ids(self, entity: dict[str, Any]) -> dict[str, str]:
+        """Return one external id per module."""
         claims = entity.get("claims", {})
         ids: dict[str, str] = {}
         for prop, module_id in EXTERNAL_ID_PROPERTIES.items():
@@ -99,30 +250,22 @@ class WikidataAdapter(OwnedClientMixin):
                 ids[module_id] = value
         return ids
 
-    def author_qid(self, entity: dict[str, Any]) -> str | None:
-        value = _first_snak_value(entity.get("claims", {}), AUTHOR_PROPERTY)
-        return value.get("id") if isinstance(value, dict) else None
+    def external_id_values(self, entity: dict[str, Any]) -> dict[str, list[str]]:
+        """Return all non-deprecated values of each id, per module.
 
-    def parent_taxon_qid(self, entity: dict[str, Any]) -> str | None:
-        value = _first_snak_value(entity.get("claims", {}), PARENT_TAXON_PROPERTY)
-        return value.get("id") if isinstance(value, dict) else None
+        An item may hold several ids of one database; `external_ids`
+        keeps one.
+        """
+        values: dict[str, list[str]] = {}
+        for prop, module_id in EXTERNAL_ID_PROPERTIES.items():
+            for statement in self.statements(entity, prop):
+                if isinstance(statement.value, str) and statement.value not in values.get(
+                    module_id, []
+                ):
+                    values.setdefault(module_id, []).append(statement.value)
+        return values
 
-    def publication_year(self, entity: dict[str, Any]) -> str | None:
-        """Extrait l'année depuis la valeur `time` de P574 (format `+1980-00-00T00:00:00Z`) —
-        seule la précision année nous intéresse ici, peu importe la précision réelle du point
-        Wikidata (jour/mois/année)."""
-        value = _first_snak_value(entity.get("claims", {}), PUBLICATION_YEAR_PROPERTY)
-        if not isinstance(value, dict) or "time" not in value:
-            return None
-        time_str = value["time"]
-        return time_str[1:5] if len(time_str) >= 5 else None
-
-    async def label_fr(self, qid: str) -> str | None:
-        """Résout le label français d'un item référencé par un claim d'une autre entité (ex.
-        l'auteur pointé par P405) — `wbgetentities` ne résout jamais les labels des entités
-        référencées dans les claims, seulement celles demandées explicitement : un appel séparé
-        est incontournable."""
-        entity = await self.get_entity(qid)
-        if entity is None:
-            return None
-        return entity.get("labels", {}).get("fr", {}).get("value")
+    def rank(self, entity: dict[str, Any]) -> str | None:
+        """Return the taxon rank (P105) as a ranks.yaml key, or None."""
+        value = _first_snak_value(entity.get("claims", {}), TAXON_RANK_PROPERTY)
+        return RANK_QIDS.get(value["id"]) if isinstance(value, dict) else None
