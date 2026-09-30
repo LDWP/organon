@@ -1,0 +1,330 @@
+{{sous-titre/Taxon| nv1=Menthe verte}}
+{{voir homonymes| Menthe{{!}}Mentha| Spicatus{{!}}Spicata}}
+{{Taxobox début | végétal | ''Mentha spicata'' | Mentha Spicata2.jpg | Menthe en épi.| classification=col}}
+{{Taxobox | sous-règne | Pteridobiotina }}
+{{Taxobox | division | Tracheophyta }}
+{{Taxobox | classe | Magnoliopsida }}
+{{Taxobox | ordre | Lamiales }}
+{{Taxobox | famille | Lamiaceae }}
+{{Taxobox | sous-famille | Nepetoideae }}
+{{Taxobox | tribu | Mentheae }}
+{{Taxobox | sous-tribu | Menthinae }}
+{{Taxobox | genre | Mentha }}
+{{Taxobox taxon | végétal | espèce | Mentha spicata | [[Carl von Linné|L.]], [[1753]] }}
+{{Taxobox UICN | LC | | }}
+{{Taxobox fin}}
+
+La '''Menthe verte''' ou '''Menthe en épi''' ('''''Mentha spicata''''' L.) est une [[espèce]] de [[plantes vivaces]] de la [[famille (biologie)|famille]] des [[Lamiacées]] (ou Labiacées, Labiées) cultivée comme [[plante aromatique]].
+
+Elle est également désignée par les [[Nom vernaculaire|noms vernaculaires]] ou [[Nom vulgaire|vulgaires]] : '''Menthe [[maroc]]aine (naânaâ, '''{{lang|ar|نَعْناع}}''')''', '''Menthe du Maghreb''', '''Menthe crépue''', '''Menthe douce'''<ref name=brun>{{Bruneton}}</ref>{{,}}<ref name=arvy/> ou encore '''Menthe frisée'''.
+
+== Description ==
+[[Fichier:Mentha_viridis_-_Köhler–s_Medizinal-Pflanzen-096.jpg | vignette|gauche|''Mentha spicata'' var. ''crispata''.]]
+[[Fichier:20140727Mentha spicata6.jpg|vignette|gauche|redresse=0.85|Menthe en épi.]]
+[[Fichier:20140727Mentha spicata2.jpg|vignette|gauche|Inflorescence spiciforme.]]
+[[Plante vivace]] herbacée ([[hémicryptophyte]]) très courante dans les jardins, elle peut atteindre {{unité|1| m}} de hauteur. Les tiges de section carrée, robustes sont [[Glossaire de botanique et de mycologie|glabres ou glabrescentes]]<ref name=arvy>{{Ouvrage | titre       = Épices, aromates et condiments | éditeur     =     Belin | auteur      = Marie-Pierre Arvy, François Gallouin | langue      =  | année       = 2003  | pages       =}}</ref>. La plante est pourvue de [[stolon (organe)|stolon]]s qui assurent sa multiplication, ce qui peut la rendre envahissante. C'est une plante très aromatique, avec parfois une odeur de moisi.
+
+Le feuillage est habituellement d'un vert profond mais les jeunes feuilles sont souvent plus claires. Ces feuilles opposées sont [[Sessilité (botanique)|sessiles ou subsessile]]s, glabres, [[forme foliaire|ovales-lancéolées]] et font 2-6 x 0,5-1,5 cm. Leurs bords sont en dents de scie (serretés). Elles portent des glandes ([[Trichome (botanique)|trichome]]s glandulaires) sécrétant une [[huile essentielle]] riche en [[carvone]] et pratiquement dépourvue de [[menthol]], donnant une odeur mentholée et fraîche.
+
+Les traits distinctifs sont une ''face inférieure des feuilles à poils simples majoritaires ou une plante glabre'' (cultivars parfois échappés) et des feuilles médianes sessiles à limbe ovale (L/l=1,5-3) plus ou moins aigu<ref name=fg>{{FloraGallica}}</ref>. La pubescence est surtout localisée sur les nervures à la face inférieure et formée de poils simples, dressés, mêlés de poils crépus-laineux.
+
+Les fleurs sont généralement rosées, voire blanches. Elles sont disposées en longs épis terminaux, denses de 4 à {{unité|10|cm}}, formés de verticilles de fleurs (à intervalles assez espacés à la base) sous-tendues par des bractées, linéaires-lancéolées. Le [[calice (botanique)|calice]] est en tube, glabre, pourvu de 5 dents linéaires, parfois ciliées<ref name=arvy/>. La [[corolle]], glabre en dedans, est pourvue de 4 lobes presque égaux en forme d'entonnoir. La lèvre supérieure, émarginée, est formée par les 2 pétales dorsaux. La corolle enserre 4 étamines divergentes, presque égales et saillantes et 2 carpelles ovoïdes.
+
+Elles fleurissent d'août à octobre.
+
+Les fruits sont des [[akène|tétrakènes]], qui restent longtemps au fond du calice persistant.
+
+Des formes pubescentes de ''Mentha spicata'' sont proches de ''Mentha longifolia''.
+
+== Répartition et habitats ==
+{{WGSRPD|certain=AFG,ALB,AUT,BGM,BUL,CHC,CHS,CHT,CYP,CZE,DEN,EAI,EGY,FRA,GER,GRC,HUN,IRN,ITA,KRI,LBS,NCS,NEP,NET,NOR,PAK,PAL,POL,ROM,SAR,SIC,SIN,SWE,SWI,TCS,TKM,TUE,TUR,UKR,WHM,YUG|introduit=ABT,AGE,AGS,AGW,ALA,ALG,ARI,ARK,ASK,AZO,BAL,BAN,BER,BLT,BRC,BZS,CAL,CHA,CNT,CNY,COL,COR,CPP,DEL,DOM,ETH,FAL,FLA,GAM,GEO,GRB,HAW,IDA,ILL,INI,IOW,IRE,IRK,JAP,KAN,KRY,KTY,LBY,LOU,MAI,MAN,MAS,MDR,MIC,MIN,MNT,MOR,MRY,MSI,MSO,MTN,MXN,NBR,NCA,NEB,NEV,NFK,NGR,NSC,NSW,NWH,NWJ,NWM,NWY,NZN,NZS,OFS,OHI,OKL,ONT,ORE,PEI,PEN,QUE,RHO,RUC,RUS,RUW,SAS,SCA,SCI,SDA,SPA,TAS,TDC,TEN,TEX,TUN,UTA,VEN,VER,VRG,WAS,WDC,WIS,WVA,WYO|source=[[Plants of the World Online|POWO]]{{Bioref|powo|22 août 2026|ref}}}}
+''Mentha spicata'' est originaire<ref>{{GRIN espèce|24082|Mentha spicata}}</ref> d'Asie occidentale tempérée ([[Liban]], [[Syrie]], [[Turquie]], [[Chypre (pays)|Chypre]]) et du sud-est de l'Europe (ex-[[Yougoslavie]], [[Albanie]], [[Bulgarie]], [[Grèce]], Italie).
+
+Elle s'est naturalisée dans de nombreux pays tempérés d'Asie, d'Europe (dont la France), ainsi qu'au Brésil et, en Argentine. Elle est cultivée aux États-Unis, en Chine, Turquie, Japon, Inde, Pakistan, Australie, Nouvelle-Zélande, Russie, Canada.
+
+Elle croît dans les milieux humides, ensoleillés à semi-ombragés.
+
+==Composition chimique==
+L'[[huile essentielle]] de ''Mentha spicata'' s'obtient par distillation à la vapeur d'eau (hydrodistillation) des feuilles, précédée par un séchage partiel de 24 heures. C'est un liquide jaune pâle, d'odeur herbacée, menthée, douce et sucrée. La norme<ref name=no>{{lien web
+|langue=fr
+|url=http://www.iso.org/iso/fr/home/store/catalogue_ics/catalogue_detail_ics.htm?ics1=71&ics2=100&ics3=60&csnumber=34580
+|titre=ISO 3033-1:2005, Huile essentielle de menthe crépue (ou menthe verte) -- Partie 1: Type native (Mentha spicata L.)
+|nom=ISO
+|prénom=
+|date=1/07/2015
+|série=
+}}</ref> [[Organisation internationale de normalisation|ISO]] 3033-1:2005 la désigne comme « Huile essentielle de menthe crépue (ou menthe verte) ». L'huile essentielle officinale renferme de 55 à {{unité|67|%}} de [[carvone]] et de 2 à {{unité|25|%}} de [[limonène]]<ref name=brun/>.
+
+Elle peut présenter plusieurs [[chémotype|chimiotype]]s différents<ref name=arvy/> :
+* chimiotype 1 : huiles riches en carvone, donnant une flaveur chaude peu épicée et une sensation de fraîcheur. Ainsi l'analyse de l'huile essentielle de Govindarajan et als<ref>{{article | nom =  M. Govindarajan, R. Sivakumar, M. Rajeswari, K. Yogalakshmi     | titre =  Chemical composition and larvicidal activity of essential oil from Mentha spicata (Linn.) against three mosquito species | périodique = Parasitology Research | lien périodique = | volume =110 | numéro =5 | année =     2012 | pages = | url texte =}}</ref> a révélé 18 composés dont les trois principaux sont :
+{| border="1" cellpadding="3" cellspacing="0" align="center"
+|-----
+| colspan="4" align="center" bgcolor=#F0C300 |Huile essentielle de ''M. spicata''
+|-----
+|Composé ||[[carvone]]|| cis-carvéol ||  [[limonène]]
+|---
+|% ||48,60 || 21,30 || 11,30
+|}
+L'analyse de l'huile de ''Mentha spicata'' cultivée à Turin (Italie) et d'une variété originaire du Michigan (USA) indique aussi des profils chromatographiques semblables avec une prépondérance de la [[carvone]] (39,13 % et 59,26 % resp.) suivi par le [[limonène]], le [[terpinène-4-ol]], [[dihydrocarvéol]] puis d'un peu de [[caryophyllène]], [[germacrène]] D<ref>{{article | nom =    Massimo Maffei, Arnaldo Codignola and Maurizio Fiewhi    | titre =    Essential Oil from Mentha spicata L. (Spearmint) Cultivated in Italy  | périodique = FLAVOUR AND FRAGRANCE JOURNAL | lien périodique = | volume =1 | numéro = | année =    1986  | pages = | url texte =}}</ref>  et pas de [[menthol]] détectable.
+
+* chimiotype 2 : huiles riches en [[pipériténone]] et/ou [[pipéritone]] ; [[pulégone]] ; [[menthone]]
+* chimiotype 3 : huiles riches en pipériténone
+La [[carvone]] est une [[cétone]] monoterpénique ayant des propriétés antispasmodiques<ref>{{article| doi = 10.1016/j.fitote.2012.10.012| issn = 0367-326X| volume = 85| pages = 20–24| nom1 = Souza| prénom1 = Fábia Valéria M.| nom2 = da Rocha| prénom2 = Marcelly Barbosa| nom3 = de Souza| prénom3 = Damião P.| nom4 = Marçal| prénom4 = Rosilene Moretti| titre = (−)-Carvone: Antispasmodic effect and mode of action| journal = Fitoterapia| consulté le = 2015-07-01| date = 2013-03| url = http://linkinghub.elsevier.com/retrieve/pii/S0367326X12002882}}</ref> et antinociceptives<ref>{{article| issn = 0918-6158| volume = 31| numéro = 5| pages = 1017–1020| nom1 = Gonçalves| prénom1 = Juan Carlos Ramos| nom2 = Oliveira| prénom2 = Fernando de Sousa| nom3 = Benedito| prénom3 = Rubens Batista| nom4 = de Sousa| prénom4 = Damião Pergentino| nom5 = de Almeida| prénom5 = Reinaldo Nóbrega| nom6 = de Araújo| prénom6 = Demetrius Antônio Machado| titre = Antinociceptive activity of (-)-carvone: evidence of association with decreased peripheral nerve excitability| journal = Biological & Pharmaceutical Bulletin| date = 2008-05| pmid = 18451538}}</ref>. Mais comme la majorité des cétones terpéniques, la carvone est neurotoxique. Le [[limonène]] est une carvone désoxygénée qui peut être irritante pour la peau.
+
+==Culture==
+La culture des menthes en épi est pratiquée dans les jardins des particuliers ou à grande échelle à des fins commerciales.
+
+Les menthes se plaisent dans les sols siliceux, riches, aérés. Elles préfèrent la mi-ombre mais supportent le soleil à condition d'être arrosées. Elles sont très résistantes au froid.
+
+Pour le jardinier amateur, la Menthe en épis se cultive dans le jardin en pleine terre ou en pot. Il peut en cueillir un peu régulièrement du mois de mai jusqu'au milieu de l'automne, au fur et à mesure des besoins.
+
+C'est une plante rustique, demandant peu d'entretien.
+
+Dans le monde, seules quatre espèces de menthes sont cultivées à des fins commerciales : ''[[Mentha arvensis]]'' (Menthe des champs)'', [[Mentha piperita]]'' (Menthe poivrée)'', Mentha spicata'' (Menthe verte), et ''[[Mentha citrata]]'' (Menthe citronnée)<ref name=a>{{lien web
+|langue=en
+|url=http://nhb.gov.in/Horticulture%20Crops%5CMint%5CMint1.htm
+|titre=Mint
+|nom=
+|prénom=
+|date=3/07/2015
+|série=
+}}</ref>. La Menthe verte est cultivée sur {{unité|3000|ha}} principalement aux États-Unis, en Chine, Russie et Inde. La production mondiale d'huile essentielle de Menthe en épi est de {{unité|2000|tonnes}}.
+
+== Usages ==
+* '''Boissons'''
+Utilisée en [[tisane]] et en [[infusion]], la feuille de menthe verte a une place de choix dans la culture du [[Maghreb]]. En effet, le traditionnel [[thé à la menthe]] est concocté en laissant infuser du thé vert avec environ 100 feuilles de menthe fraîche par litre et beaucoup de sucre. Le [[cultivar]] ''Mentha spicata'' 'Nana', est généralement utilisé ; il se caractérise par un arôme piquant mais doux. Cette appellation se retrouve dans le nom en arabe standard moderne du thé à la menthe « chāï bil n'anā » (شاي بالنعناع).
+
+Les feuilles sont utilisées dans des boissons, comme le cocktail [[mojito]] de Cuba, fait de [[rhum]], [[citron vert]] et menthe fraîche.
+
+* '''Culinaires'''
+Les feuilles de menthe en épi sont également utilisées dans de nombreuses applications culinaires, comme avec des plats à base de viande, des sauces pour le gigot ou le rôti de bœuf (en Grande-Bretagne), des plats asiatiques.
+
+* '''L'huile essentielle''' est utilisée pour la fabrication de boissons alcoolisées ou sans alcools, de confiserie, de glaces et pour aromatiser les chewing-gums ou les dentifrices.
+
+*'''Médicinaux'''
+En herboristerie, les menthes sont ''toniques, stimulantes et antispasmodiques''<ref name=pierre/>.
+La menthe verte est traditionnellement utilisée pour ses propriétés aromatiques (toniques, fortifiantes), digestives (combat les lourdeurs, les ballonnements, les gaz) et [[antispasmodique]]s (nervosité, palpitations, crampes).
+
+En infusion à {{unité|10-20|g}} pour 1 litre d'eau bouillante, la menthe exerce une action sensible sur le système nerveux<ref name=pierre>{{Ouvrage
+ | titre       = Le livre des Bonnes Herbes
+ | éditeur     =     Marabout service, Robert Morel éditeur
+ | auteur      = Pierre Lieutaghi
+ | langue      =
+  | année       = 1966
+  | pages       =
+}}</ref>.
+
+* '''Plante mellifère'''
+Très [[appétence|appétente]] pour les insectes dont les [[abeille]]s.
+
+== Taxinomie ==
+Diverses menthes ont été décrites dans l'[[Antiquité gréco-romaine]], mais le [[philologue]] Jacques André n'identifie pas l'espèce actuellement nommée ''Mentha spicata'' parmi les nombreuses appellations grecques et latines<ref>{{André}}</ref>.
+
+En 1753, lorsque [[Carl von Linné|Linné]] décrit le genre ''Mentha'' dans ''[[Species plantarum]]'', il reconnaît 10 espèces différentes dont la ''Mentha spicata'' « aux fleurs en épis, et feuilles oblongues serretées » avec trois variétés ''viridis, longifolia, rotundifolia''. En 1762, lors de la deuxième édition de ''Species Plantarum'', Linné se ravise et remplace ''M. spicata'' par 3 nouvelles espèces ''M. sylvestris, M. viridis'' et ''M. rotundifolia''. L'analyse précise des textes amène Farwell<ref>{{article | nom =    O. Farwell     | titre =    The Correct Name of the Spearmint | périodique = Rhodora | lien périodique = | volume =26 | numéro = | année =      1924 | pages = | url texte =http://biostor.org/reference/137827}}</ref> (en 1924) à considérer que la Menthe en épi (spearmint) est la ''Mentha viridis'' L. de la {{2e|édition}} de ''Species Pl.'' (1762), correspondant à la variété ''M. spicata'' L. var. ''viridis'' de la {{1re|édit}}. de ''Species Pl.'' (1753).
+
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Mentha spicata'' L.{{Bioref|POWO|22 août 2026|ref}}.
+
+Ce taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Menthe en épi{{Bioref|EOL|22 août 2026|ref}}{{,}}{{Bioref|OEPP|22 août 2026|ref}}{{,}}{{Bioref|Tela-métro|22 août 2026|ref}}{{,}}{{Bioref|VASCAN|22 août 2026|ref}}{{,}}{{Bioref|INPN|22 août 2026|ref}}, Menthe verte{{Bioref|EOL|22 août 2026|ref}}{{,}}{{Bioref|OEPP|22 août 2026|ref}}{{,}}{{Bioref|Tela-métro|22 août 2026|ref}}{{,}}{{Bioref|INPN|22 août 2026|ref}}, menthe en grappe{{Bioref|OEPP|22 août 2026|ref}}{{,}}{{Bioref|Tela-métro|22 août 2026|ref}}, menthe à épis{{Bioref|VASCAN|22 août 2026|ref}}, baume{{Bioref|VASCAN|22 août 2026|ref}}, menthe en épis{{Bioref|VASCAN|22 août 2026|ref}}, Menthe glabre{{Bioref|INPN|22 août 2026|ref}}.
+
+=== Sous-espèces et synonymes ===
+Selon {{Bioref|inpn|22 août 2026}} et {{Bioref|powo|22 août 2026}}, ''Mentha spicata'' comprend deux [[sous-espèce]]s :
+* ''Mentha spicata ''subsp.'' condensata'' (Briq.) Greuter & Burdet
+{{liste déroulante|titre=Synonymes de ''Mentha spicata ''subsp.'' condensata''{{Bioref|POWO|22 août 2026|ref}}|contenu=
+* ''Mentha chalepensis'' Mill.
+* ''Mentha derelicta'' Déségl.
+* ''Mentha microphylla ''var.'' condensata'' (Briq.) Briq.
+* ''Mentha microphylla ''var.'' glareosa'' (Briq.) Briq.
+* ''Mentha microphylla'' K.Koch
+* ''Mentha sieberi'' K.Koch
+* ''Mentha sofiana ''subsp.'' kickxiifolia'' Trautm.
+* ''Mentha sofiana'' Trautm.
+* ''Mentha spicata ''subsp.'' tomentosa'' Harley
+* ''Mentha stenostachya'' (Boiss.) Nevski
+* ''Mentha subsessilis'' Borbás
+* ''Mentha sylvestris ''var.'' stenostachya'' Boiss.
+* ''Mentha tomentosa ''subsp.'' condensata'' Briq.
+* ''Mentha tomentosa ''subsp.'' glareosa'' Briq.
+* ''Mentha tomentosa ''var.'' viridula'' Heldr.
+* ''Mentha tomentosa'' d'Urv.}}
+* ''Mentha spicata ''subsp.'' spicata''
+{{liste déroulante|titre=Synonymes de ''Mentha spicata ''subsp.'' spicata''{{Bioref|POWO|22 août 2026|ref}}|contenu=
+* ''Mentha aquatica ''subsp.'' crispa'' (L.) G.Mey.
+* ''Mentha aquatica ''var.'' crispa'' (L.) Benth.
+* ''Mentha atrata'' Schur
+* ''Mentha balsamea'' Rchb.
+* ''Mentha brevispicata'' Lehm.
+* ''Mentha cordato-ovata'' Opiz
+* ''Mentha crispa ''var.'' verticillata'' Gaudin
+* ''Mentha crispa'' L.
+* ''Mentha crispata ''var.'' lacerata'' (Opiz) Heinr.Braun
+* ''Mentha crispata'' Schrad. ex Willd.
+* ''Mentha glabra'' Mill.
+* ''Mentha hortensis'' Opiz ex Fresen.
+* ''Mentha inarimensis'' Guss.
+* ''Mentha integerrima'' Mattei & Lojac.
+* ''Mentha lacerata'' Opiz
+* ''Mentha laciniosa'' Schur
+* ''Mentha laevigata'' Willd.
+* ''Mentha lejeuneana'' Opiz
+* ''Mentha lejeunei'' Opiz ex Rchb.
+* ''Mentha longifolia ''subsp.'' undulata'' (Willd.) Briq.
+* ''Mentha longifolia ''subsp.'' viridis'' (L.) Rouy
+* ''Mentha longifolia ''var.'' crispata'' (Schrad. ex Willd.) Rouy
+* ''Mentha longifolia ''var.'' laevigata'' (Willd.) Rouy
+* ''Mentha longifolia ''var.'' piperella'' (Lej.) Rouy
+* ''Mentha longifolia ''var.'' stenophylla'' Rouy
+* ''Mentha longifolia ''var.'' undulata'' (Willd.) Briq.
+* ''Mentha longifolia subvar. psilostachya'' (Pérard) Rouy
+* ''Mentha michelii'' Ten. ex Rchb.
+* ''Mentha mollissima ''var.'' undulata'' (Willd.) Heinr.Braun
+* ''Mentha ocymiodora'' Opiz
+* ''Mentha pectinata'' Raf.
+* ''Mentha piperella'' (Lej.) Opiz ex Lej. & Courtois
+* ''Mentha pudina'' Buch.-Ham. ex Benth.
+* ''Mentha romana'' Bubani
+* ''Mentha romana'' Garsault
+* ''Mentha rosanii'' Ten.
+* ''Mentha rubicunda ''var.'' langiana'' Topitz
+* ''Mentha rubicunda'' Haw. ex Spach
+* ''Mentha scotica'' R.A.Graham
+* ''Mentha sepincola'' Holuby
+* ''Mentha spicata ''subsp.'' glabrata'' (Lej. & Courtois) Lebeau
+* ''Mentha spicata ''var.'' cordato-ovata'' Schinz & Thell.
+* ''Mentha spicata ''var.'' crispa'' Ridd.
+* ''Mentha spicata ''var.'' crispata'' (Schrad. ex Willd.) Schinz & Thell.
+* ''Mentha spicata ''var.'' oblongifolia'' (Wimm. & Grab.) Lebeau
+* ''Mentha spicata ''var.'' piperella'' (Lej. & Courtois) Schinz & Thell.
+* ''Mentha spicata ''var.'' scotica'' (R.A.Graham) P.D.Sell
+* ''Mentha spicata ''var.'' undulata'' (Willd.) Lebeau
+* ''Mentha spicata ''var.'' viridis'' L.
+* ''Mentha sylvestris ''convar.'' cyrtophylla'' Alef.
+* ''Mentha sylvestris ''subsp.'' viridis'' (L.) Batt.
+* ''Mentha sylvestris ''var.'' crispa'' (L.) Alef.
+* ''Mentha sylvestris ''var.'' crispata'' W.D.J.Koch
+* ''Mentha sylvestris ''var.'' glabra'' W.D.J.Koch
+* ''Mentha sylvestris ''var.'' glabrata'' Benth.
+* ''Mentha sylvestris ''var.'' oblongifolia'' Wimm. & Grab.
+* ''Mentha sylvestris ''var.'' rosanii'' (Ten.) Strail
+* ''Mentha sylvestris ''var.'' undulata'' (Willd.) W.D.J.Koch
+* ''Mentha sylvestris ''var.'' viridis'' (L.) Alef.
+* ''Mentha tauschii'' Heinr.Braun
+* ''Mentha tenuiflora'' Opiz
+* ''Mentha tenuifolia'' Opiz ex Rchb.
+* ''Mentha tenuis'' Michx.
+* ''Mentha undulata'' Willd.
+* ''Mentha viridifolia'' Pérard
+* ''Mentha viridis ''f.'' angustifolia'' Pérard
+* ''Mentha viridis ''f.'' crispata'' (Schrad. ex Willd.) Pérard
+* ''Mentha viridis ''f.'' laevigata'' (Willd.) Heinr.Braun
+* ''Mentha viridis ''f.'' latifolia'' Pérard
+* ''Mentha viridis ''f.'' psilostachya'' Pérard
+* ''Mentha viridis ''subsp.'' angustifolia'' (Gray) Briq.
+* ''Mentha viridis ''subsp.'' crispata'' (Schrad. ex Willd.) Briq.
+* ''Mentha viridis ''subsp.'' euryphylla'' Briq.
+* ''Mentha viridis ''subsp.'' exquisita'' Briq.
+* ''Mentha viridis ''subsp.'' inarimensis'' (Guss.) Nyman
+* ''Mentha viridis ''subsp.'' malinvaldii'' Agasse ex Briq.
+* ''Mentha viridis ''var.'' allodonta'' Topitz
+* ''Mentha viridis ''var.'' angustifolia'' Gray
+* ''Mentha viridis ''var.'' angustifolia'' Lej. ex Rchb.
+* ''Mentha viridis ''var.'' ciliata'' Gray
+* ''Mentha viridis ''var.'' cordato-ovata'' (Opiz) Heinr.Braun
+* ''Mentha viridis ''var.'' crispa'' Benth.
+* ''Mentha viridis ''var.'' crispata'' (Schrad. ex Willd.) Becker
+* ''Mentha viridis ''var.'' exquisita'' Briq.
+* ''Mentha viridis ''var.'' glabrata'' Lej. & Courtois
+* ''Mentha viridis ''var.'' holotilta'' Briq.
+* ''Mentha viridis ''var.'' hortensis'' Wirtg.
+* ''Mentha viridis ''var.'' jaccardii'' Briq.
+* ''Mentha viridis ''var.'' lacerata'' (Opiz) Heinr.Braun
+* ''Mentha viridis ''var.'' laetivridis'' Topitz
+* ''Mentha viridis ''var.'' laevigata'' (Willd.) Lamotte
+* ''Mentha viridis ''var.'' lampreilema'' Briq.
+* ''Mentha viridis ''var.'' latifolia'' Gray
+* ''Mentha viridis ''var.'' lejeuneana'' (Opiz) Heinr.Braun
+* ''Mentha viridis ''var.'' macrostemma'' Lej. & Courtois
+* ''Mentha viridis ''var.'' maderensis'' Briq.
+* ''Mentha viridis ''var.'' malinvaldii'' (Agasse ex Briq.) Briq.
+* ''Mentha viridis ''var.'' ocymiodora'' (Opiz) Lej. & Courtois
+* ''Mentha viridis ''var.'' oligotricha'' Briq.
+* ''Mentha viridis ''var.'' phaneroneura'' Briq.
+* ''Mentha viridis ''var.'' phyllopogon'' Briq.
+* ''Mentha viridis ''var.'' piperella'' Lej. & Courtois
+* ''Mentha viridis ''var.'' sinuosa'' Topitz
+* ''Mentha viridis ''var.'' spadana'' Briq.
+* ''Mentha viridis ''var.'' stenophyllon'' Topitz
+* ''Mentha viridis ''var.'' tauscheri'' Topitz
+* ''Mentha viridis ''var.'' tenuiflora'' (Opiz) Briq.
+* ''Mentha viridis ''var.'' tenuis'' (Michx.) Briq.
+* ''Mentha viridis ''var.'' walteriana'' (Opiz) Topitz
+* ''Mentha viridis'' (L.) L.
+* ''Mentha walteriana'' Opiz
+* ''Mentha × niliaca ''var.'' rosanii'' (Ten.) Briq.
+* ''Mentha × piperita ''var.'' crispa'' (L.) W.D.J.Koch
+* ''Mentha × piperita ''var.'' inarimensis'' (Guss.) Briq.
+* ''Mentha × villosa ''var.'' rosanii'' (Ten.) Rouy
+}}
+
+=== Variétés ===
+Quelques variétés et leurs noms communs :
+{{Section à sourcer|date=août 2017}}
+* ''Mentha spicata var. anisatus'' : Menthe verte anisée, Menthe anisée.
+* ''Mentha spicata var. crispa'' : Menthe crispée ; synonyme de la ''crispata'' ci-dessous.
+* ''Mentha spicata var. crispata'' : Menthe frisée, Menthe crépue, Menthe romaine, Menthe des jardins.
+* ''Mentha spicata var. ispanica'' : Menthe espagnole.
+* ''Mentha spicata var. longifolia'' : Menthe à feuilles longues, Menthe à longues feuilles, Menthe argentée, Menthe de cheval, Menthe des bois ; synonyme de la [[Menthe sylvestre]] (''Mentha longifolia'').
+* ''Mentha spicata var. nahnah'' : Menthe nanah, commune au [[Maroc]]. Elle convient particulièrement pour la confection du thé à la menthe, et sert également pour aromatiser les crudités et les salades de fruits. Elle est assez proche de la menthe verte ; son feuillage est un peu plus gaufré et sa saveur, plus puissante. 
+* ''Mentha spicata var. piperita'' : Menthe verte poivrée, Menthe anglaise ; synonyme de la [[Menthe poivrée]] (''[[Mentha ×piperita]]''). Très riche en menthol.
+* ''Mentha spicata var. suaveolens'' : Menthe verte à feuilles rondes ; synonyme de la [[Menthe à feuilles rondes]] (''[[Mentha ×rotundfolia]]''). Utilisée dans le [[taboulé]].
+* ''Mentha spicata var. spirala'' : Menthe en spirale.
+* ''Mentha spicata var. tenuis'' : Menthe fine. Utilisée comme additif en cosmétique.
+* ''Mentha spicata var. viridis'' : Menthe (Menthe commune), Menthe verte, Menthe douce
+<gallery>
+Fichier:Mentha spicata1.jpg|Port.
+Fichier:Bild Marokkanische Minze.jpg|Menthe marocaine, ''Mentha spicata'' var.''crispa''.
+Fichier:Menthe sylvestre à orelle savoie.jpg|Menthe verte (inflorescences).
+Fichier:20140727Mentha spicata4.jpg|Inflorescence.
+</gallery>
+
+== Références ==
+{{Références}}
+
+== Voir aussi ==
+{{Autres projets
+| commons titre2=Catégorie Mentha spicata
+| commons2=Category:Mentha spicata
+| commons=Mentha spicata
+| species=Mentha spicata
+| wiktionary=Mentha spicata
+}}
+
+=== Articles connexes ===
+* [[Carvone]]
+* [[Glossaire de botanique]]
+
+=== Liens externes ===
+* {{BioLib|taxon|41147|''Mentha spicata'' L.| consulté le=22 août 2026}}
+* {{CatalogueofLife | 72ZHW | ''Mentha spicata'' L. | consulté le=22 août 2026 }}
+* {{EFloras | 2 | 200019821 | Mentha spicata | consulté le=22 août 2026 }}
+* {{EFloras | 5 | 200019821 | Mentha spicata | consulté le=22 août 2026 }}
+* {{EOL | 579697 | ''Mentha spicata'' L. | consulté le=22 août 2026 }}
+* {{GBIF | 72ZHW | ''Mentha spicata'' L. | consulté le=22 août 2026 }}
+* {{INPN | 108166 | ''Mentha spicata'' L., 1753 | consulté le=22 août 2026 }}
+* {{IPNI | 451162-1 | Mentha spicata | L. | consulté le=22 août 2026 }}
+* {{IRMNG | 10933482 | ''Mentha spicata'' Linnaeus | consulté le=22 août 2026 }}
+* {{ITIS | 32272 | ''Mentha spicata'' L. | consulté le=22 août 2026 }}
+* {{MNHN | espèce | mentha/spicata | ''Mentha spicata'' | consulté le=22 août 2026}}
+* {{NCBI | 29719 | ''Mentha spicata'' | consulté le=22 août 2026 }}
+* {{OEPP | MENSP | ''Mentha spicata'' | Linnaeus | consulté le=22 août 2026 }}
+* {{POWO | 451162-1 | Mentha spicata | L. | consulté le=22 août 2026 }}
+* {{TPDB | 495714 | ''Mentha spicata'' Linnaeus 1753 | consulté le=22 août 2026}}
+* {{Tela-métro | 42234 | ''Mentha spicata'' L. 1753 | consulté le=22 août 2026 }}
+* {{Tropicos | 17600159 | Mentha spicata | L. | consulté le=22 août 2026 }}
+* {{UICN|164464|''Mentha spicata''| consulté le=22 août 2026}}
+* {{VASCAN | 6405 | ''Mentha spicata'' Linnaeus | consulté le=22 août 2026 }}
+
+{{Portail|botanique|plantes utiles|épices et aromates}}
+
+[[Catégorie:Mentha|spicata]]
+[[Catégorie:Espèce de Lamiaceae (nom scientifique)]]
+[[Catégorie:Plante condimentaire ou à épice]]

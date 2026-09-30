@@ -1,0 +1,128 @@
+{{Taxobox début | végétal | ''Epilobium parviflorum'' |  Onagraceae - Epilobium parviflorum-2.JPG  | Épilobe à petites fleurs | classification=col}}
+{{Taxobox | sous-règne | Pteridobiotina }}
+{{Taxobox | division | Tracheophyta }}
+{{Taxobox | classe | Magnoliopsida }}
+{{Taxobox | ordre | Myrtales }}
+{{Taxobox | famille | Onagraceae }}
+{{Taxobox | sous-famille | Onagroideae }}
+{{Taxobox | tribu | Epilobieae }}
+{{Taxobox | genre | Epilobium }}
+{{Taxobox taxon | végétal | espèce | Epilobium parviflorum | [[Johann Christian Daniel von Schreber|Schreb.]], [[1771]] }}
+{{Taxobox UICN | LC }}
+{{Taxobox fin}}
+
+'''''Epilobium parviflorum''''', l''''Épilobe à petites fleurs''' ou encore '''Épilobe-mollet''', est une [[espèce]] de [[plante]]s à fleurs de la [[famille (biologie)|famille]] des [[Onagraceae|onagracées]].
+
+== Description ==
+C'est une [[plante herbacée]] de 30-80 cm, dressée, mollement poilue, à souche tronquée, émettant de courtes rosettes de feuilles ; tige sans lignes saillantes ; feuilles inférieures et moyennes opposées, oblongues-lancéolées, à peine denticulées, sessiles, non embrassantes ; fleurs d'un rose pâle, petites (6-7 mm de diamètre), toujours dressées, en grappes feuillées; bouton floral obtus, à sépales [[Glossaire_de_botanique|mutiques]]; pétales bilobés, dépassant à peine le calice ; 4 stigmates, étalés en croix ; capsule pubescente.
+
+== Répartition ==
+{{WGSRPD|certain=AFG,ALB,ALG,AUT,AZO,BAL,BGM,BLT,BUL,CHC,CHI,CHN,CHS,CHX,CNY,COR,CYP,CZE,DEN,EAI,FIN,FRA,GER,GRB,GRC,HUN,IRE,IRN,IRQ,ITA,JAP,KAZ,KGZ,KOR,KRI,LBS,MDR,MOR,NCS,NEP,NET,NOR,PAK,PAL,POL,POR,ROM,RUC,RUE,RUN,RUW,SAR,SIC,SPA,SWE,SWI,TCS,TKM,TUE,TUN,TUR,TZK,UZB,WHM,YUG|introduit=BRC,ILL,INI,MIC,MRY,MYA,NWJ,NWY,NZN,OHI,ONT,PEN,VER,WAS|source=[[Plants of the World Online|POWO]]{{Bioref|powo|22 août 2026|ref}}}}
+On peut la trouver dans toute l'[[Europe]] jusqu'au sud de la [[Suède]], en [[Asie occidentale]] jusqu'à l'[[Inde]], en [[Afrique]] et en [[Amérique septentrionale]].
+
+== Caractéristiques ==
+* Sexualité : [[hermaphrodite]]
+* Ordre de maturation : [[Homogamie (biologie)|homogame]]
+* Pollinisation : [[entomogame]], [[autogame]]
+* Fruit : capsule
+* Dissémination : [[anémochore]]
+* Type biologique : [[hémicryptophyte]] érigé
+* [[Formation végétale]] : hémicryptophytale
+
+== Usage médicinal ==
+Des extraits de la plante sont utilisés en médecine traditionnelle contre les affections de la [[prostate]], des [[rein]]s et de la [[vessie]] en raison de leur effet [[antioxydant]] et [[anti-inflammatoire]]<ref name=NM>{{en}} [http://www.naturesmethod.com/Learn_About_Your_Health/Small_Flowered_Willow_Herb.php Natures Method]</ref>{{,}}<ref name=hevesi>{{en}} Hevesi BT, Houghton PJ, Habtemariam S, Kéry A. [https://www.ncbi.nlm.nih.gov/pubmed/19107731  Antioxidant and antiinflammatory effect of Epilobium parviflorum Schreb]</ref>{{,}}<ref>{{article|lang=en|auteur=V. Steenkamp, M. C. Gouws, M. Gulumian, E. E. Elgorashi, J. van Staden|titre=Studies on antibacterial, anti-inflammatory and antioxidant activity of herbal remedies used in the treatment of benign prostatic hyperplasia and prostatitis|périodique=Journal of Ethnopharmacology|volume=103|numéro=1|année=2006|mois=janvier|pages=71–75|PMID=16122891}}</ref>. Il est démontré que des extraits d'épilobe sont capables, ''[[in vitro]]'', d'inhiber la prolifération des cellules prostatiques humaines en freinant la progression du [[cycle cellulaire]]<ref>Vitalone A et al "Extracts of various species of Epilobium inhibit proliferation of human prostate cells." ''J Pharm Pharmacol''. 2003 May;55(5):683-90</ref>.
+
+D'autres espèces d'épilobe possèdent un pouvoir thérapeutique : l'[[épilobe rosé]] (''Epilobium roseum''), l'[[épilobe des montagnes]] (''Epilobium montanum''), l'[[Epilobium obscurum|épilobe foncé]] (''Epilobium obscurum''), l'[[Epilobium lanceolatum|épilobe lancéolé]] (''Epilobium lanceolatum''), l'[[épilobe des collines]] (''Epilobium collinum''), l'[[épilobe des marais]] (''Epilobium palustre'') et l'[[épilobe des moraines]] (''Epilobium fleischeri'').
+
+Préparation de la tisane : ébouillanter une cuillerée à café d'herbes avec 1/4 de litre d'eau, laisser reposer rapidement. Boire seulement deux tasses par jour, une le matin à jeun et l'autre le soir une demi-heure avant de se coucher.
+
+== Taxinomie ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce [[taxon]] est ''Epilobium parviflorum'' Schreb.{{Bioref|ITIS|22 août 2026|ref}}.
+
+Ce taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Épilobe à Petites Fleurs{{Bioref|EOL|22 août 2026|ref}}{{,}}{{Bioref|OEPP|22 août 2026|ref}}{{,}}{{Bioref|Tela-métro|22 août 2026|ref}}{{,}}{{Bioref|VASCAN|22 août 2026|ref}}{{,}}{{Bioref|INPN|22 août 2026|ref}}{{,}}{{Bioref|GBIF|22 août 2026|ref}}, Épilobe-mollet{{Bioref|EOL|22 août 2026|ref}}{{,}}{{Bioref|OEPP|22 août 2026|ref}}{{,}}{{Bioref|Tela-métro|22 août 2026|ref}}.
+
+''Epilobium parviflorum'' a pour [[Synonyme (botanique)|synonymes]]{{Bioref|POWO|22 août 2026|ref}} :
+{{colonnes|taille=25|1=
+* ''Chamaenerion parviflorum'' Schreb.
+* ''Chamaenerion pubescens'' (Roth) Moench
+* ''Epilobium adnatum ''var.'' villosum'' Aidar.
+* ''Epilobium caballeroi'' Pau
+* ''Epilobium cordatum'' Biv.
+* ''Epilobium hirsutum ''var.'' intermedium'' (Mérat) Ser. ex DC.
+* ''Epilobium intermedium'' Mérat
+* ''Epilobium menthoides'' Boiss. & Heldr.
+* ''Epilobium molle'' Lam.
+* ''Epilobium mollissimum'' Schur
+* ''Epilobium neutrum'' Pall. ex Hausskn.
+* ''Epilobium numidicum'' (Batt.) Batt.
+* ''Epilobium palustre'' Willd.
+* ''Epilobium parviflorum ''f.'' apricum'' E.S.Marshall
+* ''Epilobium parviflorum ''f.'' brevifolium'' E.S.Marshall
+* ''Epilobium parviflorum ''f.'' longifolium'' E.S.Marshall
+* ''Epilobium parviflorum ''f.'' mollissimum'' (Welw. ex H.Lév.) Samp.
+* ''Epilobium parviflorum ''f.'' trifoliatum'' E.S.Marshall
+* ''Epilobium parviflorum ''f.'' umbrosum'' E.S.Marshall
+* ''Epilobium parviflorum ''var.'' intermedium'' (Mérat) St.-Lag.
+* ''Epilobium parviflorum ''var.'' intermedium'' Rouy & E.G.Camus
+* ''Epilobium parviflorum ''var.'' lanuginosum'' Sennen
+* ''Epilobium parviflorum ''var.'' lusitanicum'' Samp.
+* ''Epilobium parviflorum ''var.'' maritimum'' Rouy & E.G.Camus
+* ''Epilobium parviflorum ''var.'' menezesii'' H.Lév.
+* ''Epilobium parviflorum ''var.'' menthoides'' (Boiss. & Heldr.) Boiss.
+* ''Epilobium parviflorum ''var.'' mollissimum'' Welw. ex H.Lév.
+* ''Epilobium parviflorum ''var.'' numidicum'' Batt.
+* ''Epilobium parviflorum ''var.'' parvifolium'' Merino
+* ''Epilobium parviflorum ''var.'' subglabrum'' W.D.J.Koch
+* ''Epilobium parviflorum ''var.'' verticillatum'' (Coss. & Germ.) Rouy & E.G.Camus
+* ''Epilobium parviflorum ''var.'' vestitum'' Benth. ex C.B.Clarke
+* ''Epilobium parviflorum subvar. verticillatum'' Coss. & Germ.
+* ''Epilobium pubescens'' Roth
+* ''Epilobium rivulare'' Hegetschw.
+* ''Epilobium tauschii'' Knaf ex Hausskn.
+* ''Epilobium umbrosum'' Dumort.
+* ''Epilobium uralense'' Hausskn.
+* ''Epilobium villosum'' Curtis
+}}
+
+== Liens externes ==
+{{Autres projets
+| commons titre2=Catégorie Epilobium parviflorum
+| commons2=Category:Epilobium parviflorum
+| commons=Epilobium parviflorum
+| species=Epilobium parviflorum
+}}
+* {{CatalogueofLife | 6FSKY | ''Epilobium parviflorum'' Schreb. | consulté le=22 août 2026 }}
+* {{EFloras | 1 | 200015087 | Epilobium parviflorum | consulté le=22 août 2026 }}
+* {{EFloras | 2 | 200015087 | Epilobium parviflorum | consulté le=22 août 2026 }}
+* {{EFloras | 5 | 200015087 | Epilobium parviflorum | consulté le=22 août 2026 }}
+* {{EOL | 583000 | ''Epilobium parviflorum'' Schreb. | consulté le=22 août 2026 }}
+* {{GBIF | 6FSKY | ''Epilobium parviflorum'' Schreb. | consulté le=22 août 2026 }}
+* {{GRIN espèce|27836|''Epilobium parviflorum'' Schreb.| consulté le=22 août 2026}}
+* {{INPN | 96229 | ''Epilobium parviflorum'' Schreb., 1771 | consulté le=22 août 2026 }}
+* {{IPNI | 612163-1 | Epilobium parviflorum | Schreb. | consulté le=22 août 2026 }}
+* {{IRMNG | 10197653 | ''Epilobium parviflorum'' Schreb. | consulté le=22 août 2026 }}
+* {{ITIS | 27321 | ''Epilobium parviflorum'' Schreb. | consulté le=22 août 2026 }}
+* {{MNHN | espèce | epilobium/parviflorum | ''Epilobium parviflorum'' | consulté le=22 août 2026}}
+* {{NCBI | 644182 | ''Epilobium parviflorum'' | consulté le=22 août 2026 }}
+* {{OEPP | EPIPF | ''Epilobium parviflorum'' | Schreber | consulté le=22 août 2026 }}
+* {{POWO | 612163-1 | Epilobium parviflorum | Schreb. | consulté le=22 août 2026 }}
+* {{Tela-métro | 24259 | ''Epilobium parviflorum'' Schreb. 1771 | consulté le=22 août 2026 }}
+* {{Tropicos | 23200151 | Epilobium parviflorum | Schreb. | consulté le=22 août 2026 }}
+* {{UICN|164450|''Epilobium parviflorum'' Schreb. 1771| consulté le=22 août 2026}}
+* {{VASCAN | 6789 | ''Epilobium parviflorum'' Schreber | consulté le=22 août 2026 }}
+
+== Notes et références ==
+{{Références}}
+
+{{Portail|botanique}}
+
+[[Catégorie:Epilobium|parviflorum]]
+[[Catégorie:Espèce d'Onagraceae (nom scientifique)]]
+[[Catégorie:Espèce de plantes herbacées (nom scientifique)]]
+[[Catégorie:Dicotylédone d'Afrique]]
+[[Catégorie:Dicotylédone d'Amérique du Nord]]
+[[Catégorie:Dicotylédone d'Asie]]
+[[Catégorie:Dicotylédone d'Inde]]
+[[Catégorie:Dicotylédone d'Europe]]
+[[Catégorie:Plante de Suède]]
+[[Catégorie:Plante médicinale]]

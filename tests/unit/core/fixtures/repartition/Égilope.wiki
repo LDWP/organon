@@ -1,0 +1,154 @@
+{{sous-titre/Taxon|ns1=Aegilops|nv1=Égilops}}
+{{Taxobox début | végétal | ''Aegilops'' | Hyparrhenia-hirta-heads.jpg | ''[[Aegilops speltoides]]''. | classification=inpn}}
+{{Taxobox | sous-règne | Viridaeplantae }}
+{{Taxobox | infra-règne | Streptophyta }}
+{{Taxobox | classe | Equisetopsida }}
+{{Taxobox | clade | Tracheophyta }}
+{{Taxobox | clade | Spermatophyta }}
+{{Taxobox | sous-classe | Magnoliidae }}
+{{Taxobox | super-ordre | Lilianae }}
+{{Taxobox | clade | Commelinids }}
+{{Taxobox | ordre | Poales }}
+{{Taxobox | famille | Poaceae }}
+{{Taxobox | sous-famille | Pooideae }}
+{{Taxobox | super-tribu | Triticodae }}
+{{Taxobox | tribu | Triticeae }}
+{{Taxobox taxon | végétal | genre | Aegilops | [[Carl von Linné|L.]], [[1753]] }}
+{{Taxobox fin}}
+
+'''''Aegilops''''', l’'''Égilope''' ou '''Égilops''', est un [[genre (biologie)|genre]] de [[plante]]s [[monocotylédone]]s de la  [[Famille (biologie)|famille]] des ''[[Poaceae]]'', [[Sous-famille (biologie)|sous-famille]] des ''[[Pooideae]]'', originaire du [[bassin méditerranéen]] et d'Asie occidentale.
+Le genre comprend une vingtaine d'espèces. Ce sont des [[plante herbacée|plantes herbacées]] [[Plante annuelle|annuelles]], rhizomateuses ou [[Cespiteux|cespiteuses]], atteignant de 15 à 80 cm de haut.
+
+Dans les années 1950, la conscience croissante de la similarité génétique (y inclus certains génomes partagés) des égilopes sauvages conduisit certains botanistes à  fusionner ''Aegilops'' et ''[[Triticum]]'' en un genre unique, ''Triticum''. Cette approche est parfois encore suivie (par des généticiens principalement), mais n’a pas été largement adoptée par les taxonomistes. Les ''Aegilops'' sont morphologiquement très distincts des ''Triticum'', avec des [[glume]]s arrondies plutôt que carénées.
+
+== Étymologie ==
+Le nom générique « ''Aegilops'' » vient du grec αἰγιλώπια – ''aigilôpia'' –, qui désigne une fistule lacrymale. Le mot est formé de αἴξ – ''aix –'', « chèvre » et ὤψ – ''ôps'' –, « vue, visage ». Dioscoride (4.137) précise que « cette plante sert à soigner les fistules lacrymales ».
+
+== Hybridation ==
+Les espèces du genre ''Aegilops'' peuvent s'hybrider avec des espèces des genres  ''[[Triticum]]'' (''× Aegilotriticum'' Wagner ex Tschermak), ''[[Secale]]'' (''× Aegilosecale'' Ciferri & Giacom.), ''[[Dasypyrum]]'', ''[[Elytrigia]]''<ref name="Watson">{{Lien web |langue=en |auteurs=L. Watson & M. J. Dallwitz |titre=''Aegilops'' L. |url=http://delta-intkey.com/grass/www/aegilops.htm |site=The grass genera of the world |consulté le=31 août 2026}}.</ref>.
+
+Le genre ''Aegilops'' est important dans l’évolution du [[blé]] pour son rôle dans deux événements d’hybridation importants. L’[[engrain]] sauvage (''[[Triticum dicoccoides]]'' et ''[[Triticum araraticum]]'') est le résultat de l’hybridation d’un blé sauvage, ''[[Triticum urartu]]'', et d’une égilope encore non identifiée, probablement similaire à ''[[Aegilops speltoides]]''. Le genre ''Aegilops'' a également été utilisé pour transférer par des techniques de [[transgénèse]] et d'[[hybride|hybridation]], des fragments chromosomiques de résistance à plusieurs maladies, dont la [[rouille brune du blé]] et l'[[Blumeria graminis|oïdium du blé]], au [[blé tendre]] pour créer la variété de blé tendre d'hiver « Renan »<ref>[http://www.biotechnologies-vegetales.com/ckfinder/userfiles/files/Fiches/FicheInfo06-Ble-Renan-un-OGM-ignore-tres-utilise-par-l-agriculture-bio.pdf "Blé Renan : un OGM ignoré, très utilisé par l'agriculture biologique"], André Gallais, Association Françaises des Biotechnologies Végétales</ref>{{,}}<ref>{{Lien web |titre=Les NBT et l'agriculture biologique |url=http://www.info-nbt.fr/les-nbt-et-l-agriculture-biologique.html |site=Info-NBT |date=25-05-2026 |consulté le=31 août 2026}}.</ref>{{,}}<ref>[http://70ans.inra.fr/lancement-du-ble-renan "Lancement du blé "Renan""], 70 ans de l'INRA</ref>{{,}}<ref>[http://www.itab.asso.fr/downloads/fiches-ble/renan.pdf Fiche blé renan], ITAB</ref>.
+
+== Répartition ==
+{{WGSRPD|certain=AFG,ALB,ALG,BAL,BUL,CHN,CHS,CHX,CNY,COR,CVI,CYP,CZE,EAI,EGY,FRA,GRC,GST,HUN,IRN,IRQ,ITA,JAP,KAZ,KGZ,KRI,KRY,KUW,LBS,LBY,MOR,NCS,OMA,PAK,PAL,POR,ROM,RUS,RUW,SAR,SAU,SIC,SIN,SPA,TCS,TKM,TUE,TUN,TUR,TZK,UKR,UZB,WHM,YUG|introduit=ALA,ARI,ARK,AUT,BLT,CAL,COL,GER,GRB,IDA,ILL,INI,IOW,KAN,KOR,KTY,LOU,MIC,MNT,MRY,MSO,MXE,NDA,NEB,NEV,NWM,NWY,OHI,OKL,ORE,PEN,POL,PRM,RUC,SDA,TEN,TEX,UTA,VRG,WAS,WVA,WYO|source=[[Plants of the World Online|POWO]]{{Bioref|powo|20 août 2026|ref}}}}
+C'est un genre de l'[[Ancien monde]]. Certaines espèces se sont [[Espèce naturalisée|naturalisées]] dans le [[Nouveau monde|Nouveau]]{{Bioref|powo|20 août 2026|ref}}.
+
+== Taxinomie ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Aegilops'' L., 1753{{Bioref|TAXREF|20 août 2026|ref}}.
+
+Ce taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Égilope{{Bioref|INPN|20 août 2026|ref}}{{,}}{{Bioref|EOL|20 août 2026|ref}}{{,}}{{Bioref|Tela-métro|20 août 2026|ref}}{{,}}{{Bioref|GBIF|20 août 2026|ref}}, Égilops{{Bioref|INPN|20 août 2026|ref}}{{,}}{{Bioref|GBIF|20 août 2026|ref}}.
+
+=== Synonymes ===
+''Aegilops'' a pour [[Synonyme (botanique)|synonymes]]{{Bioref|POWO|20 août 2026|ref}} :
+* ''Aegilemma'' Á.Löve
+* ''Aegilonearum'' Á.Löve
+* ''Aegilopodes'' Á.Löve
+* ''Amblyopyrum'' Eig
+* ''Chennapyrum'' Á.Löve
+* ''Comopyrum'' (Jaub. & Spach) Á.Löve
+* ''Cylindropyrum'' (Jaub. & Spach) Á.Löve
+* ''Gastropyrum'' (Jaub. & Spach) Á.Löve
+* ''Kiharapyrum'' Á.Löve
+* ''Orrhopygium'' Á.Löve
+* ''Patropyrum'' Á.Löve
+* ''Perlaria'' Heist. ex Fabr.
+* ''Sitopsis'' (Jaub. & Spach) Á.Löve
+
+=== Liste des espèces ===
+Selon {{Bioref|gbif|20 août 2026}} et {{Bioref|powo|20 août 2026}}, le genre ''Aegilops'' comprend 24 espèces :
+* ''[[Aegilops bicornis]]'' (Forssk.) Jaub. & Spach
+* ''[[Aegilops biuncialis]]'' Vis.
+* ''[[Aegilops caudata]]'' L.
+* ''[[Aegilops columnaris]]'' Zhuk.
+* ''[[Aegilops comosa]]'' Sm.
+* ''[[Aegilops crassa]]'' Boiss. ex Hohen.
+* ''[[Aegilops cylindrica]]'' Host
+* ''[[Aegilops geniculata]]'' Roth
+* ''[[Aegilops juvenalis]]'' (Thell.) Eig
+* ''[[Aegilops kotschyi]]'' Boiss.
+* ''[[Aegilops longissima]]'' Schweinf. & Muschl.
+* ''[[Aegilops mutica]]'' Boiss.
+* ''[[Aegilops neglecta]]'' Req. ex Bertol.
+* ''[[Aegilops peregrina]]'' (Hack.) Maire & Weiller
+* ''[[Aegilops searsii]]'' Feldman & Kislev ex K.Hammer
+* ''[[Aegilops sharonensis]]'' Eig
+* ''[[Aegilops speltoides]]'' Tausch
+* ''[[Aegilops tauschii]]'' Coss.
+* ''[[Aegilops triuncialis]]'' L.
+* ''[[Aegilops umbellulata]]'' Zhuk.
+* ''[[Aegilops uniaristata]]'' Vis.
+* ''[[Aegilops vavilovii]]'' (Zhuk.) Chennav.
+* ''[[Aegilops ventricosa]]'' Tausch
+* ''[[Aegilops ×insulae-cypri]]'' H.Scholz
+
+Selon {{Bioref|GRIN|20 août 2026}}, 21 espèces se répartissent en cinq [[Section (botanique)|sections]]:
+;''Aegilops'' L. sect. ''Aegilops''
+* ''[[Aegilops biuncialis]]'' Vis.
+* ''[[Aegilops columnaris]]'' Zhuk.
+* ''[[Aegilops geniculata]]'' Roth
+* ''[[Aegilops kotschyi]]'' Boiss.
+* ''[[Aegilops neglecta]]'' Req. ex Bertol.
+* ''[[Aegilops peregrina]]'' (Hack.) Maire & Weiller
+* ''[[Aegilops triuncialis]]'' L.
+* ''[[Aegilops umbellulata]]'' Zhuk.
+; ''Aegilops'' L. sect. ''Comopyrum''
+* ''[[Aegilops comosa]]'' Sm.
+* ''[[Aegilops uniaristata]]'' Vis.
+;''Aegilops'' L. sect. ''Cylindropyrum''
+* ''[[Aegilops cylindrica]]'' Host 
+;''Aegilops'' L. sect. ''Sitopsis''
+* ''[[Aegilops bicornis]]'' (Forssk.) Jaub. & Spach
+* ''[[Aegilops longissima]]'' Schweinf. & Muschl.
+* ''[[Aegilops searsii]]'' Feldman & Kislev ex K.Hammer
+* ''[[Aegilops sharonensis]]'' Eig
+* ''[[Aegilops speltoides]]'' Tausch
+;''Aegilops'' L. sect. ''Vertebrata''
+* ''[[Aegilops caudata]]'' L.
+* ''[[Aegilops crassa]]'' Boiss.
+* ''[[Aegilops juvenalis]]'' (Thell.) Eig
+* ''[[Aegilops tauschii]]'' Coss.
+* ''[[Aegilops vavilovii]]'' (Zhuk.) Chennav.
+
+== Importance économique ==
+Sur le plan économique, plusieurs espèces d'''Aegilops'' sont d'importantes [[Adventice|mauvaises herbes]] des cultures, notamment ''[[Aegilops cylindrica]]'', ''[[Aegilops geniculata]]'', ''[[Aegilops triuncialis]]''.
+Certaines espèces sont des plantes fourragères utiles dans les pâturages,  par exemple ''[[Aegilops cylindrica]]'', ''[[Aegilops kotschyi]]'', ''[[Aegilops triuncialis]]''<ref name="Watson"/>.
+
+== Notes et références ==
+{{Références}}
+
+== Voir aussi ==
+=== Articles connexes ===
+* [[Histoire de la culture des céréales]]
+
+=== Liens externes ===
+{{Autres projets
+| commons titre=Catégorie Aegilops
+| commons=Category:Aegilops
+| species=Aegilops
+}}
+* {{CatalogueofLife | 8VTBX | ''Aegilops'' L. | consulté le=20 août 2026 }}
+* {{EFloras | 2 | 100654 | Aegilops | consulté le=20 août 2026 }}
+* {{EFloras | 5 | 100654 | Aegilops | consulté le=20 août 2026 }}
+* {{EOL | 108016 | ''Aegilops'' | consulté le=20 août 2026 }}
+* {{GBIF | 8VTBX | ''Aegilops'' L. | consulté le=20 août 2026 }}
+* {{GRIN genre|225|''Aegilops'' L.| consulté le=20 août 2026}}
+* {{INPN | 188834 | ''Aegilops'' L., 1753 | consulté le=20 août 2026 }}
+* {{IPNI | 17369-1 | Aegilops | L. | consulté le=20 août 2026 }}
+* {{IRMNG | 1289140| ''Aegilops'' Linnaeus, 1753 | consulté le=20 août 2026 }}
+* {{ITIS | 182534 | ''Aegilops'' L. | consulté le=20 août 2026 }}
+* {{MNHN | genre | aegilops | ''Aegilops'' | consulté le=20 août 2026}}
+* {{NCBI | 4480 | ''Aegilops'' | consulté le=20 août 2026 }}
+* {{OEPP | 1AEGG | ''Aegilops'' | Linnaeus | consulté le=20 août 2026 }}
+* {{POWO | 17369-1 | Aegilops | L. | consulté le=20 août 2026 }}
+* {{TPDB | 16199 | ''Aegilops'' Linnaeus 1753 | consulté le=20 août 2026}}
+* {{Taxonomicon | 9791 | ''Aegilops'' C. Linnaeus, 1753 | consulté le=20 août 2026 }}
+* {{Tela-métro | 85811 | ''Aegilops'' L. 1753 | consulté le=20 août 2026 }}
+* {{Tropicos | 40033200 | Aegilops | L. | consulté le=20 août 2026 }}
+* {{WFO | 4000000750| Aegilops | L. | consulté le=20 août 2026 }}
+
+{{Portail|Poaceae|agriculture}}
+
+{{CLEDETRI:Egilope}}
+[[Catégorie:Flore (nom vernaculaire)]]
+[[Catégorie:Genre de Poaceae (nom vernaculaire)]]
+[[Catégorie:Pooideae]]

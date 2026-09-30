@@ -1,0 +1,43 @@
+{{Taxobox début | animal | Ammonitina | Pleuroceras solare, Little Switzerland, Bavaria, Germany.jpg | ''Pleuroceras solare'' ([[Pliensbachien]] supérieur, Jurassique inférieur). Spécimen pyritique récolté en Haute Franconie (Allemagne). Diamètre : 3,2 cm [[famille (biologie)|famille]] des [[Amaltheidae]] (sous-ordre des '''Ammonitina''') }}
+{{Taxobox | embranchement | Mollusca }}
+{{Taxobox | classe | Cephalopoda }}
+{{Taxobox | sous-classe | Ammonoidea | {{éteint}} Ammonoidea }}
+{{Taxobox | ordre | Ammonitida | {{éteint}} Ammonitida }}
+{{Taxobox taxon | animal | sous-ordre | Ammonitina | [[Alpheus Hyatt Verrill|Hyatt]], 1889 | éteint=oui }}
+{{Taxobox fin}}
+
+Les '''Ammonitina''' forme un [[sous-ordre (biologie)|sous-ordre]] de [[mollusque]]s [[céphalopode]]s marins aujourd’hui éteints.
+
+Le sous-ordre des Ammonitina se rattache à l’[[ordre (biologie)|ordre]] des [[Ammonitida]] et à [[sous-classe (biologie)|sous-classe]] des [[Ammonoidea]].
+
+== Taxonomie ==
+Le terme « ammonite », qui n’a pas de valeur taxonomique, désigne généralement parmi les [[Ammonoidea|ammonoïdés]], les Ammonitida, animaux  d’âge essentiellement jurassique et crétacé. Parmi ces dernières, les Ammonitina sont les plus utilisées en [[biostratigraphie]].
+
+=== Liste des super-familles et familles ===
+* sous-ordre Ammonitina
+** super-famille [[Acanthoceratoidea]] ou [[Acanthocerataceae]]
+*** famille [[Acanthoceratidae]]
+*** famille [[Brancoceratidae]]
+*** famille [[Coilopoceratidae]]
+*** famille [[Collignoniceratidae]]
+*** famille [[Flickiidae]]
+*** famille [[Forbesiceratidae]]
+*** famille [[Leymeriellidae]]
+*** famille [[Libycoceratidae]]
+*** famille [[Lyelliceratidae]]
+*** famille [[Pseudotissotiidae]]
+*** famille [[Sphenodiscidae]]
+*** famille [[Vascoceratidae]]
+** super-famille [[Endemoceratoidea]]
+*** famille [[Endemoceratidae]]
+*** famille [[Neocomitidae]]
+*** famille [[Pulchelliidae]]
+** super-famille [[Eoderoceratoidea]]
+*** famille [[Amaltheidae]]
+*** famille [[Dactylioceratidae]]
+*** famille [[Eoderoceratidae]]
+*** famille [[Liparoceratidae]]
+*** famille [[Polymorphitidae]]
+** super-famille [[Hammatoceratoidea]]
+*** famille [[Hammatoceratidae]]
+*** famille [[Erycitidae]]

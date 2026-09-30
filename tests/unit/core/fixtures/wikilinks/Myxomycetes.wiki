@@ -1,0 +1,127 @@
+{{sous-titre/Taxon| ns1=Myxomycetes}}
+{{Sources à lier|date=septembre 2020}}
+
+{{Taxobox début | champignon | ''Myxomycetes'' | Fuligo septica by Maja Dumat (cropped).jpg| [[Fleur de tan]], [[saprotrophe]] [[lignicole]] se développant sur le [[Champignon lignivore|bois en décomposition]] après de fortes pluies. |classification=mycobank|règne=cacher }}
+{{Taxobox | règne | Protozoa }}
+{{Taxobox | division | Myxomycota }}
+{{Taxobox taxon | champignon | classe | Myxomycetes | [[Heinrich Georg Winter|G.Winter]], [[1880]] }}
+{{Taxobox fin}}
+
+[[Fichier:Hundipiim.jpg|vignette|[[Aethalium|Corps fructifère]] (mature et immature) de la [[Lycogala epidendrum|Lycogale des arbres]] sur du bois mort.]]
+Les '''Myxomycètes''' ('''''Myxomycetes''''') sont une [[classe (biologie)|classe]] d'[[Eukaryota|eucaryotes]] [[organisme unicellulaire|unicellulaires]], caractérisés par la formation d'un [[plasmode]] (vrai ou [[pseudoplasmode]]). Ils étaient initialement réunis aux [[champignon]]s, car leurs cycles de vie comportent une étape de [[sporulation]] végétative macroscopique. Ce regroupement s'est avéré [[polyphylétique]], car formé de plusieurs lignées indépendantes de [[protiste]]s, aucune d'elle n'étant liée aux « champignons vrais » du règne des ''[[Fungi]]''.
+
+Leur nom est formé de « myxo » qui signifie gélatineux ou gluant<ref>Du grec ancien <bdi>μύξα</bdi>, ''mýxa'' (« mucus »)</ref>, en référence à la texture du plasmode. Ils sont également appelés « champignons [[Amibe|amiboïdes]] » ou parfois « champignons-animaux ». En anglais, on les connaît sous le nom de ''slime molds'' (« moisissures visqueuses »).
+
+Le cœur du groupe historique (= Myxomycètes au sens strict ou [[Mycetozoa]]) a été intégré à l'embranchement (ou supergroupe) des [[Amoebozoa]], qui comprend aussi de nombreuses [[amibe]]s. On trouve d'autres myxomycètes parmi les [[clade]]s des [[Discoba]], des [[Stramenopiles]] et des [[Rhizaria]]. Ils restent cependant traditionnellement étudiés par les [[Mycologie|mycologues]], bien qu'il s'agisse plutôt d'« amibes collectives »<ref>Voir « Cellules différenciées et spécialisées / Dépassement de l'état cellulaire », p. 73, dans Gunther Vogel et Hartmut Angermann, ''Atlas de la Biologie'', « Encyclopédies d'aujourd'hui », [[La Pochothèque]], [[Le Livre de poche]], [[Librairie Générale Française]], 1994, xiv + 641 p. {{ISBN|2-253-06451-3}}. [Édition originale {{de}} ''DTV Atlas zur Biologie'', {{langue|de|texte=Deutscher Taschenbuch Verlag}}, [[Munich]], 1984 {{OCLC|605921149}}.]</ref>.
+
+[[Fichier:Haeckel Mycetozoa.jpg|thumb|''Mycetozoa'' ; planche d'[[Ernst Haeckel]] (1904), in ''{{langue|de|texte=Kunstformen der Natur}}'' (les formes artistiques de la nature).]]
+
+== Description et habitat ==
+
+Le radical « myxo » fait référence à la formation du [[plasmode]], un des stades de développement, caractérisé par une masse gélatineuse. Cette masse correspond à une seule [[Cellule (biologie)|cellule]] non segmentée, dans laquelle baignent de nombreux [[Noyau (biologie)|noyaux]].
+
+Ce plasmode n'est pas enfermé dans une [[paroi cellulaire|paroi]] rigide ; il peut donc être animé de mouvements convulsifs et se déplacer de quelques centimètres par heure. Cette forme se développe en fonction des conditions climatiques favorables. En particulier, elle nécessite une [[hygrométrie]] importante. Quand les conditions sont défavorables, le plasmode se rétracte et peut se replier dans les anfractuosités de son substrat.
+
+Le plasmode se nourrit de [[bactéries]] et de [[champignon]]s, pouvant même engloutir un [[sporophore]] entier.
+
+Les myxomycètes se rencontrent sur différents substrats toujours végétaux : bois morts, litière de feuilles et brindilles, [[compost]], [[mousse (botanique)|mousses]]{{etc.}}
+
+== Reproduction des myxomycètes ==
+[[Fichier:Lycoperdon_echinatum_107915.jpg|thumb|Spores au milieu de capillitium.]]
+[[Fichier:Types sporanges Ptéridophytes.PNG|thumb|[[Sporange]] (spores enfermés dans une enveloppe).]]
+Lors de la reproduction, ils prennent une forme plus proche du champignon avec un stipe (pied), pas toujours présent, qui porte les [[spore]]s emprisonnées dans un réseau de [[capillitium]] (fins filaments) qui peut être enfermé dans le [[Gleba (mycologie)#Péridium|peridium]].
+
+La reproduction se fait par [[spore]]s. Quand un myxomycète va former ses spores, la masse protoplasmique s'élève sur son support et se renfle en certains points pour former des masses sphériques, ovoïdes ou variables, sessiles ou munies d'un pédicelle plus ou moins court, le [[sporocarpe]], très semblables aux [[sporange]]s. Les sporocarpes peuvent confluer en des masses globuleuses (''aethalium'') contiguës ou dispersées, assez volumineuses (quelques mm), de teinte variable<ref>{{ouvrage|auteur=Maurice Chassain|titre=Myxomycètes|éditeur=Lechevalier|date=1979|passage=9}}</ref>.
+* Chacun de ces sporanges donne naissance, par multiplication des noyaux qu'il contient et par apparition entre eux de membranes cellulosiques, à un grand nombre de spores qui deviennent sphériques, tandis qu'une partie du protoplasme est employée à la formation d'un réseau de filaments stériles et résistants, le capillitium.
+* À maturité, le sporange s'ouvre sous la pression du capillitium, qui, en se déployant au dehors, favorise la dissémination des spores, renfermées dans ses mailles. La spore germe en laissant échapper le protoplasme qu'elle contient. Cette petite masse se munit d'un cil vibratile au moyen duquel elle se déplace en utilisant aussi des mouvements amiboïdes : elle est improprement nommée zoospore puisque sa forme est essentiellement variable.
+* Quand la zoospore perd son cil, elle devient une myxamibe, s'accroît aux dépens du milieu ambiant et se divise plusieurs fois de suite.
+* Si les conditions sont défavorables, la myxamibe s'enveloppe alors d'une membrane résistante et forme un kyste.
+* Si le développement n'est pas entravé, les myxamibes se rapprochent et fusionnent en formant un symplaste.
+* Plusieurs symplastes en se réunissant constituent le plasmode, capable de donner des sporanges.
+* Si l'enkystement se produit à ce moment, le kyste prend le nom de [[sclérote]].
+* Les spores produites sont le plus souvent lisses, parfois hérissées d'aspérités piliformes, ovales ou sphériques. Le plasmode est souvent incrusté de carbonate de calcium granuleux ou cristallisé. Au cours de sa locomotion amiboïde, il englobe souvent des morceaux de bois mort et autres débris.
+
+La taille de la forme reproductive est de l'ordre du millimètre avec des spores de taille relativement importante, de l'ordre de {{unité|10|micromètres}}.
+
+Les spores produisent des cellules à n [[chromosome]]s munies ou non de [[flagelle]]s (comme les [[protozoaire]]s) qui en s'unissant formeront une cellule à 2n chromosomes : la forme [[plasmode]].
+
+Les myxomycètes sont consommés par les [[insecte]]s comme les [[psoque]]s, certaines [[moisissure]]s…
+
+L'étude des myxomycètes a été dynamisée au début du {{s-|XX}} par [[Charles Meylan]], qui en a décrit de nombreuses [[espèce]]s, sous-espèces ou variétés nouvelles. Leur étude nécessite l'emploi d'une loupe grossissant {{unité|10|fois}} au minimum et d'autres appareils optiques plus sophistiqués.
+
+Environ {{unité|1000|[[espèce]]s}} de myxomycètes sont actuellement dénombrées, réparties dans une soixantaine de genres.
+
+== Raisons de leur exclusion du règne ''Fungi'' ==
+{{Article détaillé|Taxinomie et systématique des champignons#Champignons amiboïdes{{!}}Taxinomie et systématique des champignons : Champignons amiboïdes}}
+Parce qu'ils produisent des spores et possèdent une membrane de cellulose autour de leurs spores, les myxomycètes ont été longtemps considérés comme des [[Cryptogame|végétaux cryptogames]], puis des champignons<ref>Ils furent pendant un temps cachés parmi les champignons, alors encore drapés dans les mystères de cette "Cryptogamie" qui échappait inexorablement aux botanistes.</ref>.
+
+Les myxomycètes ne sont pas des ''[[Fungi]]'' car :
+* Ils ne possèdent pas de [[mycélium]].
+* Ils possèdent un [[plasmode]] capable de se déplacer lentement vers un substrat nutritif, et assurent leur nutrition par [[phagocytose]], qui est un mode de nutrition par ingestion, ce qui les exclut également des ''[[Fungi]]'' dont on a recentré le mode de nutrition sur l'absorption exclusive. Ce mode de déplacement et de nutrition leur vaut d'être considérés abusivement comme des organismes mi-champignons mi-animaux<ref>{{ouvrage|auteur=Laurent Tillon|titre=Et si on écoutait la nature ?|éditeur=Payot|date=2018|passage=87}}</ref>.
+* Ils ne possèdent pas les caractères propres au règne fongique et ne sont donc plus des champignons au sens strict ; ils ne peuvent pas non plus s'intégrer dans l'un des quatre autres règnes, à l'exception des ''Mycetozoa''. Néanmoins, {{qui|certains}} les classent dans le règne des Protistes (Protoctista plutôt que ''Protozoa'').
+
+Ils continuent toutefois à être étudiés par des [[mycologie|mycologues]].
+
+== Classification ==
+Les myxomycètes étaient divisés en plusieurs groupes :
+* les myxomycètes au sens strict, caractérisés par un stade [[Plasmode|plasmodial]] et des fructifications définies ;
+* les acrasiomycètes, qui forment des pseudoplasmodes par agrégation de cellules ;
+* les plasmodiophoromycètes, des phytopharasites ;
+* les labyrinthulomycètes, à plasmodes en réseaux.
+
+== Étude en laboratoire ==
+[[Fichier:Fuligo septica bl1.JPG|vignette|Fuglio septica, une espèce modèle utilisé pour les études de laboratoire sur les Myxomycètes]]
+Toutes les espèces de Myxomycètes ne sont pas étudiées en laboratoire : certaines sont impossibles à élever et d'autres n'ont pas de propriétés qui les rendraient intéressantes à utiliser. Les deux espèces les plus étudiées sont ''[[Physarum polycephalum]]'' (ou "blob") et ''[[Fuligo septica]]''. Elles sont employées en [[biologie]] pour faire de la [[recherche fondamentale]] sur la cellule et en [[éthologie]] pour faire de la recherche sur les comportements des êtres vivants primitifs.
+
+L'absence de prédateurs les rend immortels en laboratoire. Le plus gros spécimen de ''Physarum polycephalum'' mesurait {{unité|10|mètres}} carrés{{Référence nécessaire|date=avril 2021}}.
+
+Le CNRS a aussi étudié leurs différents « caractères », dans une expérience concernant entre autres les espèces américaine, japonaise et australienne. Ont ainsi été étudiées leurs techniques d'exploration (pour trouver à manger) et leur façon de réfléchir. Le spécimen américain est doté d'une grande précision grâce au fait qu'il ne va pas trop vite, mais a beaucoup de mal à apprendre. Le spécimen japonais est très furtif et de ce fait, une fois sur deux, il se trompe ; les scientifiques pensent que cette technique est due au fait qu'ils sont beaucoup dans les forêts à cause de l'humidité et donc la nourriture se fait très rare, ils ne prennent donc pas le temps de réfléchir. Le spécimen australien est en revanche extrêmement lent ; cela est dû au fait qu'il « réfléchit » avant, car sa nourriture est extrêmement abondante, et n'a donc pas la nécessité de se précipiter dessus<ref>{{Article |langue=fr |titre=Le blob, nouvelle star du zoo de Paris |url=https://lejournal.cnrs.fr/articles/le-blob-nouvelle-star-du-zoo-de-paris |périodique=CNRS Le journal |date=14 octobre 2019 |prénom=Muriel |nom=Florin |consulté le=2021-01-29}}.</ref>.
+
+En {{date|octobre 2021}}, le CNRS (CNRS/Université Toulouse III - Paul Sabatier) lance un « projet de science participative ouvert à 10 000 apprentis scientifiques :  Derrière le blob, la recherche », afin d'explorer la cognition animale et « les effets du changement climatique sur le blob »<ref>{{Lien web |titre=« Derrière le blob, la recherche », une expérience de science participative du CNRS |url=https://www.cnrs.fr/fr/derriere-le-blob-la-recherche-une-experience-de-science-participative-du-cnrs |site=CNRS |consulté le=23 août 2026}}.</ref>.
+
+== Galerie photo ==
+<gallery mode="packed">
+Image:Myxomycètes sans doute du Genre Trichia 1.jpg|Myxomycète sans doute du genre ''Trichia'', sur un polypore.
+Image:Badhamia utricularis mature.jpg|Myxomycète ''[[Badhamia utricularis]].''
+Image:Myxomycete.jpg|Myxomycète sur un morceau de bois.
+Image:Trichia decipiens.jpg|''Trichia decipiens (Pers.) Macbr.''
+Image:Small orange ball slime mold 01.jpg|''[[Lycogala epidendrum]]'' au plasmode d'un beau rose « dentifrice » avant de devenir brun terne et poudreux à maturité.|alt=Lycogala epidendrum au plasmode d'un beau rose « dentifrice » avant de devenir brun terne et poudreux à maturité
+File:Schleimpilz Urwald Sababurg.jpg|''Trichia'' (sur du bois mort) ?
+File:Physarum psittacinum124.jpg|''[[Physarum psittacinum]].''
+</gallery>
+
+== Culture ==
+{{Autre|une liste des œuvres culturelles inspirées des myxomycètes|Blob#Culture et société{{!}}blob : culture et société}}
+* Dans le jeu vidéo ''[[Monster Hunter 3 Ultimate]]'', il est dit que le Brachydios utilise un myxomycète pour produire des explosions<ref>Voir la description associée, [http://fr.mogapedia.wikia.com/wiki/Brachydios#Description_en_jeu sur cette page.]</ref>.
+* Dans le manga ''[[Nausicaä de la vallée du vent (manga)|Nausicaa de la vallée du vent]]'' de [[Hayao Miyazaki]], les scientifiques de l'empire tolmèque créent un myxomycète géant pour une opération militaire.
+* ''Music for myxomycètes'', nom donné à un album du groupe (musique) Inoyama Land, composé de Makoto Inoue et Yasushi Yamashita. Sorti le {{date|5 août 1998}}, label Transonic records, style ambient, électronique.
+* Depuis 2016, on évoque parfois les myxomycètes sous le nom de « ''blob'' » en référence au film ''[[Le Blob]]'' dans lequel un organisme [[Extraterrestre dans la fiction|alien]] ressemblant à une gelée dévore tout sur son passage<ref>[https://www.francetvinfo.fr/sciences/decouvrez-l-histoire-du-blob-cet-organisme-unicellulaire-qui-ressemble-a-une-omelette_2410857.html Voir sur ''francetvinfo.fr''.]</ref>. Ce surnom, devenu courant dans la culture populaire, a été introduit par la chercheuse [[Audrey Dussutour]] qui a découvert les capacités<ref>{{Article|auteur1=Nathaniel Herzberg|titre=Le blob, cet étrange génie visqueux, ni plante, ni animal, ni champignon|périodique=[[Le Monde]]|date=19-06-2017|pages=|issn=|lire en ligne=https://www.lemonde.fr/sciences/article/2017/06/19/le-blob-cet-etrange-genie-visqueux_5147465_1650684.html}}.</ref> de croissance et d'apprentissage<ref>[http://www.futura-sciences.com/planete/actualites/botanique-blob-physarum-cellule-geante-cerveau-apprend-62597/ Voir sur ''futura-sciences.com''.]</ref> de ''[[Physarum polycephalum]]'', une espèce de myxomycètes. Elle en a fait le héros d'un livre paru aux [[éditions des Équateurs]], ''Tout ce que vous avez toujours voulu savoir sur le blob sans avoir jamais osé le demander'' ; il a reçu le prix Science pour tous<ref>[http://editionsdesequateurs.fr/aParaitre/oo/ToutCeQueVousAvezToujoursVoulu Voir sur ''editionsdesequateurs.fr''.]</ref>.
+
+== Notes et références ==
+{{Références}}
+
+== Annexes ==
+
+=== Références taxinomiques ===
+* {{Fungorum suprafamille|90788|Myxomycetes|G.Winter, 1880|consulté le=1{{er}} juillet 2025}}
+* {{CatalogueofLife|F2|''Myxomycetes''|consulté le=13.06.2023}}
+* {{MycoBank|90788|Myxomycetes|G.Winter, 1880|consulté le=1{{er}} juillet 2025}}
+
+=== Bibliographie ===
+* {{en}} J. Heilmann-Clausen (2001), ''A gradient analysis of communities of macrofungi and slime moulds on decaying beech logs''. Mycological Research 105 : 575–596. ([http://www.sciencedirect.com/science/article/pii/S0953756208618912 Résumé].)
+* {{Article |langue=fr |prénom1=Marc-André |nom1=Selosse |prénom2=Guy |nom2=Durrieu |titre=Une classification mycologique phylogénétique francophone (en 2003) |périodique=Acta Botanica Gallica |volume=151 |numéro=1 |date=2004-03 |issn=1253-8078 |issn2=2166-3408 |doi=10.1080/12538078.2004.10516022 |lire en ligne=http://www.tandfonline.com/doi/abs/10.1080/12538078.2004.10516022 |consulté le=2020-05-25 |pages=73–102}}.
+* {{Chapitre |langue=en |prénom1=Martin  |nom1=Schnittler |prénom2=Yuri  |nom2=Novozhilov |prénom3=Maria  |nom3=Romeralo |prénom4=Matthew |nom4=Brown |auteur5=Frederick Spiegel |titre chapitre=Myxomycetes and myxomycete-like organisms |auteurs ouvrage=Wolfgang Frey |titre ouvrage=Englers Syllabus of Plant Families |éditeur=Borntraeger |année=2012 |numéro d'édition=13 |lire en ligne=https://www.researchgate.net/publication/302506360_Myxomycetes_and_myxomycete-like_organisms |passage=40-88}}.
+* {{Article|langue=en|auteur1=Dmitry V. Leontyev|titre=Towards a phylogenetic classification of the Myxomycetes|périodique=[[Phytotaxa]]|volume=399|numéro=3|date=27 mars 2019|pages=|issn=|lire en ligne=https://doi.org/10.11646/phytotaxa.399.3.5 }}
+
+=== Articles connexes ===
+* [[Taxinomie et systématique des champignons]]
+
+{{Autres projets
+|wikispecies=Myxomycetes
+}}
+{{Catégorie principale|Myxomycetes}}
+{{Portail|Mycologie|Biologie}}
+
+[[Catégorie:Mycetozoa]]
+[[Catégorie:Taxon mycologique obsolète]]
+[[Catégorie:Classe de champignons (nom vernaculaire)]]

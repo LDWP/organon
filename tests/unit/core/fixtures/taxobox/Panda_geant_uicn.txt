@@ -1,0 +1,27 @@
+{{Taxobox début | animal | ''Ailuropoda melanoleuca'' | Panda at the Chengdu Research Base of Giant Panda Breeding, Chengdu, China - panoramio.jpg | Un Panda géant au [[Centre de recherche sur le Panda géant de Chengdu]], [[province du Sichuan]], en [[Chine]]. | classification=MDD }}
+{{Taxobox plage|0.774|0|Du [[Pléistocène moyen]] à l’[[Holocène]]|collections=11}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Caniformia }}
+{{Taxobox | famille | Ursidae }}
+{{Taxobox | sous-famille | Ailuropodinae }}
+{{Taxobox | tribu | Ailuropodini }}
+{{Taxobox | genre | Ailuropoda }}
+{{Taxobox taxon | animal | espèce | Ailuropoda melanoleuca | ([[Armand David|David]], [[1869]]) }}
+{{Taxobox UICN | VU | C2a(i);D1 }}
+{{Taxobox CITES | I | 14/03/1984 }}
+{{Taxobox CITES | I | 14/03/1984 | Chine uniquement }}
+{{Taxobox répartition|Mapa distribuicao Ailuropoda melanoleuca.png}}
+{{Taxobox synonymes
+| {{Liste cachée|
+* ''Ursus melanoleucus'' <small>A. David, 1869</small> ([[Protonyme]]){{Bioref|MDD|31 décembre 2025|ref}}
+* ''Ailuropus melanoleucus'' <small>(A. David, 1871)</small> {{Bioref|MDD|31 décembre 2025|ref}}
+* ''Aelureidopus baconi'' <small>Smith Woodward, 1915</small> {{Bioref|MDD|31 décembre 2025|ref}}
+* ''Aeluropus fovealis'' <small>Matthew & Granger, 1923</small> {{Bioref|MDD|31 décembre 2025|ref}}
+* ''Ailuropoda melanoleuca'' <small>Pocock, 1929</small> {{Bioref|MDD|31 décembre 2025|ref}}
+* ''Ailuropoda melanoleuca qinlingensis'' <small>Wan Qiuhong, Wu Hua, & Fang Shengguo, 2005</small> {{Bioref|MDD|31 décembre 2025|ref}}
+* ''Ailuropoda melanoleuca baconi'' <small>Jiangzuo Qigao, Huang Zien, Yu Chonghan, Tong Haowen, Zhang Bei, Hu Haiqian, Wang Deyuan, Wang Shiqi, & Liu Jinyi, 2025</small> {{Bioref|MDD|31 décembre 2025|ref}}
+* ''Ailuropoda melanoleuca melanoleuca'' <small>Jiangzuo Qigao, Huang Zien, Yu Chonghan, Tong Haowen, Zhang Bei, Hu Haiqian, Wang Deyuan, Wang Shiqi, & Liu Jinyi, 2025</small> {{Bioref|MDD|31 décembre 2025|ref}}
+}}}}
+{{Taxobox fin}}

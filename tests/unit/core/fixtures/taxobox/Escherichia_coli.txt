@@ -1,0 +1,8 @@
+{{Taxobox début | bactérie | ''Escherichia coli'' | E. coli Bacteria (7316101966).jpg | ''Escherichia coli''. <br />Grossissement × 15&nbsp;000. | classification = LPSN }}
+{{Taxobox | embranchement | Pseudomonadota }}
+{{Taxobox | classe | Gammaproteobacteria }}
+{{Taxobox | ordre | Enterobacterales }}
+{{Taxobox | famille | Enterobacteriaceae }}
+{{Taxobox | genre | Escherichia }}
+{{Taxobox taxon | bactérie | espèce | Escherichia coli | [[Theodor Escherich|T. Escherich]], [[1885]] }}
+{{Taxobox fin}}

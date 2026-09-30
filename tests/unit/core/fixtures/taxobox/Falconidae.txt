@@ -1,0 +1,13 @@
+{{Taxobox début | animal | Falconidae | Brown-Falcon,-Vic,-3.1.2008.jpg | [[Faucon bérigora]] (''Falco berigora''). | classification=COI }}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Aves }}
+{{Taxobox | ordre | Falconiformes }}
+{{Taxobox taxon | animal | famille | Falconidae | [[William Elford Leach|Leach]], [[1820]] ou [[Nicholas Aylward Vigors|Vigors]], [[1824]] }}
+{{Taxobox taxons | sous-famille |
+* [[Polyborinae]] Bonaparte, 1838
+* [[Falconinae]] Leach, 1820
+----
+<center>11 ou 12 '''[[genre (biologie)|genres]]''' & environ<br />64 '''[[espèce]]s''' (''Voir texte'')</center>
+}}
+{{Taxobox fin}}

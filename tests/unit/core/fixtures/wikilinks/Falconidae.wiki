@@ -1,0 +1,328 @@
+{{Taxobox début | animal | Falconidae | Brown-Falcon,-Vic,-3.1.2008.jpg | [[Faucon bérigora]] (''Falco berigora''). | classification=COI }}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Aves }}
+{{Taxobox | ordre | Falconiformes }}
+{{Taxobox taxon | animal | famille | Falconidae | [[William Elford Leach|Leach]], [[1820]] ou [[Nicholas Aylward Vigors|Vigors]], [[1824]] }}
+{{Taxobox taxons | sous-famille |
+* [[Polyborinae]] Bonaparte, 1838
+* [[Falconinae]] Leach, 1820
+----
+<center>11 ou 12 '''[[genre (biologie)|genres]]''' & environ<br />64 '''[[espèce]]s''' (''Voir texte'')</center>
+}}
+{{Taxobox fin}}
+
+Les '''Falconidés''' ('''Falconidae''') forment une [[famille (biologie)|famille]] d'[[oiseau]]x. Ces [[rapace]]s sont traditionnellement classés dans l'[[ordre (biologie)|ordre]] des [[Falconiformes]], mais le débat sur leurs origines est encore ouvert. Elle compte entre 60 et 70 espèces selon les [[Classification scientifique des espèces|classifications]]. La famille des Falconidés comprend les [[faucon]]s et d'autres espèces apparentées ([[Caracara (nom vernaculaire)|caracaras]], [[Micrastur|carnifex]], [[fauconnet (oiseau)|fauconnets]], [[Crécerelle (oiseau)|crécerelles]], [[macagua rieur]]...). Ce sont des oiseaux de proie de taille petite à moyenne (de 14 à {{unité|65|cm}}). On les trouve dans toutes les régions du monde, sauf l'[[Antarctique]].
+
+== Morphologie ==
+Les membres des Falconidés sont des oiseaux prédateurs de taille moyenne, avec une envergure allant de {{unité|55|cm}} à plus de {{unité|125|cm}} pour un poids allant d'une trentaine de grammes (pour le [[Fauconnet moineau]]) à un peu moins de {{unité|2|kg}} (pour le [[Faucon gerfaut]]). Comme les autres rapaces, ils disposent d'un [[bec]] crochu, de deux grands yeux bruns, et leurs membres postérieurs sont munis de doigts qualifiés de [[serre (rapace)|serres]]. Leur [[plume|plumage]] dorsal est plus foncé que leur plumage ventral. Les ''[[Falconinae]]'' sont, en général, trapus, avec des ailes en pointe, des tarses longs, des encoches sur le bec, un plumage brun, noir, gris ou blanc ou en bandes tachetées. Les ''[[Polyborinae]]'' sont plus petits que les ''[[Falconinae]]'', ils ont des pattes et un [[cou]] plus longs, des serres plus fines et courtes, le bout des ailes plus arrondi, des plumes faciales plus vives, et un plumage de couverture plus noir et brillant.
+
+L'adaptation des différentes espèces à leur habitat et aux types de proies qu'elles capturent se voit particulièrement sur la forme de l'aile et la longueur des différents os de la patte. Tandis que les ailes sont plus fines et pointues, et les [[rectrice (plume)|rectrices]] plus courtes chez les espèces vivant en paysage ouvert, comme le [[Faucon émerillon]], les [[rectrice (plume)|rectrices]] sont plus longues et les ailes plus arrondies chez les [[Carnifex (oiseau)|Carnifex]] qui vivent dans les zones forestières<ref>Fogden S.C.L. (2007) ''Oiseaux du Costa Rica''. Broquet, Ottawa, 144 p.</ref>. Les os des pattes sont plus courts chez les espèces capturant des [[insecte]]s et des [[mammifère]]s que ceux des espèces capturant des [[reptile]]s.
+
+Les Falconidés peuvent présenter un [[dimorphisme sexuel]] : les [[femelle]]s sont plus grandes que les [[mâle]]s comme chez bon nombre de rapaces ; ce trait est plus marqué chez les falconidés qui chassent des proies rapides comme les [[oiseau]]x (par exemple le faucon pèlerin) et est moins prononcé chez les espèces qui sont [[nécrophage]]s. Chez certaines espèces, les femelles peuvent avoir un plus grand [[bec]] que les mâles. Les plumes des mâles sont également plus colorées que celle des femelles, et chez quelques espèces le plumage est même différent. 
+
+Les immatures ont généralement un plumage plus terne, souvent brun pâle, avec plus de taches et de bandes que les adultes. Certaines espèces, comme les [[faucon gerfaut|faucons gerfauts]], disposent de plusieurs morphes ; dans ce cas, il dépend de la [[latitude]]<ref name="ReferenceA">{{ADW|Falco_rusticolus|''Falco rusticolus''}}</ref>.
+
+Les Falconidés [[mue des oiseaux|muent]] une fois par an, et les immatures de la plupart des espèces disposent de leur plumage adulte après leur première mue annuelle.
+
+== Comportement ==
+=== Alimentation ===
+Les Falconidés sont tous carnivores mais certains caracaras incluent des végétaux dans leur régime alimentaire. Suivant les espèces, ils se nourrissent d'[[oiseau]]x, de petits [[mammifère]]s, de [[reptile]]s, d'[[insecte]]s ou de [[charogne]]s. Plusieurs espèces sont [[sténophagie|sténophages]] : si le [[faucon pèlerin]] consomme plus volontiers des oiseaux<ref name=pelerin>{{ADW|Falco_peregrinus|''Falco peregrinus''}}</ref>, le [[Macagua rieur]] est lui principalement [[Ophiophagie|ophiophage]]<ref>{{ADW|Herpetotheres_cachinnans|''Herpetotheres cachinnans''}}</ref>. Les [[Carnifex (oiseau)|Carnifex]] qui vivent dans les [[forêt tropicale|forêts tropicales]] d'Amérique sont quant à eux des chasseurs généralistes.[[Fichier:Falco cherrug 1 (Bohuš Číčel).jpg|vignette|Faucon sacre (Falco cherrug) avec sa proie]]La technique de [[chasse]] la plus répandue dans cette famille consiste à se percher le plus haut possible, et lorsqu'une proie est repérée, à fondre sur elle à très grande vitesse. Ce n'est cependant pas la seule méthode de chasse, les [[Faucon aplomado|faucons aplomado]] chassent en couple pour la capture de petits oiseaux. 
+<br />Tous les Falconidés ne se servent pas de leur vitesse pour s'alimenter. Les [[Caracara (nom vernaculaire)|caracaras]], par exemple, sont plus opportunistes : certains caracaras marchent ou courent sur le sol pour capturer des insectes, comme le [[Messager sagittaire]] (qui lui appartient à la famille des [[Accipitridae|Accipitridés]]). Le [[Caracara à tête jaune]] consomme entre autres les [[tique]]s des [[Bovinae|bovins]]. Le [[Caracara noir]] est connu pour avoir une relation [[Mutualisme (biologie)|mutualiste]] avec les [[tapir]]s. Ces caracaras mangent les [[tique]]s des tapirs, qui les sollicitent en beuglant et qui se couchent quand ceux-ci arrivent. Certains falconidés sont aussi [[cleptoparasitisme|cleptoparasites]] aux dépens de certains [[Laridae|laridés]], de [[pélican]]s et d'autres rapaces.
+
+Beaucoup d'espèces de falconidés cachent de la nourriture en vue d'une consommation ultérieure<ref name="adw" />.
+
+=== Périodes d'activité ===
+La plupart des espèces de Falconidés sont diurnes, bien que certaines soient crépusculaires. Ils choisissent souvent un site particulier où ils viennent se reposer toutes les nuits. Les Falconidés passent un temps considérable à leur [[toilettage]], entretenant leur plumage par lissage et bains de poussière ou d'eau, probablement parce que l'état de leur plumage a une incidence sur leur capacité à capturer des proies.
+
+=== Locomotion et migration ===
+Les Falconidés, plus particulièrement les Falconinés, ont un vol rapide ; le faucon pèlerin atteint {{unité|180|km/h}} en piqué<ref>Matthias Kestenholz et Coll. Mesures faites aux Baléares au radar, pour des piqués de 250 à 350 m sur des ''F. p. brookei'' - Voir [http://perso.orange.fr/marie-christine.dehayes/technique_chasse_pelerin.htm]</ref>.
+
+Les comportements migratoires sont très divers, certaines espèces effectuent des migrations de très longue durée, d'autres des migrations partielles, certaines se contentent de migrations altitudinales. Chez certaines espèces de crécerelles, les femelles migrent tandis que les mâles restent sur les aires de reproduction toute l'année.
+
+=== Communication ===
+==== Comportement social ====
+La plupart des espèces sont [[territorialité des oiseaux|territoriales]], certaines espèces le sont toute l'année. Elles sont solitaires, cependant 10 % d'entre elles sont quelquefois grégaires tels que le [[Faucon kobez]] et le [[Faucon crécerelle]]<ref>Ille, R.; Hoi, H.; Grinschgl, F. & F. Zink (2002) « Paternity assurance in two species of colonially breeding falcon: the kestrel Falco tinnunculus and the red-footed falcon Falco vespertinus » Etologica 10 11-15</ref> ou le [[Caracara chimango]], même si elles ne le sont qu'occasionnellement. Cependant plusieurs autres espèces migratrices peuvent former des groupes importants pour leur voyage. 
+
+Chez les espèces migrantes, les mâles arrivent avant les femelles. Ils sont très attachés à leur terrain de chasse, si bien qu'il n'est pas rare que les couples partageant une même portion de territoire, se forment pour plusieurs années. Chez les espèces qui vivent en colonie, les couples se forment aussi sur plusieurs années.
+
+==== Vocalisations ====
+Les faucons émettent diverses [[vocalisation des oiseaux|vocalisations]], certaines espèces émettent même des cris relativement forts. Les vocalisations sont principalement émises pour communiquer entre les conjoints, les ascendants ou descendants mais quelquefois aussi dans les interactions antagonistes. Les faucons pèlerins, par exemple, émettent davantage de sons durant la période de reproduction<ref name="pelerin" />. Ces cris sont très variés, mais souvent les vocalisations sont simples, en général des séries de [[monosyllabe]]s. Les plus courantes sont constituées de série de « skri-i ». Des cris d'avertissement peuvent être lancés, près des nids, en cas de danger. Chez les faucons pèlerins, des cris de signalement, plus longs, sont spécifiques aux individus et permettent dans 72 à 90 % des cas, d'identifier les individus<ref name="pelerin" />. Lorsqu'il chasse, pour marquer son territoire, l'animal peut pousser des cris. En outre, les Falconidés peuvent émettre des cris de communication différents à un vis-à-vis, suivant le contexte.
+
+Pour communiquer, les Falconidés utilisent également plusieurs types de postures, des postures de menaces, des postures d'apaisement, mais également, lors de la parade nuptiale, d'une série de postures de séduction. Gonfler les plumes et ouvrir le bec sont des attitudes typiques de posture agressive ; le bec baissé la tête baissée est une posture de soumission. Les postures de séduction sont souvent des acrobaties aériennes, comme dans le cas du faucon pèlerin<ref name="pelerin" />.
+
+La {{page h'|caroncule#Oiseau|caroncule}} des [[Caracara à crête|caracaras à crête]] change de couleur, d'orange à jaune, lors d'une excitation. Ainsi il marque un signal de bonne santé, ou d'agressivité.
+
+==== Fonctions sensorielles ====
+Ces oiseaux disposent d'une des plus performantes [[vision des oiseaux|visions]] du monde animal. Ils ont, comme les [[vautour]]s et contrairement à la plupart des oiseaux, un excellent [[odorat]]. Parmi les espèces vivant dans un environnement forestier, on observe souvent qu'il n'y a plus de plumes sur la face, ce qui contribue vraisemblablement à une meilleure [[Ouïe (sens de l'audition)|audition]].
+
+=== Reproduction ===
+Les falconinés ne construisent en général pas leur [[nid]], contrairement aux polyborinés qui construisent des nids rudimentaires. Ainsi, les [[Fauconnet d'Afrique|fauconnets d'Afrique]] utilisent des nids de [[tisserin]]s, les faucons crécerelles utilisent des nids de [[merle (oiseau)|merles]] ou de [[corbeau]]x, les faucons pèlerins nichent dans des trous d'arbre, creux de falaises, creux de façades de bâtiment, etc. Ils n'hésitent d'ailleurs pas à expulser les occupants du nid qu'ils convoitent. Bien que les habitudes de reproduction de certaines espèces (comme la plupart des Carnifex) sont inconnues, la plupart des Falconidés sont supposés être monogames et nidifier en couples solitaires ; cependant le [[caracara à gorge rouge]] et le [[fauconnet à collier]] élèvent leurs petits sur un mode d'entraide inter-générationnelle. Enfin quelques espèces semblent pouvoir être polygames occasionnellement.
+
+Les mâles paradent devant la femelle en prenant des postures, en effectuant des figures en vol et en vocalisant.
+
+Une des caractéristiques comportementales des couples de falconidés est la division des responsabilités. Les femelles ont la responsabilité de la couvaison et de défendre le nid. Elles garnissent le nid de leurs plumes ensuite elles pondent de un [[œuf (amniote)|œuf]] par jour à un œuf tous les trois jours pendant quelques jours. Elle le fait jusqu'à obtenir de 2 à 7 [[œuf (amniote)|œufs]], en moyenne 2 à 4. Si un des œufs meurt, la femelle le remplace jusqu'à quinze jours après la première ponte. La femelle [[incubation (oiseau)|couve]] presque exclusivement seule. Les mâles, eux, sont responsables de la chasse, du début de la parade jusqu'au milieu de la période de nidification, jusqu'à ce que la femelle quitte elle-même le nid ; ce sont aussi les mâles qui assurent la protection du territoire.
+
+L'incubation dure de 28 à 35 jours pour le gerfaut<ref name="ReferenceA" />. Les petits quittent le [[nid]] entre 28 et 7 semaines pour les caracaras. Les petits éclosent en même temps. Les petits sont nourris une quinzaine de jours en moyenne après avoir quitté le nid.
+
+Les petits sont matures au bout de un à trois ans selon les espèces. Les estimations de survie des adultes varie de 65 à 80 % par an<ref name="adw" />.
+
+=== Prédateurs et commensaux ===
+Les [[prédateur]]s des Falconidés ne sont pas nombreux, ce sont principalement des [[rapace]]s plus gros, y compris ceux de la même famille, et l'homme. Les mangeurs d'oisillons et d'œufs tels les petits félins et les mangoustes peuvent également en faire partie. Les espèces grégaires se protègent mutuellement d'une manière efficace d'attaque de ce type.
+
+Les Falconidés sont, comme les autres oiseaux, sujets aux [[parasitisme|parasites]] externes, dont les ''[[Mallophaga]]'', et aux parasites internes, dont des [[nématode]]s et des bactéries.
+
+== Répartition et habitat ==
+Ces rapaces occupent tous les milieux, depuis les [[toundra]]s jusqu'aux [[Déserts et broussailles xérophytes|déserts]] et aux [[forêt tropicale humide|forêts tropicales]]. La plus grande diversité au sein de cette famille se trouve en [[Amérique du Sud]] et en [[Afrique]]<ref name="HJB">{{harv|texte=Hutchins, Jackson, Bock, 2002|id=HJB}}</ref>, elle est plus élevée dans les zones tropicales que sous les autres climats, sur les terrains ouverts plus qu'en forêt et dans les plaines plus qu'en altitude. Cependant, beaucoup d'espèces sont opportunistes, elles savent en général s'adapter à différents types d'[[habitat (écologie)|habitats]]. Pour celles-ci, la structure des sites et la disponibilité en sites de nidifications semblent plus importants que le type de végétation. Les [[faucon pèlerin|faucons pèlerins]] et [[Faucon crécerelle|crécerelles]] montrent cette capacité d'adaptation en réussissant même à se reproduire dans les [[ville]]s, en nidifiant sur les immeubles et autres ouvrages, chassant les pigeons et autres animaux [[Synanthropie|synanthropes]]<ref>{{harv|texte=Cade, 1996|id=PF}}</ref>. Les espèces de la [[Sous-famille (biologie)|sous-famille]] des ''[[Polyborinae]]'' requièrent des habitats plus spécifiques, comme des forêts sans présence humaine. 
+
+Certaines espèces ont une distribution exceptionnellement large, en particulier le [[Répartition cosmopolite|cosmopolite]] [[Faucon pèlerin]], qui vit du [[Groenland]] aux [[îles Fidji]], et qui dispose de la plus large répartition naturelle chez les oiseaux. Au contraire, certaines espèces ont une aire de répartition restreinte, comme le [[Crécerelle de Maurice]] qui est endémique à une seule île. 
+
+Certaines espèces, surtout celle incluses dans le genre ''[[Falco (genre)|Falco]]'', sont pleinement migratrices, nidifiant en [[Eurasie]] et hivernant en [[Afrique]], d'autres espèces ne sont que partiellement migratrices. Les espèces [[migration des oiseaux|migratrices]] choisissent souvent un site d'hivernage similaire à celui de reproduction. Le [[Faucon de l'Amour]] est le rapace à avoir une des plus longues routes de migrations, il se déplace de l'est de l'[[Asie]] à l'[[Afrique australe]].
+
+== Systématique, taxonomie et évolution ==
+=== Systématique ===
+La [[classification classique]], basée sur des [[homologie (évolution)|homologies]], range cette famille dans l'[[ordre (biologie)|ordre]] des [[Falconiformes]] tandis que celle [[Classification de Sibley-Ahlquist|de Sibley-Ahlquist]] les range au sein des [[Ciconiiformes (Sibley)|Ciconiiformes]], qui regroupe bon nombre d'espèces d'apparences diverses comme les [[Accipitridae]], les [[Strigiformes]] et bon nombre d'[[oiseau de mer|oiseaux de mer]]. Des [[Phylogénie moléculaire|analyses phylogénétiques]] de 2006 bouleversent ces conceptions, faisant des Falconidés des proches parents des [[psittaciformes]], mais des parents éloignés des Accipitridae<ref>{{lien web|url=https://www.ornithomedia.com/pratique/debuter/debut_art73_1.htm|titre= Une nouvelle étude bouleverse l'arbre phylogénétique des oiseaux|site=ornithomedia.com}}</ref>.
+
+Les Falconidés partagent plusieurs traits communs avec les Accipitridae, l'autre taxon de rapaces diurnes et pour lesquels a été créé par la suite l'ordre des [[Accipitriformes]]. Outre une morphologie générale, ils disposent en commun d'un bec court et acéré, de pattes [[anisodactyle]]s non palmées, d'un robuste [[hallux]] opposable aux autres [[doigt]]s, et la taille des femelles est en général plus grande que celle des mâles. Ceci explique qu'ils aient été rangés, dans quelques classifications basées sur des critères morphologiques, au sein de la même famille. Cependant les Falconidés ont davantage l'habitude de tuer leurs proies avec le bec plutôt qu'avec leurs serres. Contrairement aux Accipitridae les poussins des Falconidés éclosent généralement de manière synchrone et ne se tuent pas mutuellement. 
+[[Fichier:FalconHeadBeak.png|right|300px]]
+Les éléments morphologiques requis dans la classification classique pour identifier une espèce comme étant un falconidé sont<ref name="adw">{{harv|texte=ADW, 2008|id=ADW}}</ref> :
+# Dent du bec (décrochement caractéristique de la ramphothèque) ;
+# Morphologie du [[Syrinx (anatomie)|syrinx]]<ref>{{harv|texte=Griffiths, 1994|id=Syrinx}}</ref> ;
+# Caractéristiques de la [[Mue des oiseaux|mue]] des [[rémige]]s (qui commence avec la primaire {{numéro|4}} et continue dans les deux sens) ;
+# Composition chimique des [[coquille d'œuf|coquilles d'œufs]] propres à cette famille. Les œufs sont de couleur rougeâtre (plutôt que bleu ou verdâtre), presque translucide à la lumière ;
+# Projection osseuse dans les narines ;
+# Présence de [[parasitisme|parasites]] ''[[Mallophaga]]'' dans les [[plume]]s.
+
+=== Histoire évolutive ===
+{{Article détaillé|Histoire évolutive des oiseaux}}
+La [[convergence évolutive]] des rapaces rend assez hasardeuse l'identification de la phylogénie sur des bases morphologiques. Aussi, plusieurs hypothèses très différentes ont eu cours sur l’origine du groupe. Trois exemples peuvent être donnés :
+{| class="wikitable" width="100%"
+! width="50%" |[[Aves (classification phylogénétique)|Classification phylogénétique]] de Ericson, 2006<ref>{{Article|lang=en|auteur=Ericson, Per G.P. {{et al.}}|date=2006|texte=http://biology-web.nmsu.edu/houde/Ericson_et_al_2006.pdf|titre=Diversification of Neoaves: integration of molecular sequence data and fossils|revue=Biol. Lett.}}</ref>
+!Selon Olson, 1985, Feduccia, 1980, 1996<br />et Sibley & Monroe, 1990<ref>{{lien web|url=https://www.helsinki.fi/~mhaaramo/metazoa/deuterostoma/chordata/archosauria/aves/primitive_landbirds_1.html#Falconidae|titre=Primitive Land-bird Assemblage|site= Mikko’s Phylogeny Archive}}</ref>
+![[Classification classique]] ancienne<br />basée sur la morphologie
+|-----
+| valign="top" |
+  ├─o
+  │ ├─o '''Falconidae'''
+  │ └─o [[Cariamidae]]
+  ├─o [[Psittaciformes]]
+  └─o [[Passeriformes]]
+| valign="top" |
+ ├─o [[Cariamidae]]
+ ├─o [[Opisthocomidae]]
+ └─o
+   ├─o 
+   │ ├─o [[Musophagidae]]
+   │ └─o [[Accipitridae]]
+   └─o
+     ├─o '''Falconidae'''
+     └─o [[Cuculiformes]], [[Pandionidae]]
+         [[Messager sagittaire|Sagittariidae]], [[Anomalogonatae]]
+| valign="top" |
+ └─o
+   ├─o [[Strigiformes]] (hibou, chouette...)
+   └─o [[Falconiformes]]
+     ├─o '''Falconidae'''
+     └─o [[Accipitridae]] (aigle, buzard, buse...)
+|}
+
+La classification phylogénétique montre que les Falconidés ne sont pas proche des Accipitridés, contrairement à l'intuition traditionnelle qui regroupe toutes ces espèces sous le nom de [[rapace]]s.
+
+=== Taxonomie et dénomination ===
+Le terme de ''Falconidae'' a été forgé autour de celui du [[genre (biologie)|genre]] ''Falco'' issue du [[latin]] ''falconis'' via le bas latin médiéval ''falconem'' utilisé alors pour désigner plusieurs espèces de falconinés. Le terme [[faucon]], dérive lui aussi de cette racine mais ''via'' le vieux français ''falcun''<ref>{{CNRTL|faucon}}</ref>. Le terme latin dérive lui-même du [[latin]] ''falx'', qui désigne la « [[Faux (outil)|faux]] », rappelant les courbures des serres et du bec de ces oiseaux<ref name="F&WL">{{en}} {{lien web|auteur=[[United States Fish and Wildlife Service]]|url=http://www.fws.gov/endangered/recovery/peregrine/QandA.html|titre=All about the Peregrine falcon|année=1999|consulté le=2007-08-13}}</ref>.
+
+Dans la tradition de la [[fauconnerie]] les juvéniles sont nommés les niais, les mâles sont appelés les tiercelets du fait que les mâles peuvent être un tiers plus petit que les femelles.
+
+=== Liste alphabétique des genres ===
+[[Fichier:Herpetotheres cacchinans1.jpg|right|thumb|300px|Macagua rieur peint par [[Andrew Jackson Grayson]]]]
+Les Falconidés sont divisés en deux, trois ou quatre [[Sous-famille (biologie)|sous-familles]]. De nos jours, il est généralement admis que les Herpetotherinae forment un clade frère de tous les autres faucons<ref name="Griffiths">Carole S. Griffiths, George F. Barrowclough, Jeff G. Groth & Lisa Mertz: ''Phylogeny of the Falconidae (Aves): a comparison of the efficacy of morphological, mitochondrial, and nuclear data.'' Molecular Phylogenetics and Evolution 32 (2004) 101–109, [[DOI: 10.1016/j.ympev.2003.11.019]]</ref>.
+
+Selon AviList<ref name=AviList>AviList Core Team. 2025. AviList: The Global Avian Checklist, v2025. https://doi.org/10.2173/avilist.v2025</ref> :
+* Sous-famille [[Herpetotherinae]]
+** ''[[Herpetotheres]]'' Vieillot 1817
+** ''[[Micrastur]]'' G.R. Gray, 1841
+* Sous-famille [[Falconinae|falconinés]]
+** Tribu Falconini
+*** ''[[Falco (genre)|Falco]]'' Linnaeus, 1758
+*** ''[[Microhierax]]'' Sharpe, 1874
+*** ''[[Neohierax]]'' Swann, 1922
+*** ''[[Polihierax]]'' Kaup, 1847
+** Tribu Polyborini (ex-sous-famille [[Polyborinae|polyborinés]])
+*** ''[[Caracara (genre)|Caracara]]'' Merrem, 1826 (y compris ''[[Polyborus]]'' Vieillot, 1816)
+*** ''[[Daptrius]]'' Vieillot, 1816
+*** ''[[Ibycter]]'' Vieillot, 1816
+*** ''[[Spiziapteryx]]'' Kaup, 1852
+
+La classification interne des faucons est présentée dans le cladogramme suivant<ref name="Griffiths" /> :
+{{clade
+|label1='''Falconidae'''
+|1={{clade
+   |label1=Herpetotherinae
+   |1={{clade
+      |1=''[[Micrastur]]''
+      |2=''[[Herpetotheres]]''
+      }}
+   |label2=Falconinae
+   |2={{clade
+      |label1=Falconini
+      |1={{clade
+         |1=''[[Microhierax]]''
+         |2={{clade
+            |1=''[[Polihierax]]''
+            |2=''[[Falco (genre)|Falco]]''
+            }}
+         }}
+      |label2=Polyborini
+      |2={{clade
+         |1=''[[Spiziapteryx]]''
+         |label2=
+         |2={{clade
+            |1=''[[Caracara (genre)|Caracara]]''
+            |label2=
+            |2={{clade
+               |1=''[[Ibycter]]''
+               |2={{clade
+                  |1=''[[Phalcoboenus]]''
+                  |2=''[[Daptrius]]''
+}} }} }} }} }} }} }}
+
+Deux genres, ''Daptrius'' et ''Polihierax'', sont vraisemblablement [[paraphylétique]]<ref>{{harv|texte=Giffiths, 1999|id=Griffiths2}}</ref>.
+
+=== Genres fossiles ===
+* ''[[Parvulivenator]]'' ([[Éocène]] précoce d'Angleterre)
+* ''[[Stintonornis]]'' ([[London Clay]] de l'éocène précoce)
+* ''[[Badiostes]]'' (Santa Cruz [[Miocène]] précoce de [[Patagonie]], Argentine)<!-- Badiostes patagonicus: Evolution39:1174 -->
+* Falconidae gen. et sp. indet. (Miocene précoce de [[Chubut]], Argentine)
+* Falconidae gen. et sp. indet. (Pinturas Miocène moyen et précoce d'Argentine)
+* ''[[Pediohierax]]'' (Miocene moyen du [[Nebraska]], USA) – formellement ''Falco ramenta''<!-- Auk104:270 -->
+* Falconidae gen. et sp. indet. (Cerro Bandera Miocène tardif de [[Province de Neuquén|Neuquén]], Argentine)<ref>[[PVPH]] 465: a [[phalange (anatomie)|phalanges]] 1 au milieu du doigt. Un caracara? possible d'un autre taxon. (Kramarz {{et al.}} 2005)</ref>
+* ''Sushkinia pliocaena'' ([[Pliocène]] précoce du [[Pavlodar]], [[Kazakhstan]]) – ''Falco'' incertain
+
+=== Liste des espèces ===
+
+D'après la classification de référence (version 5.1, 2015) du [[Congrès ornithologique international]] (ordre [[phylogénique]]) :
+{{boîte déroulante|titre=|contenu=Liste des espèces
+* ''[[Daptrius ater]]'' – [[Caracara noir]]
+* ''[[Ibycter americanus]]'' – [[Caracara à gorge rouge]]
+* ''[[Phalcoboenus carunculatus]]'' – [[Caracara caronculé]]
+* ''[[Phalcoboenus megalopterus]]'' – [[Caracara montagnard]]
+* ''[[Phalcoboenus albogularis]]'' – [[Caracara à gorge blanche]]
+* ''[[Phalcoboenus australis]]'' – [[Caracara austral]]
+* ''[[Caracara cheriway]]'' – [[Caracara du Nord]]
+* {{éteint}}''[[Caracara lutosa]]'' – [[Caracara de Guadalupe]]
+* ''[[Caracara plancus]]'' – [[Caracara huppé]]
+* ''[[Milvago chimachima]]'' – [[Caracara à tête jaune]]
+* ''[[Milvago chimango]]'' – [[Caracara chimango]]
+* ''[[Herpetotheres cachinnans]]'' – [[Macagua rieur]]
+* ''[[Micrastur ruficollis]]'' – [[Carnifex barré]]
+* ''[[Micrastur plumbeus]]'' – [[Carnifex plombé]]
+* ''[[Micrastur gilvicollis]]'' – [[Carnifex à gorge cendrée]]
+* ''[[Micrastur mintoni]]'' – [[Carnifex de Minton]]
+* ''[[Micrastur mirandollei]]'' – [[Carnifex ardoisé]]
+* ''[[Micrastur semitorquatus]]'' – [[Carnifex à collier]]
+* ''[[Micrastur buckleyi]]'' – [[Carnifex de Buckley]]
+* ''[[Spiziapteryx circumcincta]]'' – [[Fauconnet à ailes tachetées]]
+* ''[[Polihierax semitorquatus]]'' – [[Fauconnet d'Afrique]]
+* ''[[Polihierax insignis]]'' – [[Fauconnet à pattes jaunes]]
+* ''[[Microhierax caerulescens]]'' – [[Fauconnet à collier]]
+* ''[[Microhierax fringillarius]]'' – [[Fauconnet moineau]]
+* ''[[Microhierax latifrons]]'' – [[Fauconnet de Bornéo]]
+* ''[[Microhierax erythrogenys]]'' – [[Fauconnet des Philippines]]
+* ''[[Microhierax melanoleucos]]'' – [[Fauconnet noir et blanc]]
+* ''[[Falco naumanni]]'' – [[Faucon crécerellette]]
+* ''[[Falco tinnunculus]]'' – [[Faucon crécerelle]]
+* ''[[Falco rupicolus]]'' – (?)
+* ''[[Falco newtoni]]'' – [[Crécerelle malgache]]
+* ''[[Falco punctatus]]'' – [[Crécerelle de Maurice]]
+* {{éteint}}''[[Falco duboisi]]'' – (?)
+* ''[[Falco araeus]]'' – [[Crécerelle des Seychelles]]
+* ''[[Falco moluccensis]]'' – [[Crécerelle des Moluques]]
+* ''[[Falco cenchroides]]'' – [[Crécerelle d'Australie]]
+* ''[[Falco sparverius]]'' – [[Crécerelle d'Amérique]]
+* ''[[Falco rupicoloides]]'' – [[Crécerelle aux yeux blancs]]
+* ''[[Falco alopex]]'' – [[Crécerelle renard]]
+* ''[[Falco ardosiaceus]]'' – [[Faucon ardoisé]]
+* ''[[Falco dickinsoni]]'' – [[Faucon de Dickinson]]
+* ''[[Falco zoniventris]]'' – [[Faucon à ventre rayé]]
+* ''[[Falco chicquera]]'' – [[Faucon chicquera]]
+* ''[[Falco vespertinus]]'' – [[Faucon kobez]]
+* ''[[Falco amurensis]]'' – [[Faucon de l'Amour]]
+* ''[[Falco eleonorae]]'' – [[Faucon d'Éléonore]]
+* ''[[Falco concolor]]'' – [[Faucon concolore]]
+* ''[[Falco femoralis]]'' – [[Faucon aplomado]]
+* ''[[Falco columbarius]]'' – [[Faucon émerillon]]
+* ''[[Falco rufigularis]]'' – [[Faucon des chauves-souris]]
+* ''[[Falco deiroleucus]]'' – [[Faucon orangé]]
+* ''[[Falco subbuteo]]'' – [[Faucon hobereau]]
+* ''[[Falco cuvierii]]'' – [[Faucon de Cuvier]]
+* ''[[Falco severus]]'' – [[Faucon aldrovandin]]
+* ''[[Falco longipennis]]'' – [[Petit Faucon]]
+* ''[[Falco novaeseelandiae]]'' – [[Faucon de Nouvelle-Zélande]]
+* ''[[Falco berigora]]'' – [[Faucon bérigora]]
+* ''[[Falco hypoleucos]]'' – [[Faucon gris]]
+* ''[[Falco subniger]]'' – [[Faucon noir]]
+* ''[[Falco biarmicus]]'' – [[Faucon lanier]]
+* ''[[Falco jugger]]'' – [[Faucon laggar]]
+* ''[[Falco cherrug]]'' – [[Faucon sacre]]
+* ''[[Falco rusticolus]]'' – [[Faucon gerfaut]]
+* ''[[Falco mexicanus]]'' – [[Faucon des prairies]]
+* ''[[Falco peregrinus]]'' – [[Faucon pèlerin]]
+* ''[[Falco pelegrinoides]]'' – [[Faucon de Barbarie]]
+* ''[[Falco fasciinucha]]'' – [[Faucon taita]]
+}}
+
+Parmi celle-ci, deux espèces sont éteintes :
+* {{éteint}}''[[Caracara lutosa]]'' – [[Caracara de Guadalupe]]
+* {{éteint}}''[[Falco duboisi]]'' – (?)
+
+== Les Falconidés et leur écosystème ==
+En tant que prédateur du haut de la [[Réseau trophique|pyramide alimentaire]], la santé des populations de falconidés est un bon indicateur de celui de leur [[écosystème]]. Par exemple, le [[Dichlorodiphényltrichloroéthane|DDT]] a eu sur les [[population]]s de falconidés qui y ont été exposées un impact important. Cet impact a été particulièrement visible sur le [[Faucon pèlerin]] : on estime que le DDT a été un facteur non négligeable de la disparition de cette espèce de [[Belgique]] dans les [[années 1970]]. L'espèce a naturellement regagné cette zone après l'interdiction de l'utilisation de ce produit.
+
+Les Falconidés ont un rôle important dans le maintien des populations de petits rongeurs et des passereaux qui peuvent occasionnellement devenir [[espèce invasive|invasives]], mais aussi de population d'animaux plus importants qui peuvent faire des dégâts majeurs à la végétation. Ainsi, après l'extermination volontaire du [[Caracara de Guadalupe]], prédateur des chevreaux des fermiers, il y eut par la suite destruction quasi totale de l'habitat par des chèvres [[Marronnage (zoologie)|marrons]] et [[extinction des espèces|extinction]] de plusieurs espèces [[endémisme|endémiques]].
+
+== Les Falconidés et l'homme ==
+[[Fichier:Coat of arms of Mexico.svg|thumb|200 px|armes du Mexique]][[Fichier:Falco 41.jpg|thumb|left|Faucon de chasse, probablement [[hybride]]]]
+La relation des hommes avec les Falconidés est ambivalente, jugés comme [[nuisible]]s à certains moments et utiles à d'autres. C'est le cas du pèlerin, honoré par la [[fauconnerie]], et volontiers chassés comme peste, pour être concurrent de chasse et prédateur des [[volaille]]s. Dans l'[[Égypte antique]], plusieurs espèces du [[genre (biologie)|genre]] ''[[Falco (genre)|Falco]]'' ont été déifiées sous la forme d'[[Horus]], le dieu du ciel et du Soleil, ancêtre même des [[pharaon]]s. Les caracaras sont aujourd'hui emblème national du [[Mexique]], ils sont très présents dans les légendes sud-amérindiennes, notamment chez les [[Aztèques]]. En revanche, le [[Caracara de Guadalupe]] a été exterminé à cause de ses prédations sur les chevreaux domestiques. Plusieurs espèces insulaires ont vu leur population diminuée de façon spectaculaire, aucune plus que la Crécerelle de Maurice, dont le nombre semble avoir chuté jusqu'à quatre spécimens avant de recroître. Près de quatre espèces de faucons sont considérées menacées, de vulnérables à proche de l'extinction, par l'[[UICN]].
+
+== Menaces et protections ==
+{{loupe|déclin des populations d'oiseaux|protection des oiseaux}}
+Tous les Falconidés sont inscrits soit sur l'[[annexe I de la CITES|annexe I]], soit sur l'[[annexe II de la CITES|annexe II]] de la [[CITES]]. Deux espèces ont [[extinction de l'Holocène|disparu]] dans les temps historiques, le [[Caracara de Guadalupe]] au début du {{XXe siècle}}<ref>{{UICN|150588|''Polyborus lutosus'' Ridgway, 1876 }}</ref>, et le Faucon de [[La Réunion]], ''[[Crécerelle de Dubois|Falco buboisi]]'', disparu au {{XVIIe siècle}}<ref>{{UICN|150756|''Falco buboisi'' G.S. Cowles, 1994}}</ref>. En 2008, l'[[UICN]] considère le [[Faucon sacre]] comme en danger<ref>{{UICN|144578|''Falco cherrug'' Gray, 1834 }}</ref>, quatre espèces comme vulnérables et six espèces quasi menacées<ref>{{UICN taxons | 22672967 | Falconidae | consulté le=5 janvier 2023}}</ref>. Toutes les espèces sont cependant fragilisées ; les causes principales sont d'une part la destruction de leur habitat, causée par la modification des paysages agricoles et la déforestation, et d'autre part l'utilisation de [[produit phytosanitaire|produits phytosanitaires]], fait lié à l'intensification de l'utilisation des terres par l'homme.
+
+Les autres menaces sont l'introduction de nouveaux prédateurs, les [[collision d'oiseau|collisions]] avec les véhicules (notamment aériens) et les fenêtres, les collecteurs d'œuf de collection, et les électrocutions sur les [[Ligne à haute tension|lignes à haute tension]]. Les espèces vivant en plaine (en théorie plus favorisées que les espèces vivant en forêt, qui elles sont franchement défavorisées par la présence de l'homme), ne sont donc pour ces raisons pas beaucoup avantagées. Par exemple, l'accumulation des produits toxiques dans leur organisme a une incidence négative sur leur taux de reproduction : ceci est observable avec l'accumulation de [[Dichlorodiphényltrichloroéthane|DDT]], qui rend les coquilles des œufs trop fragiles pour que les poussins éclosent. En effet depuis que les organochlorés comme le DDT ne sont plus utilisés dans les pays développés, les populations des Falconidés augmentent légèrement. Depuis la suppression du DDT, les populations de faucon pèlerin adaptées à la vie urbaine gardent quand même un plus grand taux de survie que les spécimens ruraux.
+
+== Voir aussi ==
+=== Bibliographie ===
+* {{ouvrage|lang=en|id=HOTW|auteur=White, C., P. Olsen, L. Kiff.|année=1994|titre=Family Falconidae (Falcons and Caracaras)|page=216-247|directeur=J. del Hoyo, A. Elliott, J. Sargatal|titre vo=[[Handbook of the Birds of the World]]|vol=2|lieu=Barcelona|éditeur=Lynx Edicions}}.
+* {{ouvrage|lang=en|id=HJB|année=2002|titre=Falcons and Caracaras (Falconidae)|auteur=M. Hutchins, J. Jackson, W. Bock|titre vo=Grzimek's Animal Life Encyclopedia|vol=8|publi=Seconde édition|lieu=Détroit|éditeur=Gale Group}}
+* {{ouvrage|lang=en|id=PF|auteur=Cade, T., M. Martell, P. Redig, G. Septon, H. Tordoff.|année=1996|titre=Peregrine Falcons in Urban North America.|pages=3-14 |directeur=D. Bird, D. Varland, J. Negro|titre vo=Raptors in Human Landscapes: Adaptations to Built and Cultivated Environments.|lieu=San Diego|éditeur=Academic Press Inc}}
+=== Liens externes ===
+{{Autres projets
+|commons=Category:Falconidae
+}}
+* {{COI|falcons|Falconiformes|Falconidae }}
+* {{Zoonomen|falc|Falconiformes|Falconidae}}
+* {{Tolweb|Falconidae }}
+* {{Oiseaux famille|falconidae|''Falconidae'' }}
+* {{Faunaeur2 | ae7130b4-589d-4566-a06f-a68626f007fe | ''Falconidae''  | consulté le=15 mars 2023 }}
+* {{TPDB|39317|''Falconidae'' Vigors 1824 }}
+* {{ADW|Falconidae|''Falconidae'' }}
+* {{NCBI|8949|''Falconidae'' }}
+* {{UICN taxons | 22672967 | Falconidae | consulté le=5 janvier 2023}}
+* {{CITES famille|animal|310|''Falconidae'' }}
+{{liens}}
+* {{Bases art}}
+* {{lien web|url=http://montereybay.com/creagrus/falcons.html|titre=FALCONS Falconidae|site=montereybay.com}} {{en}}
+* {{Article|id=Syrinx|titre=Monophyly of the falconiformes based on syringeal morphology|lang=en|texte=http://elibrary.unm.edu/sora/Auk/v111n04/p0787-p0805.pdf|auteur=Carole S. Griffiths|revue=[[The Auk]]|vol=111|numéro=4|pages=787-805|date=1994}}
+* {{Article|id=Griffiths2|lang=en|texte=https://findarticles.com/p/articles/mi_qa3793/is_199901/ai_n8840402|titre=Phylogeny of the Falconidae inferred from molecular and morphological data|auteur=Carole S. Griffiths|date=jan 1999|revue=The Awk}}
+
+=== Notes ===
+{{références|colonnes=2}}
+{{Palette|Familles d'oiseaux par ordres EàM}}
+
+{{Portail|ornithologie}}
+
+
+[[Catégorie:Famille d'oiseaux (nom scientifique)]]
+[[Catégorie:Falconidae| ]]
+[[Catégorie:Oiseau décrit en 1820]]
+[[Catégorie:Oiseau décrit en 1824]]

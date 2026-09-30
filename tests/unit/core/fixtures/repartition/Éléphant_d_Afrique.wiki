@@ -1,0 +1,98 @@
+{{Sous-titre/Taxon|ns1=Loxodonta}}
+{{Taxobox début | animal | ''Loxodonta'' | African elephant.jpg | [[Éléphant de savane d'Afrique]]. | classification=MSW}}
+{{Taxobox plage|7|0 | [[Miocène supérieur]]-[[Holocène|Présent]]|collections=142}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | ordre | Proboscidea }}
+{{Taxobox | famille | Elephantidae }}
+{{Taxobox taxon | animal | genre | Loxodonta | Anonyme, [[1827]] }} {{Taxobox UICN | EN }}
+{{Taxobox taxons | espèce | *''[[Loxodonta africana|L. africana]]''
+*''[[Loxodonta cyclotis|L. cyclotis]]''
+*† ''[[Loxodonta adaurora|L. adaurora]]''
+::† ''L. a. adaurora''
+::† ''L. a. kararae''
+*† ''[[Loxodonta atlantica|L. atlantica]]''
+::† ''L. a. angammensis''
+::† ''L. a. atlantica''
+*† ''[[Loxodonta exoptata|L. exoptata]]''
+*† ''[[Loxodonta cookei|L. cookei]]'' }}
+{{Taxobox répartition | African Elephant distribution map without borders.svg | Répartition des ''Loxodonta'' vivants (2007) }}
+{{Taxobox fin}}
+
+Les '''éléphants d'Afrique''' ('''''Loxodonta''''') forment un [[Genre (biologie)|genre]] de [[mammifère]]s [[Proboscidea|proboscidiens]] de la [[Famille (biologie)|famille]] des [[Elephantidae|éléphantidés]]. Les deux [[espèce]]s actuelles de ce genre, l'[[Éléphant de savane d'Afrique|éléphant de savane]] et l'[[Éléphant de forêt d'Afrique|éléphant de forêt]] étaient autrefois considérées comme une même espèce. Ces espèces sont aujourd'hui menacées<ref>{{Lien web |langue=anglais |titre=African Forest Elephant |url=https://www.iucnredlist.org/species/181007989/181019888 |site=The IUCN Red List of Threatened Species 2021}}.</ref>{{,}}<ref>{{Lien web |langue=anglais |titre=African Savanna Elephant |url=https://www.iucnredlist.org/species/181008073/181022663 |site=The IUCN Red List of Threatened Species 2021}}.</ref>.
+
+== Étymologie ==
+Le nom de genre ''Loxodonta'' est un nom de latin scientifique formé à partir de deux mots du grec ancien, {{Grec ancien|λοξός|loxós}}, « oblique, qui est de travers »<ref>{{lien web |auteur=Anatole Bailly ; 2020 : Hugo Chávez, Gérard Gréco, André Charbonnet, Mark De Wilde, Bernard Maréchal & contributeurs|titre=Le Bailly |date=2020 |url=https://bailly.app/loxos|consulté le=31 mai 2025}}.</ref>
+et {{Grec ancien|ὀδούς|odoús}}, au [[génitif]] {{Grec ancien|ὀδόντος|odóntos}}, « dent »<ref>{{lien web |auteur=Anatole Bailly ; 2020 : Hugo Chávez, Gérard Gréco, André Charbonnet, Mark De Wilde, Bernard Maréchal & contributeurs|titre=Le Bailly |date=2020 |url=https://bailly.app/odous|consulté le=31 mai 2025}}.</ref>, soit « dent oblique ».
+
+== Classification ==
+[[File:Map of Signatories to the West African Elephant MoU.jpg|thumb|Parties signataires du ''Memorandum'' sur la protection de l'éléphant en Afrique de l'Ouest établi sous l'égide de l'[[Organisation des Nations unies|ONU]] et de la [[Convention de Bonn]].]]
+Le genre comprend les deux espèces suivantes :
+* l'[[éléphant de savane d'Afrique]] - ''Loxodonta africana'' <small>(Blumenbach, 1797)</small> —, l'espèce africaine la plus connue, a des oreilles plus longues et plus grandes que celles de l'[[éléphant d'Asie]] (''Elephas maximus''). Il présente également une taille moyenne plus importante et un dos concave. Les mâles et les femelles ont des défenses externes, et sont d'habitude moins poilus que leurs cousins asiatiques ;
+* l'[[éléphant de forêt d'Afrique]] - ''Loxodonta cyclotis'' <small>(Matschie, 1900)</small> — possède des oreilles généralement plus petites et plus circulaires que l'espèce de savane et des défenses plus minces et plus droites. Il peut peser jusqu'à cinq tonnes, et mesurer jusqu'à {{unité|3.5|mètres}} pour un mâle, les femelles mesurent {{unité|2.5|mètres}} de haut et pèsent trois tonnes. Cette espèce, moins connue en raison des obstacles écologiques et politiques, est plus difficile à étudier et à protéger. On la rencontre principalement en forêt dense d'Afrique centrale et d'Afrique de l'Ouest, mais se trouve aussi parfois en lisière de territoire forestier, comme les éléphants de savane.
+
+Les différents éléphants africains ont longtemps été considérés comme des représentants de [[sous-espèce]]s du taxon ''Loxodonta africana''. Des études sur quatre gènes en 2001 ont permis de démontrer que les deux principales sous-espèces africaines ''Loxodonta africana africana'' et ''Loxodonta africana cyclotis'' étaient en fait deux [[espèce]]s phylogénétiques distinctes : en Afrique, il convient donc de distinguer désormais l’éléphant de la savane ''[[Éléphant de savane d'Afrique|Loxodonta africana]]'' et l’éléphant des forêts ''[[Éléphant de forêt d'Afrique|Loxodonta cyclotis]]''<ref>Alfred L. Roca, Nicholas Georgiadis, Jill Pecon-Slattery et Stephen J. O'Brien, « Genetic Evidence for Two Species of Elephant in Africa », 24 août 2001, ''Science'' 293 (5534), 1473. [http://www.sciencemag.org/cgi/content/abstract/sci;293/5534/1473 résumé]</ref>. Ces résultats, contestés par d'autres scientifiques, ont été confirmés par une étude portant sur 375 régions de leur [[Acide désoxyribonucléique|ADN]] nucléaire comparés avec l'[[éléphant d'Asie]] et deux « cousins » disparus, le ''[[Mammut americanum]]'' et le ''[[Mammouth laineux|Mammuthus primigenius]]''. La divergence entre les deux espèces s'est produite à la même période que la divergence de l’éléphant d’Asie et le mammouth laineux, tandis que la séparation entre les lignées de l'éléphant d'Afrique et celles d'Asie datent de {{unité|4,2|à=9|millions}} d'années<ref>Nadin Rohland et coll, « Genomic DNA Sequences from Mastodon and Woolly Mammoth Reveal Deep Speciation of Forest and Savanna Elephants », 21 décembre 2010, ''PLoS Biology'' 8(12). [https://www.plosbiology.org/article/info:doi/10.1371/journal.pbio.1000564 résumé]</ref>.
+
+<gallery mode="packed" heights="150">
+Fichier:Elephant.pair.750pix.jpg|À gauche un [[éléphant de savane d'Afrique]] (''Loxodonta africana''), à droite un [[éléphant d'Asie]] (''Elephas maximus'').
+Fichier:African Bush Elephants.jpg|Éléphant de savane d'Afrique : femelle et son éléphanteau.
+Fichier:Loxodontacyclotis.jpg|[[Éléphant de forêt d'Afrique]] (''Loxodonta cyclotis'') : femelle et son éléphanteau.  
+</gallery>
+
+=== Éléphants d'Afrique disparus ===
+Entre la fin du {{sp-|XVIII|et le|XXI}}, les éléphants d'Afrique éteints suivants ont été décrits sur la base de restes fossiles :
+
+* [[Éléphant d'Afrique du Nord]] († ''Loxodonta africana pharaohensis'') proposé par [[Paulus Edward Pieris Deraniyagala]] en 1948 était un spécimen du [[Médinet el-Fayoum|Fayoum]] en Égypte<ref>{{ouvrage|auteur=Deraniyagala, P. E. P. |année=1955 |titre=Some extinct elephants, their relatives, and the two living species |éditeur=Ceylon National Museums Publication |lieu=Colombo}}.</ref>.
+* † ''[[Loxodonta atlantica]]'' a été proposé comme ''Elephas atlanticus'' par [[Auguste Pomel]] en 1879 basé sur un [[crâne]] et des os trouvés à [[Ternifine]], Algérie<ref>{{ouvrage|nom1=Pomel |prénom1=A. |année=1897 |collection=Paléontologie : monographies |titre=Les éléphants quaternaires |lieu=Alger |éditeur=P. Fontana & Co. |pages=42–59 |chapter=''Elephas atlanticus'' Pom. |chapter-url=https://gallica.bnf.fr/ark:/12148/bpt6k62754098/f48}}.</ref>.
+* † ''[[Loxodonta exoptata]]'' proposé par [[Wilhelm Otto Dietrich]] en 1941 était basé sur des dents trouvées à [[Laetoli]], en [[Tanzanie]]<ref>{{article|nom1=Dietrich |prénom1=W. O. |année=1941 |titre=Die säugetierpaläontologischen Ergebnisse der Kohl-Larsen'schen Expedition 1937–1939 im nördlichen Deutsch-Ostafrika |journal=Zentralblatt für Mineralogie, Geologie und Paläontologie |volume=B |numéro=8 |pages=217–223}}.</ref>.
+* † ''[[Loxodonta adaurora]]'' proposé par [[Vincent Maglio]] en 1970 était un squelette complet trouvé à [[Kanapoi]], au [[Kenya]]<ref>{{article|nom1=Maglio |prénom1=V. J. |année=1970 |titre=Four new species of Elephantidae from the Plio-Pleistocene of northwestern Kenya |journal=Breviora |numéro=341 |pages=1–43 |url=https://archive.org/details/breviora326350harv/page/n291}}.</ref>.
+* † ''[[Loxodonta cookei]]'' proposé par [[William J. Sanders]] en 2007 basé sur des dents trouvées dans la [[formation de Varswater]] à [[Langebaanweg]], en [[Afrique du Sud]]<ref name = "Sanders, 2007">{{article|nom1=Sanders |prénom1=W. |date=2007 |titre=Taxonomic review of fossil Proboscidea (Mammalia) from Langebaanweg, South Africa|journal=Transactions of the Royal Society of South Africa |volume=62 |numéro=1 |numéro d'édition=Online |doi=10.1080/00359190709519192| url = https://sites.lsa.umich.edu/billsanders/wp-content/uploads/sites/382/2016/04/AP-SANDERS-REVISED.pdf | pages=1–16|s2cid=27499106 }}.</ref>.
+
+== Menaces et protection ==
+[[Fichier:African Bush Elephant.jpg|vignette|Femelle éléphant africaine au Parc national de Mikumi, Tanzanie]]
+
+=== Menaces ===
+La population des éléphants d'Afrique a très fortement chuté depuis plusieurs décennies, en raison du [[braconnage]] ainsi que, à long terme, de la destruction des [[Habitat (écologie)|habitats]]<ref>{{Article|langue=en|prénom1=Charles T. T.|nom1=Edwards|prénom2=Kathleen S.|nom2=Gobush|prénom3=Fiona|nom3=Maisels|prénom4=Dave|nom4=Balfour|titre=Survey-based inference of continental African elephant decline|périodique=Proceedings of the National Academy of Sciences|volume=121|numéro=48|date=2024-11-26|issn=0027-8424|issn2=1091-6490|doi=10.1073/pnas.2403816121|lire en ligne=https://pnas.org/doi/10.1073/pnas.2403816121|consulté le=2024-11-15}}.</ref>. En 2016, l'[[Union internationale pour la conservation de la nature|UICN]] estime l’effectif total du continent africain à {{nombre|415000|éléphants}}, avec potentiellement {{nombre|117000}} et {{nombre|135000|éléphants}} de plus dans des zones n’ayant pas été systématiquement recensées<ref>[https://www.iucn.org/fr/news/species/201609/le-braconnage-est-%C3%A0-l%E2%80%99origine-du-pire-d%C3%A9clin-subi-par-l%E2%80%99%C3%A9l%C3%A9phant-d%E2%80%99afrique-depuis-25-ans-selon-un-rapport-de-l%E2%80%99uicn Le braconnage est à l’origine du pire déclin subi par l’éléphant d’Afrique depuis {{nombre|25|ans}}, selon un rapport de l’UICN]</ref>.Au début du {{s-|XX}}, il y avait entre {{unité|3|et=5|millions}} d'éléphants<ref name="wwf elephants">[https://www.wwf.fr/especes-prioritaires/elephants Éléphant : plus grand mammifère terrestre, sur le site du WWF]</ref>, et avant la [[Colonisation européenne de l'Afrique|colonisation européenne]], il y avait environ {{nombre|20|millions}} d'[[Éléphant de savane d'Afrique|éléphants de savane]], selon une étude de l'ONG Elephants without borders publiée fin {{date-|août 2016}}<ref>{{Lien web |langue=fr |nom=AFP |titre=Au Gabon, protéger les éléphants mais aussi les villageois |url=https://www.sciencesetavenir.fr/nature-environnement/au-gabon-proteger-les-elephants-mais-aussi-les-villageois_113908 |site=Sciences et Avenir |date=2017-06-16 |consulté le=2026-06-29}}</ref>.
+
+L'[[éléphant de savane d'Afrique]] a été classé en 2004 dans la catégorie des [[Espèce vulnérable|espèces vulnérables]] de la [[liste rouge de l'UICN]]<ref>[http://www.iucnredlist.org/details/12392/0 Loxodonta africana sur le site de l'UICN]</ref>. L'[[éléphant de forêt d'Afrique]] est lui classé en danger par l'UICN. Le braconnage est favorisé par le [[Commerce de l'ivoire|commerce illégal de l'ivoire]]<ref>{{Lien web |auteur=Isabelle Hanne |titre=Les éléphants d'Afrique, «réfugiés politiques» de l'or blanc |url=https://www.liberation.fr/planete/2015/03/26/les-elephants-d-afrique-refugies-politiques-de-l-or-blanc_1228119/ |site=liberation.fr |périodique=Libération |date=26 mars 2015}}.</ref>{{,}}<ref>Mélissa Kalaydjian, « En Afrique, les éléphants s’éteignent et le trafic d’ivoire s’amplifie », ''Libération'', 8 septembre 2017, [http://www.liberation.fr/planete/2017/09/08/en-afrique-les-elephants-s-eteignent-et-le-trafic-d-ivoire-s-amplifie_1594807 lire en ligne]</ref>, qui a alimenté pendant longtemps les fabriques de [[sculpture sur ivoire]] en Chine, qui commencent à fermer depuis 2017<ref>Rachael Bale, « Le plus grand marché d'ivoire au monde est sur le point de fermer », National Geographic, 9 novembre 2017, [https://www.nationalgeographic.fr/animaux/2017/04/le-plus-grand-marche-divoire-au-monde-est-sur-le-point-de-fermer lire en ligne]</ref>. Le gouvernement du [[Botswana]] autorise à nouveau la chasse à l'éléphant à partir de 2019<ref>{{Lien web|langue=fr|titre=Environnement : le Botswana autorise la chasse aux éléphants|url=https://www.francetvinfo.fr/monde/afrique/botswana/environnement-le-botswana-autorise-la-chasse-aux-elephants_3459853.html|site=Franceinfo|date=2019-05-25|consulté le=2019-05-25}}.</ref>.
+
+La population des éléphants d'Afrique a chuté de 70 % depuis les années 1980.
+
+=== Protection ===
+L'ONG britannique [[Save the Elephants]] lutte pour la protection de l'éléphant d'Afrique<ref>[http://www.savetheelephants.org/ Site internet de l'ONG Save the Elephants]</ref>. Le [[WWF]] mène aussi des programmes de conservation, selon plusieurs axes : la lutte contre le braconnage, la réduction du commerce illégal, l'atténuation des conflits éléphants-hommes et le renforcement des capacités dans les pays de l’aire de répartition en aidant des gouvernements des États de l’aire de répartition à produire des stratégies nationales et sous régionales de conservation des éléphants<ref name="wwf elephants" />.
+
+== Notes et références ==
+{{Références}}
+
+== Voir aussi ==
+=== Articles connexes ===
+* [[Éléphant]]
+* [[Braconnage]]
+* [[Ivoire]]
+* [[Commerce de l'ivoire]]
+* [[Save the Elephants]]
+
+=== Références taxonomiques ===
+{{Autres projets
+|commons=Category:Loxodonta
+}}
+* {{MSW | 11500008 | ''Loxodonta'' |  }}
+* {{CatalogueofLife | 5GYJ | ''Loxodonta'' Anonymous, 1827 | consulté le=11 décembre 2020 }}
+* {{TPDB|43265|''Loxodonta''  Cuvier 1825}}
+* {{ITIS|584937|''Loxodonta''  Anonymous, 1827}}
+* {{ADW|Loxodonta|''Loxodonta''}}
+* {{NCBI|9784|''Loxodonta''}}
+* {{CITES genre|animal|2640|''Loxodonta''}}
+* {{fr}} [https://nature.ca/notebooks/francais/eleaf.htm Éléphant d'Afrique]
+
+=== Liens externes ===
+* [https://www.wwf.fr/especes-prioritaires/elephants WWF - Éléphant : plus grand mammifère terrestre]
+* [https://www.memoireonline.com/03/15/8934/Analyse-des-instruments-internationaux-de-lutte-contre-le-trafic-et-le-braconnage-des-especes-menace.html Analyse des instruments internationaux de lutte contre le trafic et le braconnage des espèces menacées en Afrique centrale : le cas de l'éléphant et du gorille]
+* {{Article|langue=en|prénom1=Ryan M.|nom1=Huang|prénom2=Celesté|nom2=Maré|prénom3=Robert A. R.|nom3=Guldemond|prénom4=Stuart L.|nom4=Pimm|titre=Protecting and connecting landscapes stabilizes populations of the Endangered savannah elephant|périodique=Science Advances|volume=10|numéro=1|date=2024-01-05|issn=2375-2548|pmid=38181078|pmcid=PMC10776014|doi=10.1126/sciadv.adk2896|lire en ligne=https://www.science.org/doi/10.1126/sciadv.adk2896|consulté le=2024-11-15}}
+
+{{Portail|Mammifères}}
+
+{{DEFAULTSORT:Elephant d'Afrique}}
+[[Catégorie:Elephantidae]]
+[[Catégorie:Symbole de la Côte d'Ivoire]]

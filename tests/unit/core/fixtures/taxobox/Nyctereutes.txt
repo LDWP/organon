@@ -1,0 +1,20 @@
+{{Taxobox début | animal | ''Nyctereutes procyonoides'' | Енотовидная собака Гродно (cropped 2).jpg | Un spécimen au zoo de Grodno, en [[Biélorussie]]. | classification=MDD }}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertébrés | Vertebrata }}
+{{Taxobox | classe | Mammifère | Mammalia }}
+{{Taxobox | cohorte | Placentalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Caniformia }}
+{{Taxobox | famille | Canidae }}
+{{Taxobox | tribu | Vulpini }}
+{{Taxobox | genre | Nyctereutes }}
+{{Taxobox taxon | animal | espèce | Nyctereutes procyonoides | ([[John Edward Gray|Gray]], [[1834 en science|1834]]) }}
+{{Taxobox répartition | Common raccoons Dogs subspecies area.png |{{Légende/Début|centre}}{{Légende|orange|''N. p. procyonoides''}}
+{{Légende|red|''N. p. orestes''}}{{Légende|brown|''N. p. ussuriensis''}}{{Légende|yellow|''N. p. koreensis''}}{{Légende/Fin}}}}{{Taxobox synonymes|*''Canis procyonoides'' <small>Gray, 1834</small> ([[Basionyme|protonyme]]){{Bioref|MDD|2026-06-02|ref}}
+* ''Sacalius procyonoides'' <small>C. H. Smith, 1839</small>{{Bioref|MDD|2026-06-02|ref}}
+*''Canis procgonides'' <small>Temminck, 1839</small>{{Bioref|MDD|2026-06-02|ref}}
+*''Nyctereutes Var. amurensis'' <small>Schrenck, 1859</small>{{Bioref|MDD|2026-06-02|ref}}
+*''Nyctereutes sinensis'' <small>von Brass, 1904</small>{{Bioref|MDD|2026-06-02|ref}}
+*''Nyctereutes amurensis'' <small>Matschie, 1907</small>{{Bioref|MDD|2026-06-02|ref}}
+*''Nyctereutes stegmanni'' <small>Matschie, 1907</small>{{Bioref|MDD|2026-06-02|ref}}
+*''Nyctereutes koreensis'' <small>Mori, 1922</small>{{Bioref|MDD|2026-06-02|ref}}}}{{Taxobox fin}}

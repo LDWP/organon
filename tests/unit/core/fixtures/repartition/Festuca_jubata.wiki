@@ -1,0 +1,49 @@
+{{ébauche|botanique}}
+{{Taxobox début | végétal | ''Festuca jubata'' | Festuca jubata.jpg | ''Festuca jubata'', photographié au [[Açores]]. | classification=POWO}}
+{{Taxobox | embranchement | Streptophyta }}
+{{Taxobox | classe | Equisetopsida }}
+{{Taxobox | sous-classe | Magnoliidae }}
+{{Taxobox | ordre | Poales }}
+{{Taxobox | famille | Poaceae }}
+{{Taxobox | genre | Fétuque | Festuca }}
+{{Taxobox taxon | végétal | espèce | Festuca jubata | [[Richard Thomas Lowe|Lowe]], [[1838 en science|1838]] }}
+{{Taxobox fin}}
+
+'''''Festuca jubata''''' est une [[espèce]] de [[Angiosperme|plantes à fleurs]] [[monocotylédone]]s, de la [[Famille (biologie)|famille]] des [[Poaceae|Poacées]].
+
+== Description ==
+{{Section vide ou incomplète}}
+
+== Répartition ==
+{{WGSRPD|certain=AZO,MDR|source=[[Plants of the World Online|POWO]]{{Bioref|powo|6 août 2026|ref}}}}
+Ce taxon se rencontre dans les pays et régions suivants{{Bioref|powo|6 août 2026|ref}} : [[Açores]], [[Madère]].
+
+== Systématique ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Festuca jubata'' Lowe, 1838{{Bioref|POWO|6 août 2026|ref}}.
+
+''Festuca jubata'' a pour [[Synonyme (botanique)|synonyme]]{{Bioref|POWO|6 août 2026|ref}} :
+* ''Festuca glauca'' var. ''longearistata'' Hochst. ex Seub.
+
+== Notes et références ==
+{{références}}
+
+== Voir aussi ==
+{{Autres projets| commons=Category:Festuca jubata| species=Festuca jubata}}
+
+=== Liens externes ===
+* {{CatalogueofLife | 6HSZZ | ''Festuca jubata'' Lowe | consulté le=6 août 2026 }}
+* {{GBIF | 6HSZZ | ''Festuca jubata'' Lowe | consulté le=6 août 2026 }}
+* {{IPNI | 402924-1 | Festuca jubata | Lowe | consulté le=6 août 2026 }}
+* {{MNHN | espèce | festuca/jubata | ''Festuca jubata'' | consulté le=6 août 2026}}
+* {{NCBI | 464059 | ''Festuca jubata'' | consulté le=6 août 2026 }}
+* {{OEPP | FESJB | ''Festuca jubata'' | Lowe | consulté le=6 août 2026 }}
+* {{POWO | 402924-1 | Festuca jubata | Lowe | consulté le=6 août 2026 }}
+* {{Taxonomicon | 1604112 | ''Festuca jubata'' Lowe, 1838 | consulté le=6 août 2026 }}
+* {{Tropicos | 25528426 | Festuca jubata | Lowe | consulté le=6 août 2026 }}
+* {{WFO | 0000870816 | Festuca jubata | Lowe | consulté le=6 août 2026 }}
+
+{{Portail|Poaceae}}
+
+[[Catégorie:Poaceae]]
+[[Catégorie:Espèce de plantes (nom scientifique)]]
+[[Catégorie:Flore endémique de Macaronésie]]

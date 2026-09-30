@@ -1,0 +1,16 @@
+{{Taxobox début | animal | ''Ceratotherium simum'' | Rhinocéros blanc JHE.jpg | Rhinocéros blanc. }}
+{{Taxobox plage|collections=131|1.8|0 | [[Pléistocène inférieur]] au [[Holocène|présent]]}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | ordre | Perissodactyla }}
+{{Taxobox | famille | Rhinocerotidae }}
+{{Taxobox | genre | Ceratotherium <!-- [[John Edward Gray|Gray]], [[1868]] --> }}
+{{Taxobox taxon | animal | espèce | Ceratotherium simum | ([[William John Burchell|Burchell]], [[1817]]) }}
+{{Taxobox répartition|Mapa distribuicao original white rhino.png}}{{Légende/Début|centre}}
+{{Légende|#f7941d|''[[Ceratotherium simum cottoni]]''}}
+{{Légende|#00a651|''[[Ceratotherium simum simum]]''}}
+{{Légende/Fin}}
+{{Taxobox UICN | NT <!-- L'ESPÈCE N'EST PAS ÉTEINTE À L'ÉTAT SAUVAGE, MERCI DE NE PAS MODIFIER MAIS PLUTÔT DE LIRE LE TEXTE !! --> }}
+{{Taxobox CITES | I | 12/01/2005 }}
+{{Taxobox fin}}

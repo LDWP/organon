@@ -1,0 +1,201 @@
+{{Homonymes|Moha}}
+{{Taxobox début | végétal | ''Setaria italica'' | Japanese_Foxtail_millet_01.jpg | <!-- insérer une légende descriptive de l'image --> |classification=grin|règne=cacher}}
+{{Taxobox | famille | Poaceae }}
+{{Taxobox | sous-famille | Panicoideae }}
+{{Taxobox | tribu | Paniceae }}
+{{Taxobox | sous-tribu | Cenchrinae }}
+{{Taxobox | genre | Setaria }}
+{{Taxobox taxon | végétal | espèce | Setaria italica | ([[Carl von Linné|L.]]) [[Ambroise Marie François Joseph Palisot de Beauvois|P. Beauv.]], [[1812]] }}
+{{Taxobox fin}}
+
+'''''Setaria italica''''', la '''Sétaire d'Italie''', '''Panis''', '''Millet d'Italie''', '''Millet des oiseaux''', '''Petit mil''' ou '''Moha''', est une [[plante]] de la famille des [[Poacée]]s (graminées), cultivée comme [[céréale]] pour ses [[graine]]s. Le nom vernaculaire « millet des oiseaux » désigne aussi ses graines, qui servent notamment à l'alimentation des oiseaux domestiques.
+
+== Description ==
+[[Fichier:Setaria italica MHNT.BOT.2015.34.19.jpg|vignette|gauche|''Setaria italica'' - [[Muséum de Toulouse]].]]
+{{...}}
+[[Plante annuelle]] à tiges droites et robustes, de 60 cm à 1,5 m de haut. Feuilles effilées de 10 à 20 mm de large, à gaine velue. Inflorescence en [[panicule]] dense de 20 à 30 cm de long. Ne forme pas de touffe. Les épis ne s'agrippent pas.
+
+== Histoire ==
+{{WGSRPD|certain=CHN,CHS|introduit=ABT,AFG,ALA,ALG,AMU,ARI,ARK,ASS,AUT,BAN,BGM,BLT,BOR,BRC,BUL,BZC,BZL,BZS,CAL,CAY,CBD,CHC,CHH,CHI,CHM,CHT,CHX,CLM,CNT,CNY,COL,CPP,CUB,CYP,CZE,DEL,EGY,EHM,FLA,FRA,FRG,GEO,GER,GRB,GRC,HAW,HUN,ILL,IND,INI,IOW,IRN,IRQ,ITA,JAP,JAW,KAN,KAZ,KGZ,KHA,KOR,KRI,KRY,KTY,LAO,LBS,LBY,LEE,LOU,LSI,MAI,MAN,MAS,MAU,MDV,MIC,MIN,MLW,MLY,MNT,MOL,MOZ,MRY,MSI,MSO,MXC,MXT,MYA,NAT,NBR,NCA,NCS,NDA,NEB,NEP,NNS,NSC,NWG,NWH,NWJ,NWM,NWY,NZN,NZS,OFS,OHI,OKL,OMA,ONT,ORE,PAK,PAL,PEN,PHI,POL,PRM,QUE,REU,RHO,ROM,RUC,RUE,RUS,SAR,SAU,SCA,SDA,SPA,SRL,SUM,SWI,TAI,TAS,TCS,TEN,TEX,THA,TKM,TUE,TUR,TVL,TZK,UKR,UZB,VER,VIE,VRG,WAS,WDC,WHM,WIN,WIS,WSB,WVA,WYO,YEM,YUG,ZIM|source=[[Plants of the World Online|POWO]]{{Bioref|powo|23 août 2026|ref}}}}
+''Setaria italica'' est probablement originaire du centre de la [[Chine]] où il était cultivé dès le VI{{e}} millénaire avant l'ère commune, peut-être de manière prépondérante par rapport aux autres plantes locales<ref name = "birlouez"/>. En Europe, elle y est introduite vers le III{{e}} millénaire et y est cultivé largement jusqu'au {{XVIe siècle}} avant d'être petit à petit remplacé par le [[maïs]]<ref name = "birlouez"/>; quelques producteurs subsistent encore en France au {{XXIe siècle}}<ref name = "birlouez"/>. Son importance économique est marginale ; les autochtones en font de la [[bière traditionnelle]] appelée ''jann'' en Inde. La Chine est le principal producteur.
+
+== Utilisation ==
+* Alimentation humaine : culture vivrière en Asie du Sud-Est (Chine, Inde, Birmanie), Taïwan, consommée entre autres sous forme de bouillie ou de pain<ref name = "birlouez">{{Ouvrage|langue = français|titre = Petite et grande histoire des céréales et légumes secs|auteur = Éric Birlouez|éditeur = [[Éditions Quæ]]|collection = Carnets de sciences|année = 2022|isbn = 978-2-7592-3476-9|pages totales = 191|passage = 160|partie = Portraits de céréales et légumes secs|numéro chapitre = 4|titre chapitre = Plantes vivrières d'Extrême-Orient}}.</ref>.
+* Alimentation des oiseaux : graines pour [[oiseaux]] de volière<ref name = "birlouez"/>.
+* Alimentation du bétail : [[fourrage]] pour le bétail<ref name = "birlouez"/>. C'est un fourrage d'été à pousse rapide, utilisable en pâturage, [[ensilage]] ou foin. On utilise la sous-espèce ''moharia'', couramment appelée ''moha''. Il peut être cultivé en association avec un [[trèfle incarnat]] ou un [[trèfle d'Alexandrie]].
+
+== Taxinomie ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Setaria italica'' (L.) P.Beauv., 1812{{Bioref|ITIS|23 août 2026|ref}}.
+
+Ce taxon porte en français les [[nom vernaculaire|noms vernaculaires]] ou [[nom normalisé|normalisés]] suivants : Millet à grappes{{Bioref|OEPP|23 août 2026|ref}}{{,}}{{Bioref|Tela-métro|23 août 2026|ref}}, Millet des oiseaux{{Bioref|OEPP|23 août 2026|ref}}{{,}}{{Bioref|Tela-métro|23 août 2026|ref}}{{,}}{{Bioref|VASCAN|23 août 2026|ref}}, Sétaire d'Allemagne{{Bioref|OEPP|23 août 2026|ref}}, Sétaire d'Italie{{Bioref|OEPP|23 août 2026|ref}}{{,}}{{Bioref|Tela-métro|23 août 2026|ref}}{{,}}{{Bioref|VASCAN|23 août 2026|ref}}, Millet d'Italie{{Bioref|Tela-métro|23 août 2026|ref}}, Sétaire italienne{{Bioref|VASCAN|23 août 2026|ref}}, Panic d'Italie{{Bioref|Tela-métro|23 août 2026|ref}}. Pour la sous-espèce ''Setaria italica'' subsp. ''moharia'' - synonyme de ''Setaria italica'' selon {{Bioref|POWO|23 août 2026}} : Moha, Moha fourrager, Moha bigarré<ref>{{Lien web |langue=fr-FR |titre=Moha - Fiches couverts végétaux ARVALIS-infos.fr |url=https://fiches.arvalis-infos.fr/couverts/fiche_couvert.php?mode=fc&type_couv=pures&id_couvert=136 |site=Les Fiches [[Arvalis]] |consulté le=2026-08-23}}</ref>.
+
+=== Liste des variétés et formes ===
+Selon le {{Bioref|CatalogueofLife|23 août 2026}} :
+* ''Setaria italica ''f.'' aurantiaca'' (Körn.) F.T.Hubb.
+* ''Setaria italica ''f.'' breviseta'' F.T.Hubb.
+* ''Setaria italica ''f.'' gigas'' (Körn.) F.T.Hubb.
+* ''Setaria italica ''var.'' atra'' (Körn.) F.T.Hubb.
+* ''Setaria italica ''var.'' lobata'' (Körn.) Dekapr. & Kaspar.
+* ''Setaria italica ''var.'' macrochaeta'' (Körn.) Dekapr. & Kaspar.
+* ''Setaria italica ''var.'' metzgeri'' (Körn.) Jáv.
+* ''Setaria italica ''var.'' rubra'' (Körn.) F.T.Hubb.
+
+=== Synonymes ===
+''Setaria italica'' a pour [[Synonyme (botanique)|synonymes]]{{Bioref|POWO|23 août 2026|ref}} :
+{{colonnes|taille=25|1=
+* ''Alopecurus caudatus'' Thunb.
+* ''Chaetochloa germanica'' (Mill.) Smyth
+* ''Chaetochloa italica ''var.'' germanica'' (Mill.) Scribn.
+* ''Chaetochloa italica'' (L.) Scribn.
+* ''Chamaeraphis italica ''var.'' elobulata'' Kuntze
+* ''Chamaeraphis italica ''var.'' germanica'' (Mill.) Kuntze
+* ''Chamaeraphis italica ''var.'' macrochaeta'' (J.Jacq.) Kuntze
+* ''Chamaeraphis italica'' (L.) Kuntze
+* ''Echinochloa erythrosperma'' Roem. & Schult.
+* ''Echinochloa intermedia'' Roem. & Schult.
+* ''Ixophorus italicus'' (L.) Nash
+* ''Oplismenus helvolus'' (L.f.) P.Beauv.
+* ''Oplismenus intermedius'' (Vahl ex Hornem.) Kunth
+* ''Panicum aegyptiacum'' Roem. & Schult.
+* ''Panicum asiaticum'' Schult. & Schult.f.
+* ''Panicum chinense'' Trin.
+* ''Panicum compactum'' Kit. ex Schult.
+* ''Panicum elongatum'' Salisb.
+* ''Panicum erythrospermum'' Vahl ex Hornem.
+* ''Panicum germanicum'' Mill.
+* ''Panicum germanicum'' Willd.
+* ''Panicum globulare'' (J.Presl) Steud.
+* ''Panicum glomeratum'' Moench
+* ''Panicum helvolum'' L.f.
+* ''Panicum intermedium'' Vahl ex Hornem.
+* ''Panicum italicum ''convar.'' maximum'' Alef.
+* ''Panicum italicum ''convar.'' moharia'' Alef.
+* ''Panicum italicum ''var.'' brevisetum'' Döll
+* ''Panicum italicum ''var.'' californicum'' (Kellogg) Körn.
+* ''Panicum italicum ''var.'' compactum'' (Kit.) Eichler
+* ''Panicum italicum ''var.'' erythrospermum'' (Vahl ex Hornem.) Eichler
+* ''Panicum italicum ''var.'' germanicum'' (Mill.) Koeler
+* ''Panicum italicum ''var.'' germanicum'' Loisel.
+* ''Panicum italicum ''var.'' inerme'' Döll
+* ''Panicum italicum ''var.'' longisetum'' Döll
+* ''Panicum italicum ''var.'' macrochaetum'' (J.Jacq.) Döll
+* ''Panicum italicum ''var.'' mitis'' Alef.
+* ''Panicum italicum ''var.'' nigrum'' Körn.
+* ''Panicum italicum ''var.'' pabularis'' Alef.
+* ''Panicum italicum ''var.'' praecox'' Alef.
+* ''Panicum italicum ''var.'' violaceum'' Alef.
+* ''Panicum italicum'' L.
+* ''Panicum itieri'' (Delile) Steud.
+* ''Panicum macrochaetum'' (J.Jacq.) Link
+* ''Panicum maritimum'' Lam.
+* ''Panicum melfrugum'' Schult. & Schult.f.
+* ''Panicum miliaceum'' Blanco
+* ''Panicum moharicum'' (Alef.) E.H.L.Krause
+* ''Panicum panis'' (Jess.) Jess.
+* ''Panicum pumilum'' Link
+* ''Panicum serotinum'' Trin.
+* ''Panicum setaceum'' Trin.
+* ''Panicum setosum'' Trin.
+* ''Panicum sibiricum'' Roem. & Schult.
+* ''Panicum verticillatum ''var.'' majus'' Thunb.
+* ''Panicum viride ''subsp.'' italicum'' (L.) Asch. & Graebn.
+* ''Panicum viride ''var.'' italicum'' (L.) Backer
+* ''Panicum vulgare'' Wallr.
+* ''Paspalum germanicum'' (Mill.) Baumg.
+* ''Penicillaria italica'' (L.) Oken
+* ''Pennisetum germanicum'' (Mill.) Baumg.
+* ''Pennisetum helvolum'' (L.f.) R.Br.
+* ''Pennisetum italicum'' (L.) R.Br.
+* ''Pennisetum macrochaetum'' J.Jacq.
+* ''Setaria asiatica'' Rchb.
+* ''Setaria californica'' Kellogg
+* ''Setaria compacta'' Schur
+* ''Setaria erythrosperma'' (Vahl ex Hornem.) Spreng.
+* ''Setaria erythrosperma'' Hornem. ex Rchb.
+* ''Setaria flavida'' Hornem. ex Rchb.
+* ''Setaria germanica'' (Mill.) P.Beauv.
+* ''Setaria globularis'' J.Presl
+* ''Setaria helvola'' (L.f.) Roem. & Schult.
+* ''Setaria italica ''subsp.'' colchica'' Maisaya & Gorgidze
+* ''Setaria italica ''subsp.'' germanica'' (Mill.) K.Richt.
+* ''Setaria italica ''subsp.'' macrochaeta'' (J.Jacq.) Nyman
+* ''Setaria italica ''subsp.'' maxima'' Dekapr. & Kaspar.
+* ''Setaria italica ''subsp.'' moharia'' (Alef.) H.Scholz
+* ''Setaria italica ''subsp.'' nigrofructa'' F.T.Hubb.
+* ''Setaria italica ''subsp.'' rubrofructa'' F.T.Hubb.
+* ''Setaria italica ''subsp.'' stramineofructa'' F.T.Hubb.
+* ''Setaria italica ''var.'' barbata'' Gammie
+* ''Setaria italica ''var.'' breviseta'' (Döll) Hyl.
+* ''Setaria italica ''var.'' compacta'' Beck
+* ''Setaria italica ''var.'' germanica'' (Mill.) Chevall.
+* ''Setaria italica ''var.'' longiseta'' (Döll) Hyl.
+* ''Setaria italica ''var.'' mitis'' (Alef.) Hyl.
+* ''Setaria italica ''var.'' moharia'' (Alef.) Zimm.
+* ''Setaria italica ''var.'' nuda'' N.H.F.Desp.
+* ''Setaria italica ''var.'' praecox'' (Alef.) Hyl.
+* ''Setaria italica ''var.'' purpurea'' Gammie
+* ''Setaria italica subvar. densior'' F.T.Hubb.
+* ''Setaria italica subvar. germanica'' (Mill.) F.T.Hubb.
+* ''Setaria itieri'' Delile
+* ''Setaria japonica'' Pynaert
+* ''Setaria macrochaeta'' (J.Jacq.) Schult.
+* ''Setaria maritima'' (Lam.) Roem. & Schult.
+* ''Setaria melinis'' Link ex Steud.
+* ''Setaria moharia'' (Alef.) Menabde & Erizin
+* ''Setaria multiseta'' Dumort.
+* ''Setaria pachystachya'' Borbás
+* ''Setaria panis'' Jess.
+* ''Setaria persica'' Rchb.
+* ''Setaria verticillata ''var.'' longiseta'' (Döll) Volkart
+* ''Setaria violacea'' Hornem. ex Rchb.
+* ''Setaria viridis ''subsp.'' italica'' (L.) Briq.
+* ''Setaria viridis ''var.'' multiseta'' (Dumort.) T.Durand
+* ''Setariopsis italica'' (L.) Samp.
+}}
+
+== Voir aussi ==
+{{Autres projets
+| commons titre2=Catégorie Setaria italica
+| commons2=Category:Setaria italica
+| commons=Setaria italica
+| species=Setaria italica
+}}
+=== Articles connexes ===
+* [[Glossaire de botanique]]
+* [[Millet (graminée)]]
+
+=== Liens externes ===
+* {{BioLib|taxon|42722|''Setaria italica'' (L.) P. Beauv.| consulté le=23 août 2026}}
+* {{CatalogueofLife | 6YKG8 | ''Setaria italica'' (L.) P.Beauv. | consulté le=23 août 2026 }}
+* {{EFloras | 2 | 200026272 | Setaria italica | consulté le=23 août 2026 }}
+* {{EFloras | 5 | 200026272 | Setaria italica | consulté le=23 août 2026 }}
+* {{EOL | 1114673 | ''Setaria italica'' (L.) P.Beauv. | consulté le=23 août 2026 }}
+* {{GBIF | 6YKG8 | ''Setaria italica'' (L.) P.Beauv. | consulté le=23 août 2026 }}
+* {{GRIN espèce | 33817 | ''Setaria italica'' (L.) P. Beauv. | consulté le=23 août 2026 }}
+* {{IPNI | 1207294-2 | Setaria italica | (L.) P.Beauv., 1812 | consulté le=23 août 2026 }}
+* {{IRMNG | 11067885 | ''Setaria italica'' (L.) Beauv. | consulté le=23 août 2026 }}
+* {{ITIS | 41248 | ''Setaria italica'' (L.) P. Beauv. | consulté le=23 août 2026 }}
+* {{MNHN | espèce | setaria/italica | ''Setaria italica'' | consulté le=23 août 2026}}
+* {{NCBI | 4555 | ''Setaria italica'' | consulté le=23 août 2026 }}
+* {{OEPP | SETIT | ''Setaria italica'' | (Linnaeus) Palisot de Beauvois | consulté le=23 août 2026 }}
+* {{POWO | 1207294-2 | Setaria italica | (L.) P.Beauv., 1812 | consulté le=23 août 2026 }}
+* {{Taxonomicon | 10026 | ''Setaria italica'' (Linnaeus) P. Beauv. | consulté le=23 août 2026 }}
+* {{Tela-métro | 63621 | ''Setaria italica'' (L.) P.Beauv. 1812 | consulté le=23 août 2026 }}
+* {{Tropicos | 25509961 | Setaria italica | (L.) P. Beauv. | consulté le=23 août 2026 }}
+* {{VASCAN | 7949 | ''Setaria italica'' (Linnaeus) Palisot de Beauvois | consulté le=23 août 2026 }}
+* [https://www.youtube.com/watch?v=LPJNzK6-ouE 粟の収穫] [https://www.youtube.com/watch?v=FCpuIW-IpEQ 粟の脱穀] — ''"La récolte de Millet des oiseaux"'' [[Gujō|Gujō, Gifu]], Japon
+
+=== Bibliographie ===
+* Zangre R., Nguyen-Van E., Rherissi B., Till-Bottraud., 1992. ''Organisation du pool génétique de Setaria italica (L.) P. Beauv. et exploitation des ressources génétiques d'espèces spontanées''. Colloque international sur les complexes d'espèces, flux de gènes et ressources génétiques des plantes, 8-{{date-|10 janvier}} (Paris), 87-97.
+
+== Références ==
+{{Références}}
+
+{{Palette|Céréales}}
+{{Portail|Poaceae|agriculture|bière}}
+
+[[Catégorie:Millet]]
+[[Catégorie:Plante fourragère]]
+[[Catégorie:Espèce de Poaceae (nom scientifique)]]
+[[Catégorie:Poaceae]]
+[[Catégorie:Ingrédient de la bière]]

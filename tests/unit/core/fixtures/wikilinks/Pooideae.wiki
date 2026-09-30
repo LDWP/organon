@@ -1,0 +1,409 @@
+{{Taxobox début | végétal | ''Pooideae'' | Illustration Poa trivialis0.jpg | ''[[Poa trivialis]]''. | classification=APGIII }}
+{{Taxobox | clade | Angiospermes }}
+{{Taxobox | clade | Monocotylédones }}
+{{Taxobox | clade | Commelinidées }}
+{{Taxobox | ordre | Poales }}
+{{Taxobox | famille | Poaceae }}
+{{Taxobox | clade | clade BEP }}
+{{Taxobox taxon | végétal | sous-famille | Pooideae | [[George Bentham|Benth.]], 1861 }}
+{{Taxobox fin}}
+
+Les '''''Pooideae''''' sont une [[sous-famille (biologie)|sous-famille]] de [[plante]]s [[monocotylédone]]s de la [[famille (biologie)|famille]] des ''[[Poaceae]]'' (graminées). C'est la plus importante sous-famille de graminées avec plus de {{formatnum:4200}} [[espèce]]s regroupées en 200 genres environ.
+Elle comprend notamment des [[céréale]]s importantes telles que le [[blé]], l'[[orge commune|orge]], l'[[Avoine cultivée|avoine]], le [[seigle]] et de nombreuses espèces cultivées comme [[Fourrage|plantes fourragères]] ou pour créer des [[pelouse]]s d'agrément.
+On les désigne parfois aux États-Unis comme « graminées de saison fraîche (''cool-season grasses''), parce qu'elles sont adaptées aux régions de [[climat tempéré]]<ref name="SorengPeterson2015">{{article |langue=en| nom=Soreng |prénom=Robert J. |nom2=Peterson |prénom2=Paul M. |nom3=Romschenko |prénom3=Konstantin |nom4=Davidse |prénom4=Gerrit |nom5=Zuloaga |prénom5=Fernando O. |nom6=Judziewicz |prénom6=Emmet J. |nom7 =Filgueiras | prénom7=Tarciso S. | nom8=Davis | prénom8=Jerrold I. |nom9=Morrone |prénom9=Osvaldo | titre= ''A worldwide phylogenetic classification of the Poaceae (Gramineae)'' | revue=Journal of Systematics and Evolution |volume=53 | numéro=2 | année =2015 |pages=117–137 |issn=1674-4918 |doi=10.1111/jse.12150}} {{Libre accès}}.</ref>.
+Toutes ces plantes ont une [[Fixation du carbone en C3|photosynthèse en {{formule chimique|C|3}}]].
+
+Les ''Pooideae'' sont le [[groupe frère]] des ''[[Bambusoideae]]'' au sein du [[clade BEP]], et sont elles-mêmes subdivisées en 14 [[Tribu (biologie)|tribus]]<ref name="SorengPeterson2015"/>.
+
+== Synonymes ==
+Selon Soreng ''et al.''<ref name="researchgate.net">{{lien web | url=https://www.researchgate.net/publication/265553096_A_world-wide_phylogenetic_classification_of_Poaceae_Gramineae | titre=''A world-wide phylogenetic classification of Poaceae (Gramineae)'' | auteurs=Robert Soreng, Gerrit Davidse, Paul Peterson, F. Zuloaga, Emmet Judziewicz, T.S. Filgueiras, Osvaldo Morrone & Konstantin Romaschenko |  site= ResearchGate | pages= | date= avril 2014| consulté le=30 octobre 2017 | langue=en }}.</ref> :
+{{colonnes|taille=20|
+* ''Agrostidoideae'' Kunth ex Beilschm. (1833)
+* ''Anthoxanthoideae'' Link (1827)
+* ''Avenoideae'' Link (1827)
+* ''Cynosuroideae'' Link (1827)
+* ''Echinarioideae'' Link (1827)
+* ''Festucoideae'' Link (1827)
+* ''Glycerioideae'' Link (1827)
+* ''Hordeoideae'' Burmeist. (1837)
+* ''Phalaridoideae'' Burmeist. (1837)
+* ''Secaloideae'' Rouy (1913],
+* ''Stipoideae'' Burmeist. (1837)
+}}
+
+== Description ==
+
+Les inflorescences sont des [[panicule]]s ou des [[épi (botanique)|épis]]. Les [[épillet]]s ont une ou plusieurs fleurs. Les fleurs sont [[hermaphrodite]]s. Les [[glumelle|glumelles]] ont habituellement cinq nervures parfois plus. Les [[:wikt:lodicule|lodicules]] sont triangulaires. La fleur a trois étamines, rarement moins. Les styles sont libres.
+
+== Phylogénie ==
+
+[[Cladistique|Cladogramme]], selon une classification [[Phylogénie|phylogénétique]] de 2015, montrant les relations phylogénétiques entre les tribus de ''Pooideae'', ainsi que la position des bambous comme [[groupe frère]]<ref name="SorengPeterson2015"/>{{,}}<ref name="SorengDavidse2015">{{lien web|langue=en|titre= ''A World-wide Phylogenetic Classification of Poaceae (Gramineae): căo (草), capim, çayır, çimen, darbha, ghaas, ghas, gish, gramas, graminius, gräser, grasses, gyokh, he-ben-ke, hullu, kasa, kusa, nyasi, pastos, pillu, pullu, zlaki, etc.'' |url=http://www.tropicos.org/docs/meso/CLASSIFICATION%20OF%20world%20grasses%202013%20Oct%2029%20(2)fZedits%20April%203%202015.htm  |date= 3 avril 2015|site=Tropicos |auteurs=R. J. Soreng, G. Davidse, P. M. Peterson, F. O. Zuloaga, E. J. Judziewicz, T. S. Filgueiras, O. Morrone† & K. Romaschenko}}.</ref> :
+
+{{clade|style=font-size:90%;line-height:75%;width:600px;
+|1=[[bambou]]s (''[[Bambusoideae]]'')
+|label2='''''Pooideae'''''
+|2={{clade
+   |1=''[[Brachyelytreae]]''
+   |2={{clade
+      |1={{clade
+         |1=''[[Lygeeae]]''
+         |2=''[[Nardeae]]''
+         }}
+      |2={{clade
+         |1=''[[Phaenospermateae]]''
+         |2={{clade
+            |1={{clade
+               |1=''[[Brylkinieae]]''
+               |2=''[[Meliceae]]''
+               }}
+            |2={{clade
+               |1={{clade
+                  |1=''[[Ampelodesmeae]]''
+                  |2=''[[Stipeae]]''
+                  }}
+               |2={{clade
+                  |1=''[[Diarrheneae]]''
+                  |label2=« noyau des ''Pooideae'' »
+                  |2={{clade
+                     |1=''[[Brachypodieae]]''
+                     |2={{clade
+                        |1=''[[Poeae]]''
+                        |label2=''Triticodae''
+                        |2={{clade
+                           |1=''[[Littledaleae]]''
+                           |2={{clade
+                              |1=''[[Bromeae]]''
+                              |2=''[[Triticeae]]''
+                              }}
+                           }}
+                        }}
+                     }}
+                  }}
+               }}
+            }}
+         }}
+      }}
+   }}
+}}
+
+== Classification ==
+Selon Julia Schneider et al. (2009)<ref>{{article|langue=en|prénom1=Julia |nom1=Schneider |nom2=Döring |prénom2=Elke |nom3=Hilu |prénom3=Khidir W. |nom4=Röser |prénom4=Martin |titre=Phylogenetic structure of the grass subfamily Pooideae based on comparison of plastid matK gene-3 ' trnK exon and nuclear ITS sequences|périodique=Taxon|lien périodique=|volume=58|numéro=2|mois=mai|année=2009|pages=405-424|résumé=http://www.ingentaconnect.com/content/iapt/tax/2009/00000058/00000002/art00008=}}</ref> la classification est la suivante :
+
+{| class=wikitable
+! Tribu !! sous-tribu !! genres principaux
+|-
+| ''[[Brachyelytreae]]'' || || ''[[Brachyelytrum]]''
+|- {{GrizaLinio}}
+| rowspan=2|''[[Nardeae]]'' |||''[[Nardinae]]'' || ''[[Nardus]]''
+|- {{GrizaLinio}}
+|  ''[[Lygeinae]]'' ||  ''[[Lygeum]]''
+|-
+|  rowspan=2|''[[Meliceae]]'' ||''[[Brylkiniinae]]'' || ''[[Brylkinia]]''
+|-
+|''[[Melicinae]]'' ||  ''[[Glyceria]]'', ''[[Lycochloa]]'', ''[[Melica]]'', ''[[Pleuropogon]]'', ''[[Schizachne]]'', ''[[Streblochaete]]'', ''[[Triniochloa]]''
+|- {{GrizaLinio}}
+| ''[[Phaenospermateae]]'' ||||''[[Anisopogon]]'', ''[[Duthiea]]'', ''[[Danthoniastrum]]'', ''[[Phaenospermata]]'', ''[[Sinochasea]]''
+|-
+|  rowspan=2|''[[Stipeae]]'' ||''[[Ampelodesinae]]''|| ''[[Ampelodesmos]]''
+|-
+| ''[[Stipinae]]''|| ''[[Achnatherum]]'', ''[[Nassella]]'', ''[[Stipo|Stipa]]'', ''[[Piptatherum]]''
+|- {{GrizaLinio}}
+| ''[[Diarrheneae]]''|| || ''[[Diarrhena]]''
+|-
+|''[[Brachypodieae]]''|| || ''[[Brachypodium]]''
+|- {{GrizaLinio}}
+|  rowspan=3|''[[Triticeae]]'' || ''[[Littledaleinae]]'' || ''[[Littledalea]]''
+|- {{GrizaLinio}}
+|  ''[[Bromae]]'' ||  ''[[Boissiera]]'', ''[[Bromus]]''
+|- {{GrizaLinio}}
+|  ''[[Hordeinae]]'' || ''[[Aegilops]]'', ''[[Agropyron]]'', ''[[Amblyopyrum]]'', ''[[Australopyrum]]'', ''[[Cockaynea]]'', ''[[Crithopsis]]'', ''[[Dasypyrum]]'', ''[[Elymus]]'', ''[[Elytrigia]]'', ''[[Eremopyrum]]'', ''[[Festucopsis]]'', ''[[Henrardia]]'', ''[[Heteranthelium]]'', ''[[Hordelymus]]'', ''[[Hordeum]]'', ''[[Hystrix (plante)|Hystrix]]'', ''[[Kengyilia]]'', ''[[Leymus]]'', ''[[Lophopyrum]]'', ''[[Malacurus]]'', ''[[Pascopyrum]]'', ''[[Peridictyon]]'', ''[[Psathyrostachys]]'', ''[[Pseudoroegneria]]'', ''[[Secale]]'', ''[[Sitanion]]'', ''[[Taeniatherum]]'', ''[[Thinopyrum]]'', ''[[Triticum]]''
+|-
+|''[[Aveneae]]''<br>(clade Avenae/Poeae) || ||''[[Agrostis]]'', ''[[Airopsis]]'', ''[[Ammochloa]]'', ''[[Ammophila (plante)|Ammophila]]'', ''[[Amphibromus]]'', ''[[Ancistragrostis]]'', ''[[Aniselytron]]'', ''[[Anthoxanthum]]'', ''[[Antinoria]]'', ''[[Apera]]'', ''[[Arrhenatherum]]'', ''[[Avellinia]]'', ''[[Avena]]'', ''[[Avenula]]'', ''[[Briza]]'', ''[[Calamagrostis]]'', ''[[Chaetopogon]]'', ''[[Cinna (plante)|Cinna]]'', ''[[Cornucopiae]]'', ''[[Corynephorus]]'', ''[[Cyathopus]]'', ''[[Danthoniastrus]]'', ''[[Deyeuxxia]]'', ''[[Dichelachne]]'', ''[[Dielsiochloa]]'', ''[[Echinopogon]]'', ''[[Euthryptochloa]]'', ''[[Gastridium]]'', ''[[Gaudinia]]'', ''[[Gaudiniopsis]]'', ''[[Graphephorum]]'', ''[[Helictotrichon]]'', ''[[Hierochloe]]'', ''[[Hyalopoa]]'', ''[[Hypseochloa]]'', ''[[Koeleria]]'', ''[[Lagure|Lagurus]]'', ''[[Leptagrostis]]'', ''[[Libyella]]'', ''[[Limnas]]'', ''[[Limnodea]]'', ''[[Linkagrostis]]'', ''[[Maillea]]'', ''[[Metcalfia]]'', ''[[Mibora]]'', ''[[Nephelochloa]]'', ''[[Pentapogon]]'', ''[[Periballia]]'', ''[[Peyritschia]]'', ''[[Phalaris (plante)|Phalaris]]'', ''[[Pilgerochloa]]'', ''[[Polypogon]]'', ''[[Pseudarrhenatherum]]'', ''[[Pseudodanthonia]]'', ''[[Pseudophleum]]'', ''[[Relchela]]'', ''[[Rhizocephalus]]'', ''[[Scribneria]]'', ''[[Sphenopholis]]'', ''[[Stephanachne]]'', ''[[Stilpnophleum]]'', ''[[Tovarochloa]]'', ''[[Triplachne]]'', ''[[Trisetum]]'', ''[[Vahlodea]]''
+|- {{GrizaLinio}}
+| ''[[Poeae]]'' <br>(clade Avenae/Poeae)|| || ''[[Agropyropsis]]'', ''[[Aira]]'', ''[[Alopecurus]]'', ''[[Anthochloa]]'', ''[[Aphanelytrum]]'', ''[[Arctagrostis]]'', ''[[Arctophila]]'', ''[[Austrofestuca]]'', ''[[Avenella]]'', ''[[Beckmannia]]'', ''[[Bellardiochloa]]'', ''[[Calosteca]]'', ''[[Castellia]]'', ''[[Catabrosa]]'', ''[[Catabrosella]]'', ''[[Catapodium]]'', ''[[Coleanthus]]'', ''[[Colpodium]]'', ''[[Ctenopsis (plante)|Ctenopsis]]'', ''[[Cutandia]]'', ''[[Cynosurus]]'', ''[[Dactylis]]'', ''[[Dasypoa]]'', ''[[Desmazeria]]'', ''[[Deschampsia]]'', ''[[Dissanthelium]]'', ''[[Dryopoa]]'', ''[[Dupontia]]'', ''[[Eremopoa]]'', ''[[Erianthecium]]'', ''[[Festuca]]'', ''[[Festucella]]'', ''[[Gymnachne]]'', ''[[Holcus]]'', ''[[Hainardia]]'', ''[[Helleria]]'', ''[[Hookerochloa]]'', ''[[Lamarckia]]'', ''[[Leucopoa]]'', ''[[Lindbergella]]'', ''[[Loliolum]]'', ''[[Lolium]]'', ''[[Phleum]]'', ''[[Lombardochloa]]'', ''[[Megalachne]]'', ''[[Microbriza]]'', ''[[Micropyropsis]]'', ''[[Micropyrum]]'', ''[[Millet (graminée)|Milium]]'', ''[[Narduroides]]'', ''[[Parafestuca]]'', ''[[Parapholis]]'', ''[[Phippsia]]'', ''[[Pholiurus]]'', ''[[Pâturin|Poa]]'', ''[[Podophorus]]'', ''[[Poidium]]'', ''[[Pseudobromus]]'', ''[[Psilurus]]'', ''[[Puccinellia]]'', ''[[Rhomboelytrum]]'', ''[[Sclerochloa]]'', ''[[Scolochloa]]'', ''[[Sesleria]]'', ''[[Simplicia]]'', ''[[Sphenopus]]'', ''[[Torreyochloa]]'', ''[[Tsvelevia]]'', ''[[Vulpia]]'', ''[[Ventenata]]'', ''[[Vulpiella]]'', ''[[Wangenheimia]]'', ''[[Zingeria]]''
+|}
+
+== Liste des tribus, sous-tribus, genres, espèces, sous-espèces, variétés, formes et non-classés ==
+Selon {{Bioref|GRIN famille|8 août 2014}} :
+{{colonnes|taille=25|
+* tribu des ''[[Ampelodesmeae]]''
+* tribu des ''[[Brachyelytreae]]''
+* tribu des ''[[Brachypodieae]]''
+* tribu des ''[[Bromeae]]''
+* tribu des ''[[Brylkinieae]]''
+* tribu des ''[[Diarrheneae]]''
+* tribu des ''[[Lygeeae]]''
+* tribu des ''[[Meliceae]]''
+* tribu des ''[[Nardeae]]''
+* tribu des ''[[Phaenospermateae]]''
+* tribu des ''[[Poeae]]''
+** sous-tribu des ''[[Agrostidinae]]''
+** sous-tribu des ''[[Airinae]]''
+** sous-tribu des ''[[Alopecurinae]]''
+** sous-tribu des ''[[Ammochloinae]]''
+** sous-tribu des ''[[Aveninae]]''
+** sous-tribu des ''[[Brizinae]]''
+** sous-tribu des ''[[Cinninae]]''
+** sous-tribu des ''[[Coleanthinae]]''
+** sous-tribu des ''[[Cynosurinae]]''
+** sous-tribu des ''[[Dactylidinae]]''
+** sous-tribu des ''[[Loliinae]]''
+** sous-tribu des ''[[Miborinae]]''
+** sous-tribu des ''[[Miliinae]]''
+** sous-tribu des ''[[Parapholiinae]]''
+** sous-tribu des ''[[Phalaridinae]]''
+** sous-tribu des ''[[Poinae]]''
+** sous-tribu des ''[[Puccinelliinae]]''
+** sous-tribu des ''[[Scolochloinae]]''
+** sous-tribu des ''[[Scribneriinae]]''
+** sous-tribu des ''[[Sesleriinae]]''
+** sous-tribu des ''[[Torreyochloinae]]''
+* tribu des ''[[Stipeae]]''
+* tribu des ''[[Triticeae]]''
+}}
+
+Selon {{Bioref|GRIN famille|8 août 2014}} :
+{{colonnes|taille=25|
+* genre ''[[Achnatherum]]'' P. Beauv.
+* genre ''[[×Achnella]]'' Barkworth
+* genre ''[[Aciachne]]'' Benth.
+* genre ''[[Aegilops]]'' L.
+* genre ''[[×Aegilotriticum]]'' P. Fourn.
+* genre ''[[×Agroelymus]]'' E. G. Camus ex A. Camus
+* genre ''[[×Agrohordeum]]'' E. G. Camus ex A. Camus
+* genre ''[[×Agropogon]]'' P. Fourn.
+* genre ''[[Agropyron]]'' Gaertn.
+* genre ''[[Agropyropsis]]'' (Batt. & Trab.) A. Camus
+* genre ''[[Agrostis]]'' L.
+* genre ''[[Agrostopoa]]'' Davidse & al.
+* genre ''[[×Agrotriticum]]'' Cif. & Giacom.
+* genre ''[[Aira]]'' L.
+* genre ''[[Airopsis]]'' Desv.
+* genre ''[[Alopecurus]]'' L.
+* genre ''[[Amblyopyrum]]'' Eig
+* genre ''[[Amelichloa]]'' Arriaga & Barkworth
+* genre ''[[×Ammocalamagrostis]]'' P. Fourn.
+* genre ''[[Ammochloa]]'' Boiss.
+* genre ''[[Ammophila (plante)|Ammophila]]'' Host
+* genre ''[[Ampelodesmos]]'' Link
+* genre ''[[Amphibromus]]'' Nees
+* genre ''[[Anatherostipa]]'' (Hack. ex Kuntze) Peñail.
+* genre ''[[Anemanthele]]'' Veldkamp
+* genre ''[[Aniselytron]]'' Merr.
+* genre ''[[Anisopogon]]'' R. Br.
+* genre ''[[Anthochloa]]'' Nees & Meyen
+* genre ''[[Anthosachne]]'' Steud.
+* genre ''[[Anthoxanthum]]'' L.
+* genre ''[[Antinoria]]'' Parl.
+* genre ''[[Apera]]'' Adans.
+* genre ''[[Aphanelytrum]]'' Hack.
+* genre ''[[Arctagrostis]]'' Griseb.
+* genre ''[[Arctophila]]'' (Rupr.) Andersson
+* genre ''[[Arrhenatherum]]'' P. Beauv.
+* genre ''[[Australopyrum]]'' (Tzvelev) Á. Löve
+* genre ''[[Austrofestuca]]'' (Tzvelev) E. B. Alexeev
+* genre ''[[Austrostipa]]'' S. W. L. Jacobs & J. Everett
+* genre ''[[Avellinia]]'' Parl.
+* genre ''[[Avena]]'' L.
+* genre ''[[Avenella]]'' Parl.
+* genre ''[[Avenula]]'' (Dumort.) Dumort.
+* genre ''[[Beckmannia]]'' Host
+* genre ''[[Bellardiochloa]]'' Chiov.
+* genre ''[[Boissiera]]'' Hochst. ex Steud.
+* genre ''[[Brachyelytrum]]'' P. Beauv.
+* genre ''[[Brachypodium]]'' P. Beauv.
+* genre ''[[Briza]]'' L.
+* genre ''[[Bromus]]'' L.
+* genre ''[[Brylkinia]]'' F. Schmidt
+* genre ''[[Calamagrostis]]'' Adans.
+* genre ''[[Castellia]]'' Tineo
+* genre ''[[Catabrosa]]'' P. Beauv.
+* genre ''[[Catabrosella]]'' (Tzvelev) Tzvelev
+* genre ''[[Catapodium]]'' Link
+* genre ''[[Celtica (plante)|Celtica]]'' F. M. Vazquez & Barkworth
+* genre ''[[Chaetopogon]]'' Janch.
+* genre ''[[Cinna (plante)|Cinna]]'' L.
+* genre ''[[Coleanthus]]'' Seidl
+* genre ''[[Colpodium]]'' Trin.
+* genre ''[[Connorochloa]]'' Barkworth & al.
+* genre ''[[Cornucopiae]]'' L.
+* genre ''[[Corynephorus]]'' P. Beauv.
+* genre ''[[Crithopsis]]'' Jaub. & Spach
+* genre ''[[Ctenopsis (plante)|Ctenopsis]]'' De Not.
+* genre ''[[Cutandia]]'' Willk.
+* genre ''[[Cyathopus]]'' Stapf
+* genre ''[[Cynosurus]]'' L.
+* genre ''[[Dactylis]]'' L.
+* genre ''[[Dasypyrum]]'' (Coss. & Durieu) T. Durand
+* genre ''[[Deschampsia]]'' P. Beauv.
+* genre ''[[Desmazeria]]'' Dumort.
+* genre ''[[Diarrhena]]'' P. Beauv.
+* genre ''[[Dichelachne]]'' Endl.
+* genre ''[[Dissanthelium]]'' Trin.
+* genre ''[[Douglasdeweya]]'' C. Yen & al.
+* genre ''[[Dryopoa]]'' Vickery
+* genre ''[[Dupontia]]'' R. Br.
+* genre ''[[Duthiea]]'' Hack.
+* genre ''[[Echinaria]]'' Desf.
+* genre ''[[Echinopogon]]'' P. Beauv.
+* genre ''[[×Elyhordeum]]'' Mansf. ex Tsitsin & K. A. Petrowa
+* genre ''[[×Elyleymus]]'' B. R. Baum
+* genre ''[[×Elymotriticum]]'' P. Fourn.
+* genre ''[[Elymus]]'' L.
+* genre ''[[×Elytriticale]]''
+* genre ''[[×Elytritilops]]''
+* genre ''[[Eremopoa]]'' Roshev.
+* genre ''[[Eremopyrum]]'' (Ledeb.) Jaub. & Spach
+* genre ''[[Erianthecium]]'' Parodi
+* genre ''[[Festuca]]'' L.
+* genre ''[[Festucella]]'' E. B. Alexeev
+* genre ''[[Festucopsis]]'' (C. E. Hubb.) Melderis
+* genre ''[[×Festulolium]]'' Asch. & Graebn.
+* genre ''[[Gastridium]]'' P. Beauv.
+* genre ''[[Gaudinia]]'' P. Beauv.
+* genre ''[[Gaudinopsis]]'' (Boiss.) Eig
+* genre ''[[Glyceria]]'' R. Br.
+* genre ''[[Graphephorum]]'' Desv.
+* genre ''[[Gymnachne]]'' Parodi
+* genre ''[[Hainardia]]'' Greuter
+* genre ''[[Helictochloa]]'' Romero Zarco
+* genre ''[[Helictotrichon]]'' Besser
+* genre ''[[Henrardia]]'' C. E. Hubb.
+* genre ''[[Hesperostipa]]'' (Elias) Barkworth
+* genre ''[[Heteranthelium]]'' Hochst. ex Jaub. & Spach
+* genre ''[[Holcus]]'' L.
+* genre ''[[Hookerochloa]]'' E. B. Alexeev
+* genre ''[[×Hordale]]'' Cif. & Giacom.
+* genre ''[[Hordelymus]]'' (Jess.) Harz
+* genre ''[[Hordeum]]'' L.
+* genre ''[[Hyalopoa]]'' (Tzvelev) Tzvelev
+* genre ''[[Hypseochloa]]'' C. E. Hubb.
+* genre ''[[Jarava]]'' Ruiz & Pav.
+* genre ''[[Kengyilia]]'' C. Yen & J. L. Yang
+* genre ''[[Koeleria]]'' Pers.
+* genre ''[[Lagure|Lagurus]]'' L.
+* genre ''[[Lamarckia]]'' Moench
+* genre ''[[Leptophyllochloa]]'' C. E. Calderón ex Nicora
+* genre ''[[×Leydeum]]'' Barkworth
+* genre ''[[Leymus]]'' Hochst.
+* genre ''[[Libyella]]'' Pamp.
+* genre ''[[Limnas]]'' Trin.
+* genre ''[[Limnodea]]'' L. H. Dewey
+* genre ''[[Lindbergella]]'' Bor
+* genre ''[[Littledalea]]'' Hemsl.
+* genre ''[[Loliolum]]'' V. I. Krecz. & Bobrov
+* genre ''[[Lolium]]'' L.
+* genre ''[[Lophochlaena]]'' Nees
+* genre ''[[Lycochloa]]'' Sam.
+* genre ''[[Lygeum]]'' Loefl.
+* genre ''[[Macrochloa]]'' Kunth
+* genre ''[[Megalachne]]'' Steud.
+* genre ''[[Melica]]'' L.
+* genre ''[[Metcalfia]]'' Conert
+* genre ''[[Mibora]]'' Adans.
+* genre ''[[Microbriza]]'' Parodi ex Nicora & Rúgolo
+* genre ''[[Micropyropsis]]'' Romero Zarco & Cabezudo
+* genre ''[[Micropyrum]]'' (Gaudin) Link
+* genre ''[[Milium (genre)|Milium]]'' L.
+* genre ''[[Nardus]]'' L.
+* genre ''[[Nassella]]'' (Trin.) E. Desv.
+* genre ''[[Nephelochloa]]'' Boiss.
+* genre ''[[Neuropoa]]'' Clayton
+* genre ''[[Nicoraepoa]]'' Soreng & L. J. Gillespie
+* genre ''[[Oreochloa]]'' Link
+* genre ''[[Oreopoa]]'' H. Scholz
+* genre ''[[Ortachne]]'' Nees
+* genre ''[[Oryzopsis]]'' Michx.
+* genre ''[[Pappostipa]]'' (Speg.) Romaschenko & al.
+* genre ''[[Paracolpodium]]'' (Tzvelev) Tzvelev
+* genre ''[[Parapholis]]'' C. E. Hubb.
+* genre ''[[×Pascoleymus]]'' Barkworth
+* genre ''[[Pascopyrum]]'' Á. Löve
+* genre ''[[Pentapogon]]'' R. Br.
+* genre ''[[Periballia]]'' Trin.
+* genre ''[[Peridictyon]]'' Seberg & al.
+* genre ''[[Peyritschia]]'' E. Fourn.
+* genre ''[[Phaenosperma]]'' Munro ex Benth.
+* genre ''[[Phalaris (plante)|Phalaris]]'' L.
+* genre ''[[Phippsia]]'' (Trin.) R. Br.
+* genre ''[[Phleum]]'' L.
+* genre ''[[Pholiurus]]'' Trin.
+* genre ''[[Piptatherum]]'' P. Beauv.
+* genre ''[[Piptochaetium]]'' J. Presl
+* genre ''[[Pleuropogon]]'' R. Br.
+* genre ''[[Poa (plante)|Poa]]'' L.
+* genre ''[[Podophorus]]'' Phil.
+* genre ''[[Poidium]]'' Nees
+* genre ''[[Polypogon]]'' Desf.
+* genre ''[[Psammochloa]]'' Hitchc.
+* genre ''[[Psathyrostachys]]'' Nevski
+* genre ''[[×Pseudelymus]]'' Barkworth & D. R. Dewey
+* genre ''[[Pseudodanthonia]]'' Bor & C. E. Hubb.
+* genre ''[[Pseudoroegneria]]'' (Nevski) Á. Löve
+* genre ''[[Psilurus]]'' Trin.
+* genre ''[[Ptilagrostis]]'' Griseb.
+* genre ''[[Puccinellia]]'' Parl.
+* genre ''[[Relchela]]'' Steud.
+* genre ''[[Rhizocephalus]]'' Boiss.
+* genre ''[[Rhombolytrum]]'' Link
+* genre ''[[Rostraria]]'' Trin.
+* genre ''[[Saxipoa]]''
+* genre ''[[Schizachne]]'' Hack.
+* genre ''[[Sclerochloa]]'' P. Beauv.
+* genre ''[[Scolochloa]]'' Link
+* genre ''[[Scribneria]]'' Hack.
+* genre ''[[Secale]]'' L.
+* genre ''[[Sesleria]]'' Scop.
+* genre ''[[Simplicia]]'' Kirk
+* genre ''[[Sphenopholis]]'' Scribn.
+* genre ''[[Sphenopus]]'' Trin.
+* genre ''[[Stenostachys]]'' Turcz.
+* genre ''[[Stephanachne]]'' Keng
+* genre ''[[Stipa]]'' L.
+* genre ''[[×Stiporyzopsis]]'' B. L. Johnson & Rogler
+* genre ''[[Streblochaete]]'' Hochst. ex Pilg.
+* genre ''[[Sylvipoa]]'' Soreng & al.
+* genre ''[[Taeniatherum]]'' Nevski
+* genre ''[[Thinopyrum]]'' Á. Löve
+* genre ''[[Torreyochloa]]'' G. L. Church
+* genre ''[[Tovarochloa]]'' T. D. Macfarl. & But
+* genre ''[[Tricholemma]]'' (Röser) Röser
+* genre ''[[Trikeraia]]'' Bor
+* genre ''[[Triniochloa]]'' Hitchc.
+* genre ''[[Triplachne]]'' Link
+* genre ''[[Trisetaria]]'' Forssk.
+* genre ''[[Trisetopsis]]'' Röser & A. Wölk
+* genre ''[[Trisetum]]'' Pers.
+* genre ''[[×Triticosecale]]'' Wittm. ex A. Camus
+* genre ''[[Triticum]]'' L.
+* genre ''[[×Tritordeum]]'' Asch. & Graebn.
+* genre ''[[Tzvelevia]]'' E. B. Alexeev
+* genre ''[[Vahlodea]]'' Fr.
+* genre ''[[Ventenata]]'' Koeler
+* genre ''[[Vulpia]]'' C. C. Gmel.
+* genre ''[[Vulpiella]]'' (Batt. & Trab.) Burollet
+* genre ''[[Zingeria]]'' P. A. Smirn.
+}}
+
+== Notes et références ==
+{{Références}}
+
+== Voir aussi ==
+=== Articles connexes ===
+* ''[[Programinis burmitis]]'' : une espèce fossile
+
+=== Liens externes ===
+{{Autres projets
+|commons=Category:Pooideae
+|wikispecies=Pooideae
+}}
+* {{eFloras|5|316772|Pooideae|consulté le=8 août 2014 }}
+* {{GRIN famille|1472|''Pooideae''|consulté le=8 août 2014 }}
+* {{NCBI|147368|''Pooideae''|consulté le=8 août 2014 }}
+* {{Tropicos|50106396|Pooideae|Benth.|consulté le=8 août 2014 }}
+
+{{Palette|Sous-familles des Poaceae}}
+{{portail|Poaceae}}
+{{Catégorie principale|Pooideae}}
+[[Catégorie:Poaceae]]
+[[Catégorie:Sous-famille de Poaceae (nom scientifique)]]

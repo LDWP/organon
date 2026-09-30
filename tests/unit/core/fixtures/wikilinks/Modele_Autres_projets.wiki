@@ -1,0 +1,83 @@
+<includeonly><templatestyles src="Autres projets/styles.css" /><div class="autres-projets boite-grise boite-a-droite noprint js-interprojets">
+{{#if:{{{1|}}}{{{commons|}}}{{{Commons|}}}{{{wikispecies|}}}{{{Wikispecies|}}}{{{species|}}}{{{wiktionary|}}}{{{Wiktionary|}}}{{{wikt|}}}{{{wikiversity|}}}{{{Wikiversity|}}}{{{v|}}}{{{wikibooks|}}}{{{Wikibooks|}}}{{{b|}}}{{{wikisource|}}}{{{Wikisource|}}}{{{s|}}}{{{wikiquote|}}}{{{Wikiquote|}}}{{{q|}}}{{{wikinews|}}}{{{Wikinews|}}}{{{n|}}}{{{meta|}}}{{{m|}}}{{{outreach|}}}{{{wikidata|}}}{{{Wikidata|}}}{{{d|}}}{{{wikivoyage|}}}{{{Wikivoyage|}}}{{{voy|}}}{{{incubator|}}}{{{Incubator|}}}{{{incubateur|}}}{{{Incubateur|}}}|
+<p class="titre">Sur les autres projets Wikimedia :</p>
+<ul class="noarchive plainlinks">
+{{#if:{{{commons|{{{1|{{{Commons|}}}}}}}}}|
+<li class="commons">[{{fullurl:Commons:{{{commons|{{{1|{{{Commons|}}}}}}}}}}}?uselang=fr {{#if:{{{commons titre|}}}|{{{commons titre}}}|{{PAGENAME}}}}], sur <span class="project">Wikimedia Commons</span></li>
+}}{{#if:{{{commons2|{{{Commons2|}}}}}}|
+<li class="commons">[{{fullurl:Commons:{{{commons2|{{{Commons2|}}}}}}}}?uselang=fr {{#if:{{{commons titre2|}}}|{{{commons titre2}}}|{{PAGENAME}}}}], sur <span class="project">Wikimedia Commons</span></li>
+}}{{#if:{{{commons3|{{{Commons3|}}}}}}|
+<li class="commons">[{{fullurl:Commons:{{{commons3|{{{Commons3|}}}}}}}}?uselang=fr {{#if:{{{commons titre3|}}}|{{{commons titre3}}}|{{PAGENAME}}}}], sur <span class="project">Wikimedia Commons</span></li>
+}}{{#if:{{{wikispecies|{{{species|{{{Wikispecies|}}}}}}}}}|
+<li class="wikispecies">[[wikispecies:{{{wikispecies|{{{species|{{{Wikispecies|}}}}}}}}}|{{#if:{{{wikispecies titre|}}}|{{{wikispecies titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikispecies</span></span></li>
+}}{{#if:{{{wikispecies2|{{{species2|{{{Wikispecies2|}}}}}}}}}|
+<li class="wikispecies">[[wikispecies:{{{wikispecies2|{{{species2|{{{Wikispecies2|}}}}}}}}}|{{#if:{{{wikispecies titre2|}}}|{{{wikispecies titre2}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikispecies</span></span></li>
+}}{{#if:{{{wikispecies3|{{{species3|{{{Wikispecies3|}}}}}}}}}|
+<li class="wikispecies">[[wikispecies:{{{wikispecies3|{{{species3|{{{Wikispecies3|}}}}}}}}}|{{#if:{{{wikispecies titre3|}}}|{{{wikispecies titre3}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikispecies</span></span></li>
+}}{{#if:{{{wiktionary|{{{wikt|{{{Wiktionary|}}}}}}}}}|
+<li class="wiktionary">[[wikt:{{{wiktionary|{{{wikt|{{{Wiktionary|}}}}}}}}}|{{#if:{{{wiktionary titre|}}}|{{{wiktionary titre}}}|{{{wiktionary|{{{wikt|{{{Wiktionary|}}}}}}}}}}}]], <span class="nowrap">sur le <span class="project">Wiktionnaire</span></span>{{#if:{{{wiktionary thésaurus|{{{wikt thésaurus|}}}}}}|{{espace}}([[wikt:Thésaurus:{{{wiktionary thésaurus|{{{wikt thésaurus|}}}}}}{{#if:{{#titleparts:{{{wiktionary thésaurus|{{{wikt thésaurus|}}}}}}||2}}||/français}}|thésaurus]])}}</li>
+}}{{#if:{{{wiktionary2|{{{wikt2|{{{Wiktionary2|}}}}}}}}}|
+<li class="wiktionary">[[wikt:{{{wiktionary2|{{{wikt2|{{{Wiktionary2|}}}}}}}}}|{{#if:{{{wiktionary titre2|}}}|{{{wiktionary titre2}}}|{{{wiktionary2|{{{wikt2|{{{Wiktionary2|}}}}}}}}}}}]], <span class="nowrap">sur le <span class="project">Wiktionnaire</span></span></li>
+}}{{#if:{{{wiktionary3|{{{wikt3|{{{Wiktionary3|}}}}}}}}}|
+<li class="wiktionary">[[wikt:{{{wiktionary3|{{{wikt3|{{{Wiktionary3|}}}}}}}}}|{{#if:{{{wiktionary titre3|}}}|{{{wiktionary titre3}}}|{{{wiktionary3|{{{wikt3|{{{Wiktionary3|}}}}}}}}}}}]], <span class="nowrap">sur le <span class="project">Wiktionnaire</span></span></li>
+}}{{#if:{{{wiktionary4|{{{wikt4|{{{Wiktionary4|}}}}}}}}}|
+<li class="wiktionary">[[wikt:{{{wiktionary4|{{{wikt4|{{{Wiktionary4|}}}}}}}}}|{{#if:{{{wiktionary titre4|}}}|{{{wiktionary titre4}}}|{{{wiktionary4|{{{wikt4|{{{Wiktionary4|}}}}}}}}}}}]], <span class="nowrap">sur le <span class="project">Wiktionnaire</span></span></li>
+}}{{#if:{{{wiktionary5|{{{wikt5|{{{Wiktionary5|}}}}}}}}}|
+<li class="wiktionary">[[wikt:{{{wiktionary5|{{{wikt5|{{{Wiktionary5|}}}}}}}}}|{{#if:{{{wiktionary titre5|}}}|{{{wiktionary titre5}}}|{{{wiktionary5|{{{wikt5|{{{Wiktionary5|}}}}}}}}}}}]], <span class="nowrap">sur le <span class="project">Wiktionnaire</span></span></li>
+}}{{#if:{{{wikiversity|{{{v|{{{Wikiversity|}}}}}}}}}|
+<li class="wikiversity">[[v:{{{wikiversity|{{{v|{{{Wikiversity|}}}}}}}}}|{{#if:{{{wikiversity titre|}}}|{{{wikiversity titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikiversity</span></span></li>
+}}{{#if:{{{wikiversity2|{{{Wikiversity2|}}}}}}|
+<li class="wikiversity">[[v:{{{wikiversity2|{{{Wikiversity2|}}}}}}|{{#if:{{{wikiversity titre2|}}}|{{{wikiversity titre2}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikiversity</span></span></li>
+}}{{#if:{{{wikibooks|{{{b|{{{Wikibooks|}}}}}}}}}|
+<li class="wikibooks">[[b:{{{wikibooks|{{{b|{{{Wikibooks|}}}}}}}}}|{{#if:{{{wikibooks titre|}}}|{{{wikibooks titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikibooks</span></span></li>
+}}{{#if:{{{wikibooks2|{{{b2|{{{Wikibooks2|}}}}}}}}}|
+<li class="wikibooks">[[b:{{{wikibooks2|{{{b2|{{{Wikibooks2|}}}}}}}}}|{{#if:{{{wikibooks titre2|}}}|{{{wikibooks titre2}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikibooks</span></span></li>
+}}{{#if:{{{wikisource|{{{s|{{{Wikisource|}}}}}}}}}|
+<li class="wikisource">[[s:{{{wikisource|{{{s|{{{Wikisource|}}}}}}}}}|{{#if:{{{wikisource titre|}}}|{{{wikisource titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikisource</span></span></li>
+}}{{#if:{{{wikisource2|{{{Wikisource2|}}}}}}|
+<li class="wikisource">[[s:{{{wikisource2|{{{Wikisource2|}}}}}}|{{#if:{{{wikisource titre2|}}}|{{{wikisource titre2}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikisource</span></span></li>
+}}{{#if:{{{wikisource3|{{{Wikisource3|}}}}}}|
+<li class="wikisource">[[s:{{{wikisource3|{{{Wikisource3|}}}}}}|{{#if:{{{wikisource titre3|}}}|{{{wikisource titre3}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikisource</span></span></li>
+}}{{#if:{{{wikiquote|{{{q|{{{Wikiquote|}}}}}}}}}|
+<li class="wikiquote">[[q:{{{wikiquote|{{{q|{{{Wikiquote|}}}}}}}}}|{{#if:{{{wikiquote titre|}}}|{{{wikiquote titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikiquote</span></span></li>
+}}{{#if:{{{wikinews|{{{n|{{{Wikinews|}}}}}}}}}|
+<li class="wikinews">[[n:{{{wikinews|{{{n|{{{Wikinews|}}}}}}}}}|{{#if:{{{wikinews titre|}}}|{{{wikinews titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikinews</span></span></li>
+}}{{#if:{{{wikinews2|{{{Wikinews2|}}}}}}|
+<li class="wikinews">[[n:{{{wikinews2|{{{Wikinews2|}}}}}}|{{#if:{{{wikinews titre2|}}}|{{{wikinews titre2}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikinews</span></span></li>
+}}{{#if:{{{wikinews3|{{{Wikinews3|}}}}}}|
+<li class="wikinews">[[n:{{{wikinews3|{{{Wikinews3|}}}}}}|{{#if:{{{wikinews titre3|}}}|{{{wikinews titre3}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikinews</span></span></li>
+}}{{#if:{{{meta|{{{m|}}}}}}|
+<li class="metawiki">[[m:{{{meta|{{{m|}}}}}}|{{#if:{{{meta titre|}}}|{{{meta titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Meta-Wiki</span></span></li>
+}}{{#if:{{{outreach|}}}|
+<li class="wikimedia">[[outreach:{{{outreach}}}|{{#if:{{{outreach titre|}}}|{{{outreach titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Outreach</span></span></li>
+}}{{#if:{{{wikidata|{{{d|{{{Wikidata|}}}}}}}}}|{{#ifeq:{{NAMESPACE}}|{{ns:0}}|[[Catégorie:Page avec lien wikidata dans Autres projets]]|
+<li class="wikidata">[[d:{{{wikidata|{{{d|{{{Wikidata|}}}}}}}}}|{{#if:{{{wikidata titre|}}}|{{{wikidata titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikidata</span></span></li>
+}}}}{{#if:{{{wikivoyage|{{{voy|{{{Wikivoyage|}}}}}}}}}|
+<li class="wikivoyage">[[voy:{{{wikivoyage|{{{voy|{{{Wikivoyage|}}}}}}}}}|{{#if:{{{wikivoyage titre|}}}|{{{wikivoyage titre}}}|{{PAGENAME}}}}]], <span class="nowrap">sur <span class="project">Wikivoyage</span></span></li>
+}}{{#if:{{{incubator|{{{Incubator|{{{incubateur|{{{Incubateur|}}}}}}}}}}}}|
+<li class="incubator">[[incubator:{{{incubator|{{{Incubator|{{{incubateur|{{{Incubateur|}}}}}}}}}}}}|{{#if:{{{incubateur titre|}}}|{{{incubateur titre}}}|{{PAGENAME}}}}]], <span class="nowrap">dans <span class="project">l’Incubateur Wikimédia</span></span></li>
+}}
+</ul>
+|{{#ifeq:{{NAMESPACE}}|{{ns:0}}{{ns:4}}{{ns:10}}{{ns:12}}{{ns:14}}|<span class="error">Erreur d'utilisation : au moins un paramètre est requis ([[Modèle:Autres projets|aide]]).</span>[[Catégorie:Page utilisant un modèle avec une syntaxe erronée|Autres projets]]}}
+}}<!--fin du premier #if-->
+</div></includeonly><noinclude>{{Documentation}}
+<!-- Toutes les métadonnées (catégories, interwikis) dans la page de documentation SVP ! -->
+</noinclude><includeonly><!-- Quelques catégories de maintenance en rapport avec Wikidata --><!--
+ -->{{#switch:{{NAMESPACE}}||{{ns:14}}=<!-- Articles et catégories seulement. -->
+ {{#if:{{#property:P373}}
+ | {{#if:{{{commons|{{{1|{{{Commons|}}}}}}}}}
+  | {{#ifeq:{{FULLPAGENAMEE:Category:{{#property:P373}}}}|{{FULLPAGENAMEE:{{{commons|{{{1|{{{Commons|}}}}}}}}}}}
+   | [[Catégorie:Catégorie Commons avec lien local identique sur Wikidata]] <!-- Objectif -->
+   | [[Catégorie:Catégorie Commons avec lien local différent sur Wikidata]] <!-- Le bon lien est à déterminer-->
+   }}
+ | {{#if:{{{commons|{{{1|{{{Commons|}}}}}}}}}
+   | [[Catégorie:Catégorie Commons sans lien sur Wikidata]] <!-- Il faut importer ceux-là sur Wikidata -->
+   }}
+ }}
+ }}
+}}{{#ifeq:{{NAMESPACE}}|{{ns:0}}
+    | {{#if:{{{commons|{{{1|{{{Commons|}}}}}}}}}{{{wikispecies|{{{species|{{{Wikispecies|}}}}}}}}}{{{wiktionary|{{{wikt|{{{Wiktionary|}}}}}}}}}{{{wikiversity|{{{v|{{{Wikiversity|}}}}}}}}}{{{wikibooks|{{{b|{{{Wikibooks|}}}}}}}}}{{{wikisource|{{{s|{{{Wikisource|}}}}}}}}}{{{wikiquote|{{{q|{{{Wikiquote|}}}}}}}}}{{{wikinews|{{{n|{{{Wikinews|}}}}}}}}}{{{meta|{{{m|}}}}}}{{{outreach|}}}{{{wikidata|{{{d|{{{Wikidata|}}}}}}}}}{{{wikivoyage|{{{voy|{{{Wikivoyage|}}}}}}}}}{{{incubator|{{{Incubator|{{{incubateur|{{{Incubateur|}}}}}}}}}}}}
+        |
+        | [[Catégorie:Autres projets vide]]
+      }}
+}}</includeonly>

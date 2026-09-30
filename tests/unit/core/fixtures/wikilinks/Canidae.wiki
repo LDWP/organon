@@ -1,0 +1,349 @@
+{{paronyme|Channidae}}
+{{Taxobox début | animal | Canidae | Familia_Canidae.jpg |
+Espèces de différents genres actuels :<br>
+Un [[Loup doré africain]], un [[Dhole]],<br>
+un [[Lycaon pictus|Lycaon]], un [[Renard des savanes]]<br>
+un [[Loup à crinière]], un [[Chien des buissons]]<br>
+un [[Renard des steppes]], un [[Tanuki de Chine]]<br>
+un [[Otocyon]] et un [[Renard gris américain]].<br>
+<small>(De gauche à droite et de haut en bas)</small>
+| classification=MSW }}
+{{Taxobox plage|37.8|0|[[Éocène supérieur]] à [[Holocène]]<ref name=tedford2009 />{{rp|7}}|collections=2170}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | infra-classe | Placentalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Caniformia }}
+{{Taxobox taxon | animal | famille | Canidae | [[Johann Fischer von Waldheim|G. Fischer]], [[1817 en science|1817]] }}
+{{Taxobox taxons|sous-famille|
+*[[#Genres_des_Caninés|Caninae]] (avec les espèces actuelles)
+*{{éteint}} [[Borophaginae]]
+*{{éteint}} [[Hesperocyoninae]] }}
+{{Taxobox fin}}
+
+Les {{Dfn|Canidés}} ({{Dfn|Canidae}}) sont une [[Famille (biologie)|famille]] de [[mammifère]]s de l'[[Ordre (biologie)|ordre]] des [[Carnivora|Carnivores]], [[éponymie|éponyme]] de la branche des [[Caniformia|Caniformes]], et comprenant entre autres les [[Canis lupus|loups]] (et donc le [[chien]]), les [[chacal]]s et les [[renard]]s.
+
+Les Canidés se trouvent sur tous les continents, à l'exception de l'[[Antarctique]], où ils sont arrivés indépendamment ou accompagnés d'[[Homo sapiens|êtres humains]] sur de longues périodes. Les espèces varient en taille, du [[Canis lupus|loup gris]] de {{nobr|2 mètres}} de long au [[fennec]] de {{nobr|34 centimètres}} de long. Les formes corporelles des Canidés sont similaires, ayant généralement des oreilles droites, de longs museaux, aux [[canine]]s développées et aux [[Molaire (dent)|molaires]] nombreuses, adaptées pour casser les os et trancher la chair, de longues pattes, des [[Griffe (anatomie)|griffes]] non rétractiles (contrairement aux [[Felidae|Félidés]]) et des queues touffues. Ce sont pour la plupart des [[Animal social|animaux sociaux]], vivant ensemble en unités familiales ou en petits groupes et se comportant de manière coopérative. En règle générale, seul le couple dominant d'un groupe se reproduit et une portée de jeunes est élevée chaque année dans une tanière souterraine. Les Canidés communiquent par des signaux olfactifs et des vocalisations. Les chiens, [[Canis lupus familiaris|domestiques]] et [[Marronnage_(zoologie)|féraux]] ([[Dingo_(chien_sauvage)|Dingo]] et [[Canis lupus hallstromi|Chien chanteur]]), sont des descendants du [[Canis lupus|Loup gris]] ({{Lien|trad=Pleistocene_wolf|fr=Loup du Pléistocène}}, {{Lien|trad=Paleolithic dog|fr=Chien du Paléolithique}}), nés d'une [[domestication du chien|domestication humaine]] au [[Paléolithique supérieur]] et restent aujourd'hui les [[animaux domestiques]] les plus largement conservés.
+
+== Caractéristiques ==
+Les Canidés ont un [[bulbe tympanique]] non cloisonné. Leurs [[Griffe (anatomie)#Mammifères|griffes]] ne sont pas rétractiles. Ils possèdent 5 doigts sur les pattes antérieures et 4 sur les pattes postérieures<ref>{{lien web|titre=Canidae|site=/kimura.univ-montp2.fr|url=http://kimura.univ-montp2.fr/arbredelavie/fichetaxon.php?taxon=Canidae}}</ref>.
+
+Les Canidés sauvages sont présents sur tous les continents à l'exception de l'[[Antarctique]] et peuplent une grande variété d'[[Habitat (écologie)|habitats]], dont les déserts, les massifs montagneux, les forêts et les prairies. Ils présentent des tailles variables, du [[Fennec]] qui peut ne pas dépasser {{unité|24|cm}} de long et peser {{unité|0.6|kg}}<ref>{{ouvrage|auteur=Marc Tyler Nobleman|titre=Foxes|url=https://books.google.com/books?id=bwZx2t3D4ukC|année=2007|éditeur=Marshall Cavendish|isbn=978-0-7614-2237-2 |page=35}}</ref> au [[Canis lupus|Loup gris]] qui peut atteindre {{unité|160|cm}} de long et dépasser {{unité|70|kg}}<ref name="heptner1998">Heptner, V. G.; Naumov, N. P. (1998), [https://archive.org/details/mammalsofsov211998gept Mammals of the Soviet Union Vol. II Part 1a, Sirenia and Carnivora (Sea cows; Wolves and Bears)], Science Publishers, Inc. USA., {{p.|166–176}}, {{ISBN|1-886106-81-9}}</ref>. Seuls le [[Urocyon cinereoargenteus|Renard gris]], le [[Renard gris insulaire]] (étroitement apparenté au premier)<ref>{{ADW|Urocyon_littoralis|''Urocyon littoralis''|auteur=Liu, S.|date=2002.|consulté le=19 juin 2025}}</ref> et le [[Chien viverrin]] sont capables de grimper aux arbres<ref>Kauhala, K.; Saeki, M. (2004). Raccoon Dog«. Canid Species Accounts. IUCN/SSC Canid Specialist Group. Pridobljeno 15 April 2009.</ref>{{,}}<ref>{{article| titre = Old dogs, new tricks: Asia's raccoon dog, a venerable member of the canid family is pushing into new frontiers | auteur = Ikeda, Hiroshi | journal = Natural History | volume = 95 | numéro = #8 |pages=40, 44 | date = August 1986}}</ref>{{,}}<ref>{{lien web|url=http://www.waza.org/en/zoo/visit-the-zoo/dogs-and-hyenas/nyctereutes-procyonoides. |titre=Raccoon dog – ''Nyctereutes procyonoides''. WAZA – World Association of Zoos and Aquariums. |consulté le=30 août 2011 |archive-url=https://web.archive.org/web/20150410065554/http://www.waza.org/en/zoo/visit-the-zoo/dogs-and-hyenas/nyctereutes-procyonoides |archive-date=10 April 2015 }}</ref>.
+
+Tous les Canidés ont la même forme de base, bien que les tailles relatives du [[museau]], des membres, des oreilles et de la queue varient considérablement d'une espèce à l'autre. Les Canidés ont des pattes relativement longues et un corps souple, adapté à la chasse, à l'exception du [[chien des buissons]], du chien viverrin et de certaines races de [[Chien|chiens domestiques]]. La queue est touffue et la longueur du pelage change avec la saison. Le museau est nettement plus allongé que celui des [[Felidae|félins]]. Les [[Arcade zygomatique|arcades zygomatiques]] sont larges, le [[crâne]] présente une [[Suture lambdoïde|crête lambdoïde]] transversale à l'arrière et chez quelques espèces, une [[crête sagittale]]. L'[[Orbite (anatomie)|orbite]] osseuse autour de l’œil ne forme jamais un anneau complet et les [[Os tympanal|bulles tympanales]] sont lisses et arrondies<ref name=Mivart>{{ouvrage|titre=Dogs, Jackals, Wolves, and Foxes: A Monograph of the Canidae |nom=Mivart |prénom=St. George Jackson |année=1890 |pages=xiv–xxxvi |url=https://archive.org/details/dogsjackalswolv00keulgoog |éditeur=London : R.H. Porter : Dulau }}</ref>. Les femelles ont trois à sept paires de [[mamelle]]s<ref name="Nowak2005">{{ouvrage|auteur=Ronald M. Nowak|titre=Walker's Carnivores of the World|url=https://books.google.com/books?id=0q5aHw2mFi8C|année=2005|éditeur=JHU Press|isbn=978-0-8018-8032-2}}</ref>.
+
+[[File:Black-backed Jackal skeleton.jpg|thumb|Squelette d'un chacal à dos noir (''[[Lupullela mesomelas]]'') exposé au [[Musée d'Ostéologie]]]]
+Tous les Canidés sont [[digitigrade]]s (ils marchent sur les orteils). L'extrémité du nez, la truffe, est toujours dépourvue de poils, tout comme les [[Callosité|coussinets]] sous les pattes. Ces derniers sont situés sous chaque doigt tandis qu'un coussinet plus grand est situé sous l'extrémité des doigts. Des poils poussent entre les coussinets et chez le [[Renard polaire]] le dessous des pattes est même couvert d'une fourrure dense à certaines périodes de l'année. Les Canidés ont cinq doigts sur les pattes antérieures (à l'exception du lycaon qui en a quatre), mais le pouce est atrophié et ne touche pas le sol. Les pattes postérieures ont quatre doigts mais certains chiens domestiques présentent un [[Ergot (mammifère)|cinquième doigt atrophié]] qui n'a cependant aucune connexion anatomique avec le reste du membre. Les griffes incurvées ne sont pas rétractiles et sont plus ou moins émoussées<ref name=Mivart/>.
+
+Le pénis chez le mâle contient un os, le [[baculum]]. Il contient également une structure à la base appelée bulbe glandis, qui aide à créer un lien copulatoire pendant l'accouplement, enfermant les animaux ensemble pendant jusqu'à une heure<ref name="Ewer1973">{{ouvrage|auteur=Ewer, R. F. |titre=The Carnivores|url=https://books.google.com/books?id=IETMd3-lSlkC|année=1973|éditeur=Cornell University Press|isbn=978-0-8014-8493-3}}</ref>. Les jeunes Canidés naissent aveugles, leurs yeux s'ouvrant quelques semaines après la naissance<ref>{{ouvrage|auteur= Macdonald, D.|année= 1984|titre= The Encyclopedia of Mammals|éditeur= Facts on File|lieu= New York|page= [https://archive.org/details/encyclopediaofma00mals_0/page/57 57]|isbn= 978-0-87196-871-5|url= https://archive.org/details/encyclopediaofma00mals_0/page/57}}</ref>. Tous les Canidés actuels (famille des [[Caninae]]) ont un [[ligament]] similaire au [[ligament nuchal]] des [[Ungulata]] et qui sert à maintenir la position de la tête et du cou avec peu d'effort musculaire. Ce ligament permet d'économiser de l'énergie lorsque l'animal parcourt de grandes distances tout en maintenant le nez au sol pour suivre une piste. Cependant, d'après les détails des os du cou, il semble qu'au moins certains des [[Borophaginae]] (tel que ''[[Aelurodon]]'') aient été dépourvus de ce ligament{{sfn|Wang|Tedford|2008|pp=97–98}}.
+
+=== Denture ===
+[[File:Wolf cranium labelled.jpg|thumb|300px|Diagramme d'un crâne de loup avec des caractéristiques clés étiquetées]]
+[[File:Loup Muséum Histoire naturelle Lille GLAM 2016 F Lamiot crâne détail.jpg|thumb|right|Crâne de [[Canis lupus lupus|loup gris commun]].]]
+La [[denture]] désigne la disposition des dents dans la bouche. La formule dentaire de la mâchoire supérieure est notée en lettres majuscules, I pour les [[incisive]]s, C pour les [[canine]]s, P pour les [[prémolaire]]s et M pour les [[Molaire (dent)|molaires]], tandis que les lettres minuscules i, c, p et m sont utilisées pour les dents de la mâchoire inférieure. Les dents de chaque côté de la bouche sont numérotées à partir des dents de devant jusqu'aux dents de derrière. Chez les carnivores, les [[carnassière]]s correspondent à la prémolaire supérieure P4 et à la molaire inférieure m1 et sont utilisées ensemble pour trancher les muscles et les tendons de la proie{{sfn|Wang|Tedford|2008|pp=74}}.
+
+Les Canidés utilisent leurs prémolaires pour la coupe et l'écrasement, à l'exception de la quatrième prémolaire supérieure P4 (la carnassière supérieure) qui n'est utilisée que pour la coupe. Ils utilisent leurs molaires pour le broyage à l'exception de la première molaire inférieure m1 (la carnassière inférieure) qui a évolué à la fois pour le découpage et le broyage en fonction de l'adaptation alimentaire du canidé. Sur le carnassier inférieur, le trigonide est utilisé pour le tranchage et le [[talonide]] est utilisé pour le broyage. Le rapport entre le trigonide et le talonide indique les habitudes alimentaires d'un carnivore, un trigonide plus grand indiquant un [[hypercarnivore]] et un talonide plus grand indiquant un régime plus [[omnivore]]<ref name=sansalone2015>{{article|doi=10.1016/j.quascirev.2014.12.009|titre=Evolutionary trends and stasis in carnassial teeth of European Pleistocene wolf Canis lupus (Mammalia, Canidae)|journal=Quaternary Science Reviews|volume=110|pages=36–48|année=2015|nom1=Sansalone|prénom1=Gabriele|nom2=Bertè|prénom2=Davide Federico|nom3=Maiorino|prénom3=Leonardo|nom4=Pandolfi|prénom4=Luca}}</ref>{{,}}<ref name=cherin2013>{{article|nom1=Cherin|prénom1=Marco|nom2=Bertè|prénom2=Davide Federico |nom3=Sardella|prénom3=Raffaele|nom4=Rook|prénom4=Lorenzo|titre=Canis etruscus (Canidae, Mammalia) and its role in the faunal assemblage from Pantalla (Perugia, central Italy): comparison with the Late Villafranchian large carnivore guild of Italy|journal=Bollettino della Società Paleontologica Italiana|volume=52|numéro=#1|année=2013|pages=11–18|url=https://www.researchgate.net/publication/256431568}}</ref>. En raison de sa faible variabilité, la longueur du carnassier inférieur est utilisée pour fournir une estimation de la taille du corps d'un carnivore<ref name=sansalone2015/>.
+
+La plupart des Canidés ont 42 dents suivant la formule {{FormuleDentaire|supérieure=3.1.4.2|inférieure=3.1.4.3}}, mais le [[Chien des buissons]] n'a qu'une seule paire de molaires supérieures et deux inférieures, le [[Dhole]] en a deux supérieures et deux inférieures, et le [[Renard à oreilles de chauve-souris]] a trois ou quatre paires de molaires supérieures et quatre inférieures<ref name=Mivart/>. Les molaires sont puissantes chez la plupart des espèces et leur permettent de casser les os pour atteindre la moelle. La formule des dents de lait chez les Canidés est {{FormuleDentaire|supérieure=3.1.3|inférieure=3.1.3}}, les molaires étant complètement absentes<ref name=Mivart/>.
+
+Une étude portant sur une estimation de la puissance de la morsure parmi un large échantillon de mammifères prédateurs, a découvert que rapporté à la masse corporelle, le canidé qui avait la morsure la plus puissante était ''[[Canis dirus]]'' (163) suivi par quatre canidés modernes [[hypercarnivore]]s qui s'attaquent souvent à des proies plus grosses qu'eux : le [[Lycaon (animal)|Lycaon]] (142), le [[Canis lupus|Loup gris]] (136), le Dhole (112) et le [[Dingo (chien sauvage)|Dingo]] (108). La taille maximale des proies d'un prédateur dépend fortement de ses limites [[biomécanique]]s<ref name=wroe2005>{{article|doi=10.1098/rspb.2004.2986|titre=Bite club: Comparative bite force in big biting mammals and the prediction of predatory behaviour in fossil taxa|journal=Proceedings of the Royal Society B: Biological Sciences|volume=272|numéro=#1563|pages=619–25|année=2005|nom1=Wroe|prénom1=S.|nom2=McHenry|prénom2=C.|nom3=Thomason|prénom3=J.|pmid=15817436|pmc=1564077}}</ref>.
+
+== Comportements ==
+=== Comportement social ===
+[[File:2012-bandipur-dhole-sambar.jpg|left|thumb|[[Dhole]]s attaquant un [[sambar]], [[parc national de Bandipur]]. C'est le seul canidé qui n'égorge pas ses proies : il les éviscère.]]
+{{Article connexe|Canis_lupus#Comportement|Comportement du chien|Renard_roux#Écologie_et_comportement|Lycaon_(animal)#Mode_de_vie_et_reproduction}}
+Presque tous les Canidés sont des animaux sociaux et vivent en groupe. En général, ils sont territoriaux ou ont un domaine vital et dorment à l'air libre, n'utilisant leurs tanières que pour la reproduction et parfois par mauvais temps<ref>{{ouvrage|nom1=Harris |prénom1=Stephen |nom2=Yalden |prénom2=Derek |titre=Mammals of the British Isles|éditeur=Mammal Society|numéro d'édition=4th revised |année=2008 |isbn=978-0-906282-65-6 |page=413 }}</ref>. Chez la plupart des renards, et chez beaucoup de vrais chiens, un couple travaille ensemble pour chasser et élever leurs petits. Les loups gris et certains autres grands canidés vivent en groupes plus importants appelés [[meute (canidés)|meutes]]. Les chiens sauvages africains ont des meutes qui peuvent comprendre de 20 à 40 animaux et des meutes de moins d'environ sept individus peuvent être incapables de se reproduire avec succès<ref>{{lien web|url=https://www.patriciamcconnell.com/theotherendoftheleash/comparative-canid-behavior |titre=Comparative canid behaviour |auteur=McConnell, Patricia B. |date=31 August 2009 |site=The other end of the leash |consulté le=12 juin 2014}}</ref>. La chasse en meute a l'avantage de pouvoir s'attaquer à des proies plus grosses. Tous les canidés, excepté le [[dhole]], égorgent leurs proies<ref>{{Lien web |auteur institutionnel=Parc Animalier d'Auvergne |titre=Dholes |url=https://www.parcanimalierdauvergne.fr/les-animaux-du-parc/dholes/ |site=parcanimalierdauvergne.fr |consulté le=14 mai 2025}}</ref>. Certaines espèces forment des meutes ou vivent en petits groupes familiaux selon les circonstances, notamment le type de nourriture disponible. Chez la plupart des espèces, certains individus vivent seuls. Au sein d'une meute de canidés, il existe un système de dominance pour que les animaux les plus forts et les plus expérimentés mènent la meute. Dans la plupart des cas, le mâle et la femelle dominants sont les seuls membres de la meute à se reproduire<ref name="ref_auto_1">{{ADW|Canidae|''Canidae''|ancre=ADW|auteur=Fahey, B., P. Myers|date=2000|consulté le = 13 juin 2014}}</ref>.
+
+[[File:Red_Fox_(Vulpes_vulpes)_(W1CDR0001529_BD12).ogg|left|thumb|Des renards roux qui aboient à Pinbury Park, Gloucestershire, Angleterre.]]
+Les Canidés communiquent entre eux par des signaux olfactifs, par des indices visuels et des gestes, et par des vocalisations telles que des grognements, des aboiements et des hurlements. Dans la plupart des cas, les groupes ont un territoire d'origine d'où ils chassent d'autres [[Conspécificité|congénère]]s. Le territoire est marqué en laissant des marques d'odeur d'urine, qui avertissent les individus intrusifs<ref>Nowak, R. M.; Paradiso, J. L. 1983. ''Walker's Mammals of the World''. Baltimore, Maryland: The Johns Hopkins University Press. {{ISBN|0-8018-2525-3}}.</ref>. Le comportement social est également médié par les sécrétions des glandes sur la surface supérieure de la queue près de sa racine et des [[glandes anales]]<ref name="ref_auto_1" />, des [[glandes préputiales]]<ref>Van Heerden, Joseph. "[https://repository.up.ac.za/bitstream/handle/2263/51834/5vanheerden1981.pdf?sequence=1 The role of integumental glands in the social and mating behaviour of the hunting dog Lycaon pictus (Temminck, 1820)]." (1981).</ref>, et des [[glandes supracaudales]]<ref>Fox, Michael W., and James A. Cohen. "[https://publish.iupress.indiana.edu/read/how-animals-communicate/section/d60e31a7-f9c0-4f0d-b569-7a922f64e0c1 Canid communication]." How animals communicate (1977): 728-748.</ref>.
+
+=== Reproduction ===
+{{multiple image | align = right | footer = L'accouplement des loups gris et des renards roux | image1 = Korean wolves mating (cropped).jpg | image2 = Red foxes mating (2).jpg}}
+[[File:Wilde huendin am stillen.jpg|thumb|right|Une chienne sauvage du Sri Lanka allaite ses chiots]]
+Les Canidés en tant que groupe présentent plusieurs traits de reproduction qui sont rares chez les mammifères dans leur ensemble. Ils sont généralement [[monogame]]s, fournissent des soins paternels à leur progéniture, ont des cycles de reproduction avec de longues phases [[Œstrus#Chez les chiens|prœstrales et diœstrales]] et ont un lien copulatoire pendant l'accouplement. Ils retiennent également la progéniture adulte dans le groupe social, supprimant leur capacité à se reproduire tout en utilisant les [[soins alloparentaux]] qu'ils peuvent fournir pour aider à élever la prochaine génération de progéniture<ref name=Asa>{{ouvrage|titre=A review of Small Canid Reproduction: in The Swift Fox: Ecology and Conservation of Swift Foxes in a Changing World |editor-last=Asa |editor-first=Cheryl S. |editor2-last=Valdespino|editor2-first=Carolina|editor3-last=Carbyn|editor3-first=Ludwig N.|editor4-last= Sovada|editor4-first=Marsha Ann |année=2003 |éditeur=University of Regina Press |isbn=978-0-88977-154-3 |pages=117–123 |url=https://books.google.com/books?id=Er1di1OqnlAC&pg=PA117}}</ref>.
+
+Pendant la période prœstrale, des niveaux accrus d'[[estradiol]] rendent la femelle attirante pour le mâle. Il y a une augmentation de la [[progestérone]] pendant la phase œstrale lorsque la femelle est réceptive. À la suite de cela, le niveau d'œstradiol fluctue et il y a une longue phase diœstrale pendant laquelle la femelle est enceinte. La [[pseudo-grossesse]] survient fréquemment chez les canidés qui ont ovulé mais n'ont pas réussi à concevoir. Une période d'[[anœstrus]] suit la gestation ou la pseudo-grossesse, il n'y a qu'une seule période œstrale au cours de chaque saison de reproduction. Les canidés de petite et moyenne taille ont pour la plupart une période de [[gestation]] de 50 à {{nobr|60 jours}}, tandis que les espèces plus grandes ont en moyenne 60 à {{nobr|65 jours}}. La période de l'année à laquelle la saison de reproduction a lieu est liée à la longueur du jour, comme cela a été démontré dans le cas de plusieurs espèces qui ont été déplacées de l'équateur vers l'autre hémisphère et connaissent un décalage de phase de six mois. Les chiens domestiques et certains petits canidés en captivité peuvent entrer en œstrus plus fréquemment, peut-être parce que le stimulus [[Photopériodisme|photopériodique]] se décompose dans des conditions d'éclairage artificiel<ref name=Asa/>.
+
+La taille d'une portée varie, de un à 16 chiots ou plus naissent. Les jeunes naissent petits, aveugles et impuissants et nécessitent une longue période de soins parentaux. Ils sont conservés dans une tanière, le plus souvent creusée dans le sol, pour plus de chaleur et de protection<ref name=Mivart/>. Lorsque les jeunes commencent à manger de la nourriture solide, les deux parents, et souvent d'autres membres de la meute, leur rapportent de la nourriture de la chasse. C'est le plus souvent vomi de l'estomac de l'adulte. Lorsqu'une telle implication de la meute dans l'alimentation de la portée se produit, le taux de réussite de reproduction est plus élevé que dans le cas où les femelles se séparent du groupe et élèvent leurs petits de manière isolée<ref>{{ouvrage|titre=The Behavioural Biology of Dogs |editor-last=Jensen |editor-first=Per |année=2007 |éditeur=CABI |isbn=978-1-84593-188-9 |pages=158–159 |url=https://books.google.com/books?id=SpkSd__EdKYC&pg=PA3 }}</ref>. Les jeunes canidés peuvent mettre un an à mûrir et à acquérir les compétences dont ils ont besoin pour survivre<ref>Voelker, W. 1986. ''The Natural History of Living Mammals''. Medford, New Jersey: Plexus Publishing. {{ISBN|0-937548-08-1}}</ref>. Chez certaines espèces, comme le chien sauvage d'Afrique, la progéniture mâle reste généralement dans la meute natale, tandis que les femelles se dispersent en groupe et rejoignent un autre petit groupe du sexe opposé pour former une nouvelle meute<ref>{{lien web|url=http://www.animalinfo.org/species/carnivor/lycapict.htm |titre=''Lycaon pictus'' |date=26 November 2005 |site=Animal Info: Endangered animals of the world |consulté le=11 juin 2014}}</ref>.
+
+== Taxinomie ==
+Dans l'histoire des carnivores, la famille des Canidae est représentée par les deux sous-familles éteintes désignées comme Hesperocyoninae et Borophaginae, et la sous-famille existante des Caninae<ref name=miklosi2015>{{ouvrage|nom1=Miklosi|prénom1=Adam|titre=Dog Behaviour, Evolution, and Cognition|éditeur=Oxford University Press|numéro d'édition=2nd|collection=Oxford Biology|année=2015|pages=103–107|url=https://books.google.com/books?id=VT-WBQAAQBAJ&pg=PA103|isbn=978-0199545667}}</ref>. Cette sous-famille comprend tous les canidés vivants et leurs parents fossiles les plus récents<ref name=tedford2009>{{article|titre=Phylogenetic systematics of the North American fossil Caninae (Carnivora: Canidae) |année=2009 |prénom1=Richard |nom1=Tedford |lien auteur1=Richard H. Tedford |prénom2=Xiaoming |nom2=Wang |lien auteur2=Xiaoming Wang |prénom3=Beryl E. |nom3=Taylor |journal=[[Bulletin of the American Museum of Natural History]] |volume=325 |pages=1–218 |doi=10.1206/574.1 |hdl=2246/5999 |s2cid=83594819 |url=http://digitallibrary.amnh.org/dspace/bitstream/2246/5999/1/B325.pdf}}</ref>. Tous les Canidés vivants en tant que groupe forment un groupe dentaire [[monophylétique]] avec les borophaginés éteints, les deux groupes ayant une [[prémolaire]] (deux points) sur la [[Molaire (dent)|molaire]] [[carnassière]] inférieur, ce qui confère à cette dent une capacité supplémentaire de [[mastication]]. Ceci, avec le développement d'une cuspide entoconide distincte et l'élargissement du [[talonide]] de la première [[Molaire (dent)|molaire]] inférieure, et l'élargissement correspondant du talon de la première molaire supérieure et la réduction de son parastyle distinguent ces canidés du [[Cénozoïque]] tardif et sont les différences essentielles qui identifient leur clade<ref name=tedford2009/>.
+
+Les [[feliformia]] ressemblant à des chats et les [[caniformes]] ressemblant à des chiens ont émergé au sein des [[Carnivoramorpha]] voici 45-{{nobr|42 millions}} d'années<ref>{{article| nom1 = Flynn | prénom1 = John J. | nom2 = Wesley-Hunt | prénom2 = Gina D. | année = 2005 | titre = Phylogeny of the Carnivora: Basal Relationships Among the Carnivoramorphans, and Assessment of the Position of 'Miacoidea' Relative to Carnivora | journal = Journal of Systematic Palaeontology | volume = 3 | pages = 1–28 | doi=10.1017/s1477201904001518| s2cid = 86755875 }}</ref>. Les Canidés sont apparus pour la première fois en Amérique du Nord à l'[[Éocène]] supérieur (37,8-33,9 Ma). Ils n'atteignirent l'Eurasie qu'au [[Miocène]] ou l'Amérique du Sud avant le [[Pliocène]] supérieur<ref name=tedford2009/>.
+
+== Classification ==
+=== Genres et espèces actuelles ===
+{{Article détaillé|Liste des espèces de canidés}}
+
+{{sticky header}}
+{| class="wikitable sticky-header" style="width:100%;"
+|+ La famille des canidés inclut 13 genres et au moins {{nobr|37 espèces}} vivantes de nos jours<ref>{{Ouvrage|auteur1=José R. Castelló|traducteur=Anne Saint Girons|titre=Les canidés du Monde|sous-titre=Loups, chiens sauvages, renards, chacals, coyotes, et apparentés|lieu=Paris|éditeur=Delachaux et Niestlé|collection=Guide Delachaux|année=2020|pages totales=332|passage=8|isbn=978-2-603-02695-3|lire en ligne=https://www.unitheque.com/UploadFile/DocumentPDF/G/U/5125-9782603026953.pdf}}</ref>, faisant toutes partie de la sous-famille des [[#Genres_des_Caninés|Caninés]] (Caninae). Liste des espèces actuelles selon {{Bioref|MDD|5 août 2025}} :
+! Tribu
+! Sous-tribu
+! Genre
+! Espèce 
+|-
+| rowspan="22" | [[Canini (animal)|Canini]]
+| rowspan="12" | [[Canina (sous-tribu)|Canina]]<br>Les canidés lupoïdes
+| rowspan="8" | ''[[Canis]]''
+| ''[[Canis familiaris]]''<br>Linnaeus, 1758<br>[[Chien]]
+|-
+| ''[[Canis lupus]]''<br>Linnaeus, 1758<br>[[Loup commun]]<br>[[Loup gris]]<br>
+[[Fichier:Loup Brun.png|100px|sans_cadre|centré]]<br>{{Liste cachée|
+''[[Dingo (chien sauvage)|C. l. dingo]]''<br>[[Friedrich Albrecht Anton Meyer|Meyer]], 1793<br>[[Dingo (chien sauvage)|Dingo]]<br>[[Fichier:Canis lupus dingo - cleland wildlife park.JPG|120px|sans_cadre|centré]]<br>
+''[[Canis himalayensis]]''<br>Aggarwal, Kivisild, Ramadevi & Singh, 2007<br>[[Loup de l’Himalaya]]<br>[[Fichier:Tibetan Wolf By Stanzin (Stakpa) cropped.jpg|120px|sans_cadre|centré]]<br>
+''[[Canis indica]]''<br>Aggarwal, Kivisild, Ramadevi & Singh, 2007<br>[[Loup des Indes]]<br>[[Fichier:Genome Sequencing of a Gray Wolf from Peninsular India (2022) fig. 1A.png|120px|sans_cadre|centré]]}}
+|-
+| ''[[Canis aureus]]''<br>Linnaeus, 1758<br>[[Chacal commun]]<br>[[Chacal doré]]<br>
+[[Fichier:Golden Jackal - Corbett National Park.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Canis lupaster]]''<br>Hemprich & Ehrenberg, 1832<br>[[Dihb]]<br>[[Loup africain]]<br>[[Fichier:Canis anthus - Cécile Bloch 1.png|120px|sans_cadre|centré]]
+|-
+| ''[[Canis simensis]]''<br>Rüppell, 1835<br>[[Cabéru]]<br>[[Loup d’Éthiopie]]<br>
+[[Fichier:Canis simensis Oromia.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Canis latrans]]''<br>Say, 1823<br>[[Coyote]]<br>[[Fichier:Coyote Tule Lake CA.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Canis rufus]]''<br>(Audubon & Bachman, 1851)<br>[[Loup rouge]]<br>
+[[Fichier:Captive Female at Sandy Ridge (6260981786).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Canis lycaon]]''<br>(Schreber, 1775)<br>[[Loup de l'Est]]<br>[[Fichier:Timber wolf walking in grass close up - DPLA - c49442693019ead5dfc8dbc9c8fee111.jpg|120px|sans_cadre|centré]]
+|-
+| rowspan="2" | ''[[Lupulella]]''<br>Les Chacals africains
+| ''[[Lupulella adusta]]''<br>(Sundevall, 1847)<br>[[Chacal à flancs rayés]]<br>
+[[Fichier:CANIS ADUSTUS dans le park zoologique de kinshasa (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lupulella mesomelas]]''<br>(Schreber, 1775)<br>[[Chacal à chabraque]]<br>[[Chacal à dos noir]]<br>
+[[Fichier:Canis mesomelas.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Cuon (animal)|Cuon]]''<br>Les Cuons
+| ''[[Cuon alpinus]]''<br>(Pallas, 1811)<br>[[Dhole]]<br>[[Fichier:Dhole in its habitat (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lycaon (genre)|Lycaon]]''
+| ''[[Lycaon pictus]]''<br>(Temminck, 1820)<br>[[Lycaon print]]<br>[[Cynhyène]]<br>[[Fichier:Lycaon pictus (Temminck, 1820).jpg|120px|sans_cadre|centré]]
+|-
+| rowspan="10" | [[Cerdocyonina]]<br>[[Richard H. Tedford|Telford]], [[Xiaoming Wang|Wang]] & {{lien|langue=d|fr=Beryl E. Taylor|trad=Q47675881|texte=Taylor}}, [[2009 en science|2009]]<br>Les Canidés d’Amérique du Sud ou Agouara
+| ''[[Speothos]]''
+| ''[[Speothos venaticus]]''<br>(Lund, 1842)<br>[[Chien des buissons]]<br>[[Fichier:Speothos venaticus Zoo Praha 2011-5 (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Chrysocyon]]''
+| ''[[Chrysocyon brachyurus]]''<br>(Illiger, 1815)<br>[[Grand Agouara]]<br>[[Loup à crinière]]<br>[[Fichier:Aguara guazu (Chrysocyon brachyurus), Uruguay, 1998.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Atelocynus]]''
+| ''[[Atelocynus microtis]]''<br>(Sclater, 1883)<br>[[Renard à petites oreilles]]<br>[[Fichier:Atelocynus microtis en amazonie péruvienne.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Cerdocyon]]''
+| ''[[Cerdocyon thous]]''<br>(Linnaeus, 1766)<br>[[Maikong]]<br>[[Renard crabier]]<br>[[Fichier:Zorro patas negras.jpg|120px|sans_cadre|centré]]
+|-
+| rowspan="6" | ''[[Lycalopex]]''<br>Les faux-renards d’Amérique du Sud
+| ''[[Lycalopex culpaeus]]''<br>(Molina, 1782)<br>[[Culpeau]]<br>[[Renard de Magellan]]<br>[[Fichier:Lycalopex culpaeus reissii (Canidae) = zorro culpeo or Andean fox (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lycalopex gymnocercus]]''<br>(Fischer, 1814)<br>[[Aguarachay]]<br>[[Renard d’Azara]]<br>[[Fichier:Pseudalopex gymnocercus, Urupema - SC, Brasil.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lycalopex vetulus]]''<br>(Lund, 1842)<br>[[Renard chenu]]<br>[[Renard du Brésil]]<br>
+[[Fichier:Raposinha do campo (Lycalopex vetulus).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lycalopex sechurae]]''<br>(Thomas, 1900)<br>[[Renard de Sechura]]<br>[[Renard du désert austral]]<br />[[Fichier:Lycalopex sechurae in Peru 2 (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lycalopex griseus]]''<br>(Gray, 1837)<br>[[Renard gris d'Argentine|Chilla]]<br>[[Renard gris d’Argentine]]<br>
+[[Fichier:Chilla in La Rioja.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Lycalopex fulvipes]]''<br>(Martin, 1837)<br>[[Renard à pieds fauves]]<br>[[Renard de Darwin]]<br>[[Fichier:Pseudalopex fulvipes.jpg|120px|sans_cadre|centré]]
+|-
+| colspan="2" rowspan="15" |[[Vulpini]]<br>Les canidés vulpoïdes
+| ''[[Otocyon]]''
+| ''[[Otocyon megalotis]]''<br>(Desmarest, 1822)<br>[[Otocyon]]<br>[[Renard oreillard]]<br>[[Fichier:Otocyon megalotis - Etosha 2014.jpg|120px|sans_cadre|centré]]
+|-
+| rowspan="2" | ''[[Nyctereutes]]''<br>Nyctéreutes
+| ''[[Nyctereutes procyonoides]]''<br>(Gray, 1834)<br>[[Nyctéreute de sibérie]]<br>[[Tanuki de Chine]]<br>
+[[Fichier:Nyctereutes procyonoides - Raccoon Dog - Jenot.png|120px|centré]]
+|-
+| ''[[Nyctereutes viverrinus]]''<br>Temminck, 1838<br>[[Nyctéreute viverrin]]<br>[[Tanuki du Japon]]<br>[[Fichier:タヌキ - panoramio - Masashi Taomoto (cropped).jpg|120px|centré]]
+|-
+| rowspan="12" | ''[[Vulpes]]''<br>Les vrais renards
+| ''[[Vulpes vulpes]]''<br>(Linnaeus, 1758)<br>[[Renard|Goupil]]<br>[[Renard roux]]<br>[[Fichier:Home fox (36468606055).jpg|120px|centré]]<br>{{Liste cachée|
+''[[Vulpes fulva]]''<br>(Desmarest, 1822)<br>[[Renard fauve]]<br>[[Fichier:Vulpes vulpes standing in snow.jpg|120px|sans_cadre|centré]]}}
+|-
+| ''[[Vulpes lagopus]]''<br>(Linnaeus, 1758)<br>[[Renard polaire|Isatis]]<br>[[Renard polaire]]<br>[[Fichier:Arctic fox (6375703941).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Vulpes corsac]]''<br>(Linnaeus, 1768)<br>[[Corsac]]<br>[[Renard des steppes]]<br>
+[[Fichier:Korsak.jpg|120px|centré|]]
+|-
+| ''[[Vulpes bengalensis]]''<br>(Shaw, 1800)<br>[[Renard du Bengale]]<br>[[Fichier:Black tailed fox (Bengal Fox) at Desert NP (cropped).jpg|100px|sans_cadre|centré]]
+|-
+| ''[[Vulpes zerda]]''<br>(Zimmermann, 1780)<br>[[Fennec]]<br>[[Fennec|Renard des sables]]<br>[[Fichier:Fennec Fox Vulpes zerda.jpg|120px|centré]]
+|-
+| ''[[Vulpes pallida]]''<br>(Cretzschmar, 1826)<br>[[Renard blond des sables]]<br>[[Renard pâle]]<br> 
+|-
+| ''[[Vulpes chama]]''<br>(A. Smith, 1833)<br>[[Chama]]<br>[[Renard du Cap]]<br>[[Fichier:Vulpes chama (Etosha).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Vulpes rueppellii]]''<br>(Schinz, 1825)<br>[[Renard famélique]]<br>[[Renard de Rüppell]]<br>
+[[Fichier:Vulpes rueppellii New White Desert, Egypt (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Vulpes ferrilata]]''<br>(Hodgson, 1842)<br>[[Renard du Tibet]]<br>[[Fichier:Vulpes ferrilata 367800858 (cropped).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Vulpes cana]]''<br>(Blanford, 1877)<br>[[Renard afghan]]<br>[[Renard de Blanford]]<br>[[Fichier:Blandford's fox 1.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Vulpes velox]]''<br>(Say, 1823)<br>[[Renard véloce]]<br>[[Fichier:Swiftfox Blaine County (30265776555).jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Vulpes macrotis]]''<br>(Merriam, 1888)<br>[[Renard nain]]<br>[[Fichier:Kit fox tds.jpg|120px|sans_cadre|centré]]
+|-
+| colspan="2" rowspan="2" |''[[Urocyonini]]''
+| rowspan="2" | ''[[Urocyon]]''<br>[[Urocyon]]<br>« [[Renards gris]] » 
+| ''[[Urocyon cinereoargenteus]]''<br>Schreber, 1775<br>[[Renard gris d’Amérique]]<br>
+[[Fichier:Gray fox.jpg|120px|sans_cadre|centré]]
+|-
+| ''[[Urocyon littoralis]]''<br>(Baird, 1857)<br>[[Renard gris insulaire]]<br>
+[[Fichier:Urocyon littoralis clementae Curiodyssey.JPG|120px|sans_cadre|centré]]
+|}
+
+Au sein de la sous-tribu des Cerdocyonina, existait le [[Loup des Malouines]] ou Warrah (''Dusicyon australis'') qui a [[espèce disparue|disparu]] au début du {{s-|XX}}.
+
+=== Taxons fossiles ===
+==== Sous-familles ====
+Liste des sous-famille fossiles selon la [[Paleobiology Database]]{{Bioref | TPDB | 1er août 2023 | afficher=ref }} :
+* sous-famille † [[Hesperocyoninae]] <small>Tedford 1978</small>
+* sous-famille † [[Borophaginae]] <small>Simpson, 1945</small>
+
+Le détail des genres fossiles est disponible sur les articles de ces sous-familles.
+
+==== Genres des Caninés ====
+La sous-famille des Caninés (Caninae), qui comprend les espèces actuelles, contient également de nombreux genres éteints.
+
+Classification des genres fossiles et actuels de Caninés d'après Wang Xiaoming, {{et al.}} (2008)<ref>{{Ouvrage|langue=en|auteur1=Xiaoming Wang|prénom1=Xiaoming,|nom1=Wang|prénom2=Antón|nom2=Mauricio|prénom3=Richard H.|nom3=Tedford|titre=Dogs : their fossil relatives and evolutionary history|traduction titre=Les chiens : leurs parents fossiles et leur histoire évolutive|éditeur=Columbia University Press|lieu=New York|année=2008|isbn=978-0-231-13528-3|oclc=185095648|lire en ligne=https://www.worldcat.org/oclc/185095648}}</ref>, Zrzavý {{et al.}} (2018)<ref>https://onlinelibrary.wiley.com/doi/abs/10.1111/zsc.12293</ref> et la [[Paleobiology Database]]{{Bioref | TPDB | 1er août 2023 | afficher=ref }} :
+
+Sous-famille Caninae <small>Gill, 1872</small> :
+* † ''[[Leptocyon]]'' <small>Matthew, 1918</small>  (genre basal [[Paraphylie|paraphylétique]])
+{{Début de colonnes|taille=30}}
+* tribu † Canini <small>Fischer de Waldheim, 1817</small> :
+** sous-tribu Canina <small>Gray, 1825</small> :
+*** († ''[[Aenocyon]]'' <small>Merriam, 1918</small> pour [[Canis dirus]])
+*** ''[[Canis]]'' <small>Linnaeus, 1758</small>  (paraphylétique)
+*** ''[[Cuon (genre)|Cuon]]'' <small>Hodgson, 1838</small>
+*** † ''[[Cynotherium]]'' <small>Studiati, 1857</small>
+*** † ''[[Eucyon]]'' <small>Tedford and Qiu, 1996</small>
+*** ''[[Lupulella]]'' <small>Hilzheimer, 1906</small>
+*** ''[[Lycaon (genre)|Lycaon]]'' <small>Brookes, 1827</small>
+*** † ''[[Xenocyon]]'' <small>Kretzoi, 1938</small>
+** sous-tribu † Cerdocyonina <small>Tedford et al., 2009</small> :
+*** ''[[Atelocynus]]'' <small>Cabrera, 1940</small>
+*** ''[[Cerdocyon]]'' <small>Hamilton-Smith, 1839</small>
+*** ''[[Chrysocyon]]'' <small>Hamilton-Smith, 1839</small>
+*** † ''[[Dusicyon]]'' <small>Hamilton Smith, 1839</small>
+*** ''[[Lycalopex]]'' <small>Burmeister, 1854</small>
+*** † ''[[Protocyon]]'' <small>Giebel, 1855</small>
+*** ''[[Speothos]]'' <small>Lund, 1839</small>
+*** † ''[[Theriodictis]]'' <small>Mercerat, 1891</small>
+*** † ''[[Sinicuon]]'' <small>Kretzoi, 1941</small>
+* tribu Vulpini <small>Hemprich and Ehrenberg, 1832</small> :
+** † ''[[Ferrucyon]]'' <small>Ruiz-Ramoni et al., 2020</small>
+** † ''[[Nurocyon]]'' <small>Sotnikova, 2006</small>
+** ''[[Nyctereutes]]'' <small>Temminck, 1838</small> 
+** † ''[[Metalopex]]'' <small>Tedford et Wang, 2008</small>
+** ''[[Otocyon]]'' <small>Müller, 183</small>5
+** † ''[[Prototocyon]]'' <small>Pohle, 1928</small>
+** ''[[Vulpes]]'' <small>Frisch, 1775</small>
+* ''[[Urocyon]]'' <small>Baird, 1857</small>
+{{Fin de colonnes}}
+
+
+Dans la phylogénie de 2018, le [[clade]] regroupant les genres † ''[[Metalopex]]'' et ''[[Urocyon]]'' est basal par rapport aux deux tribus.
+
+== Phylogénie ==
+Position phylogénétique des Canidés au sein des [[Caniformes]], sur la base de découvertes de fossiles<ref name="tedford2009"/> :
+{{clade| style=font-size:90%;line-height:85%
+      |label1=[[Caniformia]]
+      |1={{clade
+         |label1=
+         |1=[[Arctoidea]] (Ours, procyonidés, pinnipèdes, etc.) [[File:Ailurus fulgens - 1700-1880 - Print - Iconographia Zoologica - Special Collections University of Amsterdam -(white background).jpg|80 px]]
+         |label2=Cynoidea
+         |2={{clade
+            |label1=
+            |1=†''[[Miacis]] spp.'' [[File:Miacis restoration.jpg|60 px]] |state1=double
+            |label2='''Canidae'''
+            |2={{clade
+               |label1=
+               |1=†[[Hesperocyoninae]] [[File:Cynodictis (white background).jpg|80 px]]
+               |label2=
+               |3={{clade
+                  |1=†[[Borophaginae]] [[File:Aelurodon illustration.png|70 px]]
+                  |2=[[Caninae]] (tous les canidés modernes et parents éteints) [[File:Dogs, jackals, wolves, and foxes (Plate X).jpg|70 px]]
+ }} }} }} }} }}
+
+== Origine et évolution ==
+[[File:Hesperocyoninae, Borophaginae & Caninae.jpg|thumb|right|Représentants des trois sous-familles de Canidés : ''[[Hesperocyon]]'' (Hesperocyoninae), ''[[Aelurodon]]'' (Borophaginae) et ''[[Canis aureus]]'' (Caninae)]]
+Les canidés actuels constituent un groupe de 34 [[Espèce|espèces]] de taille et d'apparence variées, du [[Loup à crinière]] à la silhouette élancée au [[Chien des buissons]] court sur patte. Les relations évolutives entre les espèces ont été étudiées à travers la morphologie, mais aussi plus récemment en recourant à des études moléculaires. Chez certaines espèces la [[divergence génétique]] a disparu en raison d'un important [[Flux de gènes|flux génétique]] entre différentes populations<ref name=Wayne>{{lien web|url=http://wooferhouse.net/Links/MolecularEvolutionOfTheDogFamily/MolecularEvolutionOfTheDogFamily.htm |titre=Molecular evolution of the dog family |auteur=Wayne, Robert K. |consulté le=27 mai 2014}}</ref>.
+
+=== Éocène ===
+Les [[Carnivora|carnivores]] ont évolué à partir des [[Miacidae]] il y a environ {{nobr|55 millions}} d'années, pendant le [[Paléocène]] tardif. Environ {{nobr|5 millions}} d'années plus tard, les carnivores se sont séparés en deux branches principales, les [[Caniformia|caniformes]] et les [[Feliformia|féliformes]]. Le premier véritable canidé est apparu il y a environ {{nobr|40 millions}} d'années. Appelé ''{{lien|Prohesperocyon}}'', ses restes ont été découverts dans le sud-ouest de l'actuel [[Texas]]. Il présentait des traits caractéristiques des Canidés, notamment la perte de la troisième molaire supérieure (qui contribue à rendre la morsure plus cisaillante), et la structure de l'oreille moyenne qui possède un [[os tympanal]] élargi (structure osseuse creuse qui protège les parties les plus fragiles de l'oreille). ''Prohesperocyon'' avait probablement des membres légèrement plus longs que ses prédécesseurs, ainsi que des orteils parallèles et serrés les uns contre les autres qui diffèrent notablement des doigts écartés des [[Ursidae|ours]]<ref name=Wang-Tedford>{{article| nom = Wang| prénom = Xiaoming| année = 2008| titre = How Dogs Came to Run the World|périodique=Natural History Magazine| volume = July/August| url = https://www.naturalhistorymag.com/features/15771/how-dogs-came-to-run-the-world| consulté le = 24 mai 2014 }}</ref>.
+
+Les Canidés se sont ensuite subdivisés en trois sous-familles, toutes apparues pendant l'[[Éocène]] : [[Hesperocyoninae]] (environ 39,7- {{nobr|15 millions}} d'années), [[Borophaginae]] (environ 34 - {{nobr|2 millions}} d'années) et [[Caninae]] (environ {{nobr|34 millions}} d'années à aujourd'hui). Les Caninae sont la seule sous-famille encore existante et inclut les loups, les renards, les coyotes, les chacals et les chiens domestiques. Les membres de chaque sous-famille ont gagné en masse avec le temps et certains présentaient un régime spécialisé hypercarnivore qui a favorisé leur extinction<ref>{{article| prénom1 = B.| nom2 = Wang| nom1 = Van Valkenburgh | prénom2 = X. | prénom3 = J. | titre=Cope's Rule, Hypercarnivory, and Extinction in North American Canids| nom3 = Damuth | s2cid = 12017658| journal=Science | volume=306| numéro = #5693 | pages=101–104 | date=October 2004 | issn = 0036-8075| pmid = 15459388 | doi=10.1126/science.1102417|bibcode = 2004Sci...306..101V }}</ref>.
+
+=== Oligocène ===
+Pendant l'[[Oligocène]], les trois sous-familles de Canidés ([[Hesperocyoninae]], [[Borophaginae]], et [[Caninae]]) sont présentes en [[Amérique du Nord]], d'après les fossiles conservés. La branche la plus ancienne et la plus primitive des Canidés est celle des Hesperocyoninae, qui inclut le genre ''[[Mesocyon]]'' (38-{{nobr|24 millions}} d'années). Ces canidés primitifs étaient probablement adaptés à la poursuite rapide de proies dans un milieu de prairie ; ils ressemblaient aux actuels [[Viverridae|viverrides]]. Les Hesperocyonines ont fini par disparaître au milieu du Miocène. Certains des premiers membres des Hesperocyonines, les espèces du genre ''[[Hesperocyoninae|Hesperocyon]]'', ont donné naissance aux genres ''[[Archaeocyon]]'' et ''[[Leptocyon]]''. Ces branches ont ensuite mené aux Borophagines et aux Caninés<ref name=Gittleman>Martin, L.D. 1989. Fossil history of the terrestrial carnivora. Pages&nbsp;536–568 in J.L. Gittleman, editor. Carnivore Behavior, Ecology, and Evolution, Vol. 1. Comstock Publishing Associates: Ithaca.</ref>.
+
+=== Miocène ===
+Il y a environ 9-{{nobr|10 millions}} d'années, pendant le [[Miocène]] tardif, les genres ''[[Canis]]'', ''[[Urocyon]]'' et ''[[Vulpes]]'' ont commencé leur expansion à partir du Sud-Ouest de l'Amérique du Nord, là où les caninés ont commencé à se diversifier. Le succès de ces caninés est lié à l'apparition des [[Carnassière|carnassières]] inférieures leur permettant à la fois de mastiquer et d'arracher la viande<ref name=Gittleman/> . Il y a environ {{nobr|8 millions}} d'années, le pont terrestre de la [[Béringie]] a permis aux membres du genre ''[[Eucyon]]'' d'atteindre l'Asie puis l'Europe<ref name=Perini>{{article|auteur1=Perini, F. A. |auteur2=Russo, C. A. M. |auteur3=Schrago, C. G. |année=2010 |titre=The evolution of South American endemic canids: a history of rapid diversification and morphological parallelism |journal=Journal of Evolutionary Biology |volume=23 |numéro=#2 |pages=311–322 |doi=10.1111/j.1420-9101.2009.01901.x |pmid=20002250|s2cid=20763999 }}</ref>.
+
+=== Pliocène ===
+Pendant le [[Pliocène]], il y a environ 4-{{nobr|5 millions}} d'années, ''[[Canis lepophagus]]'' est apparu en Amérique du Nord. Cette espèce était de petite taille, certains spécimens ressemblaient aux coyotes et d'autres aux loups. ''[[Coyote|Canis latrans]]'' (le coyote) pourrait descendre de ''Canis lepophagus''<ref>Nowak, R.M. 1979. North American Quaternary Canis. Monograph of the Museum of Natural History, University of Kansas 6:1 – 154.</ref>.
+
+La formation de l'[[isthme de Panama]] il y a environ {{nobr|3 millions}} d'années, en reliant les deux Amériques, a permis aux Canidés d'atteindre l'Amérique du Sud où ils se sont diversifiés. Cependant l'ancêtre commun le plus récent des canidés sud-américains vivait en Amérique du Nord il y a {{nobr|4 millions}} d'années et il est probable qu'il y eut plus d'un passage à travers l'isthme. L'une des lignées issues de cette migration comprend le [[Urocyon cinereoargenteus|renard gris]] (''Urocyon cinereoargentus)'' ainsi que ''[[Canis dirus]]'', maintenant éteint. Une autre lignée est composée d'espèces endémiques de l'Amérique du Sud : le [[Loup à crinière]] (''Chrysocyon brachyurus''), le [[Chien des buissons aux oreilles courtes]] (''Atelocynus microtis''), le [[Chien des buissons]] (''Speothos venaticus''), le [[Renard des savanes|Renard crabier]] (''Cerdocyon thous'') et les renards sud-américains (''[[Lycalopex]]'' spp.). La [[phylogénie]] de ce groupe a été établie grâce à des études moléculaires<ref name=Perini/>.
+
+=== Pléistocène ===
+Durant le [[Pléistocène]] est apparu la lignée du loup d'Amérique du Nord avec ''[[Canis edwardii]]'', clairement identifié comme un loup, et ''[[Loup rouge|Canis rufus]]'', un probable descendant de ''Canis edwardii''. Il y a {{unité|800000|ans}} environ ''[[Canis armbrusteri]]'' est apparu en Amérique du Nord. Ce grand loup était présent dans toute l'Amérique du Nord et l'Amérique centrale avant d'être supplanté par son descendant, ''[[Canis dirus]]'', qui atteignit l'Amérique du Sud à la fin du Pléistocène<ref name=Larson>{{lien web|url=https://exhibits.museum.state.il.us/exhibits/larson/canis.html |titre=Wolves, coyotes and dogs (Genus ''Canis'') |auteur=Larson, Robert |site=The Midwestern United States 16,000 years ago |éditeur=Illinois State Museum |consulté le=7 juin 2014}}</ref>.
+
+Il y a {{unité|300000|ans}} un certain nombre de sous-espèces du loup gris (''[[Canis lupus]]'') étaient apparues à travers l'Europe et le Nord de l'Asie<ref>Nowak, R. 1992. "Wolves: The great travelers of evolution". ''International Wolf'' 2 (#4):3 – 7.</ref>. Le loup gris a colonisé l'Amérique du Nord à la fin du [[Rancholabréen]] en traversant le pont de la [[Béringie]]. Il y eut au moins trois passages différents, chacun ayant été effectué par au moins un clade du loup gris d'Eurasie<ref name=Chambers>{{article|titre=An account of the taxonomy of North American wolves from morphological and genetic analyses |auteur=Chambers, S. M. |auteur2=Fain, S. R. |auteur3=Fazio, B. |auteur4=Amaral, M. |année=2012 |journal=North American Fauna |volume=77 |pages=1–67 |doi=10.3996/nafa.77.0001|accès doi=libre }}</ref>. L'étude de l'[[Génome mitochondrial|ADN mitochondrial]] montre  qu'il existe actuellement au moins quatre lignée de ''Canis lupus''<ref name="gaubert">{{article|auteur1=Gaubert, P. |auteur2=Bloch, C. |auteur3=Benyacoub, S. |auteur4=Abdelhamid, A. |auteur5=Pagani, P. |année=2012|titre= Reviving the African Wolf ''Canis lupus lupaster'' in North and West Africa: A Mitochondrial Lineage Ranging More than 6,000&nbsp;km Wide|journal=PLOS ONE|volume=7 |numéro=#8 |page=e42740 |doi=10.1371/journal.pone.0042740 |pmid=22900047 |pmc=3416759 |et al.=oui|bibcode=2012PLoSO...742740G|accès doi=libre }}</ref>. ''Canis dirus'' cohabita un temps avec ''Canis lupus'' mais disparut lors de l'extinction massive qui survint il y a {{unité|11500|ans}}. Ce canidé était probablement plus un charognard qu'un prédateur : il semble que ses molaire étaient faites pour écraser les os et il a probablement été victime de la disparition des grands herbivores dont les charognes l'alimentaient<ref name=Larson/>.
+
+En 2015, une étude portant sur le génome mitochondrial et le  [[Génome|génome nucléaire]] des canidés d'Afrique et d'Eurasie a établi que les Canidés avaient colonisé l'Afrique depuis l'Eurasie au moins cinq fois au cours du Pliocène et du Pléistocène, ce que confirme les découvertes de fossiles. Cela suggère que la diversité des canidés africains est le résultat de vagues d'immigration de canidés eurasiatiques, probablement à l'occasion des changements climatiques (entre climat aride et climat humide) du Pliocène et du Pléistocène. Après avoir comparé les [[Chacal doré|Chacals dorés]] d'Afrique et d'Eurasie, l'étude conclut que les spécimens africains appartiennent à une lignée monophylétique distincte qui devrait être reconnue comme une espèce à part entière, ''Canis anthus'' (le [[Loup doré]]). D'après une étude phylogénétique effectuée à partir de séquences d'ADN nucléaire, le Chacal doré d'Eurasie (''Canis aureus)'' s'est séparé de la lignée du loup et du coyote il y a {{unité|1,9|million}} d'années, alors que le Loup doré s'en est séparé il y a {{unité|1,3|million}} d'années. Les séquences du génome mitochondrial indique que le [[Loup d'Abyssinie]] a divergé de la lignée du loup et du coyote peu de temps avant<ref name=Koepfli-2015>{{article|doi=10.1016/j.cub.2015.06.060|pmid=26234211|titre=Genome-wide Evidence Reveals that African and Eurasian Golden Jackals Are Distinct Species|journal=Current Biology|volume=25 |numéro=#16 |pages=2158–65 |année=2015 |nom1=Koepfli |prénom1=Klaus-Peter |nom2=Pollinger |prénom2=John |nom3=Godinho |prénom3=Raquel |nom4=Robinson |prénom4=Jacqueline |nom5=Lea|prénom5=Amanda |nom6=Hendricks|prénom6=Sarah|nom7=Schweizer|prénom7=Rena M.|nom8=Thalmann|prénom8=Olaf|nom9=Silva|prénom9=Pedro|nom10=Fan|prénom10=Zhenxin|nom11=Yurchenko|prénom11=Andrey A.|nom12=Dobrynin|prénom12=Pavel|nom13=Makunin|prénom13=Alexey|nom14=Cahill|prénom14=James A.|nom15=Shapiro|prénom15=Beth|nom16=Álvares|prénom16=Francisco|nom17=Brito|prénom17=José C.|nom18=Geffen|prénom18=Eli|nom19=Leonard|prénom19=Jennifer A.|nom20=Helgen|prénom20=Kristofer M.|nom21=Johnson|prénom21=Warren E.|nom22=o'Brien|prénom22=Stephen J.|nom23=Van Valkenburgh|prénom23=Blaire|nom24=Wayne|prénom24=Robert K.|accès doi=libre}}</ref>.
+
+== Canidés et humains ==
+[[File:BedaleHunt2005.jpg|thumb|[[Chasse au renard]] anglais traditionnel]]
+{{Article connexe|Chien}}
+Un canidé, le chien domestique, a noué un partenariat avec les humains il y a longtemps. Le chien a été la première espèce domestiquée<ref name=larson2014>{{article|auteur=Larson G, Bradley DG|année=2014|titre=How Much Is That in Dog Years? The Advent of Canine Population Genomics|journal=PLOS Genetics |doi=10.1371/journal.pgen.1004093|pmid=24453989|pmc=3894154|volume=10|numéro=#1|pages=e1004093}}</ref>{{,}}<ref name=larson2012>{{article|auteur=Larson G|année=2012|titre=Rethinking dog domestication by integrating genetics, archeology, and biogeography|journal=PNAS|volume=109|numéro=#23|pages=8878–8883|doi=10.1073/pnas.1203005109|pmid=22615366|pmc=3384140|bibcode=2012PNAS..109.8878L|accès doi=libre}}</ref>{{,}}<ref name=britannica>{{article encyclopédique|url=http://www.britannica.com/science/domestication|consulté le=26 mai 2016|encyclopedia=Encyclopædia Britannica|titre=Domestication|année=2016}}</ref>{{,}}<ref name=perri2016>{{article|doi=10.1016/j.jas.2016.02.003|titre=A wolf in dog's clothing: Initial dog domestication and Pleistocene wolf variation|journal=Journal of Archaeological Science|volume=68|pages=1–4|année=2016|nom1=Perri|prénom1=Angela}}</ref>. Les archives archéologiques montrent que les premiers restes de chiens incontestés ont été enterrés à côté des humains il y a {{unité|14700 ans}}<ref name=giemsch2015>Liane Giemsch, Susanne C. Feine, Kurt W. Alt, Qiaomei Fu, Corina Knipper, Johannes Krause, Sarah Lacy, Olaf Nehlich, Constanze Niess, Svante Pääbo, Alfred Pawlik, Michael P. Richards, Verena Schünemann, Martin Street, Olaf Thalmann, Johann Tinnes, Erik Trinkaus & Ralf W. Schmitz. "Interdisciplinary investigations of the late glacial double burial from Bonn-Oberkassel". Hugo Obermaier Society for Quaternary Research and Archaeology of the Stone Age: 57th Annual Meeting in Heidenheim, {{7th}} – 11 April 2015, 36-37</ref>, avec des restes contestés il y a {{unité|36000 ans}}<ref name=germonpre2009>{{article|auteur=Germonpre, M.|année=2009 |titre=Fossil dogs and wolves from Palaeolithic sites in Belgium, the Ukraine and Russia: Osteometry, ancient DNA and stable isotopes|journal=Journal of Archaeological Science |volume=36 |numéro=#2 |pages=473–490 | doi = 10.1016/j.jas.2008.09.033}}</ref>. Ces dates impliquent que les premiers chiens sont apparus à l'époque des [[chasseurs-cueilleurs]] humains et non des [[agriculteur]]s<ref name=thalmann2013>{{article|auteur=Thalmann, O.|année=2013|titre=Complete mitochondrial genomes of ancient canids suggest a European origin of domestic dogs|journal=Science|doi=10.1126/science.1243650|pmid=24233726|volume=342|numéro=#6160|pages=871–4|bibcode=2013Sci...342..871T|s2cid=1526260|url=https://digital.csic.es/bitstream/10261/88173/1/accesoRestringido.pdf}}</ref>{{,}}<ref name=freedman2014>{{article|auteur=Freedman, A.|année=2014|titre=Genome sequencing highlights the dynamic early history of dogs|journal=[[PLOS Genetics]]|volume=10|numéro=#1|pages=e1004016|doi=10.1371/journal.pgen.1004016|pmid=24453982|pmc=3894170}}</ref>.
+
+Le fait que les loups soient des bêtes de somme avec des structures sociales coopératives peut avoir été la raison pour laquelle la relation s'est développée. Les humains ont bénéficié de la loyauté, de la coopération, du travail d'équipe, de la vigilance et des capacités de suivi du canidé, tandis que le loup a peut-être bénéficié de l'utilisation d'armes pour s'attaquer à des proies plus grosses et du partage de nourriture. Les humains et les chiens peuvent avoir évolué ensemble<ref>{{article|auteur1=Schleidt, Wolfgang M. |auteur2=Shalter, Michael D. |année=2003 |titre=Co-evolution of humans and canids: An alternative view of dog domestication: Homo homini lupus? |journal=Evolution and Cognition |volume=9 |numéro=1 |pages=57–72 |url=https://www.uwsp.edu/psych/s/275/Science/Coevolution03.pdf |archive-url=https://web.archive.org/web/20140411142919/http://www4.uwsp.edu/psych/s/275/science/coevolution03.pdf |archive-date=11 April 2014 }}</ref>.
+
+Parmi les Canidés, seul le loup gris est connu pour s'attaquer aux humains<ref>{{ouvrage|auteur=Kruuk, H. |année=2002 |titre=Hunter and Hunted: Relationships between carnivores and people |lieu=Cambridge, UK |éditeur=Cambridge University Press |isbn=0-521-81410-3}}</ref>. Néanmoins, au moins deux enregistrements de coyotes tuant des humains ont été publiés<ref name="AOH">{{lien web|titre=Coyote attacks: An increasing suburban problem |éditeur=San Diego County, California |url=http://www.co.san-diego.ca.us/awm/docs/coyoteattacks.pdf |consulté le=19 août 2007 |archive-url=https://web.archive.org/web/20060224153601/http://www.co.san-diego.ca.us/awm/docs/coyoteattacks.pdf |archive-date=24 February 2006 }}</ref>, et au moins deux autres rapports de chacals dorés tuant des enfants<ref name="CWC">{{lien web|titre=''Canis aureus'' |website=Animal Diversity Web |éditeur=University of Michigan |url=http://animaldiversity.ummz.umich.edu/site/accounts/information/Canis_aureus.html |consulté le=31 juillet 2007 }}</ref>. Les êtres humains ont piégé et chassé certaines espèces de Canidés pour leur fourrure et d'autres, en particulier le loup gris, le coyote et le renard roux, pour le sport<ref>{{article|titre=Fox hunting worldwide |url=http://news.bbc.co.uk/1/hi/uk/428122.stm |journal=BBC News |date=16 September 1999 |consulté le=16 juin 2014 }}</ref>. Les Canidés tels que le [[dhole]] sont maintenant menacés dans la nature en raison de la persécution, de la perte d'habitat, de l'épuisement des espèces de proies d'ongulés et de la transmission de maladies par les chiens domestiques<ref>{{cite iucn |author=Kamler, J.F. |author2=Songsasen, N. |author3=Jenks, K. |author4=Srivathsa, A. |author5=Sheng, L. |author6=Kunkel, K. |date=2015 |title=''Cuon alpinus'' |volume=2015 |page=e.T5953A72477893 |doi=10.2305/IUCN.UK.2015-4.RLTS.T5953A72477893.en |access-date=11 November 2021}}</ref>.
+
+== Galerie ==
+<gallery style="text-align:center;" mode="packed">
+Fichier:Sm.eared.dog.jpg|''[[Atelocynus microtis]]''
+Fichier:FalklandIslandFox2.jpg|''[[Dusicyon australis]]''
+Fichier:2loups@ParcOméga.jpg|''[[Canis lupus]]''
+Fichier:Crab-eating Fox.JPG|''[[Cerdocyon thous]]''
+Fichier:Maehnenwolf.jpg|''[[Chrysocyon brachyurus]]''
+Fichier:Cuon.alpinus-cut.jpg|''[[Cuon alpinus]]''
+Fichier:African wild dog (Lycaon pictus pictus).jpg|''[[Lycaon pictus]]''
+Fichier:Nyctereutes procyonoides 1 (Piotr Kuczynski).jpg|''[[Nyctereutes procyonoides]]''
+Fichier:Zorro andino (Lycalopex culpaeus andinus), Laguna Colorada, Bolivia, 2016-02-02, DD 101.JPG|''[[Lycalopex culpaeus]]''
+Fichier:Cachorro-vinagre.jpg|''[[Speothos venaticus]]''
+Fichier:Bat eared fox Kenya crop.jpg|''[[Otocyon megalotis]]''
+Fichier:Gray Fox - Red Rock Canyon, Nevada copy.jpg|''[[Urocyon cinereoargenteus]]''
+Fichier:Renardflaire.jpg|''[[Vulpes vulpes]]''
+Fichier:Eucyon davisi.JPG|Fossile de ''[[Eucyon davisi]]''
+</gallery>
+
+== Notes et références ==
+{{Références}}
+
+== Voir aussi ==
+{{Autres projets| commons=Category:Canidae| wikispecies=Canidae}}
+
+=== Liens externes ===
+* {{ADW|Canidae|''Canidae''|consulté le=10 janv. 2014 }}
+* {{Faunaeur2|b820d16b-bb0f-4b70-b858-7f6271e59943|''Canidae''|consulté le=15.08.2022 }}
+* {{ITIS|180594|''Canidae''  Fischer, 1817|consulté le=10 janv. 2014 }}
+* {{MSW|14000691|Canidae|Fischer, 1817|consulté le=10 janv. 2014 }}
+* {{NAM famille|6|Canidae|consulté le=10 janv. 2014 }}
+* {{NCBI|9608|''Canidae''|consulté le=10 janv. 2014 }}
+* {{Tolweb|Canidae|consulté le=10 janv. 2014 }}
+* {{TPDB|41189|''Canidae'' Fischer 1817|consulté le=10 janv. 2014 }}
+* {{WRMS|404128|Canidae|Fischer, 1817|afficher=genres|consulté le=10 janv. 2014 }}
+{{Liens|bases=-}}
+
+{{Portail|mammifères|canidés}}
+
+[[Catégorie:Canidae| ]]
+[[Catégorie:Taxon décrit en 1817]]

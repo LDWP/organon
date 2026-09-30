@@ -1,0 +1,15 @@
+{{Taxobox début | animal | ''Panthera tigris'' | Sibirischer tiger de edit02.jpg | Tête de [[tigre de Sibérie]].}}
+{{Taxobox |embranchement | Chordata }}
+{{Taxobox | sous-embranchement |Vertébrés{{!}} Vertebrata }}
+{{Taxobox | super-classe | Tetrapoda }}
+{{Taxobox | classe |Mammifère{{!}} Mammalia }}
+{{Taxobox | infra-classe | Placentalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Feliformia }}
+{{Taxobox | famille | Felidae }}
+{{Taxobox | sous-famille | Pantherinae }}
+{{Taxobox | genre | Panthera }}
+{{Taxobox taxon | animal | espèce | Panthera tigris | ([[Carl von Linné|Linné]], [[1758]]) }}
+{{Taxobox UICN | EN | A2abcd }}
+{{Taxobox CITES | I | 22/10/1987 }}
+{{Taxobox fin}}

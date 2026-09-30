@@ -1,50 +1,67 @@
-"""Adaptateur fr.wikipedia.org : lit le wikitexte de l'article d'un taxon (famille/ordre/classe,
-voir module.py) et en extrait le(s) portail(s) déjà déclaré(s) via `{{Portail|...}}`, plutôt que
-de deviner à partir des catégories cachées rendues sur la page (qui incluent les portails
-"parents" par cascade — ex. l'article Falconidae ne déclare que `{{Portail|ornithologie}}` mais
-affiche aussi Zoologie/Biologie/Sciences par cascade de catégories, vérifié en direct).
+"""French Wikipedia adapter.
 
-`redirects=1` : les noms scientifiques de rang classe/ordre redirigent très souvent vers le nom
-vernaculaire (ex. Aves -> Oiseau, Insecta -> Insecte, vérifié en direct) ; sans ce paramètre,
-`prop=revisions` renverrait le contenu de la page de redirection elle-même (une ligne
-`#REDIRECT [[...]]`), jamais celui de la cible.
+Read the wikitext of a taxon's article (family, order or class, see
+module.py) and extract the portals it already declares through
+`{{Portail|...}}`, rather than guess from the rendered hidden
+categories, which include parent portals by cascade.
 
-Édition fr uniquement pour l'instant ; d'autres méthodes (catégories, ébauches, existence de
-page) rejoindront cet adaptateur au fil de l'eau — voir module.py."""
+`redirects=1`: scientific names of class or order rank often redirect to
+the vernacular name (Aves to Oiseau); without it `prop=revisions` would
+return the redirect page itself.
+
+French edition only for now.
+"""
 
 from __future__ import annotations
 
 import re
+from typing import NamedTuple
 
 import httpx
 
 from organon.core.http import USER_AGENT, OwnedClientMixin
+from organon.modules.common import mediawiki_page_exists
 
 API_URL = "https://fr.wikipedia.org/w/api.php"
 
-_PORTAIL_RE = re.compile(r"\{\{\s*[Pp]ortail\s*\|([^}]+)\}\}")
+_PORTAL_RE = re.compile(r"\{\{\s*[Pp]ortail\s*\|([^}]+)\}\}")
 
 
-def _extrait_portails(wikitext: str) -> list[str]:
-    match = _PORTAIL_RE.search(wikitext)
+def _extract_portals(wikitext: str) -> list[str]:
+    """Return the portals declared by `{{Portail|...}}`."""
+    match = _PORTAL_RE.search(wikitext)
     if not match:
         return []
     return [p.strip() for p in match.group(1).split("|") if p.strip()]
 
 
+class WikitextPage(NamedTuple):
+    """Wikitext of an article, with its revision."""
+
+    title: str
+    content: str
+    revid: int
+    timestamp: str
+
+
 class WikipediaAdapter(OwnedClientMixin):
+    """French Wikipedia client."""
+
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
+        """Use `client` if given, else create one."""
         super().__init__(client, headers={"User-Agent": USER_AGENT})
 
-    async def portails(self, titre: str) -> list[str] | None:
-        """Portail(s) déclaré(s) par l'article `titre` (en suivant une éventuelle redirection),
-        ou None si la page n'existe pas ou ne déclare aucun `{{Portail}}`."""
+    async def wikitext(self, title: str) -> WikitextPage | None:
+        """Return the wikitext of article `title`, or None if missing.
+
+        A redirect is followed and `title` is the resolved article.
+        """
         params = {
             "action": "query",
-            "titles": titre,
+            "titles": title,
             "redirects": "1",
             "prop": "revisions",
-            "rvprop": "content",
+            "rvprop": "content|ids|timestamp",
             "rvslots": "main",
             "formatversion": "2",
             "format": "json",
@@ -57,5 +74,23 @@ class WikipediaAdapter(OwnedClientMixin):
         revisions = pages[0].get("revisions")
         if not revisions:
             return None
-        wikitext = revisions[0]["slots"]["main"]["content"]
-        return _extrait_portails(wikitext) or None
+        revision = revisions[0]
+        return WikitextPage(
+            pages[0]["title"],
+            revision["slots"]["main"]["content"],
+            revision["revid"],
+            revision["timestamp"],
+        )
+
+    async def category_exists(self, name: str) -> bool:
+        """Return True if the category exists."""
+        return await mediawiki_page_exists(self._client, API_URL, f"Catégorie:{name}")
+
+    async def portails(self, title: str) -> list[str] | None:
+        """Return the portals declared by article `title`.
+
+        A redirect is followed. None if the page is missing or declares
+        no `{{Portail}}`.
+        """
+        page = await self.wikitext(title)
+        return (_extract_portals(page.content) or None) if page else None

@@ -1,0 +1,164 @@
+{{sous-titre/Taxon|nv1=[[Rosier]] des [[chien]]s|nv2=Rosier des [[haie]]s|nv3=Églantier des chiens}}
+{{voir homonymes|Rosier des haies|Églantier}}
+{{Taxobox début | végétal | ''Rosa canina'' | 106 Rosa canina L.jpg | Rameau fructifère. }}
+{{Taxobox | sous-règne | Tracheobionta}}
+{{Taxobox | division | Magnoliophyta}}
+{{Taxobox | classe | Magnoliopsida}}
+{{Taxobox | sous-classe | Rosidae}}
+{{Taxobox | ordre | Rosales}}
+{{Taxobox | famille | Rosaceae }}
+{{Taxobox | genre | Rosier|Rosa }}
+{{Taxobox taxon | végétal | espèce | Rosa canina | [[Carl von Linné|L.]], [[1753]]  }}
+{{Taxobox phylogénie bandeau}}
+{{Taxobox | ordre | Rosales }}
+{{Taxobox | famille | Rosaceae }}
+{{Taxobox fin}}
+
+'''''Rosa canina''''' L., le  '''Rosier des chiens''', '''Rosier des haies''' ou '''Églantier des chiens''', est une espèce de [[plante]]s à fleurs de la famille des [[Rosaceae|rosacées]], [[Rosa sect. Caninae|section Caninae]]. C'est un [[arbrisseau]] [[épine]]ux très commun dans les régions tempérées de l'"[[Ancien Monde]]" (expression vieillie). On le trouve dans les [[haie]]s et les bois surtout en [[plaine]]. C'est une espèce de [[rosier botanique|rosiers botaniques]] présentant de nombreux [[écotype]]s, toujours à [[fleur]]s simples appelées églantines. Il est utilisé comme [[porte-greffe]] pour des [[variété (botanique)|variétés]] de [[rose (fleur)|roses]] améliorées. Certains de ses hybrides sont des [[rosier]]s cultivés.
+[[File:Bloem van een Rosa canina 01-06-2026. (actm.).jpg |thumb|280px| inflorescence]]
+
+== Dénominations ==
+* [[Nom vulgaire|Noms vulgaires]] (vulgarisation scientifique) : Rosier des chiens, Rosier des haies, Églantier des chiens<ref>[http://www.infoflora.ch/fr/flore/1012-rosa-canina.html Info flora] et [http://data.canadensys.net/vascan/name/Rosa%20canina?lang=fr VASCAN] et [eFlore http://www.tela-botanica.org/page:eflore_bdtfx?referentiel=bdtfx&niveau=1&module=fiche&action=fiche&num_nom=56619&type_nom=nom_scientifique&nom=rosa%20canina]</ref>. Le nom de « rosier des chiens » vient de la propriété attribuée autrefois à la [[racine (botanique)|racine]] de cette plante censée guérir les morsures de chiens [[rage (maladie)|enragés]]<ref>{{Ouvrage |langue=fr |auteur1=R. Siélain |titre=Atlas de poche des plantes des champs, des prairies et des bois à l'usage des promeneurs et des excursionnistes |éditeur=Librairie des sciences naturelles |lieu=Paris |année=1895 |pages totales=162 |passage=41}}</ref>.
+* [[Nom vernaculaire|Noms vernaculaires]] (langage courant), pouvant désigner aussi d'autres espèces : églantier, rosier sauvage, gratte-cul (nom donné au [[Cynorrhodon|fruit de l'églantier]] et qui, par métonymie, peut désigner la plante entière<ref>[http://www.vulgaris-medical.com/phytotherapie/gratte-cul Encyclopédie Vulgaris Médical : Gratte-cul]</ref>). Le terme « gratte-cul » évoque les poils de l'intérieur des fruits qui peuvent provoquer des démangeaisons.
+
+== Description ==
+=== Appareil végétatif ===
+L'églantier est un arbrisseau pouvant atteindre de un à cinq mètres de haut, à [[tige]]s dressées, arquées, munies d'aiguillons recourbés très piquants. Il est muni de [[stipule]]s développés.
+
+Les [[feuille]]s alternes, composées, comprennent cinq à sept folioles elliptiques dentées.
+
+La plante est [[hermaphrodite]]. Sa floraison a lieu de mai à juillet. Les fleurs sont pollinisées par les insectes et les graines sont dispersées par les oiseaux.
+
+=== Appareil reproducteur ===
+Les fleurs, ou églantines, de quatre à cinq centimètres de diamètre, ont une [[corolle]] simple à cinq [[pétale]]s blanc rosé, et de nombreuses [[étamine]]s. Elles sont souvent solitaires ou réunies en [[corymbe]]s. Le [[réceptacle floral]] est creusé en forme d'urne ([[hypanthium]]) qui contient les [[carpelle]]s velus.
+
+Les [[Fruit (botanique)|fruit]]s ([[cynorhodon]]s, aussi appelés églantines ou familièrement gratte-culs<ref>{{CNRTL|églantier}}</ref>{{,}}<ref>{{CNRTL|gratte-cul}}</ref>), de forme ellipsoïde, sont rouges et blets à maturité, vers le mois d'octobre. Ils ont de 1,5 à {{unité|2|cm}} de long. Ils sont en fait issus de la transformation du réceptacle floral ([[faux-fruit]]), qui contient les vrais fruits ([[akène]]s résultant de la transformation des carpelles).
+
+<gallery mode="packed-hover">
+Image:Hunds-Rose.ISO200.f6.3.jpg|Fleur rosée.
+Image:Églantier4.jpg|Fleurs.
+Image:Rosa canina blatt 2005.05.26 11.50.13.jpg|Feuille composée.
+Image:FruitsÉglantier.jpg|Cynorhodons.
+Image:Rosa canina focus stacked-20220522-RM-123334.jpg|Fleur de rosa canina en Mai 2022.
+</gallery>
+
+== Propriétés ==
+Le cynorhodon est très riche en sucres et en vitamine C. On en fait des [[confitures]]. Les fruits (akènes) et les poils contenus à l’intérieur du cynorhodon ont un effet très irritant au niveau de la peau et de la [[muqueuses|muqueuse]]. Leur contact provoque des démangeaisons insupportables (utilisation comme poil à gratter) et leur ingestion provoque un prurit anal très important (d’où le nom de gratte-cul). C'est à cause de ce fort pouvoir irritant qu'on classe parfois les cynorrhodons dans les fruits faiblement [[toxiques]]<ref>Joel Reynaud, ''La Flore du pharmacien'', {{éd.}} Tec & Doc, 2002.</ref>.
+
+En forêt, l'espèce est très appréciée par les [[chevreuil]]s.
+
+== Répartition ==
+L'espèce ''Rosa canina'' est originaire d'une vaste région, dans les zones tempérées de l'ancien monde, incluant :
+* l'[[Afrique du Nord]], les [[îles Canaries]] et [[Madère]] ;
+* l'Asie occidentale, [[Afghanistan]], [[Iran]], [[Irak]], [[Palestine (région)|Palestine]]/[[Israël]], [[Liban]], [[Syrie]], la région du [[Caucase]] et l'Asie centrale ([[Tadjikistan]]),
+* le sous-continent indien ([[Pakistan]]) ;
+* toute l'Europe, de la [[Méditerranée]] à la [[Scandinavie]], y compris les [[îles Britanniques]] et la [[Russie]]
+Elle a été naturalisée notamment en Amérique du Nord ([[États-Unis]]) et en Océanie ([[Australie]], [[Nouvelle-Zélande]]).
+
+Très commune partout ;
+
+Jusqu'à {{unité|1600|m}} : étage supraméditerranéen ; étages collinéen et montagnard ;
+
+subméditerranéenne (à tendance subatlantique).
+
+=== Données autécologiques ===
+espèce héliophile ;
+
+humus : mull carbonaté à mull mésotrophe ; sols riches en bases ; pH : basique à légèrement acide ;
+
+matériaux (purs ou caillouteux) : argiles, limons, alluvions sableuses ;
+
+espèces mésoxérophiles à mésophiles ;
+
+caractère indicateur : neutrocalcicole mésoxérophile.
+
+== Variétés et hybrides de ''Rosa canina'' ==
+* ''Rosa canina'' ‘Andegavensis’, à feuilles glabres,
+* ''Rosa deseglisei'', un églantier d'Europe centrale à fleurs blanches,
+* ''Rosa marginata'' et ''Rosa marginata'' ‘Brachyphylla’ d'Europe centrale et orientale à fleurs plus grandes,
+* ''Rosa hibernica'', hybride spontané irlandais (''Rosa canina'' × ''[[Rosa pimpinellifolia]]'' type ''spinosissima''),
+* ‘Andersonii’, aux fleurs roses plus grandes que celles de ''Rosa canina'',
+* ‘[[Kiese]]’ ([[Hermann Kiese|Kiese]], 1910) : ''Rosa canina'' × ‘[[Général Jacqueminot]]’, aux fleurs simples ou semi-double rouges en corymbe ; très cultivé<ref>{{Testu|83}}</ref>,
+* ''Rosa canina froebelli'' : une variété de ''Rosa canina'' utilisée sous le nom de ''laxa'' comme [[porte-greffe]] pour les rosiers de jardin.
+
+== Autres espèces de la section des ''Caninae'' ==
+
+{{Article détaillé|Rosa sect. Caninae}}
+
+== Utilisation ==
+
+=== Porte greffe ===
+Le Rosier des chiens servait de [[porte-greffe]] pour diverses variétés de [[rosier]]s, mais actuellement seules les variétés ''Rosa canina inermis'' (sans épines) et ''Rosa canina Pfänder'' (excellent pour les greffages de rosiers tiges) sont encore utilisées.
+
+Des variétés [[Horticulture|horticoles]] ont été sélectionnées pour la culture ornementale.
+
+=== Fleurs ===
+L'églantine est utilisée en [[parfumerie]] pour ses notes délicates, ou en [[eau-de-vie]].
+
+L'eau de fleur d'églantine (''nesri'' en [[arabe]]), c'est-à-dire la production d'[[hydrolat]] de fleurs par entrainement à la vapeur est une spécialité amenée en [[Tunisie]] au {{s-|XVII}} par les [[andalous]] et encore pratiquée dans les villes de [[Testour]]<ref>{{Lien web |langue=fr-FR |titre=Mekletna : promouvoir l’identité culinaire de 4 régions tunisiennes |url=https://www.destinationtunisie.info/mekletna-promouvoir-identite-culinaire-regions-tunisiennes/ |site=Tunisie: tourisme, hôtels, agences voyages, compagnies aériennes |date=2023-03-24 |consulté le=2023-07-06}}</ref> et surtout de [[Zaghouan]]. Cette eau d'églantine est utilisée pour parfumer les pâtisseries traditionnelles, comme des [[baklava]]s, mais surtout pour confectionner le [[Kâak warka|kaâk warka]] au ''nesri'', une célèbre spécialité de la ville de [[Zaghouan]]<ref>{{Lien web |langue=fr |titre=L'églantier est une plante aux milles vertus qu’il faudrait valoriser en Tunisie |url=https://tunisie.co/article/13625/gastronomie/huiles-de-tunisie/eglantier-nesri-564014 |site=tunisie.co |date=2020-04-06 |consulté le=2023-07-06}}</ref>.
+
+En médecine traditionnelle tunisienne, l'eau de fleurs d'églantine est utilisée en application cutanée comme cicatrisant, apaisant des rougeurs et antirides, et par ingestion comme tonique général et comme tonicardiaque ou régulateur léger du rythme cardiaque ("confort cardiaque")<ref>{{Article|langue=fr|prénom1=Kamel|nom1=Bouaouina|titre=Le Nesri, une plante aux mille vertus|périodique=Le Temps|date=24 Mai 2018|lire en ligne=https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7828751/}}</ref>{{,}}<ref>{{Lien web |titre=Le Nesri, une plante aux mille vertus |url=https://www.turess.com/fr/letemps/108278 |site=Turess |consulté le=2023-07-06}}</ref> ce qui semble confirmé par de rares études scientifiques<ref>{{Article|auteur1=Ava Nasrolahi, Leila Hosseini, Fatemeh Farokhi-Sisakht, Javad Mahmoudi, Pouran Karimi, 3 Reza Badalzadeh, 4 and Marjan Erfani 3|titre=Cardioprotective effect of Rosa canina L. methanolic extract on heat shock induced cardiomyocyte injury: An experimental study|périodique=Journal of Cardiovasc Thorac Res.|date=Decembre 2022|lire en ligne=https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7828751/|pages=12(4): 286–293}}</ref>.
+
+=== Fruits ===
+Les [[Fruit (botanique)|fruit]]s de cet églantier, ou [[cynorrhodon|cynorhodon]]s, ont des emplois [[Plante médicinale|médicinaux]] et [[aliment]]aires. Très riches en [[vitamine C]] (20 fois plus que les [[agrume]]s), ils contiennent aussi des vitamines B et PP, de la [[provitamine A]] et des sels minéraux. Frais, ramollis par les premières gelées ou après une légère cuisson, ils forment une pâte qui se mange sucrée avec des laitages. Mais ils s'utilisent surtout en [[confiture]]s, en [[sirop]]s et en [[confiture#Gelée|gelée]]s. Séchés et réduits en poudre, ils servent en [[décoction]] pour des [[tisane]]s. Ils sont à la base du plat traditionnel tchèque et slovaque appelé ''šípková omáčka'', sorte de ragoût de bœuf. La confiture d'églantine est également appelée ''Bùttemües'' en [[Alsace]]<ref>{{Lien web |langue=fr-FR |nom=Simone-wp67 |titre=Confiture d’églantines, Bùttemües, le mot magique. |url=https://www.simonemorgenthaler.com/confiture-deglantines-buttemues-le-mot-magique/ |site=Simone Morgenthaler |date=2022-11-13 |consulté le=2024-09-04}}</ref>.
+
+La pulpe des fruits est comestible (confiture)<ref>{{Ouvrage|langue=fr|prénom1=Jean-Claude|nom1=Rameau|prénom2=Dominique|nom2=Mansion|prénom3=Gérard|nom3=Dumé|et al.=oui|titre=Flore forestière francaise|sous-titre=guide écologique illustré|tome=1|titre tome=Plaines et collines|lieu=Paris|éditeur=Institut pour le développement forestier|date=1989|pages totales=1785|isbn=2-904740-16-3|oclc=21187041|bnf=350743020|sudoc=001598902|présentation en ligne={{Google Livres|1Sp2Zfgi-HoC}}|consulté le=14 janvier 2019}}.</ref>.
+
+== Maladies ==
+Le Rosier des chiens est résistant aux maladies. Il peut cependant souffrir, comme le rosier, d'une [[galle (botanique)|galle]] chevelue, dite ''bédégar'', causée par un hyménoptère, le [[cynips du rosier]] ''([[Diplolepis rosae]])''.
+
+Il peut également être parasité par un petit champignon, ''[[Phragmidium mucronatum]]'' (ordre des [[Pucciniales]]) qui provoque la rouille du rosier.
+<gallery mode="packed">
+Gale-eglantier-20110814-fr78340.jpg|{{centrer|Galle de l'églantier.}}
+Phragmidium mucronatum S1 (3).jpg|{{centrer|Rouille du rosier, ''Phragmidium mucronatum''.}}
+</gallery>
+
+== Langage des fleurs ==
+Dans le [[langage des fleurs]], l'églantine symbolise l'[[amour]] et la [[poésie]]<ref>{{Ouvrage |langue=fr |auteur1=Anne Dumas |titre=Les plantes et leurs symboles |éditeur=[[Éditions du Chêne]] |collection=Les carnets du jardin |année=2000 |pages totales=128 |isbn=2-84277-174-5 |bnf=37189295d }}.</ref>.
+
+== Notes ==
+{{Références}}
+
+== Voir aussi ==
+=== Articles connexes ===
+* [[Rosier]]
+* [[Rose (fleur)|Rose]]
+* [[Rosaceae|Rosacées]]
+* [[Liste des  espèces du genre Rosa]]
+{{Autres projets
+|commons=Category:Rosa canina
+|wikispecies=Rosa canina
+|wiktionary=églantier
+}}
+
+=== Liens externes ===
+* {{eFloras|11|242417146 | Rosa canina }}
+* {{Florabase|Rosa canina|161|s|16243 }}
+* {{CatalogueofLife|4TCZM|''Rosa canina'' L.|consulté le=12 mars 2022 }}
+* {{ITIS|24819|''Rosa canina'' L. }}
+* {{NCBI|74635|''Rosa canina'' }}
+* {{GRIN espèce|5309|''Rosa canina'' L. }}
+* {{Tela-métro|56619|''Rosa canina'' L., 1753}}
+* {{Tela-antilles|9050|''Rosa canina'' L.}}
+* {{INPN|118073|''Rosa canina'' L., 1753}}
+
+=== Bibliographie ===
+*François Couplan, Eva Styner, ''Guide des plantes sauvages comestibles et toxiques'', Les guides du naturaliste, Delachaux et Niestlé, {{ISBN|2-603-00952-4}}.
+*Bernard Bertrand, Annie Jeanne, ''De mémoire d'Eglantine. Ou les secrets ethnobotaniques des Roses sauvages'', 01/10/2005, Terran (Éditions de) - {{ISBN|2-913288-49-9}}
+
+{{Palette|Groupe de rosiers|Fruits sauvages}}
+
+{{Portail|roses et rosiers|Afrique|Asie|Europe|France|pharmacie}}
+
+[[Catégorie:Rosa|canina]]
+[[Catégorie:Espèce de Rosaceae (nom scientifique)]]
+[[Catégorie:Dicotylédone endémique de l'Ancien Monde]]
+[[Catégorie:Dicotylédone d'Afrique]]
+[[Catégorie:Dicotylédone d'Asie]]
+[[Catégorie:Dicotylédone d'Afghanistan]]
+[[Catégorie:Dicotylédone d'Europe]]
+[[Catégorie:Dicotylédone de France]]
+[[Catégorie:Plante introduite]]
+[[Catégorie:Plante médicinale]]
+[[Catégorie:Plante de la Bible]]
+[[Catégorie:Taxon décrit par Carl von Linné]]

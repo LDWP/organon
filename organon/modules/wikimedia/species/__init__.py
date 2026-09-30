@@ -1,0 +1,2 @@
+"""Wikispecies adapter."""
+

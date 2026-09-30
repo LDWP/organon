@@ -1,0 +1,42 @@
+{{Voir homonymes|Rosacée (pathologie)}}
+{{Taxobox début | végétal | ''Rosaceae'' | Illustration_Rosa_canina1.jpg | ''[[Rosa canina]]''. |classification=itis }}
+{{Taxobox | sous-règne | Viridiplantae }}
+{{Taxobox | infra-règne | Streptophyta }}
+{{Taxobox | super-division|Embryophyta }}
+{{Taxobox | division|Tracheophyta }}
+{{Taxobox |sous-division|Spermatophytina }}
+{{Taxobox | classe | Angiosperme |	Magnoliopsida }}
+{{Taxobox | super-ordre| Rosanae }}
+{{Taxobox | ordre | Rosales }}
+{{Taxobox taxon | végétal | famille | Rosaceae | [[Antoine-Laurent de Jussieu|Juss.]], [[1789 en science|1789]] }}
+{{Taxobox répartition | Map-Rosaceae.PNG }}
+{{Taxobox fin}}
+== Liste des genres ==
+Selon {{Bioref|POWO|21 septembre 2020}} :
+{{colonnes|taille=15|
+*''[[Acaena]]'' Mutis ex L.
+*''[[Adenostoma]]'' Hook. & Arn.
+*''[[Agrimonia]]'' L.
+*''[[Alchemilla]]'' L.
+*''[[Amelanchier]]'' Medik.
+*[[×Amelasorbus|×''Amelasorbus'']] Rehder
+*''[[Aremonia]]'' Neck. ex Nestl.
+*''[[Argentina (plante)|Argentina]]'' Hill
+*''[[Aria (plante)|Aria]]'' (Pers.) J.Jacq. ex Host
+*''[[Aronia]]'' Medik.
+*''[[Aruncus]]'' L.
+*''[[Bencomia]]'' Webb & Berthel.
+*''[[Brachycaulos]]'' Dikshit & Panigrahi
+*''[[Cercocarpus]]'' Kunth
+*''[[Chaenomeles]]'' Lindl.
+*''[[Chamaebatia]]'' Benth.
+*''[[Chamaebatiaria]]'' (Porter ex W.H.Brewer & S.Watson) Maxim.
+*''[[Chamaecallis]]'' Smedmark
+*''[[Chamaemeles]]'' Lindl.
+*''[[Chamaemespilus]]'' Medik.
+*''[[Chamaerhodos]]'' Bunge
+*''[[Cliffortia]]'' L.
+*''[[Coleogyne]]'' Torr.
+*''[[Coluria]]'' R.Br.
+*''[[Comarum]]'' L.
+*''[[Cormier|Cormus]]'' Spach

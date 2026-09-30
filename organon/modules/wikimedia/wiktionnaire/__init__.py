@@ -1,0 +1,2 @@
+"""French Wiktionary adapter."""
+

@@ -1,0 +1,68 @@
+{{article à sourcer|date=août 2017}}
+{{Taxobox début | animal | ''Panthera'' | Lion waiting in Namibia.jpg | [[Lion]] (''P. leo''), mâle adulte.|classification=tpdb}}
+{{Taxobox plage|5.3|0| [[Blancen]] du [[Pliocène]] au [[Holocène|Présent]]<ref name="Mazák2011">{{article|nom1=Mazák |prénom1=J. H. |nom2=Christiansen |prénom2=P. |nom3=Kitchener |prénom3=A. C. |année=2011 |titre=Oldest Known Pantherine Skull and Evolution of the Tiger |journal=PLOS ONE |volume=6 |numéro=10 |article-number=e25483 |bibcode=2011PLoSO...625483M |doi=10.1371/journal.pone.0025483 |issn=1932-6203 |pmc=3189913 |pmid=22016768 |accès doi=libre}}</ref>|collections=367}}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | super-classe | Tetrapoda }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | cohorte | Placentalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Feliformia }}
+{{Taxobox | famille | Felidae }}
+{{Taxobox | sous-famille | Pantherinae }}
+{{Taxobox taxon | animal | genre | Panthera | [[Lorenz Oken|Oken]], [[1816]]  }}
+{{Taxobox fin}}
+== Étymologie ==
+{{section à sourcer|date=août 2017}}
+En [[latin classique]] ''panthēra'', lui-même du [[grec ancien]] ''pánthēr'' (πάνθηρ), composé de ''pan-'' (πάν), signifiant {{"|tout}}, et ''thēr'' (θήρ), {{"|proie}}, est le {{"|prédateur de tous [[Animal|les animaux]]}}. Des rapprochements ont également été fait avec le mot sanskrit ''pāṇḍara'' (पाण्डर) signifiant {{"|pâle}}. Le genre ''Panthera'' a été défini par [[Lorenz Oken|Oken]] en [[1816]] ; il est classé dans les [[Pantherinés]] ([[Pantherinae]]), [[Sous-famille (biologie)|sous-famille]] aussi appelée {{"|grands félins}}.  
+
+== Phylogénie ==
+=== Espèces éteintes ===
+{{section à sourcer|date=août 2017}}
+C'est d'Asie que proviennent les plus anciennes espèces de ''Panthera'' connues : ''[[Panthera blytheae]]'' dans l'Himalaya (5,9-4,1 millions d'année), ''[[Panthera palaeosinensis]]'' et ''[[Panthera zdanskyi]]'' en Chine (environ 2,6 millions d'année)<ref>{{Ouvrage|auteur1=José R. Castelló|traducteur=Anne Saint Girons|titre=Félins et hyènes du monde|sous-titre=Lions, tigres, pumas, ocelots et apparentés|éditeur=Delachaux et Niestlé|collection=Guide Delachaux|année=2022|pages totales=280|passage=La lignée des Panthera pages 30-33|isbn=978-2-603-02863-6|lire en ligne=}}</ref>.
+<!--Les premières traces attribuées au genre '''''Panthera''''' datent du [[Pliocène]] moyen (3,5 millions d’années environ) en Europe. Ses [[fossile]]s sont attribués à ''[[Panthera gombaszoegensis]]''. Néanmoins, en Afrique, un autre fossile trouvé à [[Laetoli]], daté également de 3,5 millions d’années semble appartenir à un lion primitif.
+-->
+
+En Europe, la première espèce du genre ''Panthera'' serait ''[[Panthera gombaszoegensis]]'' (Jaguar européen)  ; elle possédait des caractères de lions et de tigres, ses fossiles ont été formellement identifiés sur le continent européen ([[France]], [[Italie]], [[Espagne]], [[Allemagne]] et [[Pays-Bas]]) dans les dépôts datés du Pliocène tardif et du [[Pléistocène]] inférieur<ref>{{Article|langue=en|prénom1=Nicolás R.|nom1=Chimento|prénom2=Federico L.|nom2=Agnolin|titre=The fossil American lion (Panthera atrox) in South America: Palaeobiogeographical implications|périodique=Comptes Rendus Palevol|volume=16|numéro=8|date=2017-11-01|issn=1631-0683|doi=10.1016/j.crpv.2017.06.009|lire en ligne=https://www.sciencedirect.com/science/article/pii/S1631068317301094|consulté le=2023-01-18|pages=850–864}}</ref> et moyen (environ 1,5 million d'année). D’autres fossiles du Pléistocène inférieur de l’Ancien Monde appartiennent à ''[[Panthera gombaszoegensis|Panthera combaszoegensis]]'' et ''[[Panthera schreuderi]]''. 
+
+En Afrique, les premières formes de [[léopard]]s, ''[[Panthera crassidens]]'', sont apparues au Pléistocène inférieur (1,5 million d’années) ; puis l’espèce, après avoir été remplacée par ''[[Panthera pardus]]'' (léopard ou panthère), migra sur toute l’Afrique, en Europe<ref>{{Article|langue=en|prénom1=Adrian|nom1=Marciszak|prénom2=Grzegorz|nom2=Lipecki|titre=Panthera gombaszoegensis (Kretzoi, 1938) from Poland in the scope of the species evolution|périodique=Quaternary International|série=Eurasian Animals and Quaternary Environments: The Contribution of Palaeontology to the SEQS-DATESTRA 2020 Virtual Meeting (Wrocław, Poland) – QI Special Issue Dedicated to Adam Nadachowski|volume=633|date=2022-09-30|issn=1040-6182|doi=10.1016/j.quaint.2021.07.002|lire en ligne=https://www.sciencedirect.com/science/article/pii/S1040618221003839|consulté le=2023-01-18|pages=36–51}}</ref> (où elle est actuellement disparue) et sur toute l’Asie. 
+
+En Afrique aussi, les formes primitives de [[lion]]s les plus anciennes proviennent de [[Tanzanie]] ([[Gorges d'Olduvai]], Pléistocène inférieur, 1,7 million d’années) et sont attribuées à ''[[Panthera leo fossilis]]''. Il semble avoir pénétré en Europe il y a {{nombre|700000|ans}} (Italie) où il s’installa. Plusieurs fossiles ont été trouvés en France, en Espagne et en Allemagne. ''Panthera leo fossilis'' était plus grand que l'actuel tigre de Sibérie (''[[Panthera tigris altaica]]'').
+
+Il y a environ {{nombre|350000|ans}}, ''Panthera leo fossilis'' fut remplacé par une autre sous-espèce guère plus petite : ''Panthera leo spelaea'', le '''[[Panthera spelaea|lion des cavernes]]'''<ref>{{Lien web |langue=fr |titre=Hommes, ours et lion des cavernes : les formidables découvertes de Montmaurin |url=https://www.ladepeche.fr/2020/08/30/hommes-ours-et-lion-des-cavernes-9040326.php |site=ladepeche.fr |consulté le=2023-01-18}}</ref>. Cette sous-espèce a été trouvée un peu partout en Europe ([[France]], Allemagne, Angleterre) jusqu'à la Sibérie orientale. Ce lion est bien connu sur les parois des cavernes européennes, par les gravures et peintures du [[Paléolithique supérieur]] ; d’autres images ont été gravées dans de l’[[ivoire]] (défenses de [[mammouth]]s). Il semble que, d’après les {{"|témoignages}} de la [[grotte Chauvet]], le lion des cavernes ait été spécialisé dans la chasse aux bisons des steppes (''[[Bison priscus]]''). 
+
+L’espèce ''[[Panthera palaeosinensis]]'', du Pléistocène moyen de [[Chine]], fut sans aucun doute{{refnec}} un intermédiaire entre les deux espèces. 
+
+Autrefois, on pouvait rencontrer le tigre en Asie mineure, mais il s’éteignit, victime de la chasse. 
+
+Une sous-espèce de la taille du lion d’Asie, au crâne plus court (appelée ''Panthera leo vereshchagini''), s’installa lors d’un refroidissement général, il y a environ {{nombre|35000|ans}}, sur le [[détroit de Béring]], de la [[Sibérie]] (Russie) au territoire du [[Yukon]] (Canada) ; un immense [[glacier]] séparait le Yukon et l’Alaska du reste du continent nord-américain. Lors d’un réchauffement, il y a {{nombre|25000|ans}}, le détroit de Béring s’effaça à nouveau sous les eaux ; un corridor de terre se créa le long des montagnes rocheuses, reliant le territoire du Yukon et les États-Unis ; les lions, ayant à nouveau évolués, migrèrent vers les États-Unis. Cette ultime sous-espèce, appelée ''[[Panthera leo atrox]]'', le [[lion américain]], fut la plus grande et la plus puissante de toutes les sous-espèces de lions (plus grande encore que le tigre de Sibérie et son ancêtre ''Panthera leo fossilis''). Elle s’installa rapidement sur ce continent. Ses plus beaux fossiles proviennent de [[La Brea Tar Pits]], un gisement de goudron naturel à [[Los Angeles]] où ont été exhumés près de 80 spécimens.
+
+=== Espèces ===
+{{section à sourcer|date=août 2017}}
+*Les '''lions''' d’Asie (''Panthera leo persica'') semblent être une relique des lions des cavernes. À la fin de la période glaciaire, le territoire de cette espèce s’étendait de la péninsule italienne à l’Inde.
+:Le [[Panthera atrox|lion d'Amérique]] s’installa au [[Mexique]], passa l’[[isthme de Panama]] et migra vers l’[[Amérique du Sud]]. Il fut bloqué par les [[Cordillère des Andes|Andes]], mais s’installa le long du Pacifique jusqu’au [[Pérou]].
+
+* Les [[tigre]]s (''Panthera tigris'') ont probablement la même origine que les lions du détroit de Béring (''[[Panthera leo vereshchagini]]'') et d’Amérique (''[[Panthera leo atrox]]'') ; les tigres actuels dériveraient donc de ''Panthera leo spelaea''.
+
+*Le [[jaguar]] (''Panthera onca''), sans doute descendant de ''Panthera leo atrox'', est propre au continent américain. Il vivait autrefois en Amérique du Nord, avant de s’éteindre victime de la chasse. ''Panthera onca augusta'', une espèce de jaguar nord-américaine, fut ainsi exhumée des puits de goudrons de La Brea Tar Pits.
+
+*La lignée des panthères, les ''[[Pantherinae]]'', a divergé il y a 10,8 millions d'années de l'ancêtre commun des ''[[Felidae]]'', puis il y a 6,4 millions d'années, la lignée des panthères nébuleuses ''[[Neofelis]]'' et celle des ''Panthera''<ref name=PourLaScience>{{fr}} {{Article | auteur = Stephen O'Brien et Warren Johnson| titre = L'évolution des chats| journal = Pour la science|ISSN = 0153-4092| no = 366 | date = Avril 2008}} basée sur {{en}} {{Article | auteur = W. Johnson et al.| titre = ''The late Miocene radiation of modern felidae : a genetic assessment''| revue = Science | no = 311| date = 2006}} et {{en}} {{Article | auteur = C. Driscoll et al. | titre = ''The near eastern origin of cat domestication'' | revue = Science| no = 317| date = 2007}}</ref>. Le plus vieil ancêtre commun aux ''Panthera'' dont on possède des [[fossile]]s est ''[[Panthera palaeosinensis]]'', qui vivait de la fin du [[Pliocène]] au début du [[Pléistocène]]. La [[panthère des neiges]] est apparue bien avant le jaguar, le léopard ou panthère, et est étroitement apparentée au [[tigre]] : tigre et panthère des neiges auraient divergé il y a deux millions d'années<ref name="UICNOnce">{{UICN|22732|''Panthera uncia'' (Schreber, 1775) }}</ref>{{,}}<ref group="Note">La position du [[clade]] par rapport au reste des ''Panthera'' est encore très floue.</ref>.
+
+== Cladogrammes ==
+[[Cladogramme]] basé sur l'[[Phylogénie|analyse phylogénétique]] des [[espèce]]s vivantes et [[Extinction des espèces|éteintes]] ({{éteint}}) du genre ''Panthera'' réalisée par P. Piras et ses collègues en 2018<ref name="Piras et al._2018">{{article | langue=anglais |auteur1=Piras, P. |auteur2=Silvestro, D. |auteur3=Carotenuto, F. |auteur4=Castiglione, S.|auteur5= Kotsakis, A. |auteur6=Maiorino, L. |auteur7=Melchionna, M. |auteur8=Mondanaro, A. |auteur9=Sansalone, G., Serio, C. et Vero, V.A. |année=2018 |titre=Evolution of the sabertooth mandible: A deadly ecomorphological specialization |périodique=Palaeogeography, Palaeoclimatology, Palaeoecology |volume=496 |pages=166−174 |doi=10.1016/j.palaeo.2018.01.034|bibcode=2018PPP...496..166P}}</ref> :
+<center>{{clade| style=font-size:85%;line-height:85%
+|label1='''''Panthera'''''
+== Espèces et sous-espèces ==
+[[Image:Leopard - Sabi Sabi - South Africa.jpg|thumb|Léopard]] [[Fichier:Namibie Etosha Lion 01.JPG|thumb|Lion]][[Image:Panthera tigris tigris edited2.jpg|thumb|Tigre]] [[Image:Standing jaguar.jpg|thumb|Jaguar]][[File:Schneeleopard-P1020506.jpg|thumb|Léopard des neiges]]
+* ''[[Léopard|Panthera pardus]]'' — [[Léopard]]
+** ''[[Léopard d'Afrique|Panthera pardus pardus]]'' 
+** ''[[Panthère de Barbarie|Panthera pardus panthera]]'' 
+** ''[[Panthera pardus melas]]'' 
+** ''[[Panthera pardus saxicolor]]'' 
+** ''[[Panthera pardus kotiya]]'' 
+** ''[[Panthera pardus delacouri]]'' 
+** ''[[Panthera pardus fusca]]'' 
+** ''[[Panthera pardus orientalis]]'' 
+** ''[[Panthera pardus ciscaucasica]]''
+** ''[[Panthera pardus nimr]]'' 
+** ''[[Panthera pardus japonensis]]'' 
+** †''[[Panthera pardus jarvisi]]''

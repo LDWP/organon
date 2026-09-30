@@ -1,0 +1,18 @@
+{{Taxobox début | animal | ''Homo sapiens'' | Human.svg | Représentation d'humains adultes ([[homme]] et [[femme]]) sur la [[plaque de Pioneer]].}}
+{{Taxobox plage|collections=97|0.3|0|[[Chibanien]] au [[Holocène|présent]]}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | classe | Mammifère|Mammalia }}
+{{Taxobox | ordre | Primates }}
+{{Taxobox | sous-ordre | Haplorrhini }}
+{{Taxobox | infra-ordre | Simiiformes }}
+{{Taxobox | micro-ordre | Catarrhini }}
+{{Taxobox | super-famille | Hominoidea }}
+{{Taxobox | famille | Hominidae }}
+{{Taxobox | sous-famille | Homininae }}
+{{Taxobox | tribu | Hominini }}
+{{Taxobox | sous-tribu | Hominina }}
+{{Taxobox | genre | Homo }}
+{{Taxobox taxon | animal | espèce | Homo sapiens | [[Carl von Linné|Linnaeus]], [[1758 en science|1758]] }}
+{{Taxobox répartition| Homo Sapien range.png}}
+{{Taxobox UICN | LC }}
+{{Taxobox fin}}

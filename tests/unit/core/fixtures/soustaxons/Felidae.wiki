@@ -1,0 +1,127 @@
+{{Sous-titre/Taxon|nsd1=Félidés|nv1=Félins}}
+{{Redirect|Félin}}
+{{Voir homonyme|Felidae (film)}}
+{{Taxobox début | animal | Felidae | The_Felidae.jpg | De gauche à droite et de haut en bas : un [[Tigre du Bengale]], un [[Lynx du Canada]], un [[Serval]], un [[Puma]], un [[Chat viverrin|Chat pêcheur]], un [[Chat de Temminck]], un [[Ocelot]]  et un [[Felis silvestris|Chat sauvage]].}}
+{{Taxobox | embranchement | Chordata}}
+{{Taxobox | sous-embranchement | Vertebrata}}
+{{Taxobox | classe | Mammalia}}
+{{Taxobox | infra-classe | Placentalia}}
+{{Taxobox | super-ordre | Laurasiatheria}}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Feliformia }}
+{{Taxobox | infra-ordre | Feloidea }}
+{{Taxobox taxon | animal | famille | Felidae | [[Johann Fischer von Waldheim|G.Fischer]], [[1817]]}}
+{{Taxobox taxons | sous-famille |
+* [[Felinae]] (« petits félins » )
+* [[Pantherinae]] (« grands félins »)
+*†[[Machairodontinae]] (« félins à dents de sabre »)
+*†[[Proailurinae]]<ref name="McKenna & Bell">{{Ouvrage|prénom1=M. C.|nom1=McKenna|auteur2=Bell, S. K.|titre=Classification of Mammals|éditeur=Columbia University Press|année=2000|pages totales=631|page=230|isbn=978-0-231-11013-6|lire en ligne=https://books.google.com/books?id=zS7FZkzIw-cC&pg=PA230|titre chapitre=Family Felidae Fischer de Waldheim, 1817:372. Cats}}</ref>
+}}
+{{Taxobox fin}}
+=== Espèces actuelles ===
+La famille des Felidae compte 2 sous-familles, 13 genres et au moins 42 espèces<ref>{{Ouvrage|auteur1=José R. Castelló|traducteur=Anne Saint Girons|titre=Félins et hyènes du monde|sous-titre=Lions, tigres, pumas, ocelots et apparentés|éditeur=Delachaux et Niestlé|collection=Guide Delachaux|année=2022|pages totales=280|passage=8|isbn=978-2-603-02863-6|lire en ligne=https://www.unitheque.com/guide-delachaux-des-felins-hyenes-monde/les-guides-du-naturaliste/delachaux-et-niestle/Livre/652683}}</ref>.
+
+Liste des espèces actuelles selon [[SITI|ITIS]]{{Bioref|ITIS|4 mars 2019|afficher=ref}}:
+{{début de colonnes|taille=30|nombre=2}}
+* Sous-famille [[Felinae]] <small>Fischer de Waldheim, 1817</small>:
+** Genre ''[[Acinonyx]]'' <small>Brookes, 1828</small>:
+***''[[Acinonyx jubatus]]'' <small>(Schreber, 1775)</small> - le [[Guépard]]
+** Genre ''[[Caracal (genre)|Caracal]]'' <small>Schreber, 1776</small>:
+*** ''[[Caracal aurata]]'' <small>(Temminck, 1827)</small> - le [[Chat doré africain]]
+*** ''[[Caracal caracal]]'' <small>(Schreber, 1776)</small> - le [[Caracal]]
+** Genre ''[[Catopuma]]'' <small>Severtzov, 1858</small>:
+*** ''[[Catopuma badia]]'' <small>(Gray, 1874)</small> - le [[Chat bai]]
+*** ''[[Catopuma temminckii]]'' <small>(Vigors and Horsfield, 1827)</small> - le [[Chat de Temminck]]
+** Genre ''[[Felis]]'' <small>Linnaeus, 1758</small>:	  
+*** ''[[Felis chaus]]'' <small>(Schreber, 1777)</small> - le [[Chaus]]
+*** ''[[Felis margarita]]'' <small>(Loche, 1858)</small> - le [[Chat des sables]] 
+*** ''[[Felis nigripes]]'' <small>(Burchell, 1824)</small> - le [[Chat à pieds noirs]]
+*** ''[[Felis silvestris]]'' <small>(Schreber, 1777)</small> - le [[Felis sylvestris|Chat sauvage]]
+**** ''[[Felis silvestris bieti]]'' <small>(Milne-Edwards, 1892)</small> - le [[Chat de Biet]]
+**** ''[[Felis silvestris cafra]]'' <small>(Desmarest, 1822)</small> - le [[Chat sauvage d'Afrique subsaharienne]]
+**** ''[[Felis silvestris catus]]'' <small>(Linnaeus, 1758)</small> - le [[Chat domestique]]
+**** ''[[Felis silvestris lybica]]'' <small>(Forster, 1780)</small> - le [[Chat ganté]]
+**** ''[[Felis silvestris ornata]]'' <small>(Gray, 1830)</small> - le [[Chat orné]]
+**** ''[[Felis silvestris silvestris]]'' <small>(Schreber, 1775)</small> - le [[Chat forestier]]
+** Genre ''[[Leopardus]]'' <small>Gray, 1842</small> (incluant l'ancien genre ''Oncifelis''):
+*** ''[[Colocolo (Félin)|Leopardus colocolo]]'' <small>(Molina, 1782)</small> - le [[Colocolo (Félin)|Colocolo]]
+*** ''[[Leopardus pajeros]]'' <small>(Desmarest, 1816)</small> - le [[Leopardus pajeros|Chat des pampas]]
+*** ''[[Leopardus geoffroyi]]'' <small>(d'Orbigny and Gervais, 1844)</small> - le [[Chat de Geoffroy]]
+*** ''[[Leopardus guigna]]'' <small>(Molina, 1782)</small> - le [[Kodkod]]
+*** ''[[Leopardus guttulus]]'' <small>(Hensel, 1872)</small> - l'[[Leopardus guttulus|Oncille du Sud]]
+*** ''[[Leopardus jacobitus]]'' <small>(Cornalia, 1865)</small> - le [[Chat des Andes]]
+*** ''[[Leopardus pardalis]]'' <small>(Linnaeus, 1758)</small> - l'[[Ocelot]]
+*** ''[[Leopardus tigrinus]]'' <small>(Schreber, 1775)</small> - l'[[Oncille]]
+*** ''[[Leopardus wiedii]]'' <small>(Schinz, 1821)</small> - le [[Margay]]
+*** ''[[Leopardus tilcayo]]'' <small>(Nogales-Ascarrunz, Aliaga-Rossel, Lescroart & Eizirik, 2026)</small> - le [[Tilcayo]]
+** Genre ''[[Leptailurus]]'' <small>Severtzov, 1858</small>:
+*** ''[[Leptailurus serval]]'' <small>(Schreber, 1776)</small> - le [[Serval]]
+** Genre ''[[Lynx]]'' <small>Kerr, 1792</small>:
+*** ''[[Lynx canadensis]]'' <small>Kerr, 1792</small> - le [[Lynx du Canada]]
+*** ''[[Lynx lynx]]'' <small>(Linnaeus, 1758)</small> - le [[Lynx boréal]]
+*** ''[[Lynx pardinus]]'' <small>(Temminck, 1827)</small> - le [[Lynx pardelle]]
+*** ''[[Lynx rufus]]'' <small>(Schreber, 1777)</small> - le [[Lynx roux]]
+** Genre ''[[Otocolobus]]'' <small>Brandt, 1842</small>:
+*** ''[[Otocolobus manul]]'' <small>(Pallas, 1776)</small> - le [[Manul]]
+** Genre ''[[Pardofelis]]''  <small>Severtzov, 1858</small>:
+*** ''[[Pardofelis marmorata]]'' <small>(Martin, 1837)</small> - le [[Chat marbré]]
+** Genre ''[[Prionailurus]]'' <small>Severtzov, 1858</small>:
+*** ''[[Prionailurus bengalensis]]'' <small>(Kerr, 1792)</small> - le [[Chat-léopard]]
+*** ''[[Prionailurus iriomotensis]]'' <small>(Imaizumi, 1967)</small> - le [[Chat d'Iriomote]]
+*** ''[[Prionailurus planiceps]]'' <small>(Vigors and Horsfield, 1827)</small> - le [[Chat à tête plate]]
+*** ''[[Prionailurus rubiginosus]]'' <small>(I. Geoffroy Saint-Hilaire, 1831)</small> - le [[Chat rubigineux]]
+*** ''[[Prionailurus viverrinus]]'' <small>(I. Geoffroy Saint-Hilaire, 1831)</small> - le [[Chat viverrin]]
+** Genre ''[[Puma (genre)|Puma]]'' <small>Jardine, 1834</small>:
+*** ''[[Puma concolor]]'' <small>(Linnaeus, 1771)</small> - le [[Puma]]
+*** ''[[Puma yagouaroundi]]'' <small>(É. Geoffroy Saint-Hilaire, 1803)</small> - le [[Jaguarondi]]
+* Sous-famille [[Pantherinae]] <small>Pocock, 1917</small>:
+** Genre ''[[Neofelis]]'' <small>Gray, 1867</small>:
+*** ''[[Neofelis diardi]]'' <small>(G. Cuvier, 1823)</small> - la [[Panthère nébuleuse de Bornéo]] 
+*** ''[[Neofelis nebulosa]]'' <small>(Griffith, 1821)</small>  - la [[Panthère nébuleuse]] 
+** Genre ''[[Panthera]]'' <small>Oken, 1816</small>:
+*** ''[[Lion|Panthera leo]]'' <small>(Linnaeus, 1758)</small> - le [[Lion]] 
+*** ''[[Jaguar|Panthera onca]]'' <small>(Linnaeus, 1758)</small> - le [[Jaguar]]
+*** ''[[Léopard|Panthera pardus]]'' <small>(Linnaeus, 1758)</small> - le [[Léopard]]
+*** ''[[Tigre|Panthera tigris]]'' <small>(Linnaeus, 1758)</small> - le [[Tigre]]
+*** ''[[Panthère des neiges|Panthera uncia]]'' <small>(Schreber, 1775)</small> - la [[Panthère des neiges]]
+{{fin de colonnes}}
+
+La classification des félins est en perpétuelle évolution, notamment grâce aux récentes analyses génétiques. Les différents changement de classification ont {{C'est à dire|récemment}} été résumés dans le rapport final de la "[[Cat Specialist Group|Cat Classification Task Force]]" en 2017<ref name=catsg>{{article|auteur=Kitchener, A. C., Breitenmoser-Würsten, C., Eizirik, E., Gentry, A., Werdelin, L., Wilting A., Yamaguchi, N., Abramov, A. V., Christiansen, P., Driscoll, C., Duckworth, J. W., Johnson, W., Luo, S.-J., Meijaard, E., O’Donoghue, P., Sanderson, J., Seymour, K., Bruford, M., Groves, C., Hoffmann, M., Nowell, K., Timmons, Z. & Tobe, S. |année=2017 |titre=A revised taxonomy of the Felidae.  The final report of the Cat Classification Task Force of the IUCN/SSC Cat Specialist Group |journal=Cat News |volume=Special Issue 11 |pages=1−80 |url=https://repository.si.edu/bitstream/handle/10088/32616/A_revised_Felidae_Taxonomy_CatNews.pdf?sequence=1&isAllowed=y}}</ref> :
+
+* le [[Chat d'Iriomote]] (''Prionailurus bengalensis iriomotensis <small>(Imaizumi, 1967)</small>) est considéré depuis les années 1990 comme une sous-espèce du [[chat-léopard]].
+* le [[Chat doré africain]] (''Caracal aurata'' <small>(Temminck, 1827)</small>) est placé dans le genre ''[[Caracal (genre)|Caracal]]''.
+* le [[Chat De Pallas]] (''Otocolobus manul'' <small>(Pallas, 1776)</small>) est placé à part dans le genre ''[[Otocolobus]]'' <small>Brandt, 1842</small>.
+* le [[Chat des pampas]] (''Leopardus colocola pajeros'' <small>(Desmarest, 1816)</small>) est classé comme une sous-espèce du [[Colocolo (Félin)|Colocolo]] (''Leopardus colocola'' <small>(Molina, 1782)</small>). Le débat a cependant toujours lieu, y compris avec le [[Chat du Pantanal]].
+* la [[Panthère des neiges]] (''Panthera uncia'' <small>(Schreber, 1775)</small>) est intégrée au genre ''[[Panthera]]''.
+* l'[[Leopardus guttulus|Oncille du Sud]] est considéré depuis 2013 comme une espèce différente de l'Oncille (Leopardus tigrinus).
+
+
+Une partie des félins actuels, y compris de genres distincts, sont capables d'[[félin hybride|hybridations naturelles ou forcées]].
+
+<gallery style="text-align:center;" mode="packed">
+Fichier:Cheetah in Kenya.jpg|[[Guépard]] (''Acinonyx jubatus'').
+File:Caracl_(01),_Paris,_décembre_2013.jpg|[[Caracal]] (''Caracal caracal'').
+Fichier:Serval in Tanzania.jpg|[[Serval]] (''Leptailurus serval'').
+Fichier:Clouded leopard.jpg|[[Panthère nébuleuse]] (''Neofelis nebulosa'').
+</gallery>
+
+=== Taxons éteints ===
+{{Début de colonnes|taille=30}}
+*''[[Proailurinae]] ''
+**''[[Proailurus]]'' {{small|([[Henri Filhol|Filhol]], 1879)}}<ref>{{article|nom=Filhol, H. |année=1879 |titre=Étude sur les Mammifères fossiles de Saint-Gérand le Puy (Allier) |journal=Annales des Sciences Géologiques |volume=10 |numéro=1 |pages=1–252 |url=https://gallica.bnf.fr/ark:/12148/bpt6k432586n/f244}}</ref>
+***''P. lemanensis'' {{small|(Filhol, 1879)}}
+***''P. bourbonnensis'' {{small|(Peigne, 1999)}}<ref name=Peigne1999>{{article|auteur1=Peigné, S. |année=1999 |titre=''Proailurus'', l'un des plus anciens Felidae (Carnivora) 'dEurasie : systematique et evolution |journal=Bulletin de la Société d'Histoire Naturelle de Toulouse |numéro=135 |pages=125–134 |url=https://www.researchgate.net/file.PostFileLoader.html?id=536e24ded685cc8e7a8b45d9&assetKey=AS%3A273532158709760%401442226557576}}</ref>
+***''P. major'' {{small|(Peigne, 1999)}}<ref name=Peigne1999/>
+*''[[Pseudailurus]]''grade
+**''[[Pseudaelurus]]'' {{small|([[Paul Gervais (zoologiste)|Gervais]], 1850)}}<ref>{{article|auteur1=Gervais, P. |année=1850 |titre=Zoologie et paléontologie françaises. Nouvelles recherches sur les animaux vertébrés dont on trouve les ossements enfouis dans les sol de le France et sur leur comparaison avec les espèces propres aux autres regions du globe |journal=Zoologie et Paléontologie Françaises |volume=8 |pages=1–271}}</ref>{{,}}<ref name=Werdelin_al2010>{{chapitre  | langue=en | auteur1=L. Werdelin | auteur2=N. Yamaguchi | auteur3=W. E. Johnson | auteur4=S. J.  O'Brien | titre chapitre=Phylogeny and evolution of cats (Felidae) | année=2010 | passage=59–82 |editor1-last=Macdonald |editor1-first=D. W. |editor2-last=Loveridge |editor2-first=A. J. | titre ouvrage=Biology and Conservation of Wild Felids | éditeur=[[Oxford University Press]] | isbn=978-0-19-923445-5 | lire en ligne=https://www.researchgate.net/publication/266755142}}</ref>
+***''P. quadridentatus'' {{small|(Blainville, 1882)}}
+***''P. guangheesis'' {{small|(Cao et al, 1990)}}
+***''P. cuspidatus'' {{small|(Wang et al, 1998)}}
+**''[[Sivaelurus]]'' {{small|([[Guy Ellcock Pilgrim|Pilgrim]], 1910)}}
+***''S. chinjiensis'' {{small|(Pilgrim, 1910)}}
+**''[[Hyperailurictis]]'' {{small|(Kretzoi, 1929)}}
+***''H. intrepidus'' {{small|(Leidy, 1858)}}
+***''H. marshi'' {{small|(Thorpe, 1922)}}
+***''H. stouti'' {{small|(Schultz & Martin, 1972)}}
+***''H. validus'' {{small|(Rothwell, 2001)}}
+***''H. skinneri'' {{small|(Rothwell, 2003)}}

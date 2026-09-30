@@ -1,0 +1,93 @@
+{{Taxobox début | animal | Falconidae | Brown-Falcon,-Vic,-3.1.2008.jpg | [[Faucon bérigora]] (''Falco berigora''). | classification=COI }}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Aves }}
+{{Taxobox | ordre | Falconiformes }}
+{{Taxobox taxon | animal | famille | Falconidae | [[William Elford Leach|Leach]], [[1820]] ou [[Nicholas Aylward Vigors|Vigors]], [[1824]] }}
+{{Taxobox taxons | sous-famille |
+* [[Polyborinae]] Bonaparte, 1838
+* [[Falconinae]] Leach, 1820
+----
+<center>11 ou 12 '''[[genre (biologie)|genres]]''' & environ<br />64 '''[[espèce]]s''' (''Voir texte'')</center>
+}}
+{{Taxobox fin}}
+=== Liste alphabétique des genres ===
+[[Fichier:Herpetotheres cacchinans1.jpg|right|thumb|300px|Macagua rieur peint par [[Andrew Jackson Grayson]]]]
+Les Falconidés sont divisés en deux, trois ou quatre [[Sous-famille (biologie)|sous-familles]]. De nos jours, il est généralement admis que les Herpetotherinae forment un clade frère de tous les autres faucons<ref name="Griffiths">Carole S. Griffiths, George F. Barrowclough, Jeff G. Groth & Lisa Mertz: ''Phylogeny of the Falconidae (Aves): a comparison of the efficacy of morphological, mitochondrial, and nuclear data.'' Molecular Phylogenetics and Evolution 32 (2004) 101–109, [[DOI: 10.1016/j.ympev.2003.11.019]]</ref>.
+
+Selon AviList<ref name=AviList>AviList Core Team. 2025. AviList: The Global Avian Checklist, v2025. https://doi.org/10.2173/avilist.v2025</ref> :
+* Sous-famille [[Herpetotherinae]]
+** ''[[Herpetotheres]]'' Vieillot 1817
+** ''[[Micrastur]]'' G.R. Gray, 1841
+* Sous-famille [[Falconinae|falconinés]]
+** Tribu Falconini
+*** ''[[Falco (genre)|Falco]]'' Linnaeus, 1758
+*** ''[[Microhierax]]'' Sharpe, 1874
+*** ''[[Neohierax]]'' Swann, 1922
+*** ''[[Polihierax]]'' Kaup, 1847
+** Tribu Polyborini (ex-sous-famille [[Polyborinae|polyborinés]])
+*** ''[[Caracara (genre)|Caracara]]'' Merrem, 1826 (y compris ''[[Polyborus]]'' Vieillot, 1816)
+*** ''[[Daptrius]]'' Vieillot, 1816
+*** ''[[Ibycter]]'' Vieillot, 1816
+*** ''[[Spiziapteryx]]'' Kaup, 1852
+
+La classification interne des faucons est présentée dans le cladogramme suivant<ref name="Griffiths" /> :
+{{clade
+|label1='''Falconidae'''
+|1={{clade
+   |label1=Herpetotherinae
+   |1={{clade
+      |1=''[[Micrastur]]''
+      |2=''[[Herpetotheres]]''
+      }}
+   |label2=Falconinae
+   |2={{clade
+      |label1=Falconini
+      |1={{clade
+         |1=''[[Microhierax]]''
+         |2={{clade
+            |1=''[[Polihierax]]''
+            |2=''[[Falco (genre)|Falco]]''
+            }}
+         }}
+      |label2=Polyborini
+      |2={{clade
+         |1=''[[Spiziapteryx]]''
+         |label2=
+         |2={{clade
+            |1=''[[Caracara (genre)|Caracara]]''
+            |label2=
+            |2={{clade
+               |1=''[[Ibycter]]''
+               |2={{clade
+                  |1=''[[Phalcoboenus]]''
+                  |2=''[[Daptrius]]''
+}} }} }} }} }} }} }}
+
+Deux genres, ''Daptrius'' et ''Polihierax'', sont vraisemblablement [[paraphylétique]]<ref>{{harv|texte=Giffiths, 1999|id=Griffiths2}}</ref>.
+
+=== Genres fossiles ===
+* ''[[Parvulivenator]]'' ([[Éocène]] précoce d'Angleterre)
+* ''[[Stintonornis]]'' ([[London Clay]] de l'éocène précoce)
+* ''[[Badiostes]]'' (Santa Cruz [[Miocène]] précoce de [[Patagonie]], Argentine)<!-- Badiostes patagonicus: Evolution39:1174 -->
+* Falconidae gen. et sp. indet. (Miocene précoce de [[Chubut]], Argentine)
+* Falconidae gen. et sp. indet. (Pinturas Miocène moyen et précoce d'Argentine)
+* ''[[Pediohierax]]'' (Miocene moyen du [[Nebraska]], USA) – formellement ''Falco ramenta''<!-- Auk104:270 -->
+* Falconidae gen. et sp. indet. (Cerro Bandera Miocène tardif de [[Province de Neuquén|Neuquén]], Argentine)<ref>[[PVPH]] 465: a [[phalange (anatomie)|phalanges]] 1 au milieu du doigt. Un caracara? possible d'un autre taxon. (Kramarz {{et al.}} 2005)</ref>
+* ''Sushkinia pliocaena'' ([[Pliocène]] précoce du [[Pavlodar]], [[Kazakhstan]]) – ''Falco'' incertain
+
+=== Liste des espèces ===
+
+D'après la classification de référence (version 5.1, 2015) du [[Congrès ornithologique international]] (ordre [[phylogénique]]) :
+{{boîte déroulante|titre=|contenu=Liste des espèces
+* ''[[Daptrius ater]]'' – [[Caracara noir]]
+* ''[[Ibycter americanus]]'' – [[Caracara à gorge rouge]]
+* ''[[Phalcoboenus carunculatus]]'' – [[Caracara caronculé]]
+* ''[[Phalcoboenus megalopterus]]'' – [[Caracara montagnard]]
+* ''[[Phalcoboenus albogularis]]'' – [[Caracara à gorge blanche]]
+* ''[[Phalcoboenus australis]]'' – [[Caracara austral]]
+* ''[[Caracara cheriway]]'' – [[Caracara du Nord]]
+* {{éteint}}''[[Caracara lutosa]]'' – [[Caracara de Guadalupe]]
+* ''[[Caracara plancus]]'' – [[Caracara huppé]]
+* ''[[Milvago chimachima]]'' – [[Caracara à tête jaune]]
+* ''[[Milvago chimango]]'' – [[Caracara chimango]]

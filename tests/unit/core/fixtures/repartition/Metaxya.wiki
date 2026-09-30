@@ -1,0 +1,90 @@
+{{ébauche|botanique}}
+{{Taxobox début | végétal | ''Metaxya'' |Metaxya rostrata 2.jpg|''[[Metaxya rostrata]]'' | | classification=POWO}}
+{{Taxobox | embranchement | Streptophyta }}
+{{Taxobox | classe | Equisetopsida }}
+{{Taxobox | sous-classe | Polypodiinae }}
+{{Taxobox | ordre | Cyatheales }}
+{{Taxobox | famille | Cyatheaceae }}
+{{Taxobox taxon | végétal | genre | Metaxya | [[Karel Bořivoj Presl|C.Presl]], [[1836 en science|1836]] }}
+{{Taxobox fin}}
+
+'''''Metaxya''''' est un [[Genre (biologie)|genre]] [[néotropical]] de [[fougères]] de la [[famille (biologie)|famille]] des ''[[Cyatheaceae]]''. C'est le seul genre de la famille des ''Metaxyaceae'' dans la classification du [[Pteridophyte Phylogeny Group]] de 2016 (PPG I)<ref name=PPGI>{{article|auteur=PPG I |année=2016 |titre=A community-derived classification for extant lycophytes and ferns |journal=Journal of Systematics and Evolution |volume=54 |numéro=6 |pages=563–603 |doi=10.1111/jse.12229|s2cid=39980610 |accès doi=libre }}</ref>. Alternativement, le genre peut être placé dans la sous-famille des ''Metaxyoideae'' de la famille des ''[[Cyatheaceae]]'' plus largement définie<ref name=ChriChas14>{{article|nom1=Christenhusz |prénom1=Maarten J.M. |nom2=Chase |prénom2=Mark W. |date=2014 |titre=Trends and concepts in fern classification |journal=Annals of Botany |volume=113 |numéro=9 |pages=571–594 |doi=10.1093/aob/mct299 |pmid=24532607 |pmc=3936591 }}</ref>. Un classement par familles utilisé dans [[Plants of the World Online]]<ref name=POWO_17147700-1>{{lien web|titre=''Metaxya'' C.Presl |site=Plants of the World Online |éditeur=Royal Botanic Gardens, Kew|url=https://powo.science.kew.org/taxon/urn:lsid:ipni.org:names:17147700-1 |consulté le=2019-11-25 }}</ref>.
+
+== Description ==
+{{section à sourcer|date=août 2026}}
+Les espèces du genre se caractérisent par de grandes frondes qui atteignent près de {{unité|2,5| m}} de longueur.
+
+== Répartition ==
+{{WGSRPD|certain=BLZ,BOL,BZC,BZE,BZN,CLM,COS,ECU,FRG,GUA,GUY,HON,MXT,PAN,PER,SUR,TRT,VEN|incertain=LEE|source=[[Plants of the World Online|POWO]]{{Bioref|powo|6 août 2026|ref}}}}
+Le genre ''Metaxya'' se rencontre dans les pays et régions suivants{{Bioref|powo|6 août 2026|ref}} : [[Mexique du Sud-Est]], [[Belize]], [[Bolivie]], [[Colombie]], [[Costa Rica]], [[Guatemala]], [[Guyana]], [[Guyane]], [[Honduras]], [[Panama]], [[Pérou]], [[Région Centre-Ouest (Brésil)|Région Centre-Ouest]] du [[Brésil]], [[Région Nord (Brésil)|Région Nord]] du [[Brésil]], [[Région Nord-Est (Brésil)|Région Nord-Est]] du [[Brésil]], [[Suriname]], [[Trinité-et-Tobago]], [[Venezuela]], [[Équateur (pays)|Équateur]].
+
+La présence de ce taxon est incertaine dans le pays ou la région suivant{{Bioref|powo|6 août 2026|ref}} : [[Îles Sous-le-Vent (Antilles)|Îles Sous-le-Vent]].
+
+== Liste des espèces ==
+Selon {{Bioref|gbif|6 août 2026}} et {{Bioref|powo|6 août 2026}}, le genre ''Metaxya'' comprend 6 espèces :
+* ''[[Metaxya contamanensis]]'' Tuomisto & G.G.Cárdenas
+* ''[[Metaxya elongata]]'' Tuomisto & G.G.Cárdenas
+* ''[[Metaxya lanosa]]'' A.R.Sm. & Tuomisto
+* ''[[Metaxya parkeri]]'' (Hook. & Grev.) J.Sm.
+* ''[[Metaxya rostrata]]'' (Kunth) C.Presl
+* ''[[Metaxya scalaris]]'' Tuomisto & G.G.Cárdenas
+
+<gallery>
+Metaxya lanosa.jpg|''[[Metaxya lanosa]]''.
+14938-Metaxya rostrata-Tabaro.jpg|''[[Metaxya rostrata]]''.
+</gallery>
+
+== Phylogénie ==
+Phylogénie de ''Metaxya''<ref>{{article|nom1=Nitta |prénom1=Joel H. |nom2=Schuettpelz |prénom2=Eric |nom3=Ramírez-Barahona |prénom3=Santiago |nom4=Iwasaki |prénom4=Wataru |année=2022 |titre=An Open and Continuously Updated Fern Tree of Life |journal=Frontiers in Plant Science |volume=13 |pmid= 36092417|pmc= 9449725|accès doi=libre}}</ref>{{,}}<ref>{{lien web|année=2023 |titre=Tree viewer: interactive visualization of FTOL |url=https://fernphy.github.io/viewer.html |version=FTOL v1.4.0 [GenBank release 253] |consulté le=8 mars 2023}}</ref>.
+{{Clade | style=font-size:100%;line-height:80%
+|1={{clade
+  |1=''[[Metaxya parkeri|M. parkeri]]'' <small>(Hooker & Greville) Smith</small>
+  |2={{clade
+    |1={{clade
+      |1=''[[Metaxya rostrata|M. rostrata]]'' <small>(Kunth) Presl</small>
+      |2=''[[Metaxya scalaris|M. scalaris]]'' <small>Tuomisto & Cárdenas</small>
+       }}
+    |2={{clade
+      |1=''[[Metaxya lanosa|M. lanosa]]'' <small>Smith & Tuomisto</small>
+      |2={{clade
+        |1=''[[Metaxya contamanensis|M. contamanensis]]'' <small>Tuomisto & Cárdenas</small>
+        |2=''[[Metaxya elongata|M. elongata]]'' <small>Tuomisto & Cárdenas</small>
+         }}
+       }}
+     }}
+   }}
+}}
+== Systématique ==
+Le [[nom correct]] complet (avec [[Citation d'auteurs en botanique|auteur]]) de ce taxon est ''Metaxya'' C.Presl, 1836{{Bioref|POWO|6 août 2026|ref}}.
+
+''Metaxya'' a pour [[Synonyme (botanique)|synonyme]]{{Bioref|POWO|6 août 2026|ref}} :
+* ''Amphidesmium'' Schott
+
+== Notes et références ==
+{{références}}
+
+== Références taxinomiques ==
+{{Autres projets
+| commons titre=Catégorie Metaxya
+| commons=Category:Metaxya
+| species=Metaxya
+}}
+* {{CatalogueofLife | 5QQ7 | ''Metaxya'' C.Presl | consulté le=6 août 2026 }}
+* {{EOL | 58308 | ''Metaxya'' | consulté le=6 août 2026 }}
+* {{GBIF | 8336203 | ''Metaxya'' C.Presl | consulté le=6 août 2026}}
+* {{INPN | 731195 | ''Metaxya'' C.Presl, 1836 | consulté le=6 août 2026 }}
+* {{IPNI | 17147700-1 | Metaxya | C.Presl | consulté le=6 août 2026 }}
+* {{IRMNG | 1321426 | ''Metaxya'' K.B. Presl, 1836 | consulté le=6 août 2026 }}
+* {{ITIS | 1214870 | ''Metaxya'' C. Presl | consulté le=6 août 2026 }}
+* {{MNHN | genre | metaxya | ''Metaxya'' | consulté le=6 août 2026}}
+* {{NCBI | 32145 | ''Metaxya'' | consulté le=6 août 2026 }}
+* {{OEPP | 1MEXG | ''Metaxya'' |  | consulté le=6 août 2026 }}
+* {{POWO | 17147700-1 | Metaxya | C.Presl | consulté le=6 août 2026 }}
+* {{Tropicos | 40018048 | Metaxya | C. Presl | consulté le=6 août 2026 }}
+* {{WFO | 4000023925 | Metaxya | C.Presl | consulté le=6 août 2026}}
+* {{WRMS | 1634179 | ''Metaxya'' | C.Presl | consulté le=6 août 2026}}
+
+{{Portail|botanique|Amérique}}
+
+[[Catégorie:Cyatheaceae]]
+[[Catégorie:Espèce de plantes (nom scientifique)]]

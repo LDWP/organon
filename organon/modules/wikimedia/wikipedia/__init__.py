@@ -1,0 +1,2 @@
+"""French Wikipedia adapter."""
+

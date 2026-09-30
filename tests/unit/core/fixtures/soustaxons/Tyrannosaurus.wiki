@@ -1,0 +1,30 @@
+{{Sous-titre/Taxon|nv1=Tyrannosaure}}
+{{voir homonymes|Tyrannosaur|Tyrannosaurus rex (homonymie)|T-Rex|(9951) Tyrannosaure}}
+{{Taxobox début | animal | ''Tyrannosaurus'' | Sues_skeleton.jpg | Fossile de ''Tyrannosaurus rex'' nommé « Sue ». | classification=TPDB}}
+{{Taxobox plage|earliest=77|69|66|[[Maastrichtien]] ([[Crétacé supérieur]])<br/><small>Possible enregistrement du [[Campanien]] moyen</small>|collections=85}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Sauropsida }}
+{{Taxobox | super-ordre | Dinosauria }}
+{{Taxobox | ordre | Saurischia }}
+{{Taxobox | sous-ordre | Theropoda }}
+{{Taxobox | infra-ordre | Tetanurae }}
+{{Taxobox | micro-ordre | Coelurosauria }}
+{{Taxobox | super-famille | Tyrannosauroidea | Tyrannosauroidea | éteint=oui }}
+{{Taxobox | famille | Tyrannosauridae | Tyrannosauridae | éteint=oui }}
+{{Taxobox | sous-famille | Tyrannosauridae | Tyrannosaurinae | éteint=oui }}
+{{Taxobox taxon | animal | genre | Tyrannosaurus | [[Henry Fairfield Osborn|Osborn]], [[1905 en paléontologie|1905]] | éteint=oui }}
+{{Taxobox taxons | espèce |
+* ''' ''Tyrannosaurus rex'' '''<small>[[Henry Fairfield Osborn|Osborn]], 1905</small>
+* ''' ''Tyrannosaurus mcraeensis'' '''<small>[[Sebastian Dalman|Dalman]] {{et al.}}, 2024</small>
+{{Taxobox synonymes |
+* ''Manospondylus gigas'' <small>[[Edward Drinker Cope|Cope]], 1892</small>
+* ''Dynamosaurus imperiosus'' <small>, [[Henry Fairfield Osborn|Osborn]], 1905</small>
+* ''Tyrannosaurus imperiosus'' <small>[[Henry Fairfield Osborn|Osborn]], 1905</small>
+* ''Nanotyrannus lancensis''? <small>Gilmore, 1946 </small>
+* ''[[Aublysodon]] molnari'' <small>[[Gregory S. Paul|Paul]], 1988</small>
+* ''Dinotyrannus megagracilis'' <small>Olshevsky, 1995</small>
+* ''Stygivenator molnari'' <small>(Paul, 1988) Olshevsky, 1995</small>}}
+* ''Tyrannosaurus bataar''? <small>[[Ievgueni Maleïev|Maleev]], 1955</small>
+}}
+{{Taxobox fin}}

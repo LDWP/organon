@@ -1,0 +1,1127 @@
+{{sous-titre/Taxon|nv1=Mustélidés}}
+{{Taxobox début | animal | Mustelidae | Mustelidae-01.jpg| Différentes espèces de Mustélidés : Une [[Martre (nom vernaculaire)|Martre]] (''[[Martes martes]]''), un [[Blaireau]] (''[[Meles meles]]''),<br> une [[Loutre]] (''[[Lutra lutra]]''), un Glouton (''[[Gulo gulo]]''),<br> une [[Hermine]] (''[[Mustela erminea]]'') et un Ratel (''[[Mellivora capensis]]'').|classification=MSW}}
+{{Taxobox plage|39.7|0 |[[Duchesnéen]] de l'[[Éocène]] au [[Holocène|présent]]|collections=1080}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Caniformia }}
+{{Taxobox | super-famille | Musteloidea }}
+{{Taxobox taxon | animal | famille | Mustelidae | [[Gotthelf Fischer von Waldheim|Fischer]], [[1817]]{{Bioref|ITIS|21 mai 2013|ref}} }}
+{{Taxobox répartition | Mustelid_Distribution.png | La répartition indigène et la densité des espèces de mustélidés existantes. }}
+{{Taxobox fin}}
+
+Les {{Terme défini|Mustélidés}} ('''Mustelidae''') sont une [[famille (biologie)|famille]] de [[Mammifère|mammifères]] [[Carnivora|carnivores]] [[caniformes]], de la [[Super-famille (biologie)|super-famille]] des [[Musteloidea|Mustéloïdes]]. Ce sont des [[prédation|prédateurs]], de taille variée (de {{unité|20|cm}} à plus de {{unité|2|m}}), avec un corps allongé et des pattes courtes. Ils possèdent des glandes sécrétrices développées, de chaque côté de l'anus, qui peuvent dégager une odeur musquée en cas d'attaque. Divisée en plusieurs [[sous-famille (biologie)|sous-familles]], la famille des Mustélidés comprend une soixantaines d’espèces réparties en une vingtaine de [[Genre (biologie)|genres]]. Elle est proche de la famille des [[Méphitidés]].
+
+== Taxonomie ==
+=== Histoire taxonomique ===
+On peut dire que la classification d’animaux semblable à des « Belettes » ou à des « Fouines » a été conceptualisé pour la première fois dans la taxonomie moderne sous le nom de genre ''Mustela'', dès la première édition du ''[[Systema naturae|Systema Naturæ]]'' de [[Carl von Linné]]. Dans la première édition, le genre est représenté par des espèces appelées ''M. martes'', ''M. zibellina'', ''M. viverra'', ''M. mustela'' et ''M. putorius''. Les espèces issues de la dixième édition du ''Systema Naturæ'' (1758) sont <ref name="Linnaeus">{{Ouvrage |langue=la |auteur1=[[Carl von Linné]] |titre=Systema naturae per regna tria naturae : secundum classes, ordines, genera, species, cum characteribus, differentiis, synonymis, locis |éditeur=Impensis Direct. Laurentii Salvii |lieu=Stockholm |année=1758 |tome=1 |édition=10 |passage=45 |url=https://www.biodiversitylibrary.org/page/726942#page/65/mode/1up}}</ref> :
+{{Liste cachée|
+* La [[Saricovienne]] (''[[Mustela lutris]]'') ;
+* La [[Loutre]] (''[[Mustela lutra]]'') ;
+* Le [[Glouton]] (''[[Mustela gulo]]'') ;
+* Le [[Coase]] (''[[Mustela barbara]]'') ;
+* La [[Martes|Marte]] (''[[Mustela Martes]]'') ;
+* Le [[Putois]] (''[[Mustela putorius]]'') ;
+* Le [[Furet]] (''[[Mustela furo]]'') ;
+* La [[Zibeline]] (''[[Mustela zibellina]]'') ;
+* L’[[Hermine]] (''[[Mustela erminea]]'')<ref group="note">Il s’agit est l’[[Espèce type|espèce-type]] de ce genre, la belette (''[[Mustela nivalis]]'') ne sera décrite que dans la douzième édition du ''Systema Naturæ'' en 1766.</ref>.}}
+
+Certaines espèces comme le [[Blaireau]] (''[[Ursus meles]]'') ou le [[Carcajou]] (''[[Ursus luscus]]'') s’étaient vues placées dans le genre ''Ursus''<ref name="Linnaeus" />, genre nominal pour la famille des Ursidés.
+
+Par la suite, au cours de la fin du {{S-|XVIII}}, divers nouvelles subdivisions seront créé, notamment ''Lutra'', ''Martes'' ou encore ''Meles'', mais qui reste rattaché aux plantigrades.
+
+==== {{S-|XIX}} ====
+Pour ce qui est du regroupement de genres, une famille en tant que tel, la première mention d’un tel « groupe » a été décrite pour la première fois en 1817 par le [[naturaliste]] saxon devenu sujet russe [[Gotthelf Fischer von Waldheim]]<ref>{{Ouvrage|auteur=<!-- Nom de l'auteur -->|titre=Mémoires de la Société impériale des naturalistes de Moscou|volume=4|lieu=Moscou|éditeur=Impr. de l'Université impériale|année=1813|pages=<!-- Numéro de la page -->|issn=1560-0432|oclc=27295549|lire en ligne=https://www.biodiversitylibrary.org/page/10128997#page/427/mode/1up|consulté le=7 juillet 2026}}</ref>, toutefois, cette « famille » désignée par l’auteur sous le nom de ''Mustelinorum'' a une systématique totalement différente de la famille que l’on connaît actuellement et qui sert de base taxonomique pour les Mustélidés ainsi que les Mustélinés. La systématique de ce groupe est la suivante : 
+{{Liste cachée|
+* genre ''[[Mustela]]'' 
+** ''[[Mustela martes]]'' 
+* genre ''[[Ryzaena]]''
+** ''[[Viverra tetradactyla]]''
+* genre ''[[Herpestes]]'' 
+** ''[[Viverra ichneumon]]''
+* genre ''[[Mephitis]]'' 
+** ''[[Viverra putorius]]'' 
+* genre ''[[Viverra]]'' 
+** ''[[Viverra civetta]]''
+* genre ''[[Otolicnus]]'' 
+** ''[[Canis cerdo]]''}}
+
+En 1821, le zoologiste britannique [[John Edward Gray]] tente de mettre un peu d’ordre dans la famille, allant des [[Belettes]] et [[Putois]] (''[[Putorius]]''), des [[Martes]] (''[[Mustela]]''), des [[Moufette|Mouffettes]] (''[[Mephitis]]'') jusqu’aux [[Loutres]] (''[[Lutra]]''), les [[Blaireau|Blaireaux]] (''[[Meles (mustélidé)|Meles]]'') et les [[Gloutons]] (''[[Gulo]]'') sont en revanche toujours dans la famille des [[Ursidae|Ursidés]]<ref>{{Ouvrage|langue=en|prénom1=John Edward|nom1=Gray|titre=On the Natural Arrangement of Vertebrose Animals|volume=15|année=1821|passage=296–310|lire en ligne=https://babel.hathitrust.org/cgi/pt?id=hvd.32044103082087&view=1up&seq=309|périodique=London Medical Repository}}</ref>.
+
+L’inclusion de ces plus gros genres se fera au cours des années 1830-1860, c’est au cours de cette période que les grandes sous-familles seront constituées, en 1838 [[Charles-Lucien Bonaparte]] théorise les subdivisions Melina et Lutrina pour les Blaireaux et les Loutres, mais ce sont ici des groupes de carnivores indépendants<ref name="Bonaparte">{{Ouvrage|langue=la|auteur1=Charles-Lucien Bonaparte|titre=Synopsis Vertebratorum Systematis|volume=2|année=1838|passage=111|lire en ligne=https://www.biodiversitylibrary.org/page/9327296|titre ouvrage=Nuovi annali delle scienze naturali}}</ref>. Dans un document publié en 1845, le même auteur intègre finalement le groupe des Melina dans la famille des Mustélidés<ref name="Bonaparte1845">{{Ouvrage|langue=it|auteur1=Charles-Lucien Bonaparte|titre=Catalogo metodico dei mammiferi europei|lieu=Milan|éditeur=Coi Tipi di Luigi di Giacomo Pirola|année=1845|pages=7|doi=10.5962/bhl.title.77311|lire en ligne=https://www.biodiversitylibrary.org/page/43573728}}</ref>. D’autres auteurs ont tenté de classer les blaireaux parmi les Mustélidés, certains d’entre eux y ont même intégré la sous-famille des Ursinae<ref name="TheAnalyst1836">{{Ouvrage |langue=en |titre=The Analyst : monthly journal of science, literature, and the fine arts |volume=4 |éditeur=Simpkin, Marshall, and Co. |lieu=Londres |année=1836 |pages=70 |lire en ligne=https://www.biodiversitylibrary.org/page/2508317 }}</ref>. [[Fichier:Johnson's household book of nature (7268643562).jpg|vignette|gauche|Illustration des différentes espèces de Mustélidés telle qu’elle était théorisée à la fin du {{S-|XIX}}, dans le ''Johnson's household book of nature'', 1880. ]]Durant les années 1860, la systématique des mammifères connaît une période d'intenses révisions, portée par l'analyse minutieuse des pièces ostéologiques et des formules dentaires. Au cœur de cette dynamique, le zoologiste britannique John Edward Gray, alors conservateur des collections zoologiques au ''British Museum'', propose en 1865 une refonte de la famille des Mustélidés dans les ''Proceedings of the Zoological Society of London''<ref name="Gray1865">{{Ouvrage|langue=en|auteur1=John Edward Gray|titre=Proceedings of the Zoological Society of London|volume=1865|lieu=Londres|éditeur=Academic Press|année=1865|pages=100-154|lire en ligne=https://www.biodiversitylibrary.org/page/28497034|titre chapitre=Revision of the genera and species of Mustelidae contained in the British Museum}}</ref>. Ce jalon initial permet d'introduire des critères morphologiques fins, isolant des caractères crâniens précis sous des appellations qui marqueront durablement l'histoire naturelle (à l'instar des sous-groupes ou genres ''[[Pekania]]'', ''[[Neogale]]'', ''[[Lutrogale]]'' ou ''[[Melogale]]''). Cependant, la véritable rupture conceptuelle survient en 1869 avec la publication de son ouvrage magistral : le ''Catalogue of carnivorous, pachydermatous, and edentate Mammalia in the British museum''<ref name="Gray1869">{{Ouvrage|langue=en|auteur1=John Edward Gray|titre=Catalogue of carnivorous, pachydermatous, and edentate Mammalia in the British museum|lieu=Londres|éditeur=British Museum (Natural History). Department of Zoology|année=1869|pages=79-142|doi=10.5962/bhl.title.8305|lire en ligne=https://www.biodiversitylibrary.org/item/116397#page/155/mode/1up}}</ref>. Dans ce traité, Gray parachève sa vision en scindant radicalement l'ancienne grande famille unifiée en deux entités distinctes : La famille des Mustelidae (restreinte aux formes digitigrades, semi-aquatiques ou strictement marines), ainsi que la famille des Melinidae (érigée pour regrouper les formes plantigrades et fouisseuses, telles que les blaireaux et les mouffettes)<ref name="Gray1869" />. {{Liste cachée|
+* Section I. [[Acanthopoda]]
+** Fam. 6. Mustelidae
+*** Tribe 1. [[Mustelina]]
+**** ''[[Martes]]''
+***** ''(Skull elongate, narrow...)''
+****** ''(The upper hinder tubercular grinder quadrate...) [[Martes (sous-genre)|Martes]].''
+******* Le ''Pine-Marten'' (''[[Martes abietum]]'') ;
+******* Le ''American Sable'' (''[[Martes americana]]'') ;
+******* Le ''Japanese Sable'' (''[[Martes melanopus]]'') ;
+******* Le ''Sable'' (''[[Mustela zibellina]]'') ;
+******* ''[[Martes brachyura]]'' ;
+******* ''[[Martes japonica]]'' ;
+****** ''(Tail elongate, slender...) [[Pekania]].''
+******* Le ''The Wood-Shock'' / ''Fisher'' (''[[Martes pennantii]]'') ;
+***** ''(Skull swollen, flattened; nose short; upper cutting-teeth erect...) [[Foina]].''
+****** Le ''Beech-Marten'' (''[[Martes foina]]'') ;
+***** ''(Skull swollen, flattened; nose short, broad; upper cutting-teeth projecting...) [[Charronia]].''
+****** Le ''White-checked Weasel'' (''[[Martes flavigula]]'') ;
+**** ''[[Putorius]]''
+***** ''(Back uniform)''
+****** Le ''Polecat'' (''[[Putorius fœtidus]]'') ;
+****** ''[[Putorius eversmannii]]'' ;
+****** ''[[Putorius nigripes]]'' ;
+***** ''(Back spotted or mottled)''
+****** Le ''Vormela'' / ''Peregusna'' (''[[Putorius sarmaticus]]'') ;
+**** ''[[Mustela]]''
+***** ''(Back uniform)''
+****** ''(Back uniform colour; tail black-tipped)''
+******* Le ''Stoat'' / ''Ermine'' (''[[Mustela erminea]]'') ;
+******* Le ''Richardson's Stoat'' (''[[Mustela richardsonii]]'') ;
+******* ''[[Mustela agilis]]'' ;
+****** ''(Back and tail uniformly coloured) [[Gale (sous-genre)|Gale]].''
+******* Le ''Weasel'' (''[[Mustela vulgaris]]'') ;
+******* ''[[Mustela boccamela]]'' ;
+******* ''[[Mustela alpina]]'' ;
+***** ''(Back streaked)''
+****** ''[[Mustela albinucha]]'' ;
+***** ''(Face with pale spot in front of ears; back uniform; tail-end black) [[Neogale]].''
+****** Le ''Black-faced Weasel'' (''[[Mustela brasiliensis]]'') ;
+****** Le ''Yellow-cheeked Weasel'' (''[[Mustela xanthogenys]]'') ;
+****** ''[[Mustela aureoventris]]'' ;
+**** ''[[Vison]]''
+***** ''(The upper tubercular grinder large...) [[Vison (sous-genre)|Vison]].''
+****** Le ''American Vison'' (''[[Vison lutreocephala]]'') ;
+***** ''(The upper tubercular grinder small...) [[Lutreola]].''
+****** Le ''Mank, Nurec'' (''[[Vison lutreola]]'') ;
+****** Le ''Italse'' (''[[Vison siberica]]'') ;
+****** ''[[Vison canigula]]'' ;
+****** ''[[Vison horsfieldii]]'' ;
+****** ''[[Vison subhemachalana]]'' ;
+**** ''[[Gymnopus]]''
+***** Le ''Kathiah'' (''[[Gymnopus kathiah]]'') ;
+***** ''[[Gymnopus leucocephalus]]'' ;
+***** ''[[Gymnopus strigidorsus]]'' ;
+***** ''[[Gymnopus africanus]]'' ;
+*** B. [[Subplantigrade]] (Gulonina)
+**** ''[[Gulo]]''
+***** ''[[Gulo borealis]]'' ;
+*** C. [[Plantigrade]]
+**** ''[[Galera (Mustélidé)|Galera]]''
+***** Le ''Tiara'' (''[[Galera barbata]]'') ;
+**** ''[[Grisonia]]''
+***** ''[[Grisonia vittata]]'' ;
+*** Tribe 2. [[Lutrinae|Lutrina]]
+**** A. ''(Tail simple, conical, depressed, rounded on the sides)''
+***** a. ''(The palms and soles of the feet bald between the pads...)''
+****** ''(Muzzle entirely covered with hair...)''
+****** ''[[Barangia]]''
+******* ''[[Barangia sumatrana]]'' ;
+******* ''[[Barangia ? nepalensis]]'' ;
+****** ''(The muzzle partially hairy...)''
+****** ''[[Lontra]]''
+******* ''[[Lontra enhydris]]'' ;
+******* ''[[Lontra brasiliensis]]'' ;
+******* ''[[Lontra ? insularis]]'' ;
+****** ''(Muzzle bald on the upper edge...)''
+****** ''[[Lutra]]''
+******* ''(Forehead and nose of skull flat...)''
+******** ''(Europe)''
+********* Le ''Otter'' (''[[Lutra vulgaris]]'') ;
+********* ''[[Lutra nudipes]]'' ;
+******** ''(Asia)''
+********* ''[[Lutra chinensis]]'' ;
+********* ''[[Lutra indica]]'' ;
+******* ''(Forehead and nose of skull convex...) [[Lutrogale]].''
+******** ''(Asia)''
+********* ''[[Lutra monticola]]'' ;
+********* ''[[Lutra Swinhoei]]'' ;
+******** ''(America)''
+********* ''[[Lutra macrodus]]'' ;
+**** ''[[Nutria]]''
+***** ''[[Nutria felina]]'' ;
+**** ''[[Lutronectes]]''
+***** ''[[Lutronectes Whiteleyi]]'' ;
+**** c. ''(Feet oblong, rather elongate; toes rather slender...)''
+***** ''[[Aonyx]]''
+****** ''(African. Claws very rudimentary. [[Anahyster]])''
+******* ''[[Aonyx lalandii]]'' ;
+****** ''(Asiatic. Claws rudimentary, blunt. [[Aonyx]])''
+******* Le ''Indian Aonyx'' (''[[Aonyx leptonyx]]'') ;
+******* ''[[Aonyx indigitata]]'' ;
+******* ''[[Aonyx aurobrunnea]]'' ;
+**** d. ''(The under surface of the feet... sprinkled with scattered soft hairs...)''
+***** ''[[Hydrogale]]''
+****** ''[[Hydrogale maculicollis]]'' ;
+**** e. ''(The palms and soles of the feet hairy between the pads...)''
+***** ''[[Latax]]''
+****** ''[[Latax canadensis]]'' ;
+**** B. ''(Tail elongate, rather depressed, with a cord-like ridge on each side)''
+***** ''[[Pteronura]]''
+****** ''[[Pteronura sanbachii]]'' ;
+*** Tribe 3. [[Enhydrina (Mustélidé)|Enhydrina]]
+**** ''[[Enhydris (Mustélidé)|Enhydris]]''
+***** Le ''Kalan'' / ''Sea-Otter'' (''[[Enhydris lutris]]'') ;
+* Section II. [[Dog-footed Carnivora|Dog-footed Carnivora (Cynopoda)]]
+** Fam. 7. [[Melinidae]]
+*** A. [[Plantigrade]]
+**** Tribe 4. [[Melina (Mustélidé)|Melina]]
+***** a. ''(Palate much produced behind...)''
+****** ''[[Arctonyx]]''
+******* Le ''Balisoar'' (''[[Arctonyx collaris]]'') ;
+***** b. ''(Palate moderately produced behind...)''
+****** ''[[Meles (mustélidé)|Meles]]''
+******* ''(Skull larger; nose compressed. [[Taxus (sous-genre)|Taxus]] / [[Eumeles]])''
+******** Le ''Badger'' (''[[Meles taxus]]'') ;
+******** Le ''The Tumpha'' (''[[Meles leucurus]]'') ;
+******* ''(Skull short; nose broad. [[Eumeles]])''
+******** ''[[Meles anakuma]]'' ;
+******* ''(Skull oblong, elongate...) Pseudomeles.''
+******** ''[[Meles chinensis]]'' ;
+***** ''[[Taxidea]]''
+****** Le ''American Badger'' (''[[Taxidea americana]]'') ;
+***** ''[[Mydaus]]''
+****** ''[[Mydaus meliceps]]'' ;
+**** Tribe 5. [[Mellivorina]]
+***** ''[[Mellivora]]''
+****** Le ''Ratel'' (''[[Mellivora ratel]]'') ;
+****** ''[[Mellivora indica]]'' ;
+****** ''[[Mellivora leuconota]]'' ;
+**** Tribe 6. [[Mephitina]]
+***** ''[[Conepatus]]''
+****** ''[[Conepatus nasutus]]'' ;
+***** ''[[Mephitis]]''
+****** ''(Tail as long as body)''
+******* ''[[Mephitis varians]]'' ;
+******* ''[[Mephitis vittata]]'' ;
+****** ''(Tail longer than the body)''
+******* ''[[Mephitis mexicana]]'' ;
+***** ''[[Spilogale]]''
+****** Le ''Little Striped Skunk'' (''[[Spilogale interrupta]]'') ;
+*** B. [[Subdigitigrade]]
+**** Tribe 7. [[Zorillina]]
+***** ''[[Zorilla]]''
+****** Le ''The Zorille'' (''[[Zorilla striata]]'') ;
+****** ''[[Zorilla frenata]]'' ;
+**** Tribe 8. [[Helictidina]]
+***** ''[[Helictis]]''
+****** ''(Flesh-tooth large; aperture in front of orbits moderate. [[Melogale]])''
+******* Le ''Nyentek'' (''[[Helictis orientalis]]'') ;
+******* Le ''The Oker'' (''[[Helictis nipalensis]]'') ;
+****** ''(Flesh-tooth small; aperture in front of orbits very large)''
+******* ''[[Helictis moschata]]'' ;
+******* ''[[Helictis subaurantiaca]]'' ;
+}}
+
+Cette réorganisation en deux blocs et la création de nouvelles divisions, comme le genre de loutre japonaise ''[[Lutronectes]]'' ou l'adjonction de l'espèce ''[[Lutra Swinhoei]]'', influenceront directement les taxonomistes du début du {{S-|XX}}. Comme le soulignera plus tard Reginald Innes Pocock en 1921, les « tribus » de Gray serviront de fondations directes pour l'établissement des sous-familles modernes (''Mustelinae'', ''Melinae'', ''Mephitinae''{{Etc.}}) intégrées par la suite dans les classifications de référence<ref name="Pocock1921">{{Article|langue=en |titre=On the External Characters and Classification of the Mustelidæ |périodique=Proceedings of the Zoological Society of London |volume=91 |numéro=4 |année=1921 |pages=803-837 |auteur1=Reginald Innes Pocock|lire en ligne=https://www.biodiversitylibrary.org/page/31253581#page/448/mode/1up}}</ref>.
+
+==== {{S-|XX}} ====
+
+Dans sa révision globale de 1921, Reginald Innes Pocock remanie en profondeur la classification des Mustélidés en s'appuyant sur les caractères externes et les organes génitaux, défendant le morcellement de la famille en groupes parfois monotypiques pour mieux refléter leurs affinités réelles. Il propose ainsi plusieurs nouvelles sous-familles : les Lataxinae (remplaçant les ''Enhydrina'' pour le genre marin ''Latax''), les Tayrinae (isolant la tayra des grisons), les Lyncodontinae (dédiés à ''Lyncodon'' en raison de ses spécificités podales et crâniennes) et les Grisoninae (pour les genres ''Grison'' et ''Grisonella''). Parallèlement, il restreint les groupes existants : les Mustelinae sont limités aux hermines, belettes et putois (''Mustela'', ''Gale'', ''Plesiogale'', ''Putorius'', ''Vormela'') selon la structure de leur bulle tympanique et de leur baculum ; les Martinae (''Martes'', ''Charronia'') en sont séparés par leurs bulles auditives et leurs mâchoires plus longues ; tandis que les Melinae ne comprennent plus que ''Meles'' et ''Arctonyx''. Enfin, Pocock valide l'autonomie des Helictidinae (blaireaux-furets ''Helictis'' et ''Melogale''), des Mydainae (''Mydaus''), des Taxidiinae pour le Taxidée américain ''Taxidea''), des Mellivorinae pour le ratel et des Mephitinae, pour les différents genres de mouffettes, reliant les blaireaux via les télagons (''Mydaus'')<ref name="Pocock1921" />.
+
+En rupture avec le morcellement proposé par Pocock en 1921, George Gaylord Simpson opère en 1945 une synthèse d'inspiration résolument conservatrice. Constatant que la multiplication de sous-familles monotypiques ou fondées sur de simples convergences d'adaptations nuit à l'utilité pratique de la classification, il réduit la diversité des groupes actuels à seulement cinq grandes sous-familles majeures. C'est ainsi que la sous-famille centrale des Mustelinae absorbe de nombreuses structures autrefois isolées, y plaçant en synonymie les anciennes sous-familles de Pocock comme les ''Martinae'', ''Guloninae'', ''Grisoninae'', ''Tayrinae'', ''Ictonychinae'' et ''Lyncodontinae''. De la même manière, le grand genre ''Mustela'' est redéfini pour inclure les anciens taxons ''Putorius'', ''Lutreola'', ''Gale''{{Etc.}}, unifiant sous une même égide les belettes, putois et visons. La sous-famille des Melinae regroupant les blaireaux, subit un regroupement analogue en intégrant de force les ''Taxidiinae'', ''Mydainae'' et ''Helictidinae'', Simpson jugeant impossible ou du moins prématuré de diviser les blaireaux en lignées autonomes. Enfin, les loutres sont stabilisées au sein des Lutrinae, un bloc consolidé qui avale la sous-famille marine des ''Lataxinae'' (et son genre ''Latax'', renommé ''Enhydra''), tandis que le grand genre ''Lutra'' englobe désormais ''Lontra'' et ''Hydrictis'' (anciennement ''Hydrogale''). Ce modèle condensé et unifié à cinq branches, complété par les Mellivorinae pour le ratel et les Mephitinae pour les mouffettes, pose les fondations directes de la stabilité taxonomique moderne, qui sera reprise fidèlement par la toute première édition du ''Mammal Species of the World''<ref name="Simpson1945">{{Ouvrage|langue=en|auteur1=George Gaylord Simpson|titre=The Principles of Classification and a Classification of Mammals|périodique=Bulletin of the American Museum of Natural History|volume=85|lieu=New York|éditeur=American Museum of Natural History|année=1945|pages=227|lire en ligne=https://digitallibrary.amnh.org/server/api/core/bitstreams/0864c099-b7a7-42ec-86d1-08201d8b3bbd/content}}</ref>.
+Aux prémisses de la taxonomie contemporaine, en 1982, la première édition de ''Mammal Species of the World'' gérait la famille des Mustélidés de manière beaucoup plus large qu'aujourd'hui, y incluant notamment les différents genres de mouffettes et les télagons<ref>{{Ouvrage |langue=en |prénom1=James H. |nom1=Honacki |prénom2=Kenneth E. |nom2=Kinman |prénom3=James W. |nom3=Koeppl |titre=Mammal species of the world : a taxonomic and geographic reference |éditeur=Allen Press & Association of Systematics Collections |lieu=Lawrence, Kan. |année=1982 |passage=256-264 |isbn=0-94292-400-2 |lire en ligne=https://archive.org/details/mammalspeciesofw0000unse_p1w2/page=256/mode/2up }}</ref>. Selon cette édition, la famille comprenait {{Nobr|5 sous}}-familles, {{Nobr|23 genres}} répartis en plusieurs sous-genres et {{Nobr|65 espèces}} : {{Liste cachée|
+* Sous-famille des [[Lutrinae]]
+** ''[[Aonyx]]''
+*** ''(Sous-genre Aonyx)''
+**** La [[Loutre à joues blanches]] (''[[Aonyx capensis]]'') ;
+**** La [[Loutre à joues blanches du Congo]] (''[[Aonyx congica]]'') ;
+*** ''(Sous-genre Amblonyx)''
+**** La [[Loutre cendrée]] (''[[Aonyx cinerea]]'') ;
+** ''[[Enhydra]]''
+*** La [[Loutre de mer]] (''[[Enhydra lutris]]'') ;
+** ''[[Lutra]]''
+*** ''(Sous-genre Lutra)''
+**** La [[Loutre de rivière]] (''[[Lutra canadensis]]'') ;
+**** La [[Loutre marine]] (''[[Lutra felina]]'') ;
+**** La [[Loutre à longue queue]] (''[[Lutra longicaudis]]'') ;
+**** La [[Loutre d'Europe]] (''[[Lutra lutra]]'') ;
+**** La [[Loutre du Chili]] (''[[Lutra provocax]]'') ;
+**** La [[Loutre de Sumatra]] (''[[Lutra sumatrana]]'') ;
+*** ''(Sous-genre Hydrictis)''
+**** La [[Loutre à cou tacheté]] (''[[Lutra maculicollis]]'') ;
+*** ''(Sous-genre Lutrogale)''
+**** La [[Loutre à pelage lisse]] (''[[Lutra perspicillata]]'') ;
+** ''[[Pteronura]]''
+*** La [[Loutre géante]] (''[[Pteronura brasiliensis]]'') ;
+* Sous-famille des [[Melinae]]
+** ''[[Arctonyx]]''
+*** Le [[Blaireau à collier]] (''[[Arctonyx collaris]]'') ;
+** ''[[Meles (mustélidé)|Meles]]''
+*** Le [[Blaireau]] (''[[Meles meles]]'') ;
+** ''[[Melogale]]''
+*** Le [[Blaireau-furet de Bornéo]] (''[[Melogale everetti]]'') ;
+*** Le [[Blaireau-furet de Chine]] (''[[Melogale moschata]]'') ;
+*** Le [[Blaireau-furet de Birmanie]] (''[[Melogale personata]]'') ;
+** ''[[Mydaus]]''
+*** Le [[Blaireau de Java]] (''[[Mydaus javanensis]]'') ;
+*** Le [[Blaireau de Palawan]] (''[[Mydaus marchei]]'') ;
+** ''[[Taxidea]]''
+*** Le [[Blaireau américain]] (''[[Taxidea taxus]]'') ;
+* Sous-famille des [[Mephitinae]]
+** ''[[Conepatus]]''
+*** [[Mouffette des Andes]] (''[[Conepatus chinga]]'') ;
+*** [[Mouffette de Patagonie]] (''[[Conepatus humboldtii]]'') ;
+*** [[Mouffette à nez de cochon]] (''[[Conepatus leuconotus]]'') ;
+*** [[Mouffette à nez de porc épais]] (''[[Conepatus mesoleucus]]'') ;
+*** [[Mouffette d'Amazonie]] (''[[Conepatus semistriatus]]'') ;
+** ''[[Mephitis]]''
+*** [[Mouffette à capuchon]] (''[[Mephitis macroura]]'') ;
+*** [[Mouffette rayée]] (''[[Mephitis mephitis]]'') ;
+** ''[[Spilogale]]''
+*** [[Mouffette tachetée du Mexique]] (''[[Spilogale putorius]]'') ;
+*** [[Mouffette tachetée naine]] (''[[Spilogale pygmaea]]'') ;
+* Sous-famille des [[Mellivorinae]]
+** ''[[Mellivora]]''
+*** [[Ratel]] (''[[Mellivora capensis]]'') ;
+* Sous-famille des [[Mustelinae]]
+** ''[[Eira (genre)|Eira]]''
+*** La [[Martre à tête grise]] (''[[Eira barbara]]'') ;
+** ''[[Galictis]]''
+*** Le [[Petit grison]] (''[[Galictis cuja]]'') ;
+*** Le [[Grison d'Allemand]] (''[[Galictis vittata]]'') ;
+** ''[[Gulo]]''
+*** Le [[Glouton]] (''[[Gulo gulo]]'') ;
+** ''[[Ictonyx]]''
+*** La [[Zorille commune]] (''[[Ictonyx striatus]]'') ;
+** ''[[Lyncodon]]''
+*** La [[Belette de Patagonie]] (''[[Lyncodon patagonicus]]'') ;
+** ''[[Martes]]''
+*** ''(Sous-genre Martes)''
+**** La [[Martre d'Amérique]] (''[[Martes americana]]'') ;
+**** La [[Fouine]] (''[[Martes foina]]'') ;
+**** La [[Martre des pins]] (''[[Martes martes]]'') ;
+**** La [[Martre du Japon]] (''[[Martes melampus]]'') ;
+**** La [[Zibeline]] (''[[Martes zibellina]]'') ;
+*** ''(Sous-genre Charronia)''
+**** La [[Martre à gorge jaune]] (''[[Martes flavigula]]'') ;
+**** La [[Martre de l'Inde du Sud]] (''[[Martes gwatkinsii]]'') ;
+*** ''(Sous-genre Pekania)''
+**** Le [[Martre de Pennant]] (''[[Martes pennanti]]'') ;
+** ''[[Mustela]]''
+*** ''(Sous-genre Mustela)''
+**** La [[Belette de montagne]] (''[[Mustela altaica]]'') ;
+**** L’[[Hermine]] (''[[Mustela erminea]]'') ;
+**** La [[Belette de Colombie]] (''[[Mustela felipei]]'') ;
+**** La [[Belette à longue queue]] (''[[Mustela frenata]]'') ;
+**** Le [[Belette à ventre jaune]] (''[[Mustela kathiah]]'') ;
+**** La [[Belette]] (''[[Mustela nivalis]]'') ;
+**** La [[Belette malaise]] (''[[Mustela nudipes]]'') ;
+**** Le [[Vison de Sibérie]] (''[[Mustela sibirica]]'') ;
+**** La [[Belette à dos rayé]] (''[[Mustela strigidorsa]]'') ;
+*** ''(Sous-genre Grammogale)''
+**** La [[Belette tropicale]] (''[[Mustela africana]]'') ;
+*** ''(Sous-genre Lutreola)''
+**** Le [[Vison d'Europe]] (''[[Mustela lutreola]]'') ;
+**** La [[Belette d’Indonésie]] (''[[Mustela lutreolina]]'') ;
+*** ''(Sous-genre Putorius)''
+**** Le [[Putois d'Eversmann]] (''[[Mustela eversmanni]]'') ;
+**** Le [[Putois à pieds noirs]] (''[[Mustela nigripes]]'') ;
+**** Le [[Putois]] (''[[Mustela putorius]]'') ;
+*** ''(Sous-genre Vison)''
+**** Le [[Vison d'Amérique]] (''[[Mustela vison]]'') ;
+** ''[[Poecilictis]]''
+*** La [[Zorille de Libye]] (''[[Poecilictis libyca]]'') ;
+** ''[[Poecilogale]]''
+*** La [[Zorille à nuque blanche]] (''[[Poecilogale albinucha]]'') ;
+** ''[[Vormela]]''
+*** Le [[Putois marbré]] (''[[Vormela peregusna]]'').}}
+
+=== Taxonomie actuelle ===
+La taxonomie contemporaine des Mustélidés a été affectée par plusieurs bouleversement majeurs : Le premier étant ce qui aboutira à la création d’une famille distincte : les [[Mephitidae|Mephitidés]]<ref>{{article| auteur = Dragoo and Honeycutt | année = 1997 | titre= Systematics of Mustelid-like Carnivores | journal = [[Journal of Mammalogy]] | volume = 78 | numéro = 2 | pages = 426–443 | doi= 10.2307/1382896 | jstor = 1382896 | auteur2 = Honeycutt, Rodney L | accès doi = libre |langue=en|date=}}</ref>, dont les Moufettes conservent leur sous-famille des Méphitidinae, et les Télagons, séparés de leurs cousins américains par {{Nobr|19 millions}} d’années d’évolution, se voient placés dans leur propre sous-famille des Mydainae.
+
+Des premières études propose de créer la sous-famille des Helictidinae suite à une étude de Sato et al en 2004<ref>{{Article|langue=en|auteur1=Jun J. Sato|auteur2=Tetsuji Hosoda|auteur3=Mieczysław Wolsan|auteur4=Hitoshi Suzuki|titre=Molecular Phylogeny of Arctoids (Mammalia: Carnivora) with Emphasis on Phylogenetic and Taxonomic Positions of the Ferret-badgers and Skunks|périodique=Zoological Science|volume=21|numéro=1|pages=111-118|date=janvier 2004|issn=0289-0003|doi=10.2108/0289-0003(2004)21[111:MPOAMC]2.0.CO;2|lire en ligne=https://bioone.org/journals/zoological-science/volume-21/issue-1/0289-0003_2004_21_111_MPOAMC_2.0.CO_2/Molecular-Phylogeny-of-Arctoids-Mammalia--Carnivora-with-Emphasis-on/10.2108/0289-0003(2004)21[111:MPOAMC]2.0.CO;2.pdf}}</ref>.
+
+Une études génétiques publiées par Koepfli ''et al.'' en 2008 a eu un certain retentissement<ref name="Koepfli2008"/>, si l’étude est plus connue pour avoir décelée des caractéristiques communes entre le Glouton et les Martres, aboutissant à la réutilisation de la sous-famille des Gouloninae, ainsi que de le rétablissemen( du genre ''[[Pekania]]'' en 2014<ref name="Bradley2014">{{Article|langue=en|auteur1=Robert D. Bradley|auteur2=Lisa C. Bradley|auteur3=Loren K. Ammerman|auteur4=Robert J. Baker|auteur5=Joseph A. Cook|auteur6=Robert C. Dowler|auteur7=Clyde Jones|auteur8=David J. Schmidly|auteur9=Frederick B. Stangl, Jr.|auteur10=Ronald A. Van Den Bussche|auteur11=Bernd G. Würsig|titre=Revised checklist of North American mammals north of Mexico, 2014|périodique=Occasional Papers, Museum of Texas Tech University|numéro=327|pages=1-28|date=2 octobre 2014|issn=0149-175X|oclc=910515043|lire en ligne=https://www.biodiversitylibrary.org/page/57785985}}</ref>. L’étude a également montré que l’espèce ''[[Taxidea taxus]]'', que l’on appelait alors sous le nom de « Blaireau américain » était en fait bien éloigné phylogénétiquement des véritables blaireaux du genre ''[[Meles (mustélidé)|Meles]]''<ref name="Koepfli2008" />, 
+
+et par Law ''et al.'' en 2018<ref name="Law-2018">{{article|nom1= Law|prénom1=C. J.|nom2= Slater|prénom2=G. J.|nom3= Mehta|prénom3=R. S.|date= 2018-01-01|titre= Lineage Diversity and Size Disparity in Musteloidea: Testing Patterns of Adaptive Radiation Using Molecular and Fossil-Based Methods|journal= Systematic Biology|volume= 67|numéro= 1|pages= 127–144|doi= 10.1093/sysbio/syx047|pmid=28472434|accès doi= libre|accès url=limité|langue=en}}</ref> proposèrent une nouvelle classification définitive en huit sous-familles : Les Mustélinés, les Lutrinés, les Guloninés, Les Hélictidinés, Les Mélinés, les Mellivorinés pour le ratel, ainsi que les Taxidiinés pour le Taxidée américain.
+
+=== Liste des espèces ===
+
+{| class="wikitable" style="width:100%;"
+|+ Tableau synthétique des genres, division et espèces de Mustélidés selon {{Bioref|ITIS|7 juillet 2026}}, {{Bioref|MDD|7 juillet 2026}} et {{Bioref|UICN|7 juillet 2026}} : 
+!Sous-famille
+!Tribu
+!Genre
+!Sous-genre et subdivisions
+!Espèce (Nom binominal, auteur et noms vernaculaires)
+!Répartition et description
+!Statut UICN
+|-
+| colspan="2" rowspan="23" |[[Mustelinae]]<br />Batsch, 1788<br />[[Mustélinés]]
+| rowspan="19" |''[[Mustela]]''<br />Linnaeus, 1758
+| rowspan="2" |Sous-genre ''[[Pocockictis]]''<br />Kretzoi, 1947
+|''[[Mustela nudipes]]''<br />Desmarest, 1822<br />[[Nudipède]]<br>[[Belette à pieds nus]]<br>
+
+[[Fichier:Le furet de Java - Mustela nudipes - Histoire naturelle des mammifères avec des figures originales, coloriées, dessinées d'aprèsdes animaux vivant - tome 3 - 1824.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Malayan Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Forêts tropicales d'Asie du Sud-Est.<br />Mustélidé de taille moyenne au pelage d’un doré éclatant contrastant fortement avec sa tête et l'extrémité de sa queue blanche.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela strigidorsa]]''<br />Gray, 1853<br />[[Belette à dos rayé]]<br />[[Fichier:Mustela strigidorsa.gif|150px|sans_cadre|centré]]
+|[[Fichier:Back-striped Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Tropiques d'Asie du Sud-Est. Se distingue par une fine raie argentée le long du dos et une ligne ventrale jaunâtre.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Mustela lutreolina]]''<br />Robinson & Thomas, 1917<br />[[Belette d'Indonésie]]
+|[[Fichier:Indonesian Mountain Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Forêts de montagne (Java, Sumatra).<br />Ressemble superficiellement à un vison par sa coloration sombre uniforme, confinée aux forêts de haute altitude, il est extrêmement rare.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Mustela kathiah]]''<br />Hodgson, 1835<br />[[Belette à ventre jaune]]<br />[[Cataquil]]<br />[[Fichier:Yellow bellied weasel, Shillong, India.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Yellow-bellied Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Forêts d'altitude de l'Himalaya.<br />Espèce agile au pelage dorsal brun foncé violacé et au ventre jaune brillant, adaptée aux zones montagneuses. Est connue pour sa capacité à tuer des proies plus grande qu’elle comme des moutons.
+|{{Icône UICN|LC}}
+|-
+| rowspan="3" |''[[Mustela]]'' (Clade des Hermines)
+|''[[Mustela erminea]]''<br />Linnaeus, 1758<br />[[Hermine]] (''[[Stricto sensu]]'')<br />[[Hermine d'Eurasie]]<br />[[Fichier: Mustela erminea Norway.jpg|150px|sans_cadre|centré]]
+|Répartition : Eurasie et Alaska. Diversité génétique élevée.<br />Célèbre pour sa mue hivernale blanche et le pinceau noir terminal noir et constant sur sa queue.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela richardsonii]]''<br />Bonaparte, 1838<br />[[Hermine d'Amérique]]<br />[[Fichier:Ermine- Bacon Fiend (14083889879).jpg|150px|sans_cadre|centré]]
+|Amérique du Nord (Canada et USA). Espèce distincte de M. erminea.<br />Morphologiquement proche de l'hermine d'Eurasie mais s'en distingue par des critères crâniens et génétiques spécifiques.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela haidarum]]''<br />(Preble, 1898)<br />[[Hermine Haïda]]<br />[[Fichier:Haida Ermine (Mustela haidarum).jpg|150px|sans_cadre|centré]]
+|[[Haida Gwaii]] et archipel Alexandre. Espèce distincte confirmée.<br />Lignée insulaire hautement spécialisée et endémique de la côte pacifique nord-américaine.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Mustela russelliana]]''<br />Thomas, 1911<br />
+|Habitat : Régions montagneuses du Sichuan (Chine).<br />Espèce confinée aux altitudes d'Asie centrale. Sa génétique étrange interroge les chercheurs.
+|{{Icône UICN|LC}}
+|-
+| rowspan="4" |''[[Mustela]]'' (Clade des Belettes)
+|''[[Mustela nivalis]]''<br />Linnaeus, 1766<br />[[Belette]] (''[[Stricto sensu]]'')<br />[[Petite belette]]<br />[[Fichier:Mustela_nivalis_-British_Wildlife_Centre-4.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Mapa Mustela nivalis.png|180px|sans_cadre|centré]]<br />Habitat : Holarctique. Plus forte hétérozygotie du genre.<br />Le plus petit mammifère carnivore du monde, au corps extrêmement svelte adapté à la chasse aux rongeurs dans leurs galeries.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela subpalmata]]''<br />Hemprich & Ehrenberg, 1833<br />[[Belette subpalmée]]<br/>[[Belette d'Égypte]]<br />[[Fichier:Live weasel in full, in Maadi - Cairo.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Egyptian Weasel area.png|180px|sans_cadre|centré]]<br />Description : Population de Belettes vivent au Nord de l’Égypte, son statut d’espèce est fortement débattu, mais est une espèce à part entière selon l’UICN.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela mopbie]]''<br />Wei, Cao, He, Abramov, Wang, Fu, Li, Yang, Fu, Huang, Zhou, Wen & Ge, 2025
+|Monts Hengduan, Sichuan (Chine).<br />Nouvelle espèce cryptique récemment identifiée par analyses moléculaires dans les zones montagneuses de Chine.
+|{{Icône UICN|DD}}
+|-
+|''[[Mustela altaica]]''<br />Pallas, 1811<br />[[Belette altaïque]]<br/>[[Belette de montagne]]<br />[[Fichier:Mountain Weasel (Mustela altaica).jpg|150px|sans_cadre|centré]]
+|[[Fichier:Mountain Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Haute altitude et steppes rocheuses d'Asie.<br />Espèce adaptée au froid montagnard, se nourrissant principalement de pikas.
+|{{Icône UICN|NT}}
+|-
+| rowspan="2" | ''Mustela'' (''[[Kolonokus]]'') <small>Satunin, 1914</small> 
+|''[[Mustela sibirica]]''<br />Pallas, 1773<br />[[Kolonock]]<br />[[Vison de Sibérie]]<br />[[Fichier:Siberian Weasel Pangolakha Wildlife Sanctuary East Sikkim India 14.05.2016.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Siberian Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Asie. Goulots d'étranglement répétés durant le Pléistocène.<br />Mustélidé de taille moyenne à mi-chemin entre la belette et le putois, au pelage fauve-orangé dont les poils de la queue sont traditionnellement utilisés pour fabriquer les pinceaux.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela itatsi]]''<br />Temminck, 1844<br />[[Itatsi]]<br />[[Vison du Japon]]<br />[[Fichier:Mustela itatsi on tree.JPG|150px|sans_cadre|centré]]
+|[[Fichier:Japanese Weasel area.png|180px|sans_cadre|centré]]<br />Natif du Japon. <br />Plus trapu que le kolonock, il possède un pelage brun-orangé plus sombre.
+|{{Icône UICN|LC}}
+|-
+|''Mustela'' (''Lutreola'') <small>J.A. Wagner, 1841</small>
+|''[[Mustela lutreola]]''<br />(Linnaeus, 1761)<br />[[Loutrelle]]<br />[[Vison d'Europe]]<br />[[Fichier:Mink1.jpg|150px|sans_cadre|centré]]
+|[[Fichier:MustelaLutreolaIUCN.svg|180px|sans_cadre|centré]]<br />Position révisée (2025) : Habitat : Zones humides d'Europe.<br />Mustélidé semi-aquatique très rare et menacé, semblable à ''N. vison'' lui donnant son nom, caractérisé par une tache blanche sur les lèvres supérieure et inférieure.
+|{{Icône UICN|CR}}
+|-
+| rowspan="4" |Mustela (''[[Putorius]]''), Cuvier 1817
+|''[[Mustela putorius]]''<br />Linnaeus, 1758<br />[[Putois]] (''[[Stricto sensu]]'')<br />[[Putois d'Europe]]<br />[[Fichier:Polecat in denmark.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Mustela putorius distribution.svg|180px|sans_cadre|centré]]<br />Habitat : Forêts claires, zones humides et bocages. Érosion génétique identifiée.<br />Pelage sombre laissant entrevoir un sous-poil clair, arborant un masque facial blanc et noir contrasté. Lent et pataud, il repousse ses agresseurs par des cris stridents ainsi que ses glandes odorantes.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela furo]]''<br />Linnaeus, 1758<br />[[Furet]]<br />[[Fichier:Ferret 2008.png|150px|sans_cadre|centré]]
+|Répartition mondiale (Domestique). Hétérozygotie très faible.<br />Forme domestiquée du putois, sélectionnée depuis l'Antiquité pour la chasse aux rongeurs et aux lapins. Devenu un animal de compagnie dans tous les pays industrialisés.
+|{{Icône UICN|NE}}
+|-
+|''[[Mustela eversmanii]]''<br />Lesson, 1827<br />[[Putois d'Eversmann]]<br />[[Putois des steppes]]<br />[[Fichier:Wild steppe polecat.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Steppe Polecat area.png|180px|sans_cadre|centré]]<br />Habitat : Steppes et milieux ouverts d'Eurasie. Forte homozygotie.<br />Plus clair et plus lourd que le putois d'Europe, grand prédateur de sousliks et de hamsters.
+|{{Icône UICN|LC}}
+|-
+|''[[Mustela nigripes]]''<br />(Audubon & Bachman, 1851)<br />[[Putois à pieds noirs]]<br />[[Putois d'Amérique]]<br />[[Fichier:Mustela nigripes 2.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Mustela nigripes map.svg|180px|sans_cadre|centré]]<br />Habitat : Prairies d'Amérique du Nord. Diversité génétique extrêmement faible.<br />Espèce hautement spécialisée dépendant presque exclusivement des chiens de prairie pour sa survie et son habitat.
+|{{Icône UICN|EN}}
+|-
+| rowspan="4" |''[[Neogale]]''<br />Gray, 1865
+|Neogale (''[[Neovison]]'') <small>Baryshnikov & Abramov, 1997</small><br />[[Vison]], à proprement dit
+|''[[Neogale vison]]''<br />(Schreber, 1777)<br />[[Vison]] (''[[Stricto sensu]]'') <br />[[Vison d'Amérique]]<br />[[Fichier:American Mink, Centre Island, Toronto, ON (9371348505).jpg|150px|sans_cadre|centré]]
+|[[Fichier:American mink range map.png|180px|sans_cadre|centré]]<br />Caryotype réduit (2n=30). Espèce introduite mondialement.<br />Grand Mustélidé semi-aquatique d’Amérique du Nord semblable à la Loutrelle, mais plus gros et agressif, il ne possède généralement du blanc que sur la lèvre inférieure. Élevé intensivement pour sa fourrure estimée, il envahit les cours d’eau du monde entier.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Neogale frenata]]''<br />Lichtenstein, 1831<br />[[Belette à longue queue]]<br />[[Fichier:Bridled weasel.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Long-tailed Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Milieux ouverts et zones semi-boisées.<br />Grand Mustélidé américain dotée d'une très longue queue à l'extrémité noire et d'un ventre jaunâtre. Puissant et adaptable, mue pendant l’hiver comme l’hermine.
+|{{Icône UICN|LC}}
+|-
+| rowspan="2" |Neogale<br>(''[[Grammogale]]'')<br>Cabrera, 1940
+|''[[Neogale africana]]''<br />(Desmarest, 1818)<br />[[Belette des tropiques]]<br />[[Belette d’Amazonie]]<br/>[[Fichier:Neogale africana.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Amazon Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Bassin amazonien.<br />Espèce sud-américaine méconnue, brune avec une bande ventrale longitudinale rousse ou blanche.
+|{{Icône UICN|LC}}
+|-
+|''[[Neogale felipei]]''<br />Robert J. Izor & de la Torre, 1978<br />[[Belette de Colombie]]
+|[[Fichier:Colombian Weasel area.png|180px|sans_cadre|centré]]<br />Habitat : Andes (Colombie et Équateur).<br />L'un des carnivores les plus rares du Nouveau Monde, possédant des pattes palmées adaptés aux cours d'eau de montagne.
+|{{Icône UICN|VU}}
+|-
+| colspan="2" rowspan="14" |[[Lutrinae]]<br />Bonaparte, 1838<br />[[Lutrinés]]<br />[[Loutres]] (''[[Lato sensu]]'')
+| rowspan="6" |''[[Lutra]]''<br />Brisson, 1762<br />[[Loutres]], à proprement dites
+| rowspan="2" |''Lutra''<br />Brisson, 1762<br />[[Loutres]], à proprement dites
+|''[[Lutra lutra]]''<br />(Linnaeus, 1758)<br />[[Loutre]] (''[[Stricto sensu]]'')<br />[[Loutre d'Eurasie]]<br />[[Fichier:Fischotter, Lutra Lutra.JPG|150px|sans_cadre|centré]]
+|[[Fichier:European Otter area.png|180px|sans_cadre|centré]]<br />Espèce semi-aquatique emblématique d'Eurasie au corps allongé, montrant d'excellente aptitude à la nage. Régime alimentaire piscivore.
+|{{Icône UICN|NT}}
+|-
+|''[[Lutra sumatrana]]''<br />(Gray, 1865)<br />[[Loutre de Sumatra]]<br />[[Barano]]<br />[[Fichier:Lutra sumatrana 01.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Hairy-nosed Otter area.png|180px|sans_cadre|centré]]<br />Espèce rare d'Asie du Sud-Est se distinguant par sa truffe entièrement recouverte de poils.
+|{{Icône UICN|EN}}
+|-
+| rowspan="2" |''Lutra'' (''[[Aonyx]]'')<br />Lesson, 1827<br />[[Loutres à joues blanches]]
+|''[[Aonyx capensis]]''<br />(Schinz, 1821)<br />[[Loutre du Cap]]<br />[[Loutre à joues blanches du Cap]]<br />[[Fichier:Aonyx capensis, male, Shamvura.jpg|150px|sans_cadre|centré]]
+|[[Fichier:African Clawless Otter area.png|180px|sans_cadre|centré]]<br />Grande loutre africaine aux pattes presque dépourvues de griffes et de palmure, spécialisée dans la capture de crustacés.
+|{{Icône UICN|NT}}
+|-
+|''[[Aonyx congicus]]''<br />(Lönnberg, 1910)<br />[[Loutre du Congo]]<br />[[Loutre à joues blanches du Congo]]<br />[[Fichier:Aonyx Congicus.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Cameroon Clawless Otter area.png|180px|sans_cadre|centré]]<br />Proche de la loutre du Cap, elle est adaptée aux forêts denses et aux marais du bassin du Congo.
+|{{Icône UICN|NT}}
+|-
+|''Lutra'' (''[[Amblonyx]]'')<br />Rafinesque, 1832
+|''[[Aonyx cinereus]]''<br />(Illiger, 1815)<br />[[Loutre cendrée]]<br />[[Fichier:Petite-loutre01.JPG|150px|sans_cadre|centré]]
+|[[Fichier:Oriental Small-clawed Otter area.png|180px|sans_cadre|centré]]<br />La plus petite espèce de loutre au monde, très sociale et dotée d'une grande dextérité avec ses pattes avant rudimentaires. Fait l’objet d’un trafic illégal massif en Asie, où elle est massivement exportée dans les Bars à Thème en Corée et au Japon notamment.
+|{{Icône UICN|VU}}
+|-
+|''Lutra'' (''[[Lutrogale]]'')<br />Gray, 1865
+|''[[Lutrogale perspicillata]]''<br />(I. Geoffroy Saint-Hilaire, 1826)<br />[[Loutre à pelage lisse]]<br />[[Simung]]<br />[[Fichier:Smooth cotted otter (1).jpg|150px|sans_cadre|centré]]
+|[[Fichier:Smooth-coated Otter area.png|180px|sans_cadre|centré]]<br />Grande loutre asiatique au pelage ras et doux, au comportement social développé et coopératif. Un grand allié des pêcheurs depuis des siècles.
+|{{Icône UICN|VU}}
+|-
+| colspan="2" |''[[Hydrictis]]''<br />Pocock, 1921
+|''[[Hydrictis maculicollis]]''<br />(Lichtenstein, 1835)<br />[[Loutre à cou tacheté]]<br />[[Fichier:Spot-necked Otter (8379813628).jpg|150px|sans_cadre|centré]]
+|[[Fichier:Spotted-necked Otter area.png|180px|sans_cadre|centré]]<br />Petite loutre africaine, reconnaissable aux taches claires parsemant sa gorge.
+|{{Icône UICN|NT}}
+|-
+| colspan="2" |''[[Enhydra]]''<br />Fleming, 1828<br />Enhydres
+|''[[Enhydra lutris]]''<br />(Linnaeus, 1758)<br />[[Énhydre marine]]<br />[[Loutre de mer]]<br />[[Fichier:Marsh lounging (15085860020).jpg|150px|sans_cadre|centré]]
+|[[Fichier:Leefgebied zeeotter.jpg|180px|sans_cadre|centré]]<br />Espèce exclusivement marine du Pacifique Nord, célèbre pour ouvrir les coquillages à l'aide de pierres en guise d'outils. Animal peu agressif et maladroit sur terre, il fut massacré pour sa fourrure au cours des siècles derniers.
+|{{Icône UICN|EN}}
+|-
+| colspan="2" rowspan="5" |''[[Lontra]]''<br />Gray, 1843
+|''[[Lontra canadensis]]''<br />(Schreber, 1777)<br />[[Loutre du Canada]]<br />[[Loutre d’Amérique du Nord]]<br />[[Fichier:Northern River Otter on Seedskadee NWR (22802102984).jpg|150px|sans_cadre|centré]]
+|[[Fichier:LontraCanadensisMap.svg|180px|sans_cadre|centré]]<br />Grande loutre robuste et adaptable, occupant une vaste variété d'habitats aquatiques nord-américains.
+|{{Icône UICN|LC}}
+|-
+|''[[Lontra annectens]]''<br />(Major, 1897)<br />[[Loutre méso-américaine]]<br />[[Fichier:Lontra longicaudis 178062582.jpg|150px|sans_cadre|centré]]
+|Amérique centrale, du Mexique au Panama<br />Espèce néotropicale à mi-chemin entre la grande espèce nord-américaine et les espèces sud-américaines, liée aux réseaux fluviaux d'Amérique centrale.
+|{{Icône UICN|NE}}
+|-
+|''[[Lontra longicaudis]]''<br />(Olfers, 1818)<br />[[Loutre à longue queue]]<br />[[Loutre d'Amérique du Sud]]<br />[[Fichier:Lontra longicaudis 2.jpeg|150px|sans_cadre|centré]]
+|[[Fichier:Neotropical Otter area.png|180px|sans_cadre|centré]]<br />Espèce polyvalente d'Amérique du Sud fréquentant aussi bien les rivières en milieu forestier que les côtes maritimes.
+|{{Icône UICN|NT}}
+|-
+|''[[Lontra provocax]]''<br />(Thomas, 1908)<br />[[Loutre du Chili]]<br />[[Huillín]]<br />[[Fichier:Lontra provocax.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Southern River Otter area.png|180px|sans_cadre|centré]]<br />Menacée par la fragmentation de son habitat dans les réseaux fluviaux du Chili et d'Argentine.
+|{{Icône UICN|EN}}
+|-
+|''[[Lontra felina]]''<br />(Molina, 1782)<br />[[Loutre féline]]<br />[[Chungungo]]<br />[[Fichier:Lfelina.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Marine Otter area.png|180px|sans_cadre|centré]]<br />Petite loutre marine des côtes rocheuses du Pacifique Sud-Est, morphologiquement adaptée aux remoues violents.
+|{{Icône UICN|EN}}
+|-
+| colspan="2" |''[[Pteronura]]''<br />Gray, 1837<br />Ptéronure
+|''[[Pteronura brasiliensis]]''<br />(Zimmermann, 1780)<br />[[Saricovienne du Brésil]]<br />[[Loutre géante]]<br />[[Fichier:Loutregéanterocher.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Giant Otter area.png|180px|sans_cadre|centré]]<br />La plus grande des loutres, hyper-sociale et bruyante, grand prédateur des rivières amazoniennes.
+|{{Icône UICN|EN}}
+|-
+| rowspan="7" |[[Ictonychinae]]<br />Pocock, 1921
+| rowspan="4" |[[Ictonychini]]<br />Pocock, 1921<br />[[Zorilles]] (''[[Lato sensu]]'')<br />[[Fichier:Zoology of Egypt Ictonyx erythreae.jpg|150px|sans_cadre|centré]]
+| rowspan="2" |''[[Ictonyx]]''<br />Kaup, 1835<br />[[Zorille|Zorilles]] proprement dites
+|''[[Ictonyx]]''<br />Kaup, 1835<br />[[Zorille]], à proprement dite
+|''[[Ictonyx striatus]]''<br />(Perry, 1810)<br />[[Zorille]] (''[[Stricto sensu]]'')<br />[[Zorille commune]]<br />[[Fichier:African polecat walking in leaves - DPLA - 0ed6772dc4c09626856a1a70a7fddb7c.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Striped Polecat area.png|180px|sans_cadre|centré]]<br />Mustélidé africain au pelage rayé noir et blanc très semblable à une moufette, est capable d'émettre des sécrétions anales très nauséabondes pour se défendre.
+|{{Icône UICN|LC}}
+|-
+|''[[Poecilictis]]''<br />Thomas & Hinton, 1920
+|''[[Poecilictis libyca]]''<br />(Hemprich & Ehrenberg, 1833)<br />[[Zorille de Libye]]<br />[[Fichier:Ictonyx libyca multivittata.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Saharan Striped Polecat area.png|180px|sans_cadre|centré]]<br />Plus petite que la zorille commune, elle est hautement adaptée à la vie dans les déserts d'Afrique du Nord.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Poecilogale]]''<br />Thomas, 1883<br />[[Poecilogale]]
+|''[[Poecilogale albinucha]]''<br />(Gray, 1864)<br />[[Poecilogale à nuque blanche]]<br />[[Zorille à nuque blanche]]<br />[[Fichier:Whitenapedweasellg2.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Poecilogale albinucha range.svg|180px|sans_cadre|centré]]<br />Mustélidé longiligne d'Afrique subsaharienne, doté d'une tête blanche s'étendant en bandes claires sur le dos.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Vormela]]''<br />Blasius, 1884
+|''[[Vormela peregusna]]''<br />(Güldenstädt, 1770)<br />[[Pérousca]]<br />[[Zorille marbrée]]<br />[[Fichier:Marbled polecat.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Marbled Polecat area.png|180px|sans_cadre|centré]]<br />Semblable à un putois, se distingue par une coloration tachetée ou marbrée jaune et brune unique, habitant les steppes d'Eurasie. Il est extrêmement rare.
+|{{Icône UICN|VU}}
+|-
+| rowspan="3" |[[Lyncodontini]]<br />Pocock, 1921<br />[[Fichier:Lyncodon patagonicus 1880.jpg|150px|sans_cadre|centré]]
+| colspan="2" |''[[Lyncodon]]''<br />Gervais, 1845<br />[[Lyncodon]]
+|''[[Lyncodon patagonicus]]''<br />(de Blainville, 1842)<br />[[Lyncodon de Patagonie]]<br />[[Belette de Patagonie]]
+|[[Fichier:Patagonian Weasel area.png|125px|sans_cadre|centré]]<br />Petit carnivore méconnu des plaines de Patagonie, pourvu d'un pelage grisâtre et d'une nuque blanche-jaunâtre.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" rowspan="2" |''[[Galictis]]''<br />Bell, 1826<br />[[Grisons]] (''[[Lato sensu]]'')
+|''[[Galictis vittata]]''<br />(Schreber, 1776)<br />[[Galictis|Grison]] (''[[Stricto sensu]]'')<br />[[Grand grison]]<br />[[Fichier:Greater Grison 2.jpg|150px|sans_cadre|centré]]
+| [[Fichier:Greater Grison area.png|125px|sans_cadre|centré]]<br />Petit Mustélidé sud-américain présentent un contraste saisissant entre son dos gris and sa face inférieure noire, séparés par une ligne blanche évoquant le ratel.
+|{{Icône UICN|LC}}
+|-
+|''[[Galictis cuja]]''<br />(Molina, 1782)<br />[[Petit grison]]<br />[[Cuja]]<br>[[Fichier:Galictis cuja 365111140 (cropped).jpg|150px|sans_cadre|centré]]
+| [[Fichier:Distribuição geográfica do furão-pequeno.png|125px|sans_cadre|centré]]<br />Plus petit que le Grison, il partage la même coloration contrastée mais occupe des milieux plus ouverts.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" rowspan="6" |[[Helictidinae]]<br />Gray, 1865<br />[[Hélicres]]
+| colspan="2" rowspan="6" |''[[Melogale]]''<br />I. Geoffroy Saint-Hilaire, 1831<br />[[Melogale|Mélogales]]
+|''[[Melogale moschata]]''<br />(Gray, 1831)<br />[[Mélogale de Chine]]<br />[[Fichier:Melogale moschata (male) Praha zoo 02.2011 01.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Chinese Ferret-badger area.png|180px|sans_cadre|centré]]<br />Petit Mustélidé d'Asie au masque facial complexe, grand consommateur de vers de terre et d'insectes. Creuse des terriers à la manière des blaireaux.
+|{{Icône UICN|LC}}
+|-
+|''[[Melogale orientalis]]''<br />(Horsfield, 1821)<br />[[Mélogale de Java]]
+|[[Fichier:Javan Ferret-badger area.png|180px|sans_cadre|centré]]<br />Endémique des forêts de montagnes et zones cultivées des îles de Java et Bali.
+|{{Icône UICN|DD}}
+|-
+|''[[Melogale everetti]]''<br />(Thomas, 1895)<br />[[Mélogale d'Everett]]
+|[[Fichier:Bornean Ferret-badger area.png|180px|sans_cadre|centré]]<br />Espèce localisée et restreinte aux forêts montagneuses du mont Kinabalu à Bornéo.
+|{{Icône UICN|EN}}
+|-
+|''[[Melogale subaurantiaca]]''<br />(Swinhoe, 1862)<br />[[Mélogale de Taïwan]]<br />[[Fichier:Melogale subaurantiaca 41011945.jpg|150px|sans_cadre|centré]]
+|Taiwan<br />Espèce endémique de l'île de Taïwan, adaptée aux forêts et aux zones riches en arbres.
+|{{Icône UICN|LC}}
+|-
+|''[[Melogale cucphuongensis]]''<br />Nadler ''et al''., 2011<br />[[Mélogale de Cuc Phuong]]<br/>[[Blaireau-furet du Vietnam]]
+|Découvert récemment au Vietnam, caractérisé par des particularités crâniennes distinctives.
+|{{Icône UICN|DD}}
+|-
+|''[[Melogale personata]]''<br />I. Geoffroy Saint-Hilaire, 1831<br />[[Mélogale masquée]]<br/>[[Blaireau-furet de Birmanie]]
+|[[Fichier:Burmese Ferret-badger area.png|180px|sans_cadre|centré]]<br />Semblable au mélogale de Chine mais généralement plus grand avec une bande dorsale blanche plus longue.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" rowspan="11" |[[Guloninae]]<br />Gray, 1825<br />[[Gouloninés]]
+| colspan="2" |''[[Gulo]]''<br />Pallas, 1780<br />[[Gloutons]] (''[[Lato sensu]]'')
+|''[[Gulo gulo]]''<br />(Linnaeus, 1758)<br />[[Glouton]] (''[[De facto]]'')<br />[[Carcajou]]<br>[[Fichier:Gulo gulo 1.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Gulo gulo distribution.svg|180px|sans_cadre|centré]]<br />Mustélidé terrestre massif des zones subarctiques, réputé pour sa force et son endurance.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Eira (genre)|Eira]]''<br />C. E. H. Smith, 1842
+|''[[Eira barbara]]''<br />(Linnaeus, 1758)<br />[[Tayra]] (''[[De facto]]'')<br />[[Martre à tête grise]]<br />[[Fichier:Eira barbara male 2.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Tayra area.png|180px|sans_cadre|centré]]<br />Grand mustélidé agile et omnivore des forêts d'Amérique centrale et du Sud, doté d'une longue queue.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" |''[[Pekania]]''<br />Gray, 1865<br />[[Pékans]]
+|''[[Pekania pennanti]]''<br />(Erxleben, 1777)<br />[[Pékan]] (''[[De facto]]'')<br />[[Martre de Pennant]]<br />[[Fichier:Fishers (14791070753).jpg|150px|sans_cadre|centré]]
+|[[Fichier:Fisher area without borders.png|180px|sans_cadre|centré]]<br />Grand prédateur forestier nord-américain, l'un des rares animaux capables de chasser le porc-épic ou parfois même des renards et des lynxs.
+|{{Icône UICN|LC}}
+|-
+| rowspan="8" |''[[Martes]]''<br />Garsault, 1764<br />[[Martes]] proprement dites.
+| rowspan="2" |Sous-genre ''Martes'' (Clade eurasiatique)
+|''[[Martes martes]]''<br />(Linnaeus, 1758)<br />[[Martre]] (''[[Stricto sensu]]'')<br />[[Martre des pins]]<br />[[Fichier:Pine Marten BWC.JPG|150px|sans_cadre|centré]]
+|[[Fichier:European Pine Marten area.png|180px|sans_cadre|centré]]<br />Europe et Asie du Sud-Ouest, de l'Irlande à l'ouest, à l'est jusqu'à l'Oural et en Anatolie, en Transcaucasie, en Mésopotamie et dans le nord de l'Iran.<br />Habitudes arboricoles, se distingue de la fouine par son poitrail orangé.
+|{{Icône UICN|LC}}
+|-
+|''[[Martes zibellina]]''<br />(Linnaeus, 1758)<br />[[Zibeline]]<br />[[Martre zibeline]]<br />[[Fichier:Sobol-bur1.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Sable area.png|180px|sans_cadre|centré]]<br />Russie, Kazakhstan oriental, Chine, Corée du Nord et Hokkaidō, au Japon.<br />Recherchée historiquement pour la finesse exceptionnelle de sa fourrure sombre.
+|{{Icône UICN|LC}}
+|-
+|Sous-genre Martes (Branche distincte du clade Holarctique)
+|''[[Martes melampus]]''<br />(Wagner, 1840)<br />[[Marte à pieds noirs]]<br />[[Martre du Japon]]<br />[[Fichier:Japanese Marten.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Japanese Marten area.png|180px|sans_cadre|centré]]<br />Îles du Hondo, Introduite au sud-ouest d'Hokkaïdo, une hypothétique sous-espèce vivrait en Corée.<br />Ressemble à la zibeline, change d’apparence en été et en hiver.
+|{{Icône UICN|LC}}
+|-
+| rowspan="2" |Sous-genre ''Martes'' (Clade américain)
+|''[[Martes americana]]''<br />(Turton, 1806)<br />[[Marte d'Amérique]]<br />[[Martre des Hurons]]<br />[[Fichier:Newfoundland Pine Marten.jpg|150px|sans_cadre|centré]]
+|[[Fichier:American Marten area.png|180px|sans_cadre|centré]]<br />De l'Alaska arctique à l'est jusqu'à Terre-Neuve, au sud jusqu'à New York.<br />Mustélidé forestier agile vivant principalement dans les forêts de conifères nord-américaines.
+|{{Icône UICN|LC}}
+|-
+|''[[Martes caurina]]''<br />(Merriam, 1890)<br />[[Marte caurine]]<br />[[Martre de Merriam]]<br />[[Fichier:Martes caurina 248900933.jpg|150px|sans_cadre|centré]]
+|Sud-Est de l'Alaska jusqu'au centre de la Californie, à l'est jusqu'au nord du Nouveau-Mexique.<br />Proche de la martre d'Amérique, elle occupe les forêts de la côte ouest du continent.
+|{{Icône UICN|LC}}
+|-
+|Sous-genre ''Martes'' (Branche basale)
+|''[[Martes foina]]''<br />(Erxleben, 1777)<br />[[Fouine]]<br />[[Martre des hêtres]]<br />[[Fichier:Martes foina kuna.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Beech Marten area.png|180px|sans_cadre|centré]]<br />Espagne et Portugal à l'ouest, à travers l'Europe centrale et méridionale, le Moyen-Orient et l'Asie centrale, jusqu'aux montagnes de l'Altaï et du Tian Shan et au nord-ouest de la Chine.<br />Habitudes plus terrestres et opportunistes, s'adaptant bien aux milieux urbains ; possède un poitrail blanc bilobé.
+|{{Icône UICN|LC}}
+|-
+| rowspan="2" |Sous-genre ''[[Charronia]]''
+|''[[Martes gwatkinsii]]''<br />(Horsfield, 1851)<br />[[Martre des Nilgiri]]<br />[[Martre de l'Inde du Sud]]<br/>[[Fichier:Nilgiri Marten Naseef Gafoor.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Nilgiri Marten area.png|180px|sans_cadre|centré]]<br />Sud de l'Inde.<br />Espèce rare et endémique des collines du sud de l'Inde, au pelage sombre et à la gorge jaune vif.
+|{{Icône UICN|VU}}
+|-
+|''[[Martes flavigula]]''<br />(Boddaert, 1785)<br />[[Marte à gorge jaune]]<br />[[Fichier:Martes flavigula, yellow-throated marten.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Yellow-throated Marten area.png|180px|sans_cadre|centré]]<br />Afghanistan et Pakistan, dans l'Himalaya en Inde, au Népal and au Bhoutan, péninsule coréenne, sud de la Chine, Taïwan et extrême est de la Russie.<br />La plus grande des martres, chassant parfois en groupe de grands animaux comme de jeunes cervidés ou encore des chats.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" rowspan="8" |[[Melinae]]<br />Bonaparte, 1838<br />[[Blaireaux]] (''[[Lato sensu]]'')
+| rowspan="5" |''[[Meles (mustélidé)|Meles]]''<br />Brisson, 1762<br />[[Blaireaux]] proprement dits
+| rowspan="3" |Clade européen
+|''[[Meles meles]]''<br />(Linnaeus, 1758)<br />[[Blaireau]] (''[[Stricto sensu]]'')<br />[[Blaireau d'Europe]]<br />[[Fichier:European Badger (53170681085).jpg|150px|sans_cadre|centré]]
+|[[Fichier:European Badger area.png|180px|sans_cadre|centré]]<br />Toute l'Europe et certaines parties de l'Asie à l'ouest de la Volga.<br />Animal fouisseur robuste et trapu aux bandes faciales noires et blanches caractéristiques, vivant en clans sociaux dans de grands terriers.
+|{{Icône UICN|LC}}
+|-
+|''[[Meles canescens]]''<br />Blanford, 1875<br />[[Blaireau de Perse]]<br />[[Blaireau d'Asie du Sud-Ouest]]<br />[[Fichier:Badger Crete.jpg|150px|sans_cadre|centré]]
+|Transcaucasie, Kopet Dag, Turkménistan, Kirghizistan, Iran, Levant, Tadjikistan, Russie, Mésopotamie, Afghanistan, Asie Mineure, îles de Crète et de Rhodes.<br />Plus petit que le blaireau d'Europe, arborant un pelage gris plus terne.
+|{{Icône UICN|NE}}
+|-
+|''[[Meles leucurus]]''<br />(Hodgson, 1847)<br />[[Blaireau à queue blanche]]<br />[[Thumpha]]
+|[[Fichier:Asian Badger area.png|150px|sans_cadre|centré]]<br />Asie centrale.<br />Coloration globale plus claire et bandes faciales plus fines s'estompant derrière les oreilles.
+|{{Icône UICN|LC}}
+|-
+| rowspan="2" |Clade asiatique
+|''[[Meles amurensis]]''<br />Schrenck, 1859<br />[[Blaireau d’Asie|Blaireau d'Asie]]
+|[[Fichier:Asian Badger area.png|180px|sans_cadre|centré]]<br />Asie septentrionale, Sibérie : Russie, Corée du Nord, Corée du Sud, Chine, Mongolie.<br />Petite espèce sombre du groupe des blaireaux asiatiques, aux structures crâniennes plus lisses.
+|{{Icône UICN|NE}}
+|-
+|''[[Meles anakuma]]''<br />Temminck, 1844<br />[[Blaireau du Japon]]<br />[[Anakuma]]<br />[[Fichier:Meles meles anakuma.jpg|150px|sans_cadre|centré]]
+|[[Fichier:Japanese Badger area.png|180px|sans_cadre|centré]]<br />Endémique du Japon, absent de la grande île d'Hokkaidō. Mœurs nocturnes, pelage tournant vers le brun et beige.<br />Moins social que son cousin européen, il hiberne durant les mois les plus rudes. Il peut grimper aux arbres.
+|{{Icône UICN|LC}}
+|-
+| colspan="2" rowspan="3" |''[[Arctonyx]]''<br />Cuvier, 1825<br />Balisaurs (''[[Lato sensu]]'')
+|''[[Arctonyx collaris]]''<br />F. G. Cuvier, 1825<br />[[Balisaur]] (''[[Stricto sensu]]'')<br />[[Grand balisaur]]<br />[[Fichier:Arctonyx_collaris_84653414_2.jpg|150px|sans_cadre|centré]]
+|Sud du continent asiatique, Extrême Est de l’Inde, Bhoutan, Chine, Viêt Nam, Laos, Thaïlande, Péninsule Malaise (Asie du Sud-Est).<br />Grand Méliné rare et méconnu, doté d'un groin mobile semblable à celui d'un porc, utilisé pour déterrer sa nourriture.
+|{{Icône UICN|VU}}
+|-
+|''[[Arctonyx hoevenii]]''<br />(Hubrecht, 1891)<br />[[Balisaur de Sumatra]]
+|[[Fichier:Arctonyx hoevenii.png|150px|sans_cadre|centré]]<br>Île de Sumatra.<br />Espèce plus petite et sombre, confinée aux zones montagneuses de l'île de Sumatra.
+|{{Icône UICN|LC}}
+|-
+|''[[Arctonyx albogularis]]''<br />(Blyth, 1853)<br />[[Balisaur à gorge blanche]]<br />[[Blaireau à gorge blanche]]<br />[[Fichier:Proceedings of the Zoological Society of London (Mammalia Plate L) (7629988876).jpg|150px|sans_cadre|centré]]
+|Partie Est de l’Asie, Inde, Bhoutan, Chine, Mongolie (Asie du Sud et de l'Est).<br />Se distingue par une gorge blanche et un pelage plus dense adapté aux climats tempérés d'Asie orientale.
+|{{Icône UICN|LC}}
+|-
+| colspan="2"|[[Mellivorinae]]<br>Gray, 1865
+| colspan="2" |''[[Mellivora]]''<br />Storr, 1780<br />Ratels
+|''[[Mellivora capensis]]''<br />(Schreber, 1776)<br />[[Ratel]] (''[[De facto]]'')<br />[[Ratel du Cap]]<br />[[Fichier:Honey Badger (Mellivora capensis) (17425848662).jpg|150px|sans_cadre|centré]]
+|[[Fichier:Honey Badger area.png|180px|sans_cadre|centré]]<br />Carnivore d'une endurance et d'une férocité légendaire, pouvant même repousser les grands félins, doté d'une peau épaisse quasi-insensible aux morsures et piqûres.
+|{{Icône UICN|LC}}
+|-
+| colspan="2"|[[Taxidiinae]]<br>Pocock, 1920<br>[[Taxidinés]]
+| colspan="2" |''[[Taxidea]]''<br />Waterhouse, 1839<br />[[Taxidée]]
+|''[[Taxidea taxus]]''<br />(Schreber, 1777)<br />[[Taxidée américain]]<br />[[Blaireau d'Amérique]]<br />[[Fichier:Taxidea taxus USFWS New Mexico.jpg|150px|sans_cadre|centré]]
+|[[Fichier:American Badger area.png|180px|sans_cadre|centré]]<br />Gros Mustélidé d'Amérique du Nord, semblable à un blaireau, au corps très aplati, prédateur redoutable et ultra-rapide pour déterrer les rongeurs des plaines.
+|{{Icône UICN|LC}}
+|}
+
+=== Phylogénie ===
+
+Arbre phylogénétique de la famille des Mustelidae, présentant les relations entre les différentes sous-familles actuelles, ainsi que la résolution au niveau spécifique ou générique de plusieurs groupes majeurs.
+
+Cette synthèse intègre les données de plusieurs études génomiques majeures :
+* La structure basale des sous-familles repose sur la phylogénie multigénique de Koepfli ''et al.'' (2008)<ref name="Koepfli2008">{{Lien web |langue=en |auteur=Koepfli KP, Deere KA, Slater GJ, et al. |titre=Multigene phylogeny of the Mustelidae: Resolving relationships, tempo and biogeographic history of a mammalian adaptive radiation |périodique=BMC Biol. |volume=6 |pages=10 |année=2008 |doi=10.1186/1741-7007-6-10 |pmid=18275614 |pmc=2276185 }}</ref> ;
+* La phylogénie interne des loutres ([[Lutrinae]]) suit Koepfli ''et al.'' (2008)<ref name="Koepfli2008"/> complétée par les données de de Ferran ''et al.'' (2024) concernant les espèces néotropicales<ref name="deFerran2024">{{Lien web |langue=en |auteur=de Ferran V, Figueiró HV, Trinca CS, et al. |titre=Genome-wide data support recognition of an additional species of Neotropical river otter (Mammalia, Mustelidae, Lutrinae) |périodique=Journal of Mammalogy |volume=105 |numéro=3 |pages=534–542 |année=2024 |doi=10.1093/jmammal/gyae009 }}</ref> ;
+* Le détail de la lignée des [[Mustelinae]] (genres ''Mustela'' et ''Neogale'') découle de la génomique comparative de Totikov ''et al.'' (2025)<ref name="Law2025">{{Article |langue=en |auteur1=Azamat A. Totikov |auteur2=Andrey A. Tomarovsky |auteur3=Polina L. Perelman |auteur4=Tatiana M. Bulyonkova |auteur5=Natalia A. Serdyukova |auteur6=Aliya R. Yakupova |auteur7=David Mohr |auteur8=Daniel W. Foerster |auteur9=Jose Horacio Grau Jipoulou |auteur10=Violetta R. Beklemisheva |auteur11=Mikhail Sidorov |auteur12=Ines Miranda |auteur13=Liliana Farelo |auteur14=Alexei V. Abramov |auteur15=Ksenia Krasheninnikova |auteur16=Anna S. Mukhacheva |auteur17=Victor V. Panov |auteur18=Elena Balanovska |auteur19=Nikolay Cherkasov |auteur20=Karol Zub |auteur21=Alan F. Scott |auteur22=Jose Melo-Ferreira |auteur23=Innokentiy M. Okhlopkov |auteur24=Anna Zhuk |auteur25=Klaus-Peter Koepfli |auteur26=Alexander S. Graphodatsky |auteur27=Sergei Kliver |titre=Comparative genomics and phylogenomics of the Mustelinae lineage (Mustelidae, Carnivora) |périodique=Genome Biology and Evolution |date=March 2026 |pages=evag014 |doi=https://doi.org/10.1093/gbe/evag014 |lire en ligne=https://doi.org/10.1093/gbe/evag014|volume=18|numéro=3}}</ref> ;
+* Les relations internes au genre ''[[Meles (mustélidé)|Meles]]'' synthétisent les travaux biogéographiques de Kinoshita ''et al.'' (2017) et morpho-anatomiques de Dangerfield ''et al.'' (2026)<ref name="Dangerfield2026">{{Article |langue=en |auteur1=Emma Dangerfield |auteur2=Mao Shimoda |auteur3=Sujoo Cho |auteur4=Yuri Kimura |titre=Enhanced forelimb mobility in insular ''Meles'' populations: Insights from myological and osteological comparisons |périodique=Journal of Mammalian Evolution |année=2026 |volume=33 |numéro=15 |lire en ligne=https://www.researchgate.net/publication/393714902_Enhanced_Forelimb_Mobility_in_Insular_Meles_populations_Insights_from_Myological_and_Osteological_Comparisons/fulltext/6876a1f16e247f362b196ccb/Enhanced-Forelimb-Mobility-in-Insular-Meles-populations-Insights-from-Myological-and-Osteological-Comparisons.pdf |format=pdf |accès url=libre}}</ref> ; 
+* Les relations internes au genre ''[[Melogale]]'' selon Nadler et al. (2011)<ref>{{Article | langue=anglais allemand | auteur1=Tilo Nadler | auteur2=Ulrike Streicher | auteur3=Clara Stefen | auteur4=Elke Schwierz | auteur5=Christian Roos | titre={{Langue|anglais|A new species of ferret-badger, Genus ''{{Langue|latin|Melogale}}'', from Vietnam}} | périodique={{Langue|allemand|{{Lien|langue=de|fr=Der Zoologische Garten}}}} | éditeur=[[Elsevier (éditeur)|Elsevier]] | volume=80 | numéro=5 | année=2011 | pages=271–286 | doi=10.1016/j.zoolgart.2011.08.004 | lire en ligne=https://d1wqtxts1xzle7.cloudfront.net/50189607/Nadler_et_al_2011._Melogale_cucphuongensis-libre.pdf?1478624864=&response-content-disposition=inline%3B+filename%3DA_new_species_of_ferret_badger_Genus_Mel.pdf&Expires=1783536458&Signature=OMmW9G2M2GIEA469uI3f-Cq8uDIHXsneni9G4bil~kKJGRmvnUjYW8hXEau34dJP0SnnyXFzQ6dJnLyCmm9lELlgMWxWQsqBaGwXLEQLSIZGXBJBJY8-8wsFVuBycKmRKIOAD8y3CSR9wjzoGbuKjMQpesPEt19FrPQmRrNLpHij5MyTyRpe9zEpOOln3ds-Zpo2toznndOeHdYDdL1KLMPs~RUGDyc6X9ykRjm-aPjv8rAAvfh2GhbmsNSxX89OC8B129rwjzoZ45a0G6W09cWLZzGrzq0fJzUU~8xQMhqEWgLWps1JVUT7H5m8B3i5R98gMJx5Tz0DH0DVQnBCSw__&Key-Pair-Id=APKAJLOHF5GGSLRBV4ZA | format=pdf | consulté le=31 juillet 2015}}. {{Commentaire biblio|[[Protologue]] de ''{{Langue|latin|Melogale cucphuongensis}}''.}}</ref>.
+
+{{clade | style=font-size:90%;line-height:110%
+  | label1 = Mustelidae
+  | 1 = {{clade
+    | 1 = {{Clade
+       | label1 = '''[[Taxidiinae]]''' genre ''[[Taxidea]]'' 
+       | 1 = [[Taxidée américain]] (''[[Taxidea taxus]]'')
+       }}
+    | 2 = {{clade
+      | 1 = {{Clade
+         | label1 = '''[[Mellivorinae]]''' genre ''[[Mellivora]]''
+         | 1 = [[Ratel]] (''[[Mellivora capensis]]'')
+         }}
+      | 2 = {{clade
+        | label1 = '''[[Melinae]]'''
+        | 1 = {{clade
+          | 1 = {{Clade
+             | label1 = Genre ''[[Meles (mustélidé)|Meles]]''
+             | 1 = {{Clade
+                | label1 = Lignée japonaise
+                | 1 = [[Blaireau anakuma]] (''[[Meles anakuma]]'')
+                | 2 = {{Clade
+                   | label1 = Lignées continentales
+                   | 1 = {{Clade
+                      | label1 = Clade asiatique
+                      | 1 = [[Blaireau à queue blanche]] (''[[Meles leucurus]]'')
+                      }}
+                   | 2 = {{Clade
+                      | label1 = Clade européen
+                      | 1 = {{Clade
+                         | 1 = [[Blaireau d'Europe]] (''[[Meles meles]]'')
+                         | 2 = [[Blaireau de Perse]] (''[[Meles canescens]]'')
+                         }}
+                      }}
+                   }}
+                }}
+             }}
+          | 2 = [[Balisaurs]] (''[[Arctonyx]]'')
+          }}
+        | 2 = {{clade
+          | label1 = '''[[Helictidinae]]''' genre [[Mélogales]] (''[[Melogale]]'')
+          | 1 = {{clade
+            | 1 = [[Mélogale de Cuc Phuong]] (''[[Melogale cucphuongensis]]'')
+            | 2 = {{clade
+              | 1 = [[Mélogale de Chine]] (''[[Melogale moschata]]'')
+              | 2 = [[Mélogale masquée]] (''[[Melogale personata]]'')
+              }}
+            }}
+          | 2 = {{clade
+            | label1 = '''[[Guloninae]]'''
+            | 1 = {{Clade
+               | 1 = [[Tayra]] (''[[Eira barbara]]'')
+               | 2 = {{Clade
+                  | 1 = [[Pékan]] (''[[Pekania pennanti]]'')
+                  | 2 = {{Clade
+                     | 1 = [[Glouton]] (''[[Gulo gulo]]'')
+                     | 2 = {{Clade
+                        | label1 = Genre [[Martes|Martres]] (''[[Charronia]]'')
+                        | 1 = {{Clade
+                           | 1 = {{Clade
+                              | 1 = [[Martre à gorge jaune]] (''[[Martes flavigula]]'')
+                              | 2 = [[Martre de Nilgiri]] (''[[Martes gwatkinsii]]'')
+                              }}
+                           | 2 = {{Clade
+
+ | label1 = Genre [[Martes|Martres]] (''[[Martes]]'')
+
+                              | 1 = [[Fouine]] (''[[Martes foina]]'')
+                              | 2 = {{Clade
+                                 | label1 = Clade Holarctique
+                                 | 1 = {{Clade
+                                    | label1 = Groupe américain 
+                                    | 1 = [[Marte caurine]] (''[[Martes caurina]]'')
+                                    | 2 = [[Martre d'Amérique]] (''[[Martes americana]]'')
+                                    }}
+                                 | 2 = {{Clade
+                                    | label1 = Groupe d'Eurasie
+                                    | 1 = {{Clade
+                                       | 1 = [[Marte des pins]] (''[[Martes martes]]'')
+                                       | 2 = [[Zibeline]] (''[[Martes zibellina]]'')
+                                       }}
+                                    | 2 = [[Marte à pieds noirs]] (''[[Martes melampus]]'')
+                                    }}
+                                 }}
+                              }}
+                           }}
+                        }}
+                     }}
+                  }}
+               }}
+            | 2 = {{clade
+              | label1 = '''[[Ictonychinae]]'''
+              | 1 = {{clade 
+                 | 1 = {{Clade
+                    | label1 = Genre ''[[Galictis]]''
+                    | 1 = [[Grand grison]] (''[[Galictis vittata]]'')
+                    | 2 = [[Petit grison]] (''[[Galictis cuja]]'')
+                    }}
+                 | 2 = {{clade 
+                    | 1 = [[Zorille marbrée]] (''[[Vormela peregusna]]'') 
+                    | 2 = {{clade 
+                       | 1 = [[Zorille de Libye]] (''[[Ictonyx libycus]]'') 
+                       | 2 = {{clade 
+                          | 1 = [[Zorille commune]] (''[[Ictonyx striatus]]'') 
+                          | 2 = [[Poecilogale à nuque blanche]] (''[[Poecilogale albinucha]]'') 
+                          }} 
+                       }} 
+                    }} 
+                 }}
+              | 2 = {{clade
+                | 1 = {{Clade
+                   | label1 = '''[[Mustelinae]]'''
+                   | 1 = {{Clade
+                      | label1 = Genre ''[[Neogale]]''
+                      | 1 = {{Clade
+                         | 1 = {{Clade
+                            | label1 = Groupe « ''[[Neovison]]'' »
+                            | 1 = [[Vison d'Amérique]] (''[[Neogale vison]]'')
+                            | 2 = [[Vison de mer]] († ''[[Neogale macrodon]]'')
+                            }}
+                         | 2 = {{Clade
+                            | 1 = [[Belette à longue queue]] (''[[Neogale frenata]]'')
+                            | 2 = {{Clade
+                               | label1 = Groupe ''[[Grammogale]]''
+                               | 1 = [[Belette tropicale]] (''[[Neogale africana]]'')
+                               | 2 = [[Belette de Colombie]] (''[[Neogale felipei]]'')
+                               }}
+                            }}
+                         }}
+                      | label2 = Genre ''[[Mustela]]''
+                      | 2 = {{Clade
+                         | 1 = {{Clade
+                            | label1 = Clade Indo-malais (''[[Pocockictis]]'')
+                            | 1 = [[Belette à dos rayé]] (''[[Mustela strigidorsa]]'')
+                            | 2 = [[Nudipède]] (''[[Mustela nudipes]]'')
+                            }}
+                         | 2 = {{Clade
+                            | 1 = [[Belette d'Indonésie]] (''[[Mustela lutreolina]]'')
+                            | 2 = {{Clade
+                               | 1 = [[Cataquil]] (''[[Mustela kathiah]]'')
+                               | 2 = {{Clade
+                                  | 1 = {{Clade
+                                     | label1 = Groupe des [[Hermines]]
+                                     | 1 = [[Hermine|Hermine d'Eurasie]] (''[[Mustela erminea]]'')
+                                     | 2 = [[Hermine d'Amérique]] (''[[Mustela richardsonii]]'')
+                                     | 3 = [[Hermine Haïda]] (''[[Mustela haidarum]]'')
+                                     }}
+                                  | 2 = ''[[Mustela russelliana]]'' (''[[Mustela russelliana]]'')
+                                  | 3 = {{Clade
+                                     | 1 = {{Clade
+                                        | label1 = Groupe des « Belettes »
+                                        | 1 = {{Clade
+                                           | 1 = [[Belette altaïque]] (''[[Mustela altaica]]'')
+                                           | 2 = {{Clade
+                                              | 1 = [[Petite belette]] (''[[Mustela nivalis]]'')
+                                              | 2 = {{Clade
+                                                 | 1 = [[Belette subpalmée]] (''[[Mustela subpalmata]]'')
+                                                 | 2 = ''[[Mustela mopbie]]'' (''[[Mustela mopbie]]'')
+                                                 }}
+                                              }}
+                                           }}
+                                        }}
+                                     | 2 = {{Clade
+                                        | label1 = Groupe des « Visons » et « Putois »
+                                        | 1 = {{Clade
+                                           | 1 = {{Clade
+                                              | label1 = Groupe ''[[Kolonokus]]''
+                                              | 1 = [[Kolonok]] (''[[Mustela sibirica]]'')
+                                              | 2 = [[Itatsi]] (''[[Mustela itatsi]]'')
+                                              }}
+                                           | 2 = {{Clade
+                                              | label1 = Groupe ''Lutreola''
+                                              | 1 = [[Vison d'Europe]] (''[[Mustela lutreola]]'')
+                                              }}
+                                           }}
+                                        | 2 = {{Clade
+                                           | label1 = Groupe Putois (''[[Putorius]]'')
+                                           | 1 = [[Putois à pieds noirs]] (''[[Mustela nigripes]]'')
+                                           | 2 = {{Clade
+                                              | 1 = [[Putois d'Eversmann]] (''[[Mustela eversmanii]]'') 
+                                              | 2 = {{Clade
+                                                 | 1 = [[Putois d'Europe]] (''[[Mustela putorius]]'')
+                                                 | 2 = [[Furet]] (''[[Mustela furo]]'')
+                                                 }}
+                                              }}
+                                           }}
+                                        }}
+                                     }}
+                                  }}
+                               }}
+                            }}
+                         }}
+                      }}
+                   | 2 = {{Clade
+                      | label1 = '''[[Lutrinae]]'''
+                      | 1 = {{Clade
+                         | 1 = [[Saricovienne du Brésil]] (''[[Pteronura brasiliensis]]'')
+                         | 2 = {{Clade
+                            | label1 = Genre ''[[Lontra]]''
+                            | 1 = {{Clade
+                               | 1 = [[Loutre du Canada]] (''L. canadensis'')
+                               | 2 = {{Clade
+                                  | 1 = [[Loutre méso-américaine]] (''L. annectens'')
+                                  | 2 = {{Clade
+                                     | 1 = {{Clade
+                                        | 1 = [[Loutre du Chili]] (''L. provocax'')
+                                        | 2 = [[Loutre féline]] (''L. felina'')
+                                        }}
+                                     | 2 = [[Loutre à longue queue]] (''L. longicaudis'')
+                                     }}
+                                  }}
+                               }}
+                            | 2 = {{Clade
+                               | 1 = [[Énhydre marine]] (''[[Enhydra lutris]]'')
+                               | 2 = [[Loutre à cou tacheté]] (''[[Hydrictis maculicollis]]'')
+                               | 3 = {{Clade
+                                  | label1 = Genre ''[[Lutra]]''
+                                  | 1 = {{Clade
+                                     | 1 = [[Loutre d'Eurasie]] (''[[Lutra lutra]]'')
+                                     | 2 = [[Loutre de Sumatra]] (''[[Lutra sumatrana]]'')
+                                     }}
+                                  | 2 = {{Clade
+                                     | 1 = {{Clade
+                                        | label1 = Genre ''[[Aonyx]]''
+                                        | 1 = [[Loutre du Cap]] (''[[Aonyx capensis]]'')
+                                        | 2 = [[Loutre cendrée]] (''[[Aonyx cinerea]]'')
+                                        | 3 = [[Loutre du Congo]] (''[[Aonyx congicus]]'')
+                                        }}
+                                     | 2 = {{Clade
+                                        | label1 = Genre ''[[Lutrogale]]''
+                                        | 1 = [[Loutre à pelage lisse]] (''[[Lutrogale perspicillata]]'')
+                                        }}
+                                     }}
+                                  }}
+                               }}
+                            }}
+                         }}
+                      }}
+                   }}
+                }}
+              }}
+            }}
+          }}
+        }}
+      }}
+    }}
+  }}
+
+== Description ==
+Les mustélidés ont généralement un corps allongé, souple et effilé, aux pattes courtes, aux oreilles courtes et rondes et à la fourrure épaisse<ref>{{article|nom1=Law|prénom1=C. J.|nom2=Slater|prénom2=G. J.|nom3=Mehta|prénom3=R. S.|titre=Shared extremes by ectotherms and endotherms: Body elongation in mustelids is associated with small size and reduced limbs|journal= Evolution|numéro=4|pages=735–749|doi= 10.1111/evo.13702|année=2019|volume=73|pmid=30793764|accès doi=libre|langue=en|date=}}</ref>, excepté les [[blaireau]]x et les [[Gulo gulo|gloutons]] aux corps trapus et plus maladroits. La fourrure est principalement de couleur brune ou noire, certaines espèces ont des taches, des rayures ou des dessins de gorge.
+
+À l'exception de la l’[[Énhydre marine]]<ref>{{ouvrage| titre=The Sea Otter in the Eastern Pacific Ocean | nom=Kenyon |prénom=Karl W.|année=1969|éditeur=U.S. Bureau of Sport Fisheries and Wildlife|lieu=Washington, D.C.|langue=en}}</ref>, ils ont des glandes olfactives anales qui produisent une sécrétion à forte odeur que les animaux utilisent pour la [[Sélection sexuelle|signalisation sexuelle]] et le [[Territoire (éthologie)|marquage de territoire]].
+
+Les mustélidés ont un régime alimentaire principalement carnivore, bien que certains mangent parfois des matières végétales. Bien que n'ayant pas des dentitions identiques, ils possèdent néanmoins certaines dents communes, telles que les [[carnassière]]s, typiques des carnivores, formées par la quatrième [[prémolaire]] supérieure et la première [[Molaire (dent)|molaire]] inférieure. Celles-ci sont particulièrement tranchantes chez les carnivores spécialisés comme les belettes, alors chez d'autres mustélidés, elles sont très robustes et forment de véritables cisailles broyeuses pour casser des matériaux durs. La loutre de mer, la loutre à joues blanches et la loutre sans griffes, qui se nourrissent principalement de crustacés, ont de solides dents carnassières qui ressemblent à des molaires. Un autre trait caractéristique est une molaire supérieure qui cisaille la viande et qui est tournée de 90° vers l'intérieur de la bouche<ref>{{lien web| nom = Pratt | prénom = Philip | titre = Dentition of the Wolverine | éditeur = The Wolverine Foundation, Inc. | url = http://www.wolverinefoundation.org/dentition.htm | archive-url = https://web.archive.org/web/20080527021506/http://www.wolverinefoundation.org/dentition.htm | archive-date = 27 May 2008 | consulté le = 1 juillet 2007|langue=en}}</ref>{{,}}<ref name="akfishgame">{{lien web| nom = Taylor | prénom = Ken | titre = Wolverine | site = Wildlife Notebook Series | éditeur = Alaska Department of Fish & Game | année = 1994 | url = http://www.adfg.state.ak.us/pubs/notebook/furbear/wolverin.php | consulté le = 21 janvier 2007 | archive-url = https://web.archive.org/web/20061206233223/http://www.adfg.state.ak.us/pubs/notebook/furbear/wolverin.php | archive-date = 6 December 2006|langue=en}}</ref>.
+
+La plupart des reproductions de mustélidés impliquent une [[Diapause#La_diapause_embryonnaire|diapause embryonnaire]]<ref>{{En}} Amstislavsky, Sergei, and Yulia Ternovskaya. "[https://web.archive.org/web/20171117174933/https://pdfs.semanticscholar.org/f3b8/69a6701e7bb11035119faf36745f0bd0fafc.pdf Reproduction in mustelids.]" {{Pdf}}, Animal Reproduction Science 60 (2000): 571-581.</ref>. L'[[embryon]] ne s'implante pas immédiatement dans l'[[utérus]], mais reste dormant pendant un certain temps. Aucun développement n'a lieu tant que l'embryon reste détaché de la [[muqueuse utérine]]. En conséquence, la période de gestation normale est prolongée, parfois jusqu'à un an. Cela permet aux jeunes de naître dans des conditions environnementales favorables. La reproduction a un coût énergétique important, il est donc avantageux pour la femelle d'avoir de la nourriture disponible et un temps doux. Les jeunes ont plus de chances de survivre si la naissance a lieu après le [[Sevrage (alimentation)|sevrage]] de la progéniture précédente.
+
+== Les Mustélidés dans le monde ==
+=== Europe ===
+==== En France ====
+Les mustélidés jouent un rôle important dans le [[réseau trophique]] en tant que petits prédateurs contrôlant notamment les populations de [[rongeur]]s (souvent très prolifiques, et vecteurs ou [[Espèce réservoir|réservoirs]] de diverses maladies). Ils sont suivis par diverses associations, ONG et l'OFB qui a publié des cartes de répartition nationale puis en 2006 une première carte d'abondance relative de six mustélidés en France métropolitaine à l'échelle des [[petites régions agricoles]] de France. Ces cartes résultent d'une [[modélisation]] des données provenant des « ''carnets de bord petits carnivores'' » de l’OFB (protocole mis en place en 2001 pour tous ses agents départementaux de l'office). Un modèle statistique prend en compte l'effort d’observation et les probabilités de détection pour produire des indices de densité<ref>Calenge C & al. (2016) ''Premières  cartes d’abondance relative de  six mustélidés en France Modélisation des données collectées dans  les « carnets de bord petits carnivores » de l’ONCFS ;'' Revue Faune sauvage n° 310 ; 1er trimestre 2016 ([http://www.oncfs.gouv.fr/IMG/file/publications/revue%20faune%20sauvage/FS_310_sommaire.pdf sommaire])</ref>.
+
+Des Visons américains échappés d'élevage ou relâchés par des éleveurs depuis les années 1920 sont devenus invasifs et ont contribué à faire reculer le Vison d’Europe. Il y avait en France en 1959 environ {{Nobr|600 visonnières}} ([[Élevage de visons|fermes d'élevage à fourrure]]) en France, et lors d'une tempête, environ {{Unité|12000|visons}} américains se sont échappés en une nuit d'une visonnière du Morbihan<ref>Arlot P [http://files.biolovision.net/www.faune-aquitaine.org/userfiles/Courbageot/Courba2122-02.pdf Le Vison d’Europe (Mustela lutreola), une vision d’avenir ?] ; le courbageot 21-22, voir p 3</ref>.
+{| class="wikitable sortable mw-collapsible mw-collapsed"
+|+ Liste des espèces de Mustélidés en France
+! Nom binominal, auteur, nom vernaculaire officiel et illustration !! Statut biogéographique !! Statut UICN régional
+|-
+| ''[[Mustela putorius]]''<br><small>Linnaeus, 1758</small><br>[[Putois d'Europe]]<br>[[Fichier:Mrs Polecat (5336664311) (cropped).jpg|200px|centre|Putois d'Europe]]
+| Autochtone (Métropole)<ref name="INPN Mustela putorius">{{INPN|60731|''Mustela putorius'' Linnaeus, 1758|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|NT}} NT (Quasi menacé)<ref name="INPN Mustela putorius"/>
+|-
+| ''[[Mustela lutreola]]''<br><small>(Linnaeus, 1761)</small><br>[[Vison d'Europe]]<br>[[Fichier:European Mink at Osnabrück Zoo 02 (cropped).jpg|200px|centre|Vison d'Europe]]
+| Allochtone (Métropole)<ref name="Annexe F">{{Chapitre|langue=français|titre chapitre=Annexe F : notes relatives aux espèces allochtones pour au moins une entité biogéographique de France et aux espèces autochtones temporairement disparues de France puis de retour ({{Info|n|numéro}} = 154 invasions biologiques)|auteurs ouvrage=Michel Pascal, Olivier Lorvelec, Jean-Denis Vigne, Philippe Keith et Philippe Clergeau|titre ouvrage=Évolution holocène de la faune de Vertébrés de France : invasions et disparitions|lieu=Paris|éditeur={{Info|MNHN|Muséum national d'histoire naturelle}}|date=10 juillet 2003|pages totales=381|lire en ligne=http://web.archive.org/web/20220426084630/https://inpn.mnhn.fr/docs/inventaires/annexef.pdf|format=pdf|passage=111-332|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|CR}} CR (En danger critique)<ref name="INPN Mustela lutreola">{{INPN|60704|''Mustela lutreola'' (Linnaeus, 1761)|consulté le=18 mai 2026}}.</ref>
+|-
+| ''[[Mustela nivalis]]''<br><small>Linnaeus, 1766</small><br>[[Belette d'Europe]]<br>[[Fichier:Mustela nivalis -British Wildlife Centre-4 (cropped 2).jpg|200px|centre|Belette d'Europe]]
+| Autochtone (Métropole)<ref name="INPN Mustela nivalis">{{INPN|60716|''Mustela nivalis'' Linnaeus, 1766|consulté le=18 mai 2026}}.</ref><br>Allochtone / Introduit (Corse)<ref name="Évolution holocène de la faune de Vertébrés de France : invasions et disparitions 1">{{Article | langue=français | auteur1=Michel Pascal | auteur2=Olivier Lorvelec | auteur3=Jean-Denis Vigne | auteur4=Philippe Keith | auteur5=Philippe Clergeau | titre=Annexe F : notes relatives aux espèces allochtones pour au moins une entité biogéographique de France et aux espèces autochtones temporairement disparues de France puis de retour | périodique=Évolution holocène de la faune de Vertébrés de France : invasions et disparitions | lieu=[[Paris]] | éditeur=[[Muséum national d'histoire naturelle]] | numéro=154 invasions biologiques | jour=10 | mois=juillet | année=2003 | pages=111-332 | lire en ligne=https://inpn.mnhn.fr/docs/inventaires/annexef.pdf | format=pdf | consulté le=17 janvier 2017}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="INPN Mustela nivalis"/>
+|-
+| ''[[Mustela erminea]]''<br><small>Linnaeus, 1758</small><br>[[Hermine]]<br>[[Fichier:Stoat at Pentlands (cropped).jpg|200px|centre|Hermine]]
+| Autochtone (Métropole)<ref name="INPN Mustela erminea">{{INPN|60686|''Mustela erminea'' Linnaeus, 1758|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="INPN Mustela erminea"/>
+|-
+| ''[[Neogale vison]]''<br><small>(Schreber, 1777)</small><br>[[Vison d'Amérique]]<br>[[Fichier:Mink (cropped).jpg|200px|centre|Vison d'Amérique]]
+| Allochtone / Introduit (Métropole)<ref name="INPN Neogale vison">{{INPN|60746|''Mustela vison'' Schreber, 1777|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|NA}} NA (Non applicable)<ref name="INPN Neogale vison"/>
+|-
+| ''[[Galictis vittata]]''<br><small>(Schreber, 1776)</small><br>[[Galictis|Grison]]<br>[[Fichier:Galictis vittata.jpg|200px|centre|Grison]]
+| Autochtone (Guyane)<ref name="UICN 225">{{UICN|41640|''{{Lang|latin|Galictis vittata}}'' (Schreber, 1776)|consulté le=5 juin 2017}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="MNHN-UICN">{{Article | langue=français | auteur=Anonyme | titre=La Liste rouge des espèces menacées en France - Chapitre de la Faune vertébrée de Guyane | périodique=Comité français de l'{{Abréviation discrète|UICN|Union internationale pour la conservation de la nature}} | lieu=[[Paris]] | éditeur=Muséum national d'histoire naturelle | jour=21 | mois=juin | année=2017 | pages=1-36 | lire en ligne=https://inpn.mnhn.fr/docs/LR_FCE/Liste_rouge_Faune_vertebree_de_Guyane_Fascicule_2017.pdf | format=pdf | consulté le=5 juin 2017}}.</ref>
+|-
+| ''[[Lutra lutra]]''<br><small>(Linnaeus, 1758)</small><br>[[Loutre d'Europe]]<br>[[Fichier:Otter in a Hurry (cropped).jpg|200px|centre|Loutre d'Europe]]
+| Autochtone (Métropole)<ref name="INPN Lutra lutra">{{INPN|60630|''Lutra lutra'' (Linnaeus, 1758)|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="INPN Lutra lutra"/>
+|-
+| ''[[Lontra longicaudis]]''<br><small>(Olfers, 1818)</small><br>[[Loutre à longue queue]]<br>[[Fichier:Lontra longicaudis.jpg|200px|centre|Loutre à longue queue]]
+| Autochtone (Guyane)<ref name="UICN 222">{{UICN|12304|''{{Lang|latin|Lontra longicaudis}}'' (Olfers, 1818)|consulté le=5 juin 2017}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="MNHN-UICN"/>
+|-
+| ''[[Pteronura brasiliensis]]''<br><small>(Gmelin, 1788)</small><br>[[Loutre géante]]<br>[[Fichier:Pteronura brasiliensis.jpg|200px|centre|Loutre géante]]
+| Autochtone (Guyane)<ref name="UICN 223">{{UICN|18711|''{{Lang|latin|Pteronura brasiliensis}}'' (Gmelin, 1788)|consulté le=5 juin 2017}}.</ref>
+| {{Icône UICN France|EN}} EN (En danger)<ref name="MNHN-UICN"/>
+|-
+| ''[[Lontra canadensis]]''<br><small>(Schreber, 1777)</small><br>[[Loutre de rivière]]<br>[[Fichier:North American River Otter, Beardsley Zoo, 2009-11-06 (cropped).jpg|200px|centre|Loutre de rivière]]
+| Autochtone (Saint-Pierre-et-Miquelon : disparu, puis erratique)<ref name="Zones Humides Infos">{{Article | langue=français | auteur1=Frank Urtizbéréa | auteur2=Hélène Jacques | titre=Une loutre du Canada observée à Saint-Pierre-et-Miquelon ! | périodique=[[Zones Humides Infos]] | numéro=64-65 | mois={{2e}} et {{3e}} trimestres | année=2009 | pages=25 | lire en ligne=http://www.snpn.com/IMG/pdf/ZHI_64-65_pour_site.pdf | format=pdf | consulté le=27 novembre 2016}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="UICN 32">{{UICN|12302|''Lontra canadensis''|consulté le=18 mai 2026}}.</ref>
+|-
+| ''[[Martes foina]]''<br><small>Erxleben, 1777</small><br>[[Fouine]]<br>[[Fichier:Martes foina Poland.jpg|200px|centre|Fouine]]
+| Allochtone (Naturalisé en métropole)<ref name="Annexe F"/>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="INPN Martes foina">{{INPN|60674|''Martes foina'' (Erxleben, 1777)|consulté le=18 mai 2026}}.</ref>
+|-
+| ''[[Martes martes]]''<br><small>Linnaeus, 1758</small><br>[[Martre des pins]]<br>[[Fichier:Pine Marten (48173751702) (cropped).jpg|200px|centre|Martre des pins]]
+| Autochtone (Métropole)<ref name="INPN Martes martes">{{INPN|60658|''Martes martes'' (Linnaeus, 1758)|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="INPN Martes martes"/>
+|-
+| ''[[Meles meles]]''<br><small>Linnaeus, 1758</small><br>[[Blaireau européen]]<br>[[Fichier:European Badger (53170681085) (cropped).jpg|200px|centre|Blaireau européen]]
+| Autochtone (Métropole)<ref name="INPN Meles meles">{{INPN|60636|''Meles meles'' (Linnaeus, 1758)|consulté le=18 mai 2026}}.</ref>
+| {{Icône UICN France|LC}} LC (Préoccupation mineure)<ref name="INPN Meles meles"/>
+|}
+
+=== Amérique du Nord ===
+==== Au Canada ====
+{| class="wikitable sortable mw-collapsible mw-collapsed"
+|+ Liste des espèces de Mustélidés au Canada
+! Nom binominal, auteur, nom vernaculaire officiel et illustration !! Habitat et distribution géographique !! Statut de conservation
+|-
+| ''[[Mustela richardsonii]]''<br><small>Bonaparte, 1838</small><br>[[Hermine]]<br>[[Fichier:Ermine- Bacon Fiend (14083889879).jpg|200px|centre|Hermine]]
+| '''Habitat :''' Varié (forêts, lisières, milieux humides)<br>'''Distribution :''' Presque tout le Canada (incluant le Québec), à l'exception des Prairies et de l'[[île d'Anticosti]].
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Mustela haidarum]]''<br><small>Preble, 1898</small><br>[[Hermine Haïda]]<br>[[Fichier:Haida Ermine (Mustela haidarum).jpg|200px|centre|Hermine de Haida Gwaii]]
+| '''Habitat :''' Forêts tempérées humides côtières<br>'''Distribution :''' Endémique de l'archipel de [[Haida Gwaii]] (Colombie-Britannique).
+| {{Icône UICN|NE}} NE (Non évalué)<br><span style="font-size:smaller;">* COSEPAC : Menacée<br>(Légalement inscrite sous ''Mustela erminea haidarum'')<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=154&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Mustela&returnFlag=0&Page=1 |titre=Hermine de la sous-espèce haidarum |site=COSEPAC |consulté le=17 octobre 2010}}</ref></span>
+|-
+| ''[[Mustela erminea]]''<br><small>Linnaeus, 1758</small><br>[[Hermine]] (sens strict)<br>[[Fichier:Mustela.erminea.jpg|200px|centre|Hermine de Béringie]]
+| '''Habitat :''' Toundra et forêts boréales ouvertes<br>'''Distribution :''' Au Canada, restreinte à l'extrême nord-ouest ([[Yukon]]). Également en Alaska et Eurasie.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Mustela frenata]]''<br><small>Lichtenstein, 1831</small><br>[[Belette à longue queue]]<br>[[Fichier:Mustela frenata.jpg|200px|centre|Belette à longue queue]]
+| '''Habitat :''' Clairière<br>'''Distribution :''' Sud du Canada.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Mustela nivalis]]''<br><small>Linnaeus, 1766</small><br>[[Belette pygmée]]<br>[[Fichier:Mustela nivalis (two, fighting).jpg|200px|centre|Belette pygmée]]
+| '''Habitat :''' Varié<br>'''Distribution :''' Yukon au Labrador, à l'exception du sud de l'Ontario et du Québec.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Neogale vison]]''<br><small>(Schreber, 1777)</small><br>[[Vison d'Amérique]]<br>[[Fichier:AmericanMink.jpg|200px|centre|Vison d'Amérique]]
+| '''Habitat :''' Rivières et milieux humides<br>'''Distribution :''' Générale sous la limite des arbres.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Martes americana]]''<br><small>(Kerr, 1792)</small><br>[[Martre d'Amérique]]<br>[[Fichier:AmericanMarten23.jpg|200px|centre|Martre d'Amérique]]
+| '''Habitat :''' Forêts mixtes et de conifères<br>'''Distribution :''' Des Rocheuses à Terre-Neuve-et-Labrador (disparue dans plusieurs endroits de l'Est).
+| {{Icône UICN|LC}} LC (Préoccupation mineure)<br><span style="font-size:smaller;">* COSEPAC : Menacée (population de Terre-Neuve)<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=134&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Martes&returnFlag=0&Page=1 |titre=Martre d'Amérique, Population de Terre-Neuve |site=Cosepac |consulté le=17 octobre 2010}}</ref></span>
+|-
+| ''[[Pekania pennanti]]''<br><small>(Erxleben, 1777)</small><br>[[Pékan]]<br>[[Fichier:Fisher (animal).jpg|200px|centre|Pékan]]
+| '''Habitat :''' Forêts de conifères et de feuillus<br>'''Distribution :''' Colombie-Britannique aux provinces Maritimes.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Gulo gulo]]'' <small>Linnaeus, 1758</small><br>[[Carcajou]]<br>[[Fichier:Gulo gulo 01.jpg|200px|centre|Carcajou]]
+| '''Habitat :''' Forêt boréale et toundra<br>'''Distribution :''' Générale, disparue au sud du Canada à l'est des Rocheuses.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)<br><span style="font-size:smaller;">* COSEPAC : En voie de disparition (population de l'Est)<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=137&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Gulo&returnFlag=0&Page=1 |titre=Carcajou, Population de l'Est |site=Cosepac |consulté le=17 octobre 2010}}</ref> ; Préoccupante (population de l'Ouest)<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=172&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Gulo&returnFlag=0&Page=1 |titre=Carcajou, Population de l'Ouest |site=Cosepac |consulté le=17 octobre 2010}}</ref></span>
+|-
+| ''[[Taxidea taxus]]''<br><small>(Schreber, 1777)</small><br>[[Blaireau d'Amérique]]<br>[[Fichier:Badger.jpg|200px|centre|Blaireau d'Amérique]]
+| '''Habitat :''' Champs<br>'''Distribution :''' Sud des Prairies, centre-sud de la Colombie-Britannique et extrême sud de l'Ontario.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)<br><span style="font-size:smaller;">* COSEPAC : En voie de disparition (sous-espèces ''jacksoni'' et ''jeffersonii'')<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=621&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Taxidea&returnFlag=0&Page=1 |titre=Blaireau d'Amérique de la sous-espèce ''jacksoni'' |site=Cosepac |consulté le=17 octobre 2010}}</ref>{{,}}<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=622&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Taxidea&returnFlag=0&Page=1 |titre=Blaireau d'Amérique de la sous-espèce ''jeffersonii'' |site=Cosepac |consulté le=17 octobre 2010}}</ref> ; Non en péril (sous-espèce ''taxus'')<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=623&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Taxidea&returnFlag=0&Page=1 |titre=Blaireau d'Amérique de la sous-espèce ''taxus'' |site=Cosepac |consulté le=17 octobre 2010}}</ref></span>
+|-
+| ''[[Lontra canadensis]]''<br><small>(Schreber, 1777)</small><br>[[Loutre de rivière]]<br>[[Fichier:LutraCanadensis fullres.jpg|200px|centre|Loutre de rivière]]
+| '''Habitat :''' Rivières, lacs et marais<br>'''Distribution :''' Générale sous la ligne des arbres à l'exception des Prairies.
+| {{Icône UICN|LC}} LC (Préoccupation mineure)
+|-
+| ''[[Enhydra lutris]]''<br><small>(Linnaeus, 1758)</small><br>[[Loutre de mer]]<br>[[Fichier:Sea-otter-morro-bay 13.jpg|200px|centre|Loutre de mer]]
+| '''Habitat :''' Mer côtière<br>'''Distribution :''' Côte des îles de Vancouver et Goose.
+| {{Icône UICN|EN}} EN (En danger)<br><span style="font-size:smaller;">* COSEPAC : Préoccupante<ref>{{Lien web |url=http://www.cosewic.gc.ca/fra/sct1/searchdetail_f.cfm?id=149&StartRow=1&boxStatus=All&boxTaxonomic=All&location=All&change=All&board=All&commonName=&scienceName=Enhydra%20lutris&returnFlag=0&Page=1 |titre=Loutre de mer |site=Cosepac |consulté le=17 octobre 2010}}</ref> (réintroduite entre 1969 et 1972).</span>
+|}
+
+== Les Mustélidés et l’Homme ==
+=== Enjeux sanitaires ===
+==== Mustélidés et COVID-19 ====
+Il existe une soixantaine d'espèces de mustélidés ; elles occupent dans le monde des habitats très divers<ref>{{Chapitre|langue=en|prénom1=George V.|nom1=Kollias|prénom2=Jesus|nom2=Fernandez-Moran|titre chapitre=Chapter 48 - Mustelidae|titre ouvrage=Fowler's Zoo and Wild Animal Medicine, Volume 8|éditeur=W.B. Saunders|date=2015-01-01|pages totales=476–491|isbn=978-1-4557-7397-8|doi=10.1016/B978-1-4557-7397-8.00048-7|pmcid=7152349|lire en ligne=https://www.sciencedirect.com/science/article/pii/B9781455773978000487|consulté le=2026-08-30}}</ref>, terrestres (prairies, steppes, toundra, forêts) et aquatiques (marins et d'eau douce)<ref>{{Lien web |prénom=Costanza |nom=Manes |prénom2=Rania |nom2=Gollakner |titre=Could Mustelids spur COVID-19 into a panzootic? |url=https://doi.org/10.12834/VetIt.2375.13627.1 |site=Veterinaria Italiana |date=2020-09-09 |doi=10.12834/VetIt.2375.13627.1 |consulté le=2020-11-16|langue=en}}</ref>. Quelques mustélidés sauvages se sont habitués aux villes et à la proximité de l'Homme (ex : [[fouine]] ou localement [[loutre]]s et [[blaireaux]]). Le [[furet]] est quant à lui élevé en grand nombre comme NAC ([[nouvel animal de compagnie]]) ou animal destiné à la chasse dans les terriers.
+
+Et dans le même temps, des centaines ou milliers de « fermes à fourrures » existent de par le monde, principalement en [[Chine]], en [[Europe]] et en [[Amérique du Nord]] qui concentrent de dizaines de millions de [[vison]]s et autres mustélidés dans des cages et des environnements favorables aux épidémies.
+
+En [[2020]], les [[élevage de vison|élevages de visons]] sont les élevages d'animaux qui ont été les plus touchés par le virus [[SARS-CoV-2]] responsable de la [[COVID-19]]. Si ce virus devait se répandre parmi les mustélidés sauvages, ces derniers pourraient devenir un [[espèce réservoir|réservoir permanent]] d'infection pour d'autres espèces animales, comme ce fut le cas pour la [[Rage (maladie)|rage]] transmise aux [[ratons laveurs]] et aux [[mouffette]]s<ref>{{En}} C Rupprecht, J Smith, M Fekadu & J Childs, ''The ascension of wildlife  rabies: a cause for public health concern or intervention?'' Emerg Infect Dis, 1 (4), 1995, {{P.|107-114}}. </ref>, ou encore avec la [[tuberculose bovine]] transmise aux [[blaireaux]]<ref>{{Lien web |langue=en |prénom=J |nom=Gallagher |prénom2=R.S |nom2=Clifton-Hadley |titre=Tuberculosis in badgers; a review of the disease and its significance for other animals |url=https://linkinghub.elsevier.com/retrieve/pii/S0034528800904223 |site=Research in Veterinary Science |date=2000-12 |doi=10.1053/rvsc.2000.0422 |consulté le=2020-11-16 |page=203–217}}</ref> ou avec la [[paratuberculose]], transmissible à de nombreux ruminants sauvages et parfois transmise à des humains [[immunodépression|immunitairement déprimés]].
+
+Début septembre [[2020]], avant que la situation se dégrade encore dans les élevages de visons (six
+
+pays touchés début {{date|novembre 2020}} : [[Danemark]], [[Pays-Bas]], [[Espagne]], [[Suède]], [[Italie]] et [[États-Unis]])<ref>{{Lien web |langue=fr |titre=Des cas de coronavirus dans des élevages de visons recensés dans six pays |url=https://www.20minutes.fr/sante/2903387-20201107-coronavirus-six-pays-recense-cas-covid-19-chez-elevages-visons |site= |consulté le=2020-11-17|date=2020-11-07|périodique=[[20 Minutes (France)|20 Minutes]]}}</ref>, Costanza Manes & ses collègues, du Centre d'excellence « ''[[One Health]]'' », de l'[[Université de Floride]] alertaient et estimaient qu'{{Citation|il est important de prioriser les études chez les mustélidés sur leur rôle putatif comme réservoirs et amplificateurs de l'infection par le [[SRAS-CoV-2]] chez les animaux et par la suite chez les humains. Le développement de stratégies de surveillance et d'intervention appropriées permettra de déterminer si les mustélidés sont l'un des maillons clés de la chaîne du déclenchement d'un événement historique sans précédent : une [[panzootie]]}}. D'autant que les élevages industriels de visons, et autour d'eux une partie de la population de visons sauvages sont, depuis les [[années 1980]], de plus en plus touchés par la [[maladie aléoutienne]], une virose induite par un [[parvovirus]] qui s'est répandue dans les élevages<ref name="DMLA_maladieVison2019">{{Lien web |langue=en |prénom=Qing-Long |nom=Gong |prénom2=Dong |nom2=Li |titre=Mink Aleutian disease seroprevalence in China during 1981–2017: A systematic review and meta-analysis|url=https://linkinghub.elsevier.com/retrieve/pii/S0882401019304243 |site=Microbial Pathogenesis |date=2020-02 |doi=10.1016/j.micpath.2019.103908 |consulté le=2020-11-13|page=103908}}</ref> et qui peut aussi infecter d'autres mustélidés tels que [[furet]], [[loutre]], [[Mustela putorius|putois]], [[martre des pins]] (…) et au-delà [[renard]] et raton-laveur et qui est connue pour affaiblir l'immunité des animaux infectés par ce virus.
+ 
+Dans certains pays comme la France, les mustélidés sont souvent considérés comme nuisibles et chassés, voire déterrés et tués sans précautions sanitaires, ce qui expose les chasseurs et leurs chiens à des contacts avec le sang et des sécrétions contaminantes. A l'automne 2020, les chasseurs français ont en outre été exemptés de confinement quand il s'agit de chasser des espèces dites « nuisibles »<ref>{{Lien web |langue=fr |titre=Chasseurs et agriculteurs veulent plus de dérogations lors du confinement |url=https://www.20minutes.fr/societe/2907683-20201113-confinement-federation-nationale-chasseurs-organisations-agricoles-veut-davantage-derogations |site= |consulté le=2020-11-17|périodique=[[20 Minutes (France)|20 Minutes]]|date=2020-11-13}}</ref>.
+
+== Notes et références ==
+=== Notes ===
+{{Références|groupe=note}}
+=== Références ===
+{{Références}}
+
+== Voir aussi ==
+{{Autres projets
+|commons=Category:Mustelidae
+|wikispecies=Mustelidae
+}}
+=== Bibliographie ===
+* C. S. Davis et C. Strobeck, ''Isolation, variability, and cross-species amplification of polymorphic microsatellite loci in the family Mustelidae''. Molecular Ecology, 7(12), 1998, {{P.|1776-1778}} ([http://www.citeulike.org/group/15497/article/9675244 résumé]).
+{{Catégorie principale}}
+=== Articles connexes ===
+* [[Élevage de visons]]
+
+=== Liens externes ===
+{{Liens}}
+==== Références taxonomiques ====
+* {{CatalogueofLife | L299D |Mustelidae G. Fischer von Waldheim, 1817 | consulté le=13 décembre 2025 }}
+* {{ITIS|180545|Mustelidae Fischer, 1817|consulté le=21 mai 2013 }}
+* {{NAM famille|24|Mustelidae|consulté le=21 mai 2013 }}
+* {{NCBI|9655|Mustelidae|consulté le=21 mai 2013 }}
+* {{Tolweb|Mustelidae|consulté le=21 mai 2013 }}
+* {{TPDB|41086|Mustelidae Fischer 1817|consulté le=21 mai 2013 }}
+* {{WRMS|136974|Mustelidae|Fischer, 1817|afficher=genres|consulté le=21 mai 2013 }}
+
+==== Autres liens externes ====
+* [http://www.carnivores-rapaces.org/Mustelides/int_muste.htm Dossier sur les principales espèces de Mustélidés du site Leis oursoun - Carnivores et rapaces]
+* [http://ead.univ-angers.fr/%7Eecologie/Polecat_fr.html Recherches scientifiques sur le Putois, la loutre, le vison d'Europe, la fouine et le castor]
+
+{{Portail|Mammifères}}
+
+[[Catégorie:Mustelidae|*]]
+[[Catégorie:Famille de carnivores (nom scientifique)]]

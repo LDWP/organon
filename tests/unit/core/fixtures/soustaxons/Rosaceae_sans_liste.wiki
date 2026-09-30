@@ -1,0 +1,68 @@
+{{Voir homonymes|Rosacée (pathologie)}}
+{{Taxobox début | végétal | ''Rosaceae'' | Illustration_Rosa_canina1.jpg | ''[[Rosa canina]]''. |classification=itis }}
+{{Taxobox | sous-règne | Viridiplantae }}
+{{Taxobox | infra-règne | Streptophyta }}
+{{Taxobox | super-division|Embryophyta }}
+{{Taxobox | division|Tracheophyta }}
+{{Taxobox |sous-division|Spermatophytina }}
+{{Taxobox | classe | Angiosperme |	Magnoliopsida }}
+{{Taxobox | super-ordre| Rosanae }}
+{{Taxobox | ordre | Rosales }}
+{{Taxobox taxon | végétal | famille | Rosaceae | [[Antoine-Laurent de Jussieu|Juss.]], [[1789 en science|1789]] }}
+{{Taxobox répartition | Map-Rosaceae.PNG }}
+{{Taxobox fin}}
+
+Les '''''Rosaceae''''' ('''Rosacées''') sont une [[famille (biologie)|famille]] de [[plantes à fleurs]] de l'ordre des ''[[Rosales]]'' qui réunit environ {{nb|5000 [[espèce]]s}} réparties en plus d'une centaine de [[genre (biologie)|genres]].
+
+Cette famille [[Répartition cosmopolite|cosmopolite]] comprend aussi bien des [[plante herbacée|plantes herbacées]] vivaces que des [[arbuste]]s ou des [[arbre]]s. Elle est représentée par de nombreuses espèces sauvages (on peut citer le [[sorbier (arbre)|sorbier]], l'[[aubépine]], le [[prunelier]], l'[[églantier]], la [[ronce commune]], les [[Fragaria|fraisiers]], les [[benoîte]]s, les [[potentille]]s, la [[reine-des-prés]], la [[pimprenelle]], l'[[aigremoine]], etc.) et cultivées parmi les plus importantes (voir [[#Importance économique|leur importance économique]]).
+
+== Étymologie ==
+Le nom vient du [[genre type]] ''Rosa'' signifiant {{"|rose}} en latin, lui-même d'origine incertaine. Et de ''aceae'' signifiant {{"|famille}}.
+
+== Description ==
+Les ''Rosaceae'' sont une famille par enchaînement<ref>Une grande différence existe entre les espèces, mais de nombreux intermédiaires les relient les unes aux autres.</ref>, montrant plusieurs tendances évolutives, ce qui explique la diversité de l'[[appareil végétatif]] (grande variabilité morphologique) et [[Appareil reproducteur|reproducteur]] (évolution vers l'[[inférovarie]] et la réduction de l'[[androcée]] et du [[Pistil|gynécée]])<ref>{{Ouvrage|auteur1=Rodolphe-Edouard Spichiger, Vincent V. Savolainen, Murielle Figeat, Daniel Jeanmonod|titre=Botanique systématique des plantes à fleurs : une approche phylogénétique nouvelle des angiospermes des régions tempérées et tropicales|éditeur=Presses polytechniques et universitaires romandes|année=2002|passage=188|isbn=}}.</ref>.
+
+=== Appareil végétatif ===
+Les Rosacées sont des plantes herbacées (vivaces comme le fraisier ou plus rarement annuelles comme le genre ''[[Aphanes|Aphane]]'') ou [[plantes ligneuses]] sous forme d'arbrisseaux, d'arbustes (rosiers, ronces dont les poils épidermiques se lignifient et se transforment en [[aiguillon (botanique)|aiguillons]]) ou d'arbres (cerisier, prunier, pêcher, pommier dont certains rameaux peuvent se transformer en [[épine]]s), à feuilles caduques ou persistantes.
+
+Les bourgeons foliaires sont disposés en spirale et ont des [[stipule]]s soudées. Les feuilles à [[Nervure (feuille)#Les différents types de nervations|nervation pennée]], à pétiole sans [[Coussinet foliaire|pulvinus]] sont souvent alternes, [[Stipule|stipulées]] (stipules libres ou adnés au pétiole), à marge dentée et glanduleuse sur le limbe. Elles sont primitivement composées-imparipennées (folioles [[pétiole|pétiolulées]] de ronces, folioles sessiles de rosier). L’évolution emprunte deux voies : confluence des folioles entre elles pour former une feuille simple (11-17 paires de folioles chez le [[Sorbier des oiseleurs]], une feuille simple chez le [[sorbier des Alpes]]) ; réduction à 3 folioles (fraisier) ou même une foliole (pommier, prunier, cerisier). La réduction à trois folioles s'accompagne parfois d'une surévolution par le développement de folioles de {{3e}} ou de {{3e}} ordre sur les deux folioles latérales, donnant une disposition digitée (feuille de la potentille), avec parfois soudure des folioles (Alchemilla)<ref name="Botineau">{{Ouvrage|auteur1=Michel Botineau|titre=Botanique systématique et appliquée des plantes à fleurs|éditeur=Lavoisier|année=2010|passage=648|isbn=}}</ref>. Des glandes peuvent se développer sur le pétiole.
+
+Les tiges sont dressées, plus rarement étalées ou rampantes. Elles sont dotées souvent de poils simples ou étoilés, comme les feuilles. Certains poils épidermiques très développés se lignifient, se transformant en aiguillons piquants. Des rameaux de cerisiers, pêchers, poiriers, peuvent se transformer en épines<ref name="Botineau"/>.
+
+Chimiquement, les plantes produisent des tanins (leur conférant souvent un intérêt médicinal), des huiles essentielles et des [[hétéroside]]s de type saponosides ou [[glycoside|glycosides cyanogènes]] (150 espèces à l'exception des ''[[Rosoideae]]'' contiennent ces composés potentiellement toxiques donnant le goût amer aux amandes){{sfn|Botineau|2010|p=662}}.
+
+=== Appareil reproducteur ===
+[[Fichier:Fragaria virginiana 2423.JPG|vignette|Le calicule du ''[[Fragaria]]'' est composé de 5 sépalules provenant chacun de la soudure 2 à 2 de 10 stipules.]]
+Les [[inflorescence]]s sont variables. Il s'agit le plus souvent de [[grappe]]s (ou des formes dérivées : [[Épi (botanique)|épi]], [[corymbe]], [[panicule]]), plus rarement des fleurs terminales solitaires (espèces de ''[[Rosier|Rosa]]''){{sfn|Botineau|2010|p=650}}.
+
+Le [[réceptacle floral]] est composé de deux parties : l'[[hypanthium]] (les ''Rosaceae'' étaient traditionnellement classées dans les dialypétales « caliciflores<ref>Corolle, calice et androcée sont concrescents en une coupe (calix en latin).</ref> ») de forme variée (aplati, cupulaire ou cylindrique), libre ou adné aux carpelles, parfois caduc (prunier) ou accrescent dans le [[faux-fruit]] (pomme, poire) ; le [[gynophore]] plus ou moins développé selon les sous-familles peut être sec (framboisier, ronce) ou charnu (fraisier). Lorsque l'hypanthium est présent, la fleur est plus ou moins [[périgyne]] ([[épigyne]] chez ''[[Pommier|Malus]])''. L'[[entomophilie]] par des pollinisateurs généralistes est favorisée par la présence d'un anneau ou disque nectarifère à l'intérieur de l'hypanthium<ref>{{Ouvrage|auteur1=Walter S. Judd, Christopher S. Campbell, Elizabeth A. Kellogg, Peter Stevens|titre=Botanique systématique|sous-titre=une perspective phylogénétique|éditeur=De Boeck Supérieur|année=2002|passage=292|isbn=}}</ref>.
+
+Les [[fleur]]s de type [[euanthe]] sont souvent grandes, régulières, [[actinomorphe]]s (à symétrie rayonnée), presque toujours bisexuées et [[Polymérie|pentamères]]. Elles présentent parfois, sous le [[calice (botanique)|calice]], un [[wikt:calicule|calicule]] (appelé aussi épicalice) de 3 ou 5 pièces (genres ''Fragaria'', ''Potentilla'', ''Alchemilla'')<ref>{{Ouvrage|auteur1=Rodolphe-Edouard Spichiger|auteur2=Murielle Figeat|titre=Botanique systématique des plantes à fleurs|éditeur=[[Presses polytechniques et universitaires romandes]]|année=2002|passage=85|isbn=}}</ref>.
+
+Le [[Calice (botanique)|calice]] est le plus souvent formé de 5 [[sépale]]s (parfois réduits à 3) et est parfois soudé à l'ovaire. La [[corolle]] est en général formée de 5 [[pétale]]s libres et entiers (parfois 3 ou 10). Les pétales sont souvent fixés à l’hypanthium, parfois nuls (''Alchemilla'', ''Aphanes'').
+
+Les [[étamines]] sont nombreuses (supérieures à 10, se multipliant par [[Androcée#Nombre d’étamines|méristémonie]] pour atteindre 100 chez des rosiers), rarement en nombre déterminé et réduites à 12 ou 5. Cette méristémonie correspond à une polyandrie secondaire, adaptation particulière à l'[[entomophilie]]<ref>{{Article|langue=de|auteur=W. Kania|titre=Entwicklungsgeschichtliche. Untersuchungen an Rosaceenblüten|périodique=Bot. Jahrb. Syst.|date=1973|volume=93|pages=175–246}}.</ref>. Les étamines ont des filets libres (ou soudés à la base pour les ''[[Chaenomeles]]'') et de petites [[anthères]] [[Glossaire de botanique et de mycologie#D|didymes]] qui s'ouvrent par des fentes longitudinales. La position de l'[[Ovaire (botanique)|ovaire]] uniloculaire est supère ou infère. Le pistil est formé primitivement de cinq carpelles libres multiovulés (nombre indéterminé d'ovules) qui peuvent se réduire à un (''Prunus''), 2-3 (''Crataegus'') ou devenir nombreux (plusieurs centaines), pauciovulés (un ou deux ovules) et diversement unis (les carpelles soudés de ''Pyrus'' ont un ovaire à placentation axile) lorsque le réceptacle floral se développe<ref>{{Article|langue=de|auteur=Hans Oscar Juel|titre=Beiträge zur Blütenanatomie und zur Systematik der Rosaceen|périodique=Svenska Vetenskapsakad. Handl.|date=1918|volume=58|numéro=5|pages=1–81}}.</ref>.
+
+[[Formule florale]] : [[Fichier:Male and female sign.svg|12px]] <math>\star   S_{(3-) 5 (-10)} \; P_{(0-3-) 5 (-10)} \; E_{{\infty} - {5} - {1} St} ; C_{{\infty} - {5} - {1}}</math>
+
+<gallery>
+Rosa tomentosa flowerdiagram.png|[[Diagramme floral]] de ''[[Rosa tomentosa]]''
+Prunus padus flowerdiagram.png|Diagramme floral de ''[[Prunus padus]]''
+Sanguisorba officinalis flowerdiagram.png|Diagramme floral de ''[[Sanguisorba officinalis]]'' : fleur unisexuée à pollinisation anémophile
+Spiraea hypericifolia flowerdiagram.png| Diagramme floral de ''[[Spiraea hypericifolia]]''
+</gallery>
+
+Les [[Fruit (botanique)|fruits]] sont très divers : ce peut être un [[follicule (botanique)|follicule]] (ex : follicule spiralé de ''Spiraea''), une [[drupe]] (''[[Prunus]]''), un [[akène]] (''[[Rosier|Rosa]]''), un [[polyakène]] (''[[Potentilla]]''), des [[wikt:drupéole|drupéoles]] multiples (''[[Rubus]]'') ou un [[faux-fruit]] (telle la pomme constituée du réceptacle charnu), mais jamais une [[gousse]] ; les graines, petites et exalbuminées, sont dispersées par zoochorie ou [[anémochorie]]<ref>{{Ouvrage|langue=en|auteur1=Gurcharan Singh|titre=Plant Systematics|sous-titre=an Integrated Approach|éditeur=Science Publishers|année=2004|passage=419|isbn=}}</ref>.
+
+== Sous-familles ==
+On distingue parmi les Rosacées trois sous-familles homogènes :
+* les ''[[Amygdaloideae]]'' (ou ''[[Prunoideae]]'', [[pêcher]] et [[prunier]]), et qui inclut les anciennes sous-familles ''[[Maloideae]]'' ([[pommier]] et [[poirier]]) et ''[[Spiraeoideae]]'' ([[spirée]]) ; 
+* les ''[[Rosoideae]]'' ([[rosier]]) ;
+* les ''[[Dryadoideae]]''  ([[Dryas (plante)|Dryades]], [[Purshia|Purshies]] et ''[[Cercocarpus]]'').
+
+== Répartition ==
+[[Fichier:Rosa pendulina.jpg|vignette|''[[Rosa pendulina]]'' ([[Autriche]]).]]
+Cette famille [[Répartition cosmopolite|cosmopolite]] est surtout représentée dans les régions tempérées de l'hémisphère nord. Les genres les plus importants sont ''[[Potentilla]]'' (500 espèces dont 42 en France), ''[[Cotoneaster]]'' (260 espèces), ''[[Rubus]]'' et ''[[Alchemilla]]'' (250 espèces), ''[[Prunus]]'' (200 espèces dont onze spontanées en France), ''[[Sorbus]]'' (193 espèces), ''[[Crataegus]]'' (500 espèces dont 42 en France), ''[[Rosier|Rosa]]'' (150 espèces dont 32 en France){{sfn|Botineau|2010|p=647}}.
+
+En [[phytosociologie]], la classe [[Crataego monogynae-Prunetea spinosae]] est typique des [[Phytosociologie|manteaux forestiers]], des haies et [[fruticée]]s. La famille des ''Rosaceae'' (''Rubus, Rosa, Malus, Prunus, Sorbus'') est très représentée dans cette classe{{sfn|Botineau|2010|p=657}}.
+

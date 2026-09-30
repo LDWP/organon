@@ -1,0 +1,79 @@
+{{Taxobox début | animal | ''Panthera leo'' |011 The lion king Tryggve in the Serengeti National Park Photo by Giles Laurent.jpg| Un mâle adulte.| classification=msw }}
+{{Taxobox plage|2.58|0|[[Gélasien]] du [[Pléistocène inférieur]] au [[Holocène|présent]]|collections=125}}
+{{Taxobox | embranchement | Chordata }}
+{{Taxobox | sous-embranchement | Vertebrata }}
+{{Taxobox | classe | Mammalia }}
+{{Taxobox | ordre | Carnivora }}
+{{Taxobox | sous-ordre | Feliformia }}
+{{Taxobox | famille | Felidae }}
+{{Taxobox | sous-famille | Pantherinae }}
+{{Taxobox | genre | Panthera }}
+{{Taxobox taxon | animal | espèce | Panthera leo | ([[Carl von Linné|Linnaeus]], [[1758 en science|1758]]) }}
+{{Taxobox répartition | Lion-map-2.png |  }}
+{{Taxobox UICN | VU | A2c }}
+{{Taxobox CITES | I | 04/02/1977 | ''Panthera leo'' }}
+{{Taxobox synonymes | {{Liste cachée|
+* ''Felis leo'' <small>Linnaeus, 1758</small> ([[Protonyme]])
+* ''Felix leo'' <small>F. S. Voigt, 1819</small>
+* ''Felis leo arabicus'' <small>H. R. Schinz, 1825</small>
+* ''Felis leo race 1, barbaricus'' <small>J. N. von Meyer, 1826</small>
+* ''Felis leo persicus'' <small>J. N. von Meyer, 1826</small>
+* ''Felis leo race 3, senegalensis'' <small>J. N. von Meyer, 1826</small>
+* ''Leo africanus'' <small>A. E. Brehm, 1829</small>
+* ''Leo asiaticus'' <small>A. E. Brehm, 1829</small>
+* ''Felis leo bengalensis'' <small>E. T. Bennett, 1829</small>
+* ''Felis leo barbarus'' <small>J. B. Fischer, 1829</small>
+* ''Felis leo capensis'' <small>J. B. Fischer, 1829</small>
+* ''Felis leo senegalensis'' <small>J. B. Fischer, 1829</small>
+* ''Leo africanus'' <small>Jardine, 1834</small>
+* ''Felis leo, var. goojratensis'' <small>Smee, 1834</small>
+* ''Felis leo gougeratensis'' <small>C. H. Smith, 1842</small>
+* ''Leo melanochaitus'' <small>C. H. Smith, 1842</small>
+* ''Felis leo indicus'' <small>de Blainville, 1843</small>
+* ''Felis leo nubicus'' <small>de Blainville, 1843</small>
+* ''Leo gambianus'' <small>J. E. Gray, 1843</small>
+* ''Felis leo guzuratensis'' <small>H. R. Schinz, 1844</small>
+* ''Leo barbarus'' <small>Fitzinger, 1855</small>
+* ''Felis leo nigra'' <small>Loche, 1858</small>
+* ''Tigris leo'' <small>Severtzov, 1858</small>
+* ''Leo nobilis'' <small>J. E. Gray, 1867</small>
+* ''Felis leo var. somaliensis'' <small>Noack, 1891</small>
+* ''Felis (Leo) somaliensis'' <small>Matschie, 1895</small>
+* ''Felis leo kamptzi'' <small>Matschie, 1900</small>
+* ''Felis leo massaicus'' <small>O. R. Neumann, 1900</small>
+* ''Felis leo massaica'' <small>Trouessart, 1904</small>
+* ''Felis leo persica'' <small>Trouessart, 1904</small>
+* ''Felis leo sabakiensis'' <small>Lönnberg, 1908</small>
+* ''Felis leo barbara'' <small>Lydekker, 1908</small>
+* ''Felis leo masaica'' <small>Lydekker, 1908</small>
+* ''Felis leo typica'' <small>Lydekker, 1908</small>
+* ''Felis (Leo) massaica'' <small>Berger, 1910</small>
+* ''Felis leo gujratensis'' <small>J. R. Ward, 1910</small>
+* ''Felis leo kamptsii'' <small>E. Brass, 1911</small>
+* ''Felis leo nyanzae'' <small>E. Heller, 1913</small>
+* ''Felis leo roosevelti'' <small>E. Heller, 1913</small>
+* ''Felis leo bleyenberghi'' <small>Lönnberg, 1914</small>
+* ''Leo leo azandicus'' <small>J. A. Allen, 1924</small>
+* ''Leo leo hollisteri'' <small>J. A. Allen, 1924</small>
+* ''Leo leo krugeri'' <small>A. Roberts, 1929</small>
+* ''Leo leo'' <small>M. Kretzoi, 1929</small>
+* ''Panthera leo'' <small>O. Thomas, 1929</small>
+* ''Panthera leo persica'' <small>Dollman, 1932</small>
+* ''Panthera leo krugeri'' <small>Shortridge, 1934</small>
+* ''Panthera leo melanochaitus'' <small>Shortridge, 1934</small>
+* ''Panthera leo sinhaleyus'' <small>Deraniyagala, 1939</small>
+* ''Panthera melanochaitus'' <small>Shortridge, 1942</small>
+* ''Leo leo vernayi'' <small>A. Roberts, 1948</small>
+* ''Panthera leo leo'' <small>Ellerman & Morrison-Scott, 1951</small>
+* ''Panthera leo webbiensis'' <small>Zukowsky, 1964</small>
+* ''Panthera leo azandica'' <small>Wozencraft, 2005</small>
+* ''Panthera leo bleyenberghi'' <small>Wozencraft, 2005</small>
+* ''Panthera leo hollisteri'' <small>Wozencraft, 2005</small>
+* ''Panthera leo kamptzi'' <small>Wozencraft, 2005</small>
+* ''Panthera leo massaica'' <small>Wozencraft, 2005</small>
+* ''Panthera leo melanochaita'' <small>Wozencraft, 2005</small>
+* ''Panthera leo nyanzae'' <small>Wozencraft, 2005</small>
+* ''Panthera leo senegalensis'' <small>Wozencraft, 2005</small>
+* ''Panthera leo nubica'' <small>D. E. Wilson & Mittermeier, 2009</small>
+}} }}
+{{Taxobox fin}}
