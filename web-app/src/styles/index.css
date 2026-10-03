@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@import "./tokens.css";
+@import "./base.css";
+@import "./ui.css";
+@import "../shell/shell.css";
+@import "../features/search/search.css";
+@import "../features/result/result.css";
+@import "../features/wikidata/wikidata.css";
+@import "../features/wikitext/wikitext.css";
+@import "../features/sources/sources.css";
+@import "../features/authors/authors.css";

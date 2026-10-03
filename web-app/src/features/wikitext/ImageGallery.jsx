@@ -1,16 +1,20 @@
-// Sous-onglet "Image" du bloc "Résultats" (voir App.jsx, wikitextSubTab === "image") : galerie de
-// suggestions Wikimedia Commons pour la taxobox, déjà filtrées côté serveur par licence
-// permissive et par distinction qualité/featured (voir organon/modules/commons_images/service.py)
-// — ce composant n'a plus qu'à afficher, jamais à re-filtrer.
+// "Image" sub-tab of the "Results" block (see App.jsx, wikitextSubTab
+// === "image"): gallery of Wikimedia Commons suggestions for the
+// taxobox, already filtered server-side by permissive license and
+// quality or featured distinction (see
+// organon/modules/commons_images/service.py). This component only
+// displays, never refilters.
 //
-// Deux actions distinctes par vignette, volontairement non conflictuelles : cliquer l'image
-// sélectionne le fichier pour la taxobox (`onSelect`), le lien "Voir sur Commons" à côté ouvre la
-// page du fichier dans un nouvel onglet sans rien sélectionner (stopPropagation + cible dédiée).
+// Two distinct actions per thumbnail, deliberately non-conflicting:
+// clicking the image selects the file for the taxobox (`onSelect`), the
+// "Voir sur Commons" link next to it opens the file page in a new tab
+// without selecting anything (stopPropagation and a dedicated target).
 //
-// La recherche elle-même est déclenchée côté App.jsx dès que le taxon est connu, pas ici : ce
-// sous-onglet est démonté/remonté à chaque bascule, un effet posé ici manquerait donc les
-// recherches lancées avant sa première ouverture. `cache` (indexé par taxon) peut donc déjà
-// contenir l'entrée en arrivant sur ce composant.
+// The search itself is triggered in App.jsx as soon as the taxon is
+// known, not here: this sub-tab is unmounted and remounted on each
+// switch, so an effect here would miss searches launched before its
+// first opening. `cache` (indexed by taxon) may thus already hold the
+// entry on arrival.
 export default function ImageGallery({ taxon, selectedFileName, onSelect, onDeselect, cache }) {
   const entry = taxon ? cache[taxon] : null;
 
@@ -54,9 +58,11 @@ export default function ImageGallery({ taxon, selectedFileName, onSelect, onDese
           const selected = s.file_name === selectedFileName;
           return (
             <div className={"image-card" + (selected ? " selected" : "")} key={s.file_name}>
-              {/* Le badge "Sélectionnée" devient le bouton de désélection : même emplacement,
-                  mais posé en dehors de image-card-thumb (imbriquer un bouton dans un autre
-                  bouton serait invalide en HTML). */}
+              {/*
+                 The "Sélectionnée" badge becomes the deselect button:
+                 same place, but not nested in the select button (a
+                 button in a button is invalid HTML).
+               */}
               <div className="image-card-thumb-wrap">
                 <button
                   type="button"

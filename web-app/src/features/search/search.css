@@ -1,0 +1,97 @@
+/* ---------- hero / search ---------- */
+
+.home-title em { color: inherit; }
+.home-title span { color: var(--accent); }
+
+/* position + pile d'empilement propres : le formulaire ne doit jamais peindre
+   par-dessus le panneau de résultat qui le suit, quelle que soit la largeur de
+   fenêtre (le select "Filtre" a longtemps été soupçonné de déborder dessus). */
+.console { position: relative; z-index: 1; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 22px; }
+.prompt { display: flex; align-items: center; gap: 10px; position: relative; }
+.prompt-glyph { font-family: var(--mono); color: var(--accent); font-size: 18px; }
+.autocomplete-dropdown {
+  list-style: none; margin: 6px 0 0; padding: 6px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  max-height: 320px; overflow-y: auto;
+}
+.autocomplete-dropdown li button {
+  width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; color: var(--ink);
+  background: none; border: none; border-radius: 6px; padding: 8px 10px; cursor: pointer;
+}
+.autocomplete-dropdown li button em { font-family: var(--serif); font-style: italic; }
+.autocomplete-dropdown li button:hover, .autocomplete-dropdown li button.highlighted { background: var(--bg-alt); }
+.console input[type="text"] {
+  flex: 1; background: transparent; border: none; font-family: var(--serif); font-style: italic;
+  font-size: 19px; color: var(--ink); padding: 8px 0; min-width: 0;
+}
+.console input[type="text"]:focus { outline: none; }
+.console input[type="text"]::placeholder { color: var(--ink-soft); font-style: normal; }
+.divider { height: 1px; background: var(--line); margin: 18px 0; }
+.params { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
+
+.example-row { margin-top: 14px; font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); }
+.example-row button { font: inherit; color: var(--amber); background: none; border: none; cursor: pointer; padding: 0; }
+.example-row button:hover { text-decoration: underline; }
+
+/* Champ unique de l'accueil et barre compacte de la fiche. */
+.prompt input:focus-visible { outline: none; }
+.prompt > .autocomplete-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 5; }
+.home-run { margin-left: 0; }
+.home-foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.home-foot .example-row { margin: 0; }
+.search-options-toggle {
+  font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); background: none; border: none; cursor: pointer;
+  padding: 10px 8px; min-height: 44px;
+}
+.search-options-toggle:hover { color: var(--accent); }
+.search-options { margin-top: 14px; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+.search-toggles { display: flex; align-items: center; }
+.search-info-bubble {
+  margin: 14px 0 0; padding: 12px 14px; max-width: 520px; font-family: var(--mono); font-size: 11.5px; line-height: 1.6;
+  color: var(--ink-soft); background: var(--bg-alt); border: 1px solid var(--line); border-radius: 8px;
+}
+.search-help { flex: 1 1 280px; margin: 0; font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--ink-soft); }
+.kept-row { margin-top: 20px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kept-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.kept-chip {
+  font-family: var(--serif); font-style: italic; font-size: 12.5px; color: var(--ink); background: var(--bg-alt);
+  border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px; min-height: 32px; cursor: pointer;
+}
+.kept-chip:hover { border-color: var(--accent); }
+.search-compact { position: relative; z-index: 1; }
+.search-compact-row { display: flex; gap: 12px; align-items: center; }
+.search-compact-field {
+  flex: 1; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 2px 8px 2px 14px;
+}
+.search-compact-field input[type="text"] {
+  flex: 1; min-width: 0; background: transparent; border: none; font-family: var(--serif); font-style: italic;
+  font-size: 17px; color: var(--ink); padding: 8px 0;
+}
+.search-compact-run { margin-left: 0; padding: 11px 20px; white-space: nowrap; }
+.search-compact .disambiguation { margin-top: 14px; }
+.search-compact .kept-row { margin-top: 12px; }
+
+/* ---------- désambiguïsation (recherche par nom vernaculaire / homonymie) ---------- */
+.disambiguation { position: relative; z-index: 2; margin-top: 24px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.disambiguation-title { margin: 0 0 12px; font-size: 13px; color: var(--ink-soft); }
+.disambiguation ul { list-style: none; margin: 0 0 14px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.disambiguation li button {
+  width: 100%; display: flex; align-items: center; gap: 10px; text-align: left; font: inherit; color: var(--ink);
+  background: var(--bg-alt); border: 1px solid var(--line); border-radius: 8px; padding: 10px 14px; cursor: pointer;
+}
+.disambiguation li button:hover { border-color: var(--accent); }
+.disambiguation li button em { font-family: var(--serif); font-style: italic; }
+.disambiguation-vernacular { font-size: 12px; color: var(--ink-soft); }
+.disambiguation-author { font-size: 12.5px; color: var(--ink-soft); }
+.disambiguation-empty { font-size: 13px; color: var(--ink-soft); margin: 0 0 14px; }
+.disambiguation-continue { display: block; margin: 0 0 14px; font-size: 13px; }
+
+.tree-connector { font-family: var(--mono); color: var(--ink-soft); }
+.disambiguation-footer { display: flex; align-items: center; justify-content: flex-end; gap: 12px; flex-wrap: wrap; }
+
+@media (max-width: 640px) {
+  .params { flex-direction: column; align-items: stretch; }
+  .search-compact-row { flex-wrap: wrap; }
+  .search-compact-run { width: 100%; min-height: 44px; }
+  .home-run { padding: 13px 14px; }
+}

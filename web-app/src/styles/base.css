@@ -1,0 +1,55 @@
+* { box-sizing: border-box; }
+
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+#root { min-height: 100svh; }
+
+.app { min-height: 100svh; position: relative; display: flex; flex-direction: column; }
+
+.app .scan {
+  position: fixed; inset: 0; pointer-events: none; opacity: 0.035; z-index: 0;
+  background-image: repeating-linear-gradient(0deg, #fff 0 1px, transparent 1px 3px);
+}
+:root[data-theme="light"] .app .scan { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .app .scan { display: none; }
+}
+
+.wrap { max-width: 1000px; margin: 0 auto; padding-inline: 24px; position: relative; z-index: 1; }
+
+/* Desktop: header and footer stay put, only .page-scroll scrolls; its
+   stable gutter keeps content from shifting between short and long
+   pages. Mobile: the window scrolls (screen too small to pin the footer). */
+.page-scroll { flex: 1; }
+@media (min-width: 641px) {
+  .app { height: 100svh; }
+  .page-scroll { min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+}
+@media (max-width: 640px) {
+  html { scrollbar-gutter: stable; }
+}
+
+main { padding: 48px 0 80px; }
+.eyebrow {
+  display: block;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
+}
+h1 {
+  font-family: var(--disp); font-weight: 600; font-size: 32px; letter-spacing: -0.01em; line-height: 1.2;
+  margin: 6px 0 32px; text-wrap: balance; color: var(--ink);
+}
+h1 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--accent); }
+
+@media (max-width: 640px) {
+  h1 { font-size: 26px; }
+}

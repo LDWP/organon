@@ -1,0 +1,131 @@
+/* ==========================================================================
+   Organon — système de design "Console" : palette sombre par défaut façon
+   poste de données scientifique, encadrés façon étiquette de collection pour
+   les champs domaine/classification, onglets qui changent réellement la
+   classification active.
+   ========================================================================== */
+
+:root {
+  --bg: #eef3f5;
+  --bg-alt: #e2eaed;
+  --card: #ffffff;
+  --card-hi: #f3f7f8;
+  --ink: #101b22;
+  --ink-soft: #4d6470;
+  --accent: #1a7a69;
+  --accent-ink: #eef8f6;
+  --amber: #8f5e1a;
+  --amber-ink: #fff6e9;
+  --line: #cbd8dd;
+  --danger: #b3403a;
+  --danger-bg: rgba(179, 64, 58, 0.12);
+
+  /* Éléments courants (page Sources) — une teinte par tag, palette inspirée de Wikimedia Codex */
+  --chip-auteur-bg: #e8eeff;   --chip-auteur-fg: #3056a9;
+  --chip-rang-bg: #f0ecf6;     --chip-rang-fg: #534fa3;
+  --chip-regne-bg: #f6ebeb;    --chip-regne-fg: #854848;
+  --chip-classif-bg: #dff2eb;  --chip-classif-fg: #196551;
+  --chip-vernac-bg: #f5ebf2;   --chip-vernac-fg: #82456a;
+  --chip-syno-bg: #ffead4;     --chip-syno-fg: #8e4424;
+  --chip-sst-bg: #e3f2e4;      --chip-sst-fg: #1f6631;
+  --chip-basio-bg: #fdf2d5;    --chip-basio-fg: #735421;
+  --chip-eteint-bg: #ffe9e5;   --chip-eteint-fg: #9f3526;
+  --chip-ident-bg: #eaecf0;    --chip-ident-fg: #404244;
+  --chip-projets-bg: #e6f4fb;  --chip-projets-fg: #1c6b8c;
+
+  --disp: "Bahnschrift", "Segoe UI Semibold", "Segoe UI", system-ui, sans-serif;
+  --sans: "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "Cascadia Code", Consolas, "SFMono-Regular", monospace;
+  --serif: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1720;
+    --bg-alt: #131e29;
+    --card: #141f2b;
+    --card-hi: #182533;
+    --ink: #e6edf3;
+    --ink-soft: #7c93a6;
+    --accent: #4fc3b0;
+    --accent-ink: #081815;
+    --amber: #e0a94a;
+    --amber-ink: #221604;
+    --line: #243441;
+    --danger: #e0736c;
+    --danger-bg: rgba(224, 115, 108, 0.14);
+
+    --chip-auteur-bg: #233566;  --chip-auteur-fg: #b6d4fb;
+    --chip-rang-bg: #353262;    --chip-rang-fg: #d9d0e9;
+    --chip-regne-bg: #512e2e;   --chip-regne-fg: #e8cecd;
+    --chip-classif-bg: #153d31; --chip-classif-fg: #aedfcd;
+    --chip-vernac-bg: #4e2c40;  --chip-vernac-fg: #e6cede;
+    --chip-syno-bg: #572c19;    --chip-syno-fg: #ffc894;
+    --chip-sst-bg: #183f20;     --chip-sst-fg: #b9debc;
+    --chip-basio-bg: #453217;   --chip-basio-fg: #ffcf4f;
+    --chip-eteint-bg: #612419;  --chip-eteint-fg: #ffc8bd;
+    --chip-ident-bg: #27292d;   --chip-ident-fg: #c8ccd1;
+    --chip-projets-bg: #163542; --chip-projets-fg: #8fd3ea;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1720;
+  --bg-alt: #131e29;
+  --card: #141f2b;
+  --card-hi: #182533;
+  --ink: #e6edf3;
+  --ink-soft: #7c93a6;
+  --accent: #4fc3b0;
+  --accent-ink: #081815;
+  --amber: #e0a94a;
+  --amber-ink: #221604;
+  --line: #243441;
+  --danger: #e0736c;
+  --danger-bg: rgba(224, 115, 108, 0.14);
+
+  --chip-auteur-bg: #233566;  --chip-auteur-fg: #b6d4fb;
+  --chip-rang-bg: #353262;    --chip-rang-fg: #d9d0e9;
+  --chip-regne-bg: #512e2e;   --chip-regne-fg: #e8cecd;
+  --chip-classif-bg: #153d31; --chip-classif-fg: #aedfcd;
+  --chip-vernac-bg: #4e2c40;  --chip-vernac-fg: #e6cede;
+  --chip-syno-bg: #572c19;    --chip-syno-fg: #ffc894;
+  --chip-sst-bg: #183f20;     --chip-sst-fg: #b9debc;
+  --chip-basio-bg: #453217;   --chip-basio-fg: #ffcf4f;
+  --chip-eteint-bg: #612419;  --chip-eteint-fg: #ffc8bd;
+  --chip-ident-bg: #27292d;   --chip-ident-fg: #c8ccd1;
+  --chip-projets-bg: #163542; --chip-projets-fg: #8fd3ea;
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --bg: #eef3f5;
+  --bg-alt: #e2eaed;
+  --card: #ffffff;
+  --card-hi: #f3f7f8;
+  --ink: #101b22;
+  --ink-soft: #4d6470;
+  --accent: #1a7a69;
+  --accent-ink: #eef8f6;
+  --amber: #8f5e1a;
+  --amber-ink: #fff6e9;
+  --line: #cbd8dd;
+  --danger: #b3403a;
+  --danger-bg: rgba(179, 64, 58, 0.12);
+
+  --chip-auteur-bg: #e8eeff;   --chip-auteur-fg: #3056a9;
+  --chip-rang-bg: #f0ecf6;     --chip-rang-fg: #534fa3;
+  --chip-regne-bg: #f6ebeb;    --chip-regne-fg: #854848;
+  --chip-classif-bg: #dff2eb;  --chip-classif-fg: #196551;
+  --chip-vernac-bg: #f5ebf2;   --chip-vernac-fg: #82456a;
+  --chip-syno-bg: #ffead4;     --chip-syno-fg: #8e4424;
+  --chip-sst-bg: #e3f2e4;      --chip-sst-fg: #1f6631;
+  --chip-basio-bg: #fdf2d5;    --chip-basio-fg: #735421;
+  --chip-eteint-bg: #ffe9e5;   --chip-eteint-fg: #9f3526;
+  --chip-ident-bg: #eaecf0;    --chip-ident-fg: #404244;
+  --chip-projets-bg: #e6f4fb;  --chip-projets-fg: #1c6b8c;
+  color-scheme: light;
+}

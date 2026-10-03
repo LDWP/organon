@@ -1,12 +1,12 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
-import { fetchSources } from "./apiClient.js";
+import { fetchSources } from "@/api/client.js";
 
-// Tags qui reviennent dans la plupart des sources ("courants") vs mentions propres à une seule
-// source ("spécifiques"). `startsWith` couvre les variantes qualifiées (ex. "identifiant Wikidata
-// (QID)", "chaîne de classification (genre → embranchement)") : la nuance entre parenthèses est
-// perdue, mais la source doit rester taguée comme fournissant bien cet élément. Chaque tag courant
-// a sa propre couleur (voir index.css, palette inspirée de Wikimedia Codex) pour rester scannable
-// même avec plusieurs tags par ligne.
+// Tags recurring in most sources ("common") vs mentions specific to one
+// source ("specific"). `startsWith` covers qualified variants (e.g.
+// "identifiant Wikidata (QID)"): the parenthesized nuance is lost, but
+// the source must stay tagged as providing that item. Each common tag
+// has its own color (see index.css, palette inspired by Wikimedia
+// Codex) to stay scannable with several tags per row.
 const FREQUENT_ELEMENTS = [
   { label: "Auteur", css: "chip-auteur", test: (s) => s.toLowerCase() === "auteur" },
   { label: "Rang", css: "chip-rang", test: (s) => s.toLowerCase() === "rang" },
@@ -21,54 +21,58 @@ const FREQUENT_ELEMENTS = [
   { label: "Autres projets", css: "chip-projets", test: (s) => s.toLowerCase() === "autres projets" },
 ];
 
-// Regroupement de "Méthode d'accès" pour le rendre triable — suit acces.type, une énumération
-// propre côté backend (voir organon/core/db_inventory.py). Le détail brut ("API REST/JSON
-// (checklistbank.org, dataset 3LXR...)") devient redondant une fois ce marqueur affiché ; il
-// reste consultable en infobulle au survol plutôt que de réencombrer la cellule.
+// Grouping of "Méthode d'accès" to make it sortable; follows
+// access.type, a backend enumeration (see
+// organon/core/db_inventory.py). The raw detail ("API REST/JSON
+// (checklistbank.org, dataset 3LXR...)") is redundant once this marker
+// is shown; it stays in a hover tooltip rather than clutter the cell
+// again.
 const ACCESS_GROUPS = [
-  { label: "API REST", test: (s) => s.acces.type === "api_rest" },
-  { label: "SOAP", test: (s) => s.acces.type === "soap" },
-  { label: "Scraping HTML", test: (s) => s.acces.type === "scraping" },
-  { label: "Vérification HTTP", test: (s) => s.acces.type === "verification_http" },
-  { label: "Export de données", test: (s) => s.acces.type === "export" },
-  { label: "Contact requis", test: (s) => s.acces.type === "contact_requis" },
+  { label: "API REST", test: (s) => s.access.type === "api_rest" },
+  { label: "SOAP", test: (s) => s.access.type === "soap" },
+  { label: "Scraping HTML", test: (s) => s.access.type === "scraping" },
+  { label: "Vérification HTTP", test: (s) => s.access.type === "verification_http" },
+  { label: "Export de données", test: (s) => s.access.type === "export" },
+  { label: "Contact requis", test: (s) => s.access.type === "contact_requis" },
 ];
 
 function accessGroupLabel(source) {
   return (ACCESS_GROUPS.find((g) => g.test(source)) ?? { label: "Autre" }).label;
 }
 
-// Une source peut couvrir plusieurs sites/usages distincts sous un même module (même id, même
-// statut/accès) — ex. le module `externe` couvre Wikidata, Commons, Wikispecies, Wiktionnaire et
-// fr.wikipedia.org. Le détail par site vient alors de `source.volets` (db_inventory.yaml), pas
-// d'une déduction sur le texte de `elements_recoltes` : une ligne par volet, avec le nom/url
-// propres à celui-ci et le reste hérité de la source parente.
-function expandVolets(source) {
-  if (!source.volets?.length) return [source];
-  return source.volets.map((volet, i) => ({
+// A source may cover several distinct sites or usages under one module
+// (same id, status and access): e.g. the `externe` module covers
+// Wikidata, Commons, Wikispecies, Wiktionary and fr.wikipedia.org. The
+// per-site detail then comes from `source.facets` (db_inventory.yaml),
+// not from a deduction on the text of `harvested_items`: one row per
+// facet, with its own name and url and the rest inherited from the
+// parent source.
+function expandParts(source) {
+  if (!source.facets?.length) return [source];
+  return source.facets.map((part, i) => ({
     ...source,
     id: `${source.id}-${i}`,
-    nom: volet.nom,
-    url: volet.url,
-    elements_recoltes: volet.elements_recoltes,
+    name: part.name,
+    url: part.url,
+    harvested_items: part.harvested_items,
   }));
 }
 
 function splitElements(list) {
-  const courants = [];
-  const specifiques = [];
+  const common = [];
+  const specific = [];
   for (const raw of list) {
     const hit = FREQUENT_ELEMENTS.find((f) => f.test(raw));
     if (hit) {
-      if (!courants.includes(hit)) courants.push(hit);
+      if (!common.includes(hit)) common.push(hit);
     } else {
-      specifiques.push(raw);
+      specific.push(raw);
     }
   }
-  return { courants, specifiques };
+  return { common, specific };
 }
 
-const STATUT_LABELS = {
+const STATUS_LABELS = {
   en_attente: "module prêt, en attente de configuration (clé/compte)",
   non_sonde: "non sondée / à revérifier",
   bloque_temporaire: "bloquée temporairement",
@@ -86,7 +90,7 @@ function formatDateFr(iso) {
 }
 
 function SourceName({ source }) {
-  const label = source.is_default ? `${source.nom} (défaut)` : source.nom;
+  const label = source.is_default ? `${source.name} (défaut)` : source.name;
   if (!source.url) return <span>{label}</span>;
   return (
     <a href={source.url} target="_blank" rel="noopener noreferrer">
@@ -96,13 +100,13 @@ function SourceName({ source }) {
 }
 
 function ClassificationCell({ classification }) {
-  if (!classification.possible) {
+  if (!classification.can_classify) {
     return <span className="source-muted">non</span>;
   }
   return (
     <span>
       oui
-      {classification.estime && <span className="source-badge source-badge-warn">estimé</span>}
+      {classification.estimated && <span className="source-badge source-badge-warn">estimé</span>}
     </span>
   );
 }
@@ -121,11 +125,11 @@ function SourcesHeader({ onBack, children }) {
 
 function sortComparator(key, dir) {
   return (a, b) => {
-    const av = key === "nb_courants" ? a[key] : String(a[key]).toLowerCase();
-    const bv = key === "nb_courants" ? b[key] : String(b[key]).toLowerCase();
+    const av = key === "commonCount" ? a[key] : String(a[key]).toLowerCase();
+    const bv = key === "commonCount" ? b[key] : String(b[key]).toLowerCase();
     if (av < bv) return -1 * dir;
     if (av > bv) return 1 * dir;
-    return a.nom.localeCompare(b.nom);
+    return a.name.localeCompare(b.name);
   };
 }
 
@@ -143,7 +147,7 @@ function SortableHeader({ label, sortKey, sort, onSort }) {
 export default function SourcesPage({ onBack }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [sort, setSort] = useState({ key: "nom", dir: 1 });
+  const [sort, setSort] = useState({ key: "name", dir: 1 });
   const [collapsed, setCollapsed] = useState({});
 
   useEffect(() => {
@@ -165,42 +169,43 @@ export default function SourcesPage({ onBack }) {
 
     const categories = data.categories
       .map((category) => ({
-        nom: category.nom,
-        sources: category.sources.filter((s) => s.statut === "disponible").flatMap(expandVolets),
+        name: category.name,
+        sources: category.sources.filter((s) => s.status === "disponible").flatMap(expandParts),
       }))
       .filter((category) => category.sources.length > 0);
 
     return categories.map((category) => ({
-      nom: category.nom,
+      name: category.name,
       sources: category.sources.map((s) => {
-        const { courants, specifiques } = splitElements(s.elements_recoltes);
+        const { common, specific } = splitElements(s.harvested_items);
         return {
           ...s,
-          categorie: category.nom,
-          courants,
-          specifiques,
-          nb_courants: courants.length,
-          acces_group: accessGroupLabel(s),
+          category: category.name,
+          common,
+          specific,
+          commonCount: common.length,
+          accessGroup: accessGroupLabel(s),
         };
       }),
     }));
   }, [data]);
 
-  const nonDisponibles = useMemo(() => {
+  const unavailable = useMemo(() => {
     if (!data) return [];
-    return data.categories.flatMap((category) => category.sources).filter((s) => s.statut !== "disponible");
+    return data.categories.flatMap((category) => category.sources).filter((s) => s.status !== "disponible");
   }, [data]);
 
-  // "retire" = intégrée un temps puis débranchée volontairement (voir la sémantique du statut
-  // dans db_inventory.yaml) : jamais "considérée" au même titre que le reste des indisponibles
-  // (jamais évaluée, écartée...), donc comptée et listée à part.
-  const archivees = useMemo(
-    () => nonDisponibles.filter((s) => s.statut === "retire").sort((a, b) => a.nom.localeCompare(b.nom, "fr")),
-    [nonDisponibles]
+  // "retire" = integrated for a while then deliberately unplugged (see
+  // the status semantics in db_inventory.yaml): never "considered" like
+  // the other unavailable ones (never evaluated, discarded...), so
+  // counted and listed apart.
+  const archived = useMemo(
+    () => unavailable.filter((s) => s.status === "retire").sort((a, b) => a.name.localeCompare(b.name, "fr")),
+    [unavailable]
   );
-  const considerees = useMemo(
-    () => nonDisponibles.filter((s) => s.statut !== "retire").sort((a, b) => a.nom.localeCompare(b.nom, "fr")),
-    [nonDisponibles]
+  const considered = useMemo(
+    () => unavailable.filter((s) => s.status !== "retire").sort((a, b) => a.name.localeCompare(b.name, "fr")),
+    [unavailable]
   );
 
   if (error) {
@@ -219,12 +224,13 @@ export default function SourcesPage({ onBack }) {
     );
   }
 
-  // Nombre d'entrées yaml "disponible" avant l'éclatement en volets (voir `grouped` ci-dessus) —
-  // sinon le titre grimperait dès qu'une source à volets (ex. `externe`) est affichée en
-  // plusieurs lignes, sans rapport avec le nombre réel de modules distincts. Même calcul que le
-  // badge de l'en-tête (App.jsx), pour que les deux nombres restent toujours identiques.
-  const totalDisponibles = data.categories.reduce(
-    (n, c) => n + c.sources.filter((s) => s.statut === "disponible").length,
+  // Number of "disponible" yaml entries before the split into facets
+  // (see `grouped` above); otherwise the title would grow as soon as a
+  // multi-facet source (e.g. `externe`) shows on several rows,
+  // unrelated to the real number of distinct modules. Same count as the
+  // header badge (App.jsx), so both numbers always match.
+  const totalAvailable = data.categories.reduce(
+    (n, c) => n + c.sources.filter((s) => s.status === "disponible").length,
     0
   );
   const cmp = sortComparator(sort.key, sort.dir);
@@ -232,18 +238,18 @@ export default function SourcesPage({ onBack }) {
   function handleSort(key) {
     setSort((prev) => ({
       key,
-      dir: prev.key === key ? -prev.dir : key === "nb_courants" ? -1 : 1,
+      dir: prev.key === key ? -prev.dir : key === "commonCount" ? -1 : 1,
     }));
   }
 
-  function toggleGroup(categorie) {
-    setCollapsed((prev) => ({ ...prev, [categorie]: !prev[categorie] }));
+  function toggleGroup(category) {
+    setCollapsed((prev) => ({ ...prev, [category]: !prev[category] }));
   }
 
   return (
     <SourcesHeader onBack={onBack}>
-      <h1>{totalDisponibles} sources disponibles</h1>
-      <p className="sources-updated">Liste mise à jour le {formatDateFr(data.derniere_maj)}</p>
+      <h1>{totalAvailable} sources disponibles</h1>
+      <p className="sources-updated">Liste mise à jour le {formatDateFr(data.last_updated)}</p>
 
       <section className="sources-section">
         <h2>Disponibles</h2>
@@ -264,38 +270,38 @@ export default function SourcesPage({ onBack }) {
           <table className="sources-table">
             <thead>
               <tr>
-                <SortableHeader label="Source" sortKey="nom" sort={sort} onSort={handleSort} />
+                <SortableHeader label="Source" sortKey="name" sort={sort} onSort={handleSort} />
                 <SortableHeader label="Classification" sortKey="classif" sort={sort} onSort={handleSort} />
-                <SortableHeader label="Éléments courants" sortKey="nb_courants" sort={sort} onSort={handleSort} />
+                <SortableHeader label="Éléments courants" sortKey="commonCount" sort={sort} onSort={handleSort} />
                 <th>Éléments spécifiques</th>
-                <SortableHeader label="Méthode d'accès" sortKey="acces_group" sort={sort} onSort={handleSort} />
+                <SortableHeader label="Méthode d'accès" sortKey="accessGroup" sort={sort} onSort={handleSort} />
               </tr>
             </thead>
             <tbody>
               {grouped.map((category) => {
-                const isCollapsed = !!collapsed[category.nom];
+                const isCollapsed = !!collapsed[category.name];
                 const rows = [...category.sources]
-                  .map((s) => ({ ...s, classif: s.classification.possible ? (s.classification.estime ? "oui (estimé)" : "oui") : "non" }))
+                  .map((s) => ({ ...s, classif: s.classification.can_classify ? (s.classification.estimated ? "oui (estimé)" : "oui") : "non" }))
                   .sort(cmp);
                 return (
-                  <Fragment key={category.nom}>
+                  <Fragment key={category.name}>
                     <tr
                       className={`group-head${isCollapsed ? " collapsed" : ""}`}
                       role="button"
                       tabIndex={0}
                       aria-expanded={!isCollapsed}
-                      onClick={() => toggleGroup(category.nom)}
+                      onClick={() => toggleGroup(category.name)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          toggleGroup(category.nom);
+                          toggleGroup(category.name);
                         }
                       }}
                     >
                       <td colSpan={5}>
                         <span className="group-toggle">
                           <span className="group-chev">▾</span>
-                          {category.nom}
+                          {category.name}
                         </span>
                         <span className="group-count">
                           {" "}
@@ -313,9 +319,9 @@ export default function SourcesPage({ onBack }) {
                             <ClassificationCell classification={source.classification} />
                           </td>
                           <td>
-                            {source.courants.length ? (
+                            {source.common.length ? (
                               <div className="chip-row">
-                                {source.courants.map((c) => (
+                                {source.common.map((c) => (
                                   <span key={c.label} className={`chip ${c.css}`}>
                                     {c.label}
                                   </span>
@@ -326,8 +332,8 @@ export default function SourcesPage({ onBack }) {
                             )}
                           </td>
                           <td>
-                            {source.specifiques.length ? (
-                              source.specifiques.map((sp) => (
+                            {source.specific.length ? (
+                              source.specific.map((sp) => (
                                 <span key={sp} className="specifique-text">
                                   {sp}
                                 </span>
@@ -337,8 +343,8 @@ export default function SourcesPage({ onBack }) {
                             )}
                           </td>
                           <td>
-                            <span className="access-chip" title={source.acces.detail}>
-                              {source.acces_group}
+                            <span className="access-chip" title={source.access.detail}>
+                              {source.accessGroup}
                             </span>
                           </td>
                         </tr>
@@ -355,24 +361,24 @@ export default function SourcesPage({ onBack }) {
         <h2>Non disponibles</h2>
         <div className="considered-list">
           <p>
-            {considerees.length} source{considerees.length > 1 ? "s" : ""} considérée{considerees.length > 1 ? "s" : ""} :{" "}
-            {considerees.map((s, i) => (
+            {considered.length} source{considered.length > 1 ? "s" : ""} considérée{considered.length > 1 ? "s" : ""} :{" "}
+            {considered.map((s, i) => (
               <span key={s.id}>
                 {s.url ? (
-                  <a href={s.url} target="_blank" rel="noopener noreferrer" title={STATUT_LABELS[s.statut] || s.statut}>
-                    {s.nom}
+                  <a href={s.url} target="_blank" rel="noopener noreferrer" title={STATUS_LABELS[s.status] || s.status}>
+                    {s.name}
                   </a>
                 ) : (
-                  <span title={STATUT_LABELS[s.statut] || s.statut}>{s.nom}</span>
+                  <span title={STATUS_LABELS[s.status] || s.status}>{s.name}</span>
                 )}
-                {i < considerees.length - 1 && <span className="sep">, </span>}
+                {i < considered.length - 1 && <span className="sep">, </span>}
               </span>
             ))}
           </p>
-          {archivees.length > 0 && (
+          {archived.length > 0 && (
             <p className="sources-archived">
-              {archivees.length} source{archivees.length > 1 ? "s" : ""} archivée
-              {archivees.length > 1 ? "s" : ""} : {archivees.map((s) => s.nom).join(", ")}
+              {archived.length} source{archived.length > 1 ? "s" : ""} archivée
+              {archived.length > 1 ? "s" : ""} : {archived.map((s) => s.name).join(", ")}
             </p>
           )}
         </div>

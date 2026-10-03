@@ -1,0 +1,43 @@
+/* ---------- header ---------- */
+.app header { border-bottom: 1px solid var(--line); }
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 0; }
+.brand { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; }
+.brand img { height: 30px; width: auto; display: block; }
+.brand a.footer-link, .brand .auth-status { color: var(--ink-soft); }
+.brand a.footer-link:hover { color: var(--accent); }
+.status {
+  font-family: var(--mono); font-size: 11px; color: var(--ink-soft); display: flex; align-items: center; gap: 8px;
+  background: none; border: none; padding: 4px; cursor: pointer;
+}
+.status:hover .live { text-decoration: underline; }
+.status .live { color: var(--accent); display: flex; align-items: center; gap: 6px; }
+.status .live::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.icon-btn {
+  appearance: none; border: 1px solid var(--line); background: var(--bg-alt); color: var(--ink);
+  width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn:disabled { opacity: 0.5; cursor: default; }
+
+.connect-gate-desc { margin: 0 0 14px; font-size: 14px; line-height: 1.6; color: var(--ink); max-width: 560px; }
+.connect-gate-desc:last-of-type { margin-bottom: 22px; }
+.connect-gate-cta { display: inline-block; text-decoration: none; }
+
+footer { padding: 12px 0; border-top: 1px solid var(--line); }
+footer p { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); margin: 0; }
+footer .footer-meta a { color: var(--ink-soft); text-decoration: none; }
+footer .footer-meta a:hover { color: var(--accent); text-decoration: underline; }
+footer .footer-meta span[title] { cursor: help; border-bottom: 1px dotted var(--line); }
+
+/* ---------- bandeau consentement stockage local ---------- */
+.storage-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 10; max-width: 640px; margin: 0 auto;
+  background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); display: flex; flex-direction: column; gap: 12px;
+}
+.storage-banner p { margin: 0; font-size: 12.5px; line-height: 1.6; color: var(--ink); }
+.storage-actions { display: flex; gap: 10px; justify-content: flex-end; }

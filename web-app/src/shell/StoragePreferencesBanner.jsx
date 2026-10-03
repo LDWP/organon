@@ -1,9 +1,10 @@
-// Icônes façon Iconoir "cookie"/"half-cookie" (pleine = stockage local accepté, mi-pleine =
-// refusé), redessinées en SVG inline (même style trait que les icônes de App.jsx) plutôt que
-// dépendre du paquet Iconoir pour deux icônes.
+// Icons in the Iconoir "cookie" and "half-cookie" style (full = local
+// storage accepted, half = refused), redrawn as inline SVG (same stroke
+// style as the App.jsx icons) rather than depend on the Iconoir package
+// for two icons.
 //
-// Fichier nommé "StoragePreferences" plutôt que "CookieConsent" volontairement : voir
-// storagePreferences.js pour la raison (neutralité vis-à-vis des bloqueurs de publicité).
+// The file is named "StoragePreferences" rather than "CookieConsent" on
+// purpose: see storagePreferences.js (neutrality towards ad blockers).
 function AcceptedIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

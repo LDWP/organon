@@ -1,0 +1,76 @@
+/* ---------- sources page ---------- */
+
+.sources-page h1 { font-family: var(--disp); font-size: 24px; margin: 6px 0 8px; }
+.sources-updated { font-family: var(--mono); font-size: 12.5px; color: var(--ink-soft); margin: 0 0 32px; }
+
+.sources-section { margin-bottom: 40px; }
+.sources-section h2 { font-family: var(--disp); font-size: 16px; margin: 0 0 4px; }
+.sources-section .section-sub { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 16px; max-width: 640px; line-height: 1.5; }
+
+.table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+.sources-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.sources-table th {
+  text-align: left; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--ink-soft); border-bottom: 1px solid var(--line); padding: 9px 12px; background: var(--bg-alt);
+}
+.sources-table th.sortable button {
+  font: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; background: none; border: none;
+  padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+}
+.sources-table th.sortable button:hover, .sources-table th.sortable button.sort-active { color: var(--ink); }
+.sort-arrow { display: inline-block; width: 11px; font-size: 12px; }
+.sources-table td { padding: 9px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.sources-table tbody tr:last-child td { border-bottom: none; }
+.sources-table a { color: var(--accent); text-decoration: none; }
+.sources-table a:hover { text-decoration: underline; }
+
+.color-legend {
+  display: flex; flex-wrap: wrap; gap: 7px 10px; align-items: center; margin: 0 0 16px;
+  padding: 10px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+}
+.color-legend-title {
+  flex-basis: 100%; font-family: var(--mono); font-size: 11.5px; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--ink-soft);
+}
+
+.group-head { cursor: pointer; }
+.group-head td {
+  background: var(--bg-alt); font-family: var(--sans); font-weight: 600; font-size: 14px; padding: 9px 12px;
+}
+.group-head:hover td { background: var(--card-hi); }
+.group-toggle { display: inline-flex; align-items: center; gap: 8px; }
+.group-chev { display: inline-block; font-size: 15px; line-height: 1; color: var(--ink); transition: transform 0.15s ease; }
+.group-head.collapsed .group-chev { transform: rotate(-90deg); }
+.group-count { color: var(--ink-soft); font-family: var(--mono); font-weight: normal; font-size: 12.5px; }
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; max-width: 300px; }
+
+
+.specifique-text { color: var(--ink-soft); font-style: italic; font-size: 13.5px; max-width: 240px; display: block; }
+.none-cell { color: var(--ink-soft); }
+
+.access-chip {
+  display: inline-block; font-size: 12.5px; font-weight: 600; padding: 3px 9px; border-radius: 4px;
+  background: var(--bg-alt); color: var(--ink-soft); border: 1px solid var(--line); cursor: help;
+}
+
+.considered-list {
+  background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px;
+  font-size: 14.5px; line-height: 1.9;
+}
+.considered-list p { margin: 0; }
+.considered-list p + p { margin-top: 12px; }
+.considered-list a { color: var(--accent); text-decoration: none; border-bottom: 1px dotted var(--line); }
+.considered-list a:hover { border-bottom-color: var(--accent); }
+.considered-list [title] { cursor: help; }
+.considered-list .sep { color: var(--ink-soft); }
+
+.sources-archived { font-size: 13px; color: var(--ink-soft); line-height: 1.7; }
+
+.source-muted { color: var(--ink-soft); }
+
+.source-badge {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase;
+  padding: 2px 7px; border-radius: 999px; margin-left: 6px; display: inline-block;
+}
+.source-badge-warn { background: var(--amber); color: var(--amber-ink); }

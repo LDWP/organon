@@ -1,0 +1,5 @@
+.authors-entry { margin-bottom: 28px; max-width: 620px; }
+.authors-entry h2 { font-family: var(--disp); font-size: 17px; margin: 0 0 8px; }
+.authors-entry p { font-size: 13.5px; line-height: 1.7; color: var(--ink); margin: 0 0 8px; }
+.authors-entry a, .authors-entry .footer-link { color: var(--accent); text-decoration: none; }
+.authors-entry a:hover, .authors-entry .footer-link:hover { text-decoration: underline; }

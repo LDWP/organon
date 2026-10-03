@@ -1,0 +1,150 @@
+.field-box { border: 1px solid var(--line); border-radius: 8px; background: var(--bg-alt); padding: 8px 12px; min-width: min(170px, 100%); }
+.field-box .field-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft);
+  display: block; margin-bottom: 4px;
+}
+.field-box select {
+  width: 100%; font-family: var(--disp); font-size: 13.5px; color: var(--ink); background: var(--bg-alt);
+  border: none; padding: 2px 0 0;
+}
+.field-box select:focus { outline: none; }
+.field-box select option { background: var(--bg-alt); color: var(--ink); }
+.run {
+  margin-left: auto; align-self: center; font-family: var(--disp); font-weight: 600; font-size: 13px; letter-spacing: 0.03em;
+  background: var(--accent); color: var(--accent-ink); border: none; padding: 13px 22px; border-radius: 8px; cursor: pointer;
+}
+.run:hover { filter: brightness(1.1); }
+.run:disabled { opacity: 0.6; cursor: default; filter: none; }
+
+@media (max-width: 640px) {
+  .run { margin-left: 0; }
+}
+
+.chip {
+  font-family: var(--mono); font-size: 11px; border-radius: 999px; padding: 3px 10px; white-space: nowrap; display: inline-block;
+}
+.chip-creer { background: var(--chip-auteur-bg); color: var(--chip-auteur-fg); }
+.chip-reviser { background: var(--chip-basio-bg); color: var(--chip-basio-fg); }
+.chip-completer { background: var(--chip-classif-bg); color: var(--chip-classif-fg); }
+.chip-neutre { background: var(--chip-ident-bg); color: var(--chip-ident-fg); }
+
+.error-banner {
+  margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: var(--danger-bg); color: var(--danger);
+  font-size: 13px; border: 1px solid color-mix(in srgb, var(--danger) 35%, transparent);
+}
+
+.id-badge-rank { background: var(--bg-alt); color: var(--ink-soft); border: 1px solid var(--line); }
+
+.id-badge {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent-ink); background: var(--accent); padding: 3px 9px; border-radius: 999px;
+}
+.id-badge-eteint { background: var(--ink-soft); color: var(--card); }
+.id-badge-clickable { border: none; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+
+.tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.tab {
+  font-family: var(--disp); font: inherit; font-size: 13px; font-weight: 600; color: var(--ink-soft);
+  background: none; border: none; cursor: pointer; padding: 10px 4px; margin-right: 22px;
+  border-bottom: 2px solid transparent; margin-bottom: -1px; display: flex; align-items: center; gap: 7px;
+}
+.tab.on { color: var(--ink); border-color: var(--accent); }
+.tab:hover { color: var(--ink); }
+.tab:disabled { opacity: 0.45; cursor: default; }
+
+.id-badge-btn { border: none; cursor: pointer; font: inherit; }
+.id-badge-btn:hover { filter: brightness(1.08); }
+.id-badge-btn.on { outline: 2px solid var(--ink); outline-offset: 1px; }
+.id-badge-conflict { background: var(--amber); color: var(--amber-ink); }
+.id-badge-conflict.on { outline-color: var(--amber); }
+.classification-compare-table th { vertical-align: middle; }
+.conflict-cell { background: color-mix(in srgb, var(--amber) 16%, transparent); }
+.chosen-col { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.classification-compare-table tbody th abbr { text-decoration-color: var(--ink-soft); cursor: help; }
+/* Largeurs figées pour tenir dans le cadre sans défilement horizontal (les deux tableaux de
+   comparaison — Taxobox et Classification par source — partagent cette base) : la colonne
+   libellé a une largeur fixe, les colonnes source se partagent le reste à parts égales
+   (table-layout: fixed ne calcule les largeurs que sur la 1ʳᵉ ligne). */
+.classification-compare-wrap { overflow-x: visible; }
+.classification-compare-table { table-layout: fixed; }
+.classification-compare-table th:first-child, .classification-compare-table td:first-child { width: 110px; }
+.classification-compare-table td { overflow-wrap: break-word; }
+/* Colonne "gérer" (case à cocher seule) — uniquement le tableau Taxobox, qui a une colonne de
+   fin dédiée au désaccord ; le tableau Classification par source n'en a pas, sa dernière colonne
+   est une vraie colonne de données et ne doit pas être réduite. */
+.classification-compare-table--managed th:last-child, .classification-compare-table--managed td:last-child { width: 28px; padding-left: 2px; padding-right: 2px; }
+
+.panel { background: var(--card); border: 1px solid var(--line); border-top: none; border-radius: 0 0 12px 12px; overflow: hidden; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--line); background: var(--card-hi); flex-wrap: wrap; }
+.panel-head .t { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
+.panel-head-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.edit-btn {
+  font-family: var(--mono); font-size: 11px; color: var(--amber); background: none; border: 1px solid var(--amber);
+  border-radius: 5px; padding: 4px 9px; cursor: pointer;
+}
+.edit-btn:hover { background: var(--amber); color: var(--amber-ink); }
+.edit-btn[aria-pressed="true"] { background: var(--amber); color: var(--amber-ink); }
+
+.banner {
+  display: flex; align-items: center; gap: 8px; margin: 0; padding: 9px 16px; font-family: var(--mono); font-size: 11.5px;
+  background: color-mix(in srgb, var(--amber) 14%, transparent); color: var(--amber); border-bottom: 1px solid var(--line);
+}
+.panel-empty { padding: 28px 16px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+.panel-loading { padding: 28px 16px; text-align: center; color: var(--ink-soft); font-family: var(--mono); font-size: 12px; }
+
+.data-table-title {
+  margin: 16px 16px 4px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--ink-soft); font-weight: 600;
+}
+.data-table-wrap:first-of-type .data-table-title { margin-top: 4px; }
+
+.data-table-wrap { padding: 4px 16px 16px; overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.data-table th {
+  text-align: left; font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--ink-soft); padding: 8px 10px; border-bottom: 1px solid var(--line);
+}
+.data-table td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.data-table td:first-child { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+/* `display:flex` posé directement sur un `<td>` casse sa participation à la ligne de table (la
+   cellule suivante retombe sur une nouvelle ligne) — le flex va donc sur ce wrapper interne
+   plutôt que sur la cellule elle-même (pastille+lien de la 1ʳᵉ colonne, message+bouton Réessayer
+   de la 2ᵉ, onglet Données). */
+.data-table-cell-flex { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
+.data-table-duration { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.data-table a {
+  font-family: var(--mono); font-size: 11.5px; color: var(--accent); text-decoration: none; border: 1px solid var(--line);
+  border-radius: 5px; padding: 3px 8px;
+}
+.data-table a:hover { border-color: var(--accent); }
+
+.footer-link {
+  font: inherit; color: var(--ink-soft); background: none; border: none; padding: 0; cursor: pointer;
+  text-decoration: underline; text-decoration-style: dotted;
+}
+.footer-link:hover { color: var(--accent); }
+
+.back-link {
+  font-family: var(--mono); font-size: 12px; color: var(--ink-soft); background: none; border: none;
+  padding: 0; margin-bottom: 20px; cursor: pointer; display: block;
+}
+.back-link:hover { color: var(--accent); }
+
+.chip { font-size: 12.5px; padding: 3px 9px; border-radius: 4px; white-space: nowrap; font-weight: 600; }
+.chip-auteur { background: var(--chip-auteur-bg); color: var(--chip-auteur-fg); }
+.chip-rang { background: var(--chip-rang-bg); color: var(--chip-rang-fg); }
+.chip-regne { background: var(--chip-regne-bg); color: var(--chip-regne-fg); }
+.chip-classif { background: var(--chip-classif-bg); color: var(--chip-classif-fg); }
+.chip-vernac { background: var(--chip-vernac-bg); color: var(--chip-vernac-fg); }
+.chip-syno { background: var(--chip-syno-bg); color: var(--chip-syno-fg); }
+.chip-sst { background: var(--chip-sst-bg); color: var(--chip-sst-fg); }
+.chip-basio { background: var(--chip-basio-bg); color: var(--chip-basio-fg); }
+.chip-eteint { background: var(--chip-eteint-bg); color: var(--chip-eteint-fg); }
+.chip-ident { background: var(--chip-ident-bg); color: var(--chip-ident-fg); }
+.chip-projets { background: var(--chip-projets-bg); color: var(--chip-projets-fg); }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
