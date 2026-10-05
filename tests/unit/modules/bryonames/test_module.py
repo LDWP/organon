@@ -80,7 +80,6 @@ async def test_bryonames_enrichment_only_accepted_species():
     assert data["name"] == "Sphagnum palustre"
     assert data["author"] == "L."
     assert data["rank"] == "espèce"
-    assert data["link"] == "https://www.tropicos.org/name/35001500"
     assert "synonyme" not in data
     # Enrichissement seul : pas d'effet sur la classification.
     assert result.classification == ""
@@ -89,13 +88,44 @@ async def test_bryonames_enrichment_only_accepted_species():
     bioref = module.render_bioref(result)
     assert bioref == (
         "{{Lien web | langue=en | titre=''Sphagnum palustre'' L. | "
-        "url=https://www.tropicos.org/name/35001500 | site=Bryonames | consulté le="
+        "url=https://www.bryonames.org/nomenclator?group=Sphagnum%20palustre | site=Bryonames | consulté le="
         + bioref.rsplit("=", 1)[1]
     )
     assert module.debug_link(result) == (
-        "<a href='https://www.tropicos.org/name/35001500' "
+        "<a href='https://www.bryonames.org/nomenclator?group=Sphagnum%20palustre' "
         "target='_blank' rel='noopener noreferrer'>Bryonames</a>"
     )
+
+
+@pytest.mark.asyncio
+async def test_bryonames_link_family_uses_nomenclator_not_tropicos():
+    payload = {
+        "result": [
+            {
+                "id": "1",
+                "usage": {
+                    "status": "accepted",
+                    "name": {
+                        "scientificName": "Blasiaceae",
+                        "authorship": "H.Klinggr.",
+                        "rank": "family",
+                        "link": "https://www.tropicos.org/name/35002602",
+                    },
+                },
+            }
+        ]
+    }
+    with respx.mock(assert_all_called=False) as router:
+        router.get(SEARCH_URL, params={"q": "Blasiaceae"}).respond(200, json=payload)
+        module = BryonamesModule(adapter=ChecklistBankAdapter("170394"))
+        struct = Struct(taxon=TaxonInfo(name="Blasiaceae", rank="famille"), kingdom="végétal")
+        result = await module.collect(struct, is_classification=False, options=GenerateOptions())
+
+    assert result is not None
+    url = "https://www.bryonames.org/nomenclator?group=Blasiaceae"
+    assert f"url={url} " in module.render_bioref(result)
+    assert f"<a href='{url}'" in module.debug_link(result)
+    assert "tropicos" not in module.render_bioref(result)
 
 
 @pytest.mark.asyncio

@@ -433,8 +433,8 @@ categories:
         classification: {can_classify: true, estimated: false, detail: "classification des bryophytes (mousses, hépatiques, anthocérotes) seulement — domaine 'végétal' faute de sous-domaine dédié dans l'arbre Organon, comme POWO"}
         harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
         access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 170394, alias « Bryonames », DOI 10.48580/d8zmp) — même plateforme et même schéma que le module col"}
-        last_updated: "2026-09-11"
-        notes: "Le site bryonames.org lui-même est derrière un challenge JS Cloudflare (bloqué même en navigateur automatisé réel, testé en direct) ; les données sont cependant distribuées sans restriction via ChecklistBank, qui sert le module à la place. La page web publique du dataset sur checklistbank.org est elle aussi derrière un contrôle anti-bot (403 même en navigateur automatisé) — render_bioref/debug_link pointent donc vers la fiche Tropicos d'origine (champ name.link de l'API, toujours présent en pratique) plutôt que vers checklistbank.org."
+        last_updated: "2026-10-05"
+        notes: "Le site bryonames.org lui-même est derrière un challenge JS Cloudflare (bloqué même en navigateur automatisé réel, testé en direct) ; les données sont cependant distribuées sans restriction via ChecklistBank, qui sert le module à la place. La page web publique du dataset sur checklistbank.org est elle aussi derrière un contrôle anti-bot (403 même en navigateur automatisé) — render_bioref/debug_link pointent vers la page du nomenclateur (https://www.bryonames.org/nomenclator?group=<nom scientifique>, URL-encodé), plutôt que vers checklistbank.org ou la fiche Tropicos d'origine (name.link). Vérifié en direct (2026-10-05) pour une famille (Blasiaceae) et un genre (Blasia, Sphagnum) ; une espèce (Blasia pusilla) n'a pu être vérifiée, le défi Cloudflare bloquant l'accès automatisé — le lien d'une espèce est donc non garanti."
       - id: wfo
         name: "World Flora Online (WFO)"
         url: "https://www.worldfloraonline.org"
