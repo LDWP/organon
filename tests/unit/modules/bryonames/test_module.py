@@ -87,10 +87,10 @@ async def test_bryonames_enrichment_only_accepted_species():
 
     bioref = module.render_bioref(result)
     assert bioref == (
-        "{{Lien web | langue=en | titre=''Sphagnum palustre'' L. | "
-        "url=https://www.bryonames.org/nomenclator?group=Sphagnum%20palustre | site=Bryonames | consulté le="
+        "{{Bryonames | Sphagnum palustre | ''Sphagnum palustre'' L. | consulté le="
         + bioref.rsplit("=", 1)[1]
     )
+    assert bioref.endswith(" }}")
     assert module.debug_link(result) == (
         "<a href='https://www.bryonames.org/nomenclator?group=Sphagnum%20palustre' "
         "target='_blank' rel='noopener noreferrer'>Bryonames</a>"
@@ -123,7 +123,7 @@ async def test_bryonames_link_family_uses_nomenclator_not_tropicos():
 
     assert result is not None
     url = "https://www.bryonames.org/nomenclator?group=Blasiaceae"
-    assert f"url={url} " in module.render_bioref(result)
+    assert module.render_bioref(result).startswith("{{Bryonames | Blasiaceae | ")
     assert f"<a href='{url}'" in module.debug_link(result)
     assert "tropicos" not in module.render_bioref(result)
 
@@ -214,7 +214,8 @@ async def test_bryonames_synonym_marked_without_following():
     assert data["synonym"] is True
 
     bioref = module.render_bioref(result)
-    assert bioref.endswith("<small>(non valide)</small>")
+    assert bioref.startswith("{{Bryonames | Isocladus | ''Isocladus'' Lindb. | consulté le=")
+    assert bioref.endswith(" | nv=1 }}")
 
 
 @pytest.mark.asyncio

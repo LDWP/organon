@@ -2,8 +2,10 @@
 
 from urllib.parse import quote
 
-from organon.core.models import LinkEntry
+from organon.core.models import LinkEntry, Struct
 from organon.core.registry import ModuleMeta, register_module
+from organon.core.rendering.grammar import wp_apply_italics
+from organon.core.rendering.support import retrieval_dates
 from organon.modules.checklistbank import ChecklistBankModule
 
 
@@ -27,6 +29,22 @@ class BryonamesModule(ChecklistBankModule):
         # genera; species pages are behind a Cloudflare challenge that
         # blocks automated checks, so they are unverified.
         return f"https://www.bryonames.org/nomenclator?group={quote(data['name'])}"
+
+    def render_bioref(self, struct: Struct) -> str | None:
+        """Render the {{Bryonames}} template."""
+        data = struct.links.get(self.meta.id)
+        if not data or "id" not in data:
+            return None
+        display = wp_apply_italics(
+            data["name"], data.get("rank") or struct.taxon.rank, struct.kingdom
+        )
+        if author := data.get("author"):
+            display += " " + author
+        suffix = " | nv=1" if data.get("synonym") else ""
+        return (
+            f"{{{{Bryonames | {data['name']} | {display} "
+            f"| consulté le={retrieval_dates()}{suffix} }}}}"
+        )
 
 
 register_module(BryonamesModule)
