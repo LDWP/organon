@@ -3,13 +3,27 @@
 from __future__ import annotations
 
 import asyncio
+import ssl
 import time
 from collections.abc import Awaitable, Callable
+from pathlib import Path
 from typing import Any, Self
 
+import certifi
 import httpx
 
 USER_AGENT = "Organon/0.1 (https://fr.wikipedia.org/wiki/Projet:Biologie/Organon)"
+
+
+def ssl_context_with(extra_ca_file: Path) -> ssl.SSLContext:
+    """Return a verifying context: certifi roots plus `extra_ca_file`.
+
+    For a server omitting its intermediate certificate, which curl
+    completes through AIA and OpenSSL does not. Verification stays on.
+    """
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    ctx.load_verify_locations(cafile=extra_ca_file)
+    return ctx
 
 
 _Throttle = Callable[[], Awaitable[None]]
@@ -39,6 +53,7 @@ class OwnedClientMixin:
         timeout: float = 10.0,
         headers: dict[str, str] | None = None,
         follow_redirects: bool = False,
+        verify: ssl.SSLContext | None = None,
         throttle: _Throttle | None = None,
     ) -> None:
         """Use `client` if given, else create one."""
@@ -46,6 +61,7 @@ class OwnedClientMixin:
             timeout=timeout,
             headers={"User-Agent": USER_AGENT, **(headers or {})},
             follow_redirects=follow_redirects,
+            verify=verify if verify is not None else True,
             event_hooks={"request": [_wait_hook(throttle)]} if throttle else None,
         )
         self._owns_client = client is None

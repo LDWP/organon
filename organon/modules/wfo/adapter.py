@@ -19,7 +19,17 @@ rank; see `organon.modules.wfo.ranks`), with each ancestor's exact rank
 
 from __future__ import annotations
 
-from organon.core.http import OwnedClientMixin
+from pathlib import Path
+from typing import Any
+
+from organon.core.http import OwnedClientMixin, ssl_context_with
+
+# The server sends only its leaf, not the public intermediate "GeoTrust
+# TLS RSA CA G1" (root: DigiCert Global Root G2): certifi alone fails
+# with "unable to get local issuer certificate".
+_GEOTRUST_INTERMEDIATE = (
+    Path(__file__).resolve().parents[2] / "core" / "data" / "geotrust_tls_rsa_ca_g1.pem"
+)
 
 GRAPHQL_URL = "https://list.worldfloraonline.org/gql.php"
 
@@ -52,6 +62,11 @@ SEARCH_LIMIT = 50
 
 class WfoAdapter(OwnedClientMixin):
     """Raw WFO GraphQL client."""
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        """Trust the missing intermediate, for this client only."""
+        kwargs.setdefault("verify", ssl_context_with(_GEOTRUST_INTERMEDIATE))
+        super().__init__(*args, **kwargs)
 
     async def _graphql(self, query: str, variables: dict) -> dict | None:
         """Run a GraphQL query; return its data, or None on error."""
