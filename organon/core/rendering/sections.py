@@ -17,6 +17,7 @@ from organon.core.rendering.grammar import (
     link_for_author,
     link_for_basionym,
     link_for_synonym,
+    load_rank_table,
     wp_agree_adjective,
     wp_apply_italics,
     wp_definite_rank,
@@ -25,6 +26,7 @@ from organon.core.rendering.grammar import (
     wp_is_infraspecific,
     wp_is_more_specific_rank,
     wp_is_species_or_below,
+    wp_is_valid_rank,
     wp_rank_name,
 )
 from organon.core.rendering.support import (
@@ -329,6 +331,27 @@ def render_subtaxon_line(
     return f"* {target}{author}\n"
 
 
+def _lower_taxa_intro(struct: Struct, module_source: str | None, cdate: str, rank_text: str) -> str:
+    """Return the sentence introducing the sub-taxa bullets.
+
+    Above genus (subgenus excluded), a full sentence naming the taxon;
+    otherwise just the source clause.
+    """
+    rank = struct.taxon.rank
+    bioref = f"Selon {{{{Bioref|{module_source}|{cdate}}}}}"
+    if not wp_is_valid_rank(rank) or not wp_is_more_specific_rank("genre", rank):
+        return f"{bioref} :\n"
+
+    ranks = compute_rank_names(struct.subtaxa.items) if struct.subtaxa else {}
+    table = load_rank_table()
+    feminine = bool(ranks) and all(table.ranks[r].gender == "feminine" for r in ranks)
+    article = wp_definite_rank(rank)
+    name = wp_rank_name(rank, link=False, capitalize=False, plural=False)
+    taxon = wp_apply_italics(struct.taxon.name, rank, struct.kingdom)
+    following = "suivantes" if feminine else "suivants"
+    return f"{bioref}, {article}{name} des {taxon} comprend les {rank_text} {following} :\n"
+
+
 def render_lower_taxa(struct: Struct, options: GenerateOptions) -> str:
     """Render the sub-taxa section."""
     cdate = retrieval_dates()
@@ -341,7 +364,8 @@ def render_lower_taxa(struct: Struct, options: GenerateOptions) -> str:
     rank_text, _, default_rank = compute_rank_text(subtaxa.items)
     module_source = subtaxa.source
 
-    ret = f"\n== Liste des {rank_text} ==\nSelon {{{{Bioref|{module_source}|{cdate}}}}} :\n"
+    intro = _lower_taxa_intro(struct, module_source, cdate, rank_text)
+    ret = f"\n== Liste des {rank_text} ==\n{intro}"
 
     ret0 = ""
     for subtaxon in sorted(subtaxa.items, key=lambda s: s.name):

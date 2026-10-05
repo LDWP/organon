@@ -86,7 +86,7 @@ ranks:
   sous-tribu:
     gender: feminine
     page: Tribu (biologie)
-    plural: Sous-tribus
+    plural: sous-tribus
     below_species: false
   tribu:
     gender: feminine
@@ -95,7 +95,7 @@ ranks:
   super-tribu:
     gender: feminine
     page: Tribu (biologie)
-    plural: super-tribu
+    plural: super-tribus
     below_species: false
   infra-tribu:
     gender: feminine
