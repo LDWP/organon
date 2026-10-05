@@ -3,7 +3,7 @@ répartition, bloc « voir aussi », code Taxobox)."""
 
 from __future__ import annotations
 
-from organon.api.routes.generate import _assemble_response
+from organon.api.routes.generate import _assemble_response, _select_main_author
 from organon.api.schemas import GenerateRequest
 from organon.core.models import DistributionEntry, RankName, Struct, SubTaxonList, TaxonInfo
 from organon.core.rendering.engine import sections
@@ -11,7 +11,8 @@ from organon.core.rendering.engine import sections
 
 def _assemble(struct):
     req = GenerateRequest(taxon="Panthera leo")
-    return _assemble_response(req, req, "col", struct, [], [], [], 0.0)
+    candidates = _select_main_author(struct, req, "col")
+    return _assemble_response(req, req, "col", struct, [], [], [], 0.0, candidates)
 
 
 def _struct(**kw):

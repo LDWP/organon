@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from organon.api.routes.generate import _assemble_response
+from organon.api.routes.generate import _assemble_response, _select_main_author
 from organon.api.schemas import GenerateRequest
 from organon.core.config import GenerateOptions
 from organon.core.models import (
@@ -283,6 +283,7 @@ def test_wikitext_snapshot(case):
 def test_api_response_snapshot(case):
     struct, classification_id = CASES[case]()
     req = GenerateRequest(taxon=struct.taxon.name)
+    candidates = _select_main_author(struct, GenerateOptions(), classification_id)
     response = _assemble_response(
         req,
         GenerateOptions(),
@@ -292,6 +293,7 @@ def test_api_response_snapshot(case):
         [],
         [],
         0.0,
+        candidates,
     )
     data = response.model_dump(mode="json")
     data["elapsed_seconds"] = 0

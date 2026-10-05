@@ -5,7 +5,7 @@ Les clés sont en anglais ; seules les valeurs (rangs, règnes, libellés) reste
 
 from __future__ import annotations
 
-from organon.api.routes.generate import _assemble_response
+from organon.api.routes.generate import _assemble_response, _select_main_author
 from organon.api.schemas import GenerateRequest
 from organon.core.db_inventory import load_db_inventory
 from organon.core.models import (
@@ -87,7 +87,8 @@ RESPONSE_FIELDS = {
 
 def _assemble(struct):
     req = GenerateRequest(taxon="Panthera leo")
-    return _assemble_response(req, req, "col", struct, [], [], [], 0.0)
+    candidates = _select_main_author(struct, req, "col")
+    return _assemble_response(req, req, "col", struct, [], [], [], 0.0, candidates)
 
 
 def test_request_field_names():

@@ -9,6 +9,7 @@ here; synonym, basionym and sub-taxon authors use `format_author`.
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from functools import lru_cache
 from pathlib import Path
 
@@ -16,10 +17,12 @@ import yaml
 
 from organon.core.models import Struct
 from organon.core.rendering.support import is_similar
+from organon.core.wikidata_authors import normalize_abbreviation
 
 __all__ = [
     "BOTANIST_KINGDOMS",
     "resolve_main_author",
+    "unknown_botanist_tokens",
 ]
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -138,13 +141,33 @@ def _lookup_normalise(table: dict, token: str) -> dict | None:
     return None
 
 
-def _resolve_botanist(token: str) -> tuple[str | None, dict | None]:
+def _resolve_botanist(token: str, wikidata: Mapping[str, str]) -> tuple[str | None, dict | None]:
     entry = _lookup_normalise(_load_botanists(), token)
     if entry is None:
-        return None, None
+        qid = wikidata.get(normalize_abbreviation(token))
+        if qid is None:
+            return None, None
+        return f"{{{{Lien|langue=d|trad={qid}|texte={token}|lienfr=non}}}}", None
     if entry.get("conflit"):
         return None, entry
     return f"[[{entry['cible']}|{token}]]", None
+
+
+def unknown_botanist_tokens(struct: Struct) -> list[str]:
+    """Return the author tokens the botanist table cannot resolve.
+
+    Candidates for the Wikidata lookup; empty outside botanists.
+    """
+    if struct.kingdom not in BOTANIST_KINGDOMS:
+        return []
+    table = _load_botanists()
+    unknown = []
+    for kind, text in _tokenize((struct.taxon.author or "").strip()):
+        token = text.strip()
+        if kind == "cur" and token and not _YEAR_RE.match(token):
+            if _lookup_normalise(table, token) is None:
+                unknown.append(token)
+    return unknown
 
 
 def _resolve_prokaryote(token: str) -> str | None:
@@ -178,12 +201,16 @@ def _resolve_zoologist(token: str, year: int | None) -> tuple[str | None, list[d
     return None, candidates
 
 
-def resolve_main_author(struct: Struct) -> tuple[str, list[str]]:
+def resolve_main_author(
+    struct: Struct, wikidata: Mapping[str, str] | None = None
+) -> tuple[str, list[str]]:
     """Return `(wikified text, warnings)` for the main author.
 
     Warnings list botanist conflicts and zoologist homonyms, for the
-    caller to add to the API response.
+    caller to add to the API response. `wikidata` maps normalized
+    abbreviations to QIDs for botanists missing from the table.
     """
+    wikidata = wikidata or {}
     author = (struct.taxon.author or "").strip()
     if not author:
         return "", []
@@ -216,7 +243,7 @@ def resolve_main_author(struct: Struct) -> tuple[str, list[str]]:
 
         resolved: str | None = None
         if kingdom in BOTANIST_KINGDOMS:
-            resolved, conflict = _resolve_botanist(stripped)
+            resolved, conflict = _resolve_botanist(stripped, wikidata)
             if conflict is not None:
                 warnings.append(
                     f"Auteur « {stripped} » : désaccord entre la liste Wikipédia "

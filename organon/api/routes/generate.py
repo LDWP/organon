@@ -25,7 +25,7 @@ import json
 import logging
 import time
 from collections import Counter
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Mapping
 from dataclasses import dataclass
 from typing import Literal
 
@@ -60,7 +60,7 @@ from organon.core.registry import (
     module_domain_trees,
     module_priorities,
 )
-from organon.core.rendering.authors import resolve_main_author
+from organon.core.rendering.authors import resolve_main_author, unknown_botanist_tokens
 from organon.core.rendering.engine import (
     render,
     render_references_items_block,
@@ -77,6 +77,7 @@ from organon.core.selectors.coherence import (
     gbif_probable_year_validated,
     reference_module_is_consistent,
 )
+from organon.core.wikidata_authors import lookup_author_qids
 
 router = APIRouter()
 
@@ -544,6 +545,8 @@ async def _generation_pipeline(
             duration_seconds=module_event.duration_seconds,
         )
 
+    author_candidates = _select_main_author(runner.struct, options, classification_id)
+    wikidata_authors = await lookup_author_qids(unknown_botanist_tokens(runner.struct))
     yield ResultEvent(
         data=_assemble_response(
             req,
@@ -554,6 +557,8 @@ async def _generation_pipeline(
             warnings,
             logs,
             started,
+            author_candidates,
+            wikidata_authors,
         )
     )
 
@@ -689,28 +694,14 @@ def _extinct_fallback(struct: Struct) -> None:
         struct.taxon.extinct = True
 
 
-def _assemble_response(
-    req: GenerateRequest,
-    options: GenerateOptions,
-    classification_id: str,
-    struct: Struct,
-    ran_modules: list[str],
-    warnings: list[str],
-    logs: list[str],
-    started: float,
-) -> GenerateResponse:
-    """Run the final steps shared by both endpoints.
+def _select_main_author(
+    struct: Struct, options: GenerateOptions, classification_id: str
+) -> dict[str, str]:
+    """Set the retained author on `struct`; return the candidates.
 
-    Kingdom inconsistencies, categories and portals, main author,
-    wikitext, external links and response. Local computation only, no
-    network call.
+    Not idempotent (the classification author is one of the candidates):
+    call once, before `_assemble_response`.
     """
-    _extinct_fallback(struct)
-    kingdom_inconsistencies = detect_kingdom_inconsistencies(struct, classification_id)
-    rank_inconsistencies = detect_rank_inconsistencies(struct, classification_id)
-
-    struct.links[FOOTER_LINK] = compute_footer_links(struct, options)
-
     author_candidates = _author_candidates(struct, classification_id)
     if options.author_source and options.author_source in author_candidates:
         struct.taxon.author = author_candidates[options.author_source]
@@ -722,7 +713,35 @@ def _assemble_response(
     gbif_validated_year = gbif_probable_year_validated(struct, struct.taxon.author)
     if gbif_validated_year is not None:
         struct.taxon.author = f"{struct.taxon.author}, {gbif_validated_year}"
-    struct.taxon.resolved_author, author_warnings = resolve_main_author(struct)
+    return author_candidates
+
+
+def _assemble_response(
+    req: GenerateRequest,
+    options: GenerateOptions,
+    classification_id: str,
+    struct: Struct,
+    ran_modules: list[str],
+    warnings: list[str],
+    logs: list[str],
+    started: float,
+    author_candidates: dict[str, str],
+    wikidata_authors: Mapping[str, str] | None = None,
+) -> GenerateResponse:
+    """Run the final steps shared by both endpoints.
+
+    Kingdom inconsistencies, categories and portals, main author
+    wikification, wikitext, external links and response. Local
+    computation only, no network call: the author is already selected
+    (`_select_main_author`) and Wikidata already queried.
+    """
+    _extinct_fallback(struct)
+    kingdom_inconsistencies = detect_kingdom_inconsistencies(struct, classification_id)
+    rank_inconsistencies = detect_rank_inconsistencies(struct, classification_id)
+
+    struct.links[FOOTER_LINK] = compute_footer_links(struct, options)
+
+    struct.taxon.resolved_author, author_warnings = resolve_main_author(struct, wikidata_authors)
     warnings = warnings + author_warnings
 
     wikitext = render(struct, options, ext_only=req.external_only)
