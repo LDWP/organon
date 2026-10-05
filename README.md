@@ -10,16 +10,35 @@ EOL, NCBI, …).
   catégorisation, données de grammaire/rangs. Indépendant de toute interface.
 - `organon/modules/` — un adaptateur par base de données tierce (`adapter.py` = appels HTTP + parsing
   du format d'échange, `module.py` = logique métier branchée sur le registre).
-- `organon/api/` — backend FastAPI exposant `/api/v1/generate`, `/api/v1/modules`,
-  `/api/v1/domains`, `/api/v1/version`, `/healthz`. Sert aussi le frontend buildé (`web-app/dist/`) en statique une fois `npm run build` exécuté — un seul process pour l'API et l'UI, contrainte du
-  déploiement Toolforge.
+- `organon/api/` — backend FastAPI, préfixe `/api/v1`. Sert aussi le frontend buildé (`web-app/dist/`) en statique une fois `npm run build` exécuté — un seul process pour l'API et l'UI, contrainte du déploiement Toolforge.
 - `web-app/` — frontend React (Vite), client HTTP de l'API ci-dessus. Voir `web-app/README.md` pour son propre développement local.
-- `organon/cli/` — client en ligne de commande. Simple client HTTP de l'API ci-dessus (en développement).
+
+## API
+
+Politique : toute route qui appelle un service tiers exige une session OAuth (cookie posé par
+`/auth/login`) et est limitée en débit par IP (voir `organon/api/rate_limit.py`). Les routes
+locales (catalogues, version, auth) sont libres.
+
+| Route | Rôle | Session |
+|---|---|---|
+| `POST /generate`, `GET /generate?taxon=` | génération complète d'un squelette | oui |
+| `POST /generate/stream` | idem en Server-Sent Events, un événement par module | oui |
+| `GET /search?q=` | recherche floue (nom scientifique, vernaculaire ou QID) | oui |
+| `POST /taxobox/refresh` | mise à jour de la taxobox par le compte bot | oui |
+| `GET /commons-images?taxon=` | suggestions d'images Commons | oui |
+| `POST /subtaxa-merge` | fusion des sous-taxons de plusieurs sources | oui |
+| `POST /update/diagnose`, `POST /update/export` | écarts Wikidata/sources, export QuickStatements | oui |
+| `GET /modules`, `/domains`, `/sources`, `/version` | catalogues et version | non |
+| `GET /auth/login`, `/auth/callback`, `/auth/me`, `POST /auth/logout` | flux OAuth Wikimedia | non |
+| `GET /healthz` (hors préfixe) | sonde de santé | non |
+
+Pas de CLI : la génération exige une session OAuth, qu'un client en ligne de commande ne peut pas
+obtenir, et l'ancienne CLI recopiait les options de `GenerateOptions` à la main.
 
 ## Développement
 
-Pour le frontend React (`web-app/`), voir son propre `README.md` — nécessite Node.js et
-`npm install` séparément.
+Backend : `pip install -e ".[dev]"`, puis `ORGANON_DEV=1 uvicorn organon.api.app:app --port 8123`
+(`ORGANON_DEV=1` simule une session, local uniquement). Frontend : voir `web-app/README.md`.
 
 ## Licence
 
