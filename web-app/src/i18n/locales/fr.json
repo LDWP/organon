@@ -1,0 +1,9 @@
+{
+  "language": {
+    "label": "Langue"
+  },
+  "sources": {
+    "available_one": "{count} source disponible",
+    "available_other": "{count} sources disponibles"
+  }
+}
