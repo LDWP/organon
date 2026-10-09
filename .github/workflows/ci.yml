@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: No CRLF in the working tree
+        run: "! git ls-files --eol | grep w/crlf"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install production requirements only
+        run: pip install -r requirements.txt
+      # Same dependency set as Toolforge: a transitive package missing here breaks the deploy.
+      - name: Production app imports
+        run: python -c "import organon.api.app"
+      - name: Dependency tree is consistent
+        run: pip check
+      - name: Install dev tools
+        run: pip install -e ".[dev]"
+      - run: ruff check organon
+      - run: mypy organon
+      - run: pytest
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web-app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web-app/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test:i18n
+      - run: npm run check:dist
+        continue-on-error: true
