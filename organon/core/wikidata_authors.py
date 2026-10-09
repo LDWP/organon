@@ -15,7 +15,7 @@ from collections.abc import Iterable
 
 import httpx
 
-from organon.core.http import USER_AGENT
+from organon.core.http import USER_AGENT, OwnedClientMixin
 
 __all__ = [
     "WIKIDATA_API",
@@ -54,30 +54,32 @@ async def lookup_author_qids(abbreviations: Iterable[str]) -> dict[str, str]:
     now = time.monotonic()
     missing = [k for k in keys if k not in _cache or _cache[k][0] <= now]
     if missing:
-        async with httpx.AsyncClient(
-            timeout=_TIMEOUT_SECONDS, headers={"User-Agent": USER_AGENT}
-        ) as client:
-            await asyncio.gather(*(_fetch(client, k) for k in missing))
+        async with _AuthorsClient() as client:
+            await asyncio.gather(*(client.fetch(k) for k in missing))
     return {k: qid for k in keys if (qid := _cache.get(k, (0.0, None))[1]) is not None}
 
 
-async def _fetch(client: httpx.AsyncClient, abbreviation: str) -> None:
-    try:
-        resp = await client.get(
-            WIKIDATA_API,
-            params={
-                "action": "query",
-                "list": "search",
-                "srsearch": f"haswbstatement:P428={abbreviation}",
-                "srlimit": "2",
-                "format": "json",
-                "formatversion": "2",
-            },
-        )
-        resp.raise_for_status()
-        hits = resp.json()["query"]["search"]
-    except (httpx.HTTPError, ValueError, KeyError) as exc:
-        logger.warning("Wikidata indisponible pour l'auteur « %s » : %s", abbreviation, exc)
-        return
-    qid = hits[0]["title"] if len(hits) == 1 else None
-    _cache[abbreviation] = (time.monotonic() + _TTL_SECONDS, qid)
+class _AuthorsClient(OwnedClientMixin):
+    def __init__(self) -> None:
+        super().__init__(timeout=_TIMEOUT_SECONDS, headers={"User-Agent": USER_AGENT})
+
+    async def fetch(self, abbreviation: str) -> None:
+        try:
+            resp = await self._client.get(
+                WIKIDATA_API,
+                params={
+                    "action": "query",
+                    "list": "search",
+                    "srsearch": f"haswbstatement:P428={abbreviation}",
+                    "srlimit": "2",
+                    "format": "json",
+                    "formatversion": "2",
+                },
+            )
+            resp.raise_for_status()
+            hits = resp.json()["query"]["search"]
+        except (httpx.HTTPError, ValueError, KeyError) as exc:
+            logger.warning("Wikidata indisponible pour l'auteur « %s » : %s", abbreviation, exc)
+            return
+        qid = hits[0]["title"] if len(hits) == 1 else None
+        _cache[abbreviation] = (time.monotonic() + _TTL_SECONDS, qid)

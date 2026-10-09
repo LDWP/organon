@@ -5,6 +5,7 @@ import pytest
 import respx
 
 from organon.core import wikidata_authors
+from organon.core.http import USER_AGENT, OwnedClientMixin
 from organon.core.wikidata_authors import WIKIDATA_API, lookup_author_qids, normalize_abbreviation
 
 
@@ -57,3 +58,19 @@ async def test_http_error_status_is_not_cached():
     assert await lookup_author_qids(["A.B."]) == {}
     assert await lookup_author_qids(["A.B."]) == {"A.B.": "Q1"}
     assert route.call_count == 2
+
+
+@respx.mock
+async def test_client_is_built_by_owned_client_mixin(monkeypatch):
+    seen: list[dict] = []
+    original = OwnedClientMixin.__init__
+
+    def spy(self, *args, **kwargs):
+        seen.append(kwargs)
+        original(self, *args, **kwargs)
+
+    monkeypatch.setattr(OwnedClientMixin, "__init__", spy)
+    route = respx.get(WIKIDATA_API).mock(return_value=_hits("Q1"))
+    await lookup_author_qids(["A.B."])
+    assert seen == [{"timeout": 5.0, "headers": {"User-Agent": USER_AGENT}}]
+    assert route.calls.last.request.headers["User-Agent"] == USER_AGENT
