@@ -10,6 +10,7 @@ from organon.modules.checklistbank import ChecklistBankAdapter
 
 from organon.core.config import GenerateOptions
 from organon.core.models import Struct, TaxonInfo
+from organon.modules.fishbase import module as fishbase_module
 from organon.modules.fishbase.module import FishbaseModule
 
 SEARCH_URL = "https://api.checklistbank.org/dataset/1010/nameusage/search"
@@ -18,6 +19,30 @@ SALMO_ID = "urn:lsid:marinespecies.org:taxname:126141"
 SALAR_LINK = "https://www.marinespecies.org/aphia.php?p=taxdetails&id=127186"
 CHILDREN_URL = f"https://api.checklistbank.org/dataset/1010/tree/{SALAR_ID}/children"
 SYNONYMS_URL = f"https://api.checklistbank.org/dataset/1010/taxon/{SALAR_ID}/synonyms"
+
+SALAR_PAGE_URL = f"https://www.checklistbank.org/dataset/1010/taxon/{SALAR_ID}"
+
+
+class _Site:
+    """FishBase site stub: codes by name, `fail` simulates an unreachable site."""
+
+    def __init__(self, species=None, families=None, fail=False):
+        self._species, self._families, self._fail = species or {}, families or {}, fail
+
+    async def species_code(self, name):
+        if self._fail:
+            raise httpx.ConnectError("down")
+        return self._species.get(name)
+
+    async def family_code(self, name):
+        return self._families.get(name)
+
+
+@pytest.fixture(autouse=True)
+def _no_fishbase_site(monkeypatch):
+    """Tests reach the FishBase site only through an explicit `site=` stub."""
+    monkeypatch.setattr(fishbase_module, "FishbaseSiteAdapter", _Site)
+
 
 _ACCEPTED_PAYLOAD = {
     "result": [
@@ -82,22 +107,64 @@ async def test_fishbase_enrichment_only_accepted_species():
     assert data["name"] == "Salmo salar"
     assert data["author"] == "Linnaeus, 1758"
     assert data["rank"] == "espèce"
-    assert data["link"] == SALAR_LINK
     assert "synonyme" not in data
     # Enrichissement seul : pas d'effet sur la classification.
     assert result.classification == ""
     assert result.ranks == []
 
-    # Espèce : pas de code FishBase numérique côté ChecklistBank (bascule Aphia/WoRMS), repli
-    # sur {{Lien web}} vers la fiche WoRMS d'origine plutôt que {{FishBase espèce}}.
+    # Code FishBase introuvable : repli sur la fiche ChecklistBank, jamais sur l'URL WoRMS.
+    assert "code" not in data
     bioref = module.render_bioref(result)
     assert bioref == (
         "{{Lien web | langue=en | titre=''Salmo salar'' Linnaeus, 1758 | "
-        f"url={SALAR_LINK} | site=FishBase | consulté le=" + bioref.rsplit("=", 1)[1]
+        f"url={SALAR_PAGE_URL} | site=FishBase | consulté le=" + bioref.rsplit("=", 1)[1]
     )
-    assert module.debug_link(result) == (
-        f"<a href='{SALAR_LINK}' target='_blank' rel='noopener noreferrer'>FishBase</a>"
-    )
+    assert "aphia.php" not in bioref
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("rank", "name", "expected"),
+    [
+        ("espèce", "Salmo salar", "{{FishBase espèce | 236 | ''Salmo salar'' Linnaeus, 1758 | consulté le="),
+        ("famille", "Salmonidae", "{{FishBase famille | 302 | Salmonidae | consulté le="),
+    ],
+)
+async def test_fishbase_renders_template_when_code_known(rank, name, expected):
+    module = FishbaseModule(site=_Site(species={"Salmo salar": "236"}, families={"Salmonidae": "302"}))
+    struct = Struct(taxon=TaxonInfo(name=name, rank=rank), kingdom="animal")
+    struct.links["fishbase"] = {
+        "id": SALAR_ID,
+        "name": name,
+        "rank": rank,
+        "author": "Linnaeus, 1758" if rank == "espèce" else None,
+        "detected_status": "accepté",
+    }
+    await module._add_code(struct.links["fishbase"])
+    assert module.render_bioref(struct).startswith(expected)
+
+
+@pytest.mark.asyncio
+async def test_fishbase_collect_adds_species_code():
+    with respx.mock(assert_all_called=False) as router:
+        router.get(SEARCH_URL, params={"q": "Salmo salar"}).respond(200, json=_ACCEPTED_PAYLOAD)
+        module = FishbaseModule(
+            adapter=ChecklistBankAdapter("1010"), site=_Site(species={"Salmo salar": "236"})
+        )
+        struct = Struct(taxon=TaxonInfo(name="Salmo salar", rank="espèce"), kingdom="animal")
+        result = await module.collect(struct, is_classification=False, options=GenerateOptions())
+    assert result.links["fishbase"]["code"] == "236"
+
+
+@pytest.mark.asyncio
+async def test_fishbase_site_unreachable_keeps_fallback():
+    with respx.mock(assert_all_called=False) as router:
+        router.get(SEARCH_URL, params={"q": "Salmo salar"}).respond(200, json=_ACCEPTED_PAYLOAD)
+        module = FishbaseModule(adapter=ChecklistBankAdapter("1010"), site=_Site(fail=True))
+        struct = Struct(taxon=TaxonInfo(name="Salmo salar", rank="espèce"), kingdom="animal")
+        result = await module.collect(struct, is_classification=False, options=GenerateOptions())
+    assert "code" not in result.links["fishbase"]
+    assert "{{Lien web" in module.render_bioref(result)
 
 
 @pytest.mark.asyncio

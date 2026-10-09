@@ -94,6 +94,7 @@ class LinkEntry(_LinkDict, total=False):
     url: str | None
     link: str | None
     key: int
+    code: str
     inpn_id: str | int
     col_xr: ColXrLink
     probable_year: int

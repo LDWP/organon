@@ -753,10 +753,10 @@ categories:
         url: "https://www.fishbase.org"
         status: disponible
         classification: {can_classify: true, estimated: false, detail: "classification des poissons — domaine 'poisson', sous-domaine réel de l'arbre Organon"}
-        harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant]
-        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 1010, alias « WoRMS FishBase »), même plateforme et même schéma que le module col/bryonames. Depuis le 2025-05-01 l'export est généré depuis la plateforme Aphia/VLIZ : identifiants LSID WoRMS, plus de code numérique natif FishBase (SpecCode/FamCode)"}
+        harvested_items: [auteur, rang, "chaîne de classification", "sous-taxons", synonymes, éteint, identifiant, "code FishBase (espèce, famille)"]
+        access: {type: api_rest, detail: "API REST/JSON ChecklistBank (api.checklistbank.org, dataset 1010, alias « WoRMS FishBase »), même plateforme et même schéma que le module col/bryonames. Depuis le 2025-05-01 l'export est généré depuis la plateforme Aphia/VLIZ : identifiants LSID WoRMS, plus de code numérique natif FishBase (SpecCode/FamCode), récupéré en complément sur la page fishbase.se"}
         last_updated: "2026-09-11"
-        notes: "Remplace la piste rfishbase (données figées 2021, jamais utilisée en pratique) par le mirror ChecklistBank, activement resynchronisé. La bascule Aphia/WoRMS de la source prive le module du code FishBase numérique exigé par {{FishBase espèce}}/{{FishBase famille}} (vérifié en direct dans le code des modèles, aucun mode de repli par nom) : ces deux rangs utilisent {{Lien web}} vers la fiche WoRMS d'origine plutôt que le modèle FishBase dédié. {{FishBase genre}}/{{FishBase ordre}}, qui n'exigent qu'un nom, sont en revanche utilisés tels quels."
+        notes: "Remplace la piste rfishbase (données figées 2021, jamais utilisée en pratique) par le mirror ChecklistBank, activement resynchronisé. La bascule Aphia/WoRMS prive l'export du code FishBase numérique exigé par {{FishBase espèce}}/{{FishBase famille}} : ce code (SpecCode/FamCode) est lu sur la page publique fishbase.se (espèce par nom, famille par nom), requête honnête avec le User-Agent Organon (fishbase.org répond 403). Sans code (page inconnue, site injoignable, synonyme), {{Lien web}} vers la fiche ChecklistBank. {{FishBase genre}}/{{FishBase ordre}} n'exigent qu'un nom et sont utilisés tels quels."
       - id: mussel_project
         name: "The MUSSEL project"
         url: null
