@@ -331,7 +331,9 @@ def render_subtaxon_line(
     return f"* {target}{author}\n"
 
 
-def _lower_taxa_intro(struct: Struct, module_source: str | None, cdate: str, rank_text: str) -> str:
+def _lower_taxa_intro(
+    struct: Struct, module_source: str | None, cdate: str, rank_text: str
+) -> str:
     """Return the sentence introducing the sub-taxa bullets.
 
     Above genus (subgenus excluded), a full sentence naming the taxon;
