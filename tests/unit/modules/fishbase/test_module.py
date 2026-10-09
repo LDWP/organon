@@ -20,9 +20,6 @@ SALAR_LINK = "https://www.marinespecies.org/aphia.php?p=taxdetails&id=127186"
 CHILDREN_URL = f"https://api.checklistbank.org/dataset/1010/tree/{SALAR_ID}/children"
 SYNONYMS_URL = f"https://api.checklistbank.org/dataset/1010/taxon/{SALAR_ID}/synonyms"
 
-SALAR_PAGE_URL = f"https://www.checklistbank.org/dataset/1010/taxon/{SALAR_ID}"
-
-
 class _Site:
     """FishBase site stub: codes by name, `fail` simulates an unreachable site."""
 
@@ -112,14 +109,9 @@ async def test_fishbase_enrichment_only_accepted_species():
     assert result.classification == ""
     assert result.ranks == []
 
-    # Code FishBase introuvable : repli sur la fiche ChecklistBank, jamais sur l'URL WoRMS.
+    # Code FishBase introuvable : pas de bioref (ni WoRMS ni ChecklistBank étiquetés FishBase).
     assert "code" not in data
-    bioref = module.render_bioref(result)
-    assert bioref == (
-        "{{Lien web | langue=en | titre=''Salmo salar'' Linnaeus, 1758 | "
-        f"url={SALAR_PAGE_URL} | site=FishBase | consulté le=" + bioref.rsplit("=", 1)[1]
-    )
-    assert "aphia.php" not in bioref
+    assert module.render_bioref(result) is None
 
 
 @pytest.mark.asyncio
@@ -164,7 +156,7 @@ async def test_fishbase_site_unreachable_keeps_fallback():
         struct = Struct(taxon=TaxonInfo(name="Salmo salar", rank="espèce"), kingdom="animal")
         result = await module.collect(struct, is_classification=False, options=GenerateOptions())
     assert "code" not in result.links["fishbase"]
-    assert "{{Lien web" in module.render_bioref(result)
+    assert module.render_bioref(result) is None
 
 
 @pytest.mark.asyncio
@@ -253,7 +245,8 @@ async def test_fishbase_synonym_marked_without_following():
     assert data["synonym"] is True
 
     bioref = module.render_bioref(result)
-    assert bioref.endswith("<small>(non valide)</small>")
+    # Espèce synonyme : pas de code FishBase lu, donc rien à citer.
+    assert bioref is None
 
 
 @pytest.mark.asyncio

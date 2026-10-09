@@ -62,7 +62,7 @@ class FishbaseModule(ChecklistBankModule):
             data["code"] = code
 
     def render_bioref(self, struct: Struct) -> str | None:
-        """Render a FishBase template, else a {{Lien web}}."""
+        """Render a FishBase template, or None if not citable."""
         data = struct.links.get(self.meta.id)
         if not data or "id" not in data:
             return None
@@ -80,7 +80,9 @@ class FishbaseModule(ChecklistBankModule):
                 label += f" {data['author']}"
             code = data["code"]
             return f"{{{{FishBase {rank} | {code} | {label} | consulté le={date} }}}}{suffix}"
-        return super().render_bioref(struct)
+        # No numeric code, no FishBase page to cite: the export's WoRMS
+        # pages are not FishBase sources.
+        return None
 
 
 register_module(FishbaseModule)
